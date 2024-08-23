@@ -55,11 +55,10 @@ La API estará disponible en `http://localhost:8000`
 
 Si deseas contribuir al proyecto, por favor sigue las siguientes pautas:
 
-1. Haz un fork del proyecto.
-2. Crea una nueva rama (`git checkout -b feature/nueva-caracteristica`).
-3. Realiza tus cambios y haz commit (`git commit -m 'Agrega nueva característica'`).
-4. Empuja tu rama (`git push origin feature/nueva-caracteristica`).
-5. Abre un Pull Request.
+1. Crea una nueva rama (`git checkout -b feature/nueva-caracteristica`).
+2. Realiza tus cambios y haz commit (`git commit -m 'Agrega nueva característica'`).
+3. Empuja tu rama (`git push origin feature/nueva-caracteristica`).
+4. Abre un Pull Request.
 
 ## Licencia
 
