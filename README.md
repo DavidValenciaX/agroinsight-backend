@@ -6,8 +6,9 @@ Este documento muestra cómo configurar el proyecto inicialmente.
 
 ## Requisitos
 
-- Python 3.9+
-- Poetry
+- Python 3.12+
+- Git
+- VSCode
 - Docker
 
 ## Instalación
@@ -17,6 +18,12 @@ Este documento muestra cómo configurar el proyecto inicialmente.
 ```bash
 https://github.com/DavidValenciaX/agroinsight-backend
 cd agroinsight-backend
+```
+
+### Instala el gestor de dependencias de Poetry
+
+```bash
+pip install  Poetry
 ```
 
 ### Instala las dependencias con Poetry
