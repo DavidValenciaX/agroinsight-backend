@@ -1,4 +1,4 @@
-#app/infrastructure/db/conexion.py
+#app/infrastructure/db/connection.py
 import pymysql
 pymysql.install_as_MySQLdb()
 

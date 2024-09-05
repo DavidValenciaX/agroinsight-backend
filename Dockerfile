@@ -6,8 +6,8 @@ ARG MYSQL_PUBLIC_URL
 ARG SECRET_KEY
 
 # Establece las variables de entorno usando los ARGs, con valores por defecto
-ENV MYSQL_PUBLIC_URL=${MYSQL_PUBLIC_URL:-mysql://root:uykYedlFvprkpNRaLiFEHYXJHxDnTsMN@autorack.proxy.rlwy.net:15690/railway}
-ENV SECRET_KEY=${SECRET_KEY:-AgroInsight2024!}
+ENV MYSQL_PUBLIC_URL=$MYSQL_PUBLIC_URL
+ENV SECRET_KEY=$SECRET_KEY
 
 WORKDIR /code
 
