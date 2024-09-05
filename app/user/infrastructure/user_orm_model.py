@@ -1,7 +1,6 @@
 #app/user/infrastructure/user_orm_model
 from sqlalchemy import Column, Integer, String, DateTime, event
 from sqlalchemy.orm import declarative_base
-from app.core.security.security_utils import hash_password
 
 Base = declarative_base()
 

@@ -69,20 +69,6 @@ AgroInsight es una aplicación innovadora diseñada para optimizar el cultivo de
    poetry run uvicorn app.main:app --reload
    ```
 
-### Usando Docker
-
-1. Construir la imagen:
-
-   ```bash
-   docker build -t agroinsight-backend .
-   ```
-
-2. Ejecutar el contenedor:
-
-   ```bash
-   docker run -p 8000:8000 agroinsight-backend
-   ```
-
 La API estará disponible en `http://localhost:8000`.
 
 ## Estructura del Proyecto
