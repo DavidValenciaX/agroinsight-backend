@@ -6,13 +6,8 @@ ARG MYSQL_PUBLIC_URL
 ARG SECRET_KEY
 
 # Establece las variables de entorno usando los ARGs, con valores por defecto
-ENV MYSQL_PUBLIC_URL=${MYSQL_PUBLIC_URL}
-ENV SECRET_KEY=${SECRET_KEY}
-
-# Instalación de dependencias del sistema (si es necesario)
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+ENV MYSQL_PUBLIC_URL=${MYSQL_PUBLIC_URL:-mysql://root:uykYedlFvprkpNRaLiFEHYXJHxDnTsMN@autorack.proxy.rlwy.net:15690/railway}
+ENV SECRET_KEY=${SECRET_KEY:-AgroInsight2024!}
 
 WORKDIR /code
 

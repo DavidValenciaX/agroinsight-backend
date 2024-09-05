@@ -13,8 +13,8 @@ load_dotenv()
 
 # Asegúrate de que DATABASE_URL esté en el formato correcto para PyMySQL
 DATABASE_URL = os.getenv('MYSQL_PUBLIC_URL')
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+if DATABASE_URL and DATABASE_URL.startswith('mysql://'):
+    DATABASE_URL = DATABASE_URL.replace('mysql://', 'mysql+pymysql://', 1)
 
 # Configuración de SQLAlchemy
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)

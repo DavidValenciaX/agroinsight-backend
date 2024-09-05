@@ -66,7 +66,7 @@ AgroInsight es una aplicación innovadora diseñada para optimizar el cultivo de
 2. Ejecutar el servidor de desarrollo:
 
    ```bash
-   uvicorn app.main:app --reload
+   poetry run uvicorn app.main:app --reload
    ```
 
 ### Usando Docker
