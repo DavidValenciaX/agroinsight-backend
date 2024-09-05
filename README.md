@@ -1,72 +1,145 @@
-# AgroInsight - Crecimiento sostenible del Maíz
 
-Este es un proyecto que tiene como objetivo desarrollar una aplicación con arquitectura cliente-servidor, con servidor en la nube de Coolify y cliente móvil en Android, para el análisis de suelos, la detección temprana del gusano cogollero en cultivos de maíz, la integración de datos meteorológicos de una API externa y la generación de reportes y recomendaciones basados en el análisis de los datos recolectados, a través de la inteligencia artificial.
+# AgroInsight - Backend
 
-Este documento muestra cómo configurar el proyecto inicialmente.
+## Descripción del Proyecto
 
-## Requisitos
+AgroInsight es una aplicación innovadora diseñada para optimizar el cultivo de maíz en la región del Huila, Colombia. Utiliza una arquitectura cliente-servidor, con el backend desplegado en la plataforma Railway y clientes móvil (Android) y web.
+
+### Características Principales
+
+- Análisis de suelos mediante procesamiento de imágenes
+- Detección temprana del gusano cogollero utilizando visión artificial
+- Integración de datos meteorológicos de OpenWeatherMap
+- Generación de reportes y recomendaciones personalizadas basadas en IA
+- Funcionalidad offline y sincronización de datos
+
+## Tecnologías Utilizadas
+
+- **Backend:** FastAPI 0.112.1, Python 3.12
+- **Base de Datos:** MySQL 8.0
+- **ORM:** SQLAlchemy 2.0.32
+- **Contenedorización:** Docker
+- **IA y Procesamiento de Imágenes:** TensorFlow 2.16.1, OpenCV 4.10.0
+- **Despliegue:** Railway
+
+## Requisitos del Sistema
 
 - Python 3.12+
-- Git
-- VSCode
 - Docker
+- Poetry 1.8.3+
+- Git
 
-## Instalación
+## Configuración del Entorno de Desarrollo
 
-### Clona este repositorio
+1. Clonar el repositorio:
+
+   ```bash
+   git clone https://github.com/DavidValenciaX/agroinsight-backend.git
+   cd agroinsight-backend
+   ```
+
+2. Instalar Poetry (si no está instalado):
+
+   ```bash
+   pip install poetry
+   ```
+
+3. Instalar dependencias del proyecto:
+
+   ```bash
+   poetry install
+   ```
+
+4. Configurar variables de entorno:
+   Copiar el archivo `.env.example` a `.env` y configurar las variables necesarias.
+
+## Ejecución del Proyecto
+
+### Desarrollo Local
+
+1. Activar el entorno virtual:
+
+   ```bash
+   poetry shell
+   ```
+
+2. Ejecutar el servidor de desarrollo:
+
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+### Usando Docker
+
+1. Construir la imagen:
+
+   ```bash
+   docker build -t agroinsight-backend .
+   ```
+
+2. Ejecutar el contenedor:
+
+   ```bash
+   docker run -p 8000:8000 agroinsight-backend
+   ```
+
+La API estará disponible en `http://localhost:8000`.
+
+## Estructura del Proyecto
 
 ```bash
-https://github.com/DavidValenciaX/agroinsight-backend
-cd agroinsight-backend
+agroinsight-backend/
+├── .github/                    # Configuraciones de GitHub
+├── app/                        # Código fuente de la aplicación
+│   ├── main.py                 # Punto de entrada de la aplicación
+│   └── __init__.py
+├── .dockerignore
+├── .env                        # Variables de entorno (no incluir en el repositorio)
+├── .gitignore
+├── Dockerfile                  # Configuración para la construcción de la imagen Docker
+├── LICENSE                     # Licencia del proyecto (MIT)
+├── pyproject.toml              # Configuración de Poetry y dependencias
+├── README.md                   # Este archivo
 ```
 
-### Instala el gestor de dependencias de Poetry
+## Flujo de Trabajo de Desarrollo
+
+1. Crear una nueva rama para cada característica o corrección (`git checkout -b feature/new_feature`)
+2. Desarrollar y probar los cambios localmente.
+3. Asegurar que el código pase todas las pruebas y linters.
+4. Realice un commit siguiendo el estandar de conventional commits (`git commit -m 'feat: Add some new_feature'`).
+5. Realice push a la rama de la nueva feature (`git push origin feature/new_feature`).
+6. Crear un Pull Request siguiendo la plantilla proporcionada.
+7. Esperar la revisión y aprobación antes de fusionar.
+
+## Despliegue
+
+El despliegue se realiza automáticamente en Railway al fusionar cambios en la rama `main`.
+
+## Pruebas
+
+Ejecutar las pruebas unitarias:
 
 ```bash
-pip install  Poetry
+poetry run pytest
 ```
-
-### Instala las dependencias con Poetry
-
-```bash
-poetry install
-```
-
-## Uso
-
-### Desarrollo
-
-Para desarrollar y ejecutar la aplicación localmente:
-
-```bash
-poetry run uvicorn app.main:app --reload
-```
-
-### Despliegue
-
-Construye la imagen de Docker:
-
-```bash
-docker build -t agroinsight-backend .
-```
-
-Ejecuta el contenedor de Docker:
-
-```bash
-docker run -p 8000:8000 agroinsight-backend
-```
-
-La API estará disponible en `http://localhost:8000`
 
 ## Contribución
 
-Si deseas contribuir al proyecto, por favor sigue las siguientes pautas:
+Las contribuciones son bienvenidas. Por favor, siga estas pautas:
 
-1. Crea una nueva rama (`git checkout -b feature/nueva-caracteristica`).
-2. Realiza tus cambios y haz commit (`git commit -m 'Agrega nueva característica'`).
-3. Empuja tu rama (`git push origin feature/nueva-caracteristica`).
-4. Abre un Pull Request.
+1. Bifurque el repositorio.
+2. Cree una rama para su característica (`git checkout -b feature/amazing_feature`).
+3. Realice sus cambios y haga commit (`git commit -m 'feat: Add some amazing_feature'`).
+4. Empuje a la rama (`git push origin feature/amazing_feature`).
+5. Abra un Pull Request.
 
 ## Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT.
+Este proyecto está licenciado bajo la Licencia MIT. Consulte el archivo `LICENSE` para más detalles.
+
+## Contacto
+
+David Valencia - [davidvalencia0526@gmail.com]
+
+Enlace del Proyecto: [https://github.com/DavidValenciaX/agroinsight-backend]
