@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from app.user.infrastructure.user_api_controller import router
 
 app = FastAPI()
 
+app.include_router(router)
+
 @app.get("/")
 async def root():
-    return {"message": "Primera versión del Backend de AgroinSight"}
+    return {"message": "Bienvenido a AgroinSight"}

@@ -1,4 +1,13 @@
+# Usa una imagen base de Python
 FROM python:3.12-slim
+
+# Declara los ARGs para las variables de entorno que necesitas
+ARG MYSQL_PUBLIC_URL
+ARG SECRET_KEY
+
+# Establece las variables de entorno usando los ARGs, con valores por defecto
+ENV MYSQL_PUBLIC_URL=${MYSQL_PUBLIC_URL:-mysql://root:12345@host.docker.internal:3306/agroinsightdb}
+ENV SECRET_KEY=${SECRET_KEY:-AgroInsight2024!}
 
 # Instalación de dependencias del sistema (si es necesario)
 RUN apt-get update && apt-get install -y \
