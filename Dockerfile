@@ -6,8 +6,8 @@ ARG MYSQL_PUBLIC_URL
 ARG SECRET_KEY
 
 # Establece las variables de entorno usando los ARGs, con valores por defecto
-ENV MYSQL_PUBLIC_URL=${MYSQL_PUBLIC_URL:-mysql://root:12345@host.docker.internal:3306/agroinsightdb}
-ENV SECRET_KEY=${SECRET_KEY:-AgroInsight2024!}
+ENV MYSQL_PUBLIC_URL=${MYSQL_PUBLIC_URL}
+ENV SECRET_KEY=${SECRET_KEY}
 
 # Instalación de dependencias del sistema (si es necesario)
 RUN apt-get update && apt-get install -y \
