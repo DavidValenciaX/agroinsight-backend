@@ -8,7 +8,7 @@ class UserCreate(BaseModel):
     apellido: str
     email: str
     password: str
-    state_id: int = 1
+    state_id: Optional[int] = None
 
 class UserInDB(BaseModel):
     id: int

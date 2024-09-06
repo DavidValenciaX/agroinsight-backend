@@ -25,13 +25,18 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             detail="El usuario con este correo electrónico ya existe.",
         )
 
-    created_user = creation_use_case.create_user(
-        nombre=user.nombre,
-        apellido=user.apellido,
-        email=user.email,
-        password=user.password,
-        state_id=user.state_id,
-    )
+    try:
+        created_user = creation_use_case.create_user(
+            nombre=user.nombre,
+            apellido=user.apellido,
+            email=user.email,
+            password=user.password,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
     # Convertir el modelo SQLAlchemy a un modelo Pydantic
     return UserResponse.from_orm(created_user)

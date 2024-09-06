@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.user.domain.user_entities import UserInDB as UserDomain
 from app.user.infrastructure.user_orm_model import User as UserModel
 from app.user.domain.user_repository_interface import UserRepositoryInterface
+from app.user.infrastructure.estado_usuario_orm_model import EstadoUsuario
 
 class UserRepository(UserRepositoryInterface):
     def __init__(self, db: Session):
@@ -45,6 +46,9 @@ class UserRepository(UserRepositoryInterface):
             self.db.refresh(user_model)
             return UserDomain(**user_model.__dict__)
         return None
+    
+    def get_active_user_state(self):
+        return self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "active").first()
 
     def get_default_role(self):
         from app.user.infrastructure.role_orm_model import Role
