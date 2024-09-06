@@ -18,4 +18,11 @@ class UserCreationUseCase:
             state_id=state_id
         )
         user_model = UserModel(**user_create.dict())
-        return self.user_repository.create_user(user_model)
+        created_user = self.user_repository.create_user(user_model)
+        
+        # Asignar el rol por defecto "Usuario"
+        default_role = self.user_repository.get_default_role()
+        if default_role:
+            self.user_repository.assign_role_to_user(created_user.id, default_role.id)
+        
+        return created_user

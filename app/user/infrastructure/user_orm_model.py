@@ -1,8 +1,7 @@
 #app/user/infrastructure/user_orm_model
-from sqlalchemy import Column, Integer, String, DateTime, event
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from app.infrastructure.db.connection import Base
 
 class User(Base):
     __tablename__ = "usuario"
@@ -12,6 +11,9 @@ class User(Base):
     apellido = Column(String(50), index=True)
     email = Column(String(100), unique=True, index=True)
     password = Column(String(255))
-    failed_attempts = Column(Integer, default=0)  # Número de intentos fallidos
-    locked_until = Column(DateTime, nullable=True)  # Tiempo hasta el que la cuenta está bloqueada
-    state_id = Column (Integer)
+    failed_attempts = Column(Integer, default=0)
+    locked_until = Column(DateTime, nullable=True)
+    state_id = Column(Integer, ForeignKey('estado_usuario.id'))
+
+    roles = relationship("Role", secondary="usuario_rol", back_populates="users")
+    estado = relationship("EstadoUsuario")
