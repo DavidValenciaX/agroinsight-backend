@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from app.user.infrastructure.user_api_controller import router
 from app.infrastructure.db.connection import engine, Base
-from app.user.infrastructure import User, Role, UserRole, EstadoUsuario # Importa todos los modelos
+from app.user.infrastructure import User, Role, UserRole, EstadoUsuario
 
 app = FastAPI()
 
