@@ -9,7 +9,7 @@ class UserCreationUseCase:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
-    def create_user(self, nombre: str, apellido: str, email: str, password: str):
+    def create_user(self, nombre: str, apellido: str, email: str, password: str) -> bool:
         hashed_password = hash_password(password)
         
         # Obtener el estado activo
@@ -32,4 +32,4 @@ class UserCreationUseCase:
         if default_role:
             self.user_repository.assign_role_to_user(created_user.id, default_role.id)
         
-        return created_user
+        return True

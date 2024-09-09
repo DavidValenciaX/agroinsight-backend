@@ -5,14 +5,14 @@ from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.user_authentication_use_case import AuthUseCase
 from app.user.infrastructure.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.user.domain.user_entities import UserCreate, UserResponse, LoginRequest, TokenResponse
+from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse
 
 router = APIRouter()
 
 router = APIRouter(prefix="/user", tags=["user"])
 
 @router.post(
-    "/create", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+    "/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
 )
 async def create_user(user: UserCreate, db: Session = Depends(getDb)):
     user_repository = UserRepository(db)
@@ -26,7 +26,7 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
         )
 
     try:
-        created_user = creation_use_case.create_user(
+        creation_successful = creation_use_case.create_user(
             nombre=user.nombre,
             apellido=user.apellido,
             email=user.email,
@@ -38,8 +38,13 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             detail=str(e)
         )
 
-    # Convertir el modelo SQLAlchemy a un modelo Pydantic
-    return UserResponse.from_orm(created_user)
+    if creation_successful:
+        return UserCreationResponse(message="User created successfully")
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo crear el usuario"
+        )
 
 @router.post("/login", response_model=TokenResponse)
 async def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
