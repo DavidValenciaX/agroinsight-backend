@@ -1,4 +1,3 @@
-#app/user/application/user_authentication_use_case.py
 from datetime import timedelta, datetime, timezone
 from app.user.domain.user_entities import UserInDB
 from app.user.domain.user_repository_interface import UserRepositoryInterface

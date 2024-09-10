@@ -1,4 +1,3 @@
-# app/user/infrastructure/estado_usuario_orm_model.py
 from sqlalchemy import Column, Integer, String, DateTime
 from app.infrastructure.db.connection import Base
 

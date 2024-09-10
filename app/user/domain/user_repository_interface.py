@@ -1,4 +1,3 @@
-#app/user/domain/user_repository_interface.py
 from abc import ABC, abstractmethod
 from .user_entities import UserInDB
 

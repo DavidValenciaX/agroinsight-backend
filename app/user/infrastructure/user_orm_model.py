@@ -12,7 +12,7 @@ class User(Base):
     password = Column(String(255))
     failed_attempts = Column(Integer, default=0)
     locked_until = Column(DateTime, nullable=True)
-    state_id = Column(Integer, ForeignKey('estado_usuario.id'))
+    state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
 
     roles = relationship("Role", secondary="usuario_rol", back_populates="users")
     estado = relationship("EstadoUsuario")

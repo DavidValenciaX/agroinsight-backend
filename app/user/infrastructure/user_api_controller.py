@@ -39,20 +39,13 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             )
 
     try:
-        new_user = creation_use_case.create_user(
-            nombre=user.nombre,
-            apellido=user.apellido,
-            email=user.email,
-            password=user.password,
-        )
+        new_user = creation_use_case.create_user(user)
         if create_user_with_confirmation(db, new_user):
             return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
         else:
             # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
-            db_user = db.query(UserModel).filter(UserModel.id == new_user.id).first()
-            if db_user:
-                db.delete(db_user)
-                db.commit()
+            db.delete(new_user)
+            db.commit()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al crear el usuario o enviar el email de confirmación. Por favor, intenta nuevamente."

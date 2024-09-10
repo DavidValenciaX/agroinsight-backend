@@ -1,4 +1,3 @@
-#app/user/infrastructure/user_role_orm_model.py
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from app.infrastructure.db.connection import Base
 
