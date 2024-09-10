@@ -1,5 +1,6 @@
 import os
 import secrets
+import hashlib
 from datetime import datetime, timedelta
 from mailersend import emails
 from sqlalchemy.orm import Session
@@ -12,7 +13,11 @@ MAILERSEND_API_KEY = os.getenv('MAILERSEND_API_KEY')  # API Key de MailerSend
 FROM_EMAIL = os.getenv('FROM_EMAIL')  # El email de envío verificado en MailerSend
 
 def generate_pin():
-    return str(secrets.randbelow(10000)).zfill(4)
+    # Generar un PIN de 4 dígitos
+    pin = ''.join(secrets.choice('0123456789') for _ in range(4))
+    # Crear un hash del PIN
+    pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+    return pin, pin_hash
 
 def send_confirmation_email(email: str, pin: str):
     # Crear el cliente de MailerSend
@@ -43,17 +48,17 @@ def send_confirmation_email(email: str, pin: str):
 
 def create_user_with_confirmation(db: Session, user: User) -> bool:
     try:
-        # Generar y guardar el PIN
-        pin = generate_pin()
+        # Generar PIN y su hash
+        pin, pin_hash = generate_pin()
         confirmation = ConfirmacionUsuario(
             usuario_id=user.id,
-            pin=pin,
+            pin=pin_hash,
             expiracion=datetime.utcnow() + timedelta(minutes=10)
         )
         db.add(confirmation)
         db.commit()
         
-        # Enviar el email de confirmación
+        # Enviar el email de confirmación con el PIN de 4 dígitos
         if send_confirmation_email(user.email, pin):
             return True
         else:
@@ -64,10 +69,10 @@ def create_user_with_confirmation(db: Session, user: User) -> bool:
         print(f"Error al crear la confirmación del usuario: {str(e)}")
         return False
 
-def confirm_user(db: Session, user_id: int, pin: str):
+def confirm_user(db: Session, user_id: int, pin_hash: str):
     confirmation = db.query(ConfirmacionUsuario).filter(
         ConfirmacionUsuario.usuario_id == user_id,
-        ConfirmacionUsuario.pin == pin,
+        ConfirmacionUsuario.pin == pin_hash,
         ConfirmacionUsuario.expiracion > datetime.utcnow()
     ).first()
     

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+import hashlib
 from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.user_authentication_use_case import AuthUseCase
 from app.user.infrastructure.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse
+from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest
 from app.core.services.email_service import create_user_with_confirmation, confirm_user, handle_failed_confirmation
 from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionUsuario
 from app.user.infrastructure.user_orm_model import User as UserModel
@@ -63,11 +64,24 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
         )
 
 @router.post("/confirm", status_code=status.HTTP_200_OK)
-async def confirm_user_registration(user_id: int, pin: str, db: Session = Depends(getDb)):
-    if confirm_user(db, user_id, pin):
+async def confirm_user_registration(
+    confirmation: ConfirmationRequest,
+    db: Session = Depends(getDb)
+):
+    # Hashear el PIN ingresado por el usuario
+    pin_hash = hashlib.sha256(confirmation.pin.encode()).hexdigest()
+    
+    confirmation_record = db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.pin == pin_hash).first()
+    if not confirmation_record:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="PIN inválido"
+        )
+    
+    if confirm_user(db, confirmation_record.usuario_id, pin_hash):
         return {"message": "Usuario confirmado exitosamente"}
     else:
-        handle_failed_confirmation(db, user_id)
+        handle_failed_confirmation(db, confirmation_record.usuario_id)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="PIN inválido o expirado"

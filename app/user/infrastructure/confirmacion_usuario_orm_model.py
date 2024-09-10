@@ -7,7 +7,7 @@ class ConfirmacionUsuario(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey('usuario.id', ondelete="CASCADE"), nullable=False)
-    pin = Column(String(4), nullable=False)
+    pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
 
