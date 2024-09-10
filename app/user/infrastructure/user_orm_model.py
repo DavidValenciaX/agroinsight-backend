@@ -1,4 +1,3 @@
-#app/user/infrastructure/user_orm_model
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
@@ -17,3 +16,4 @@ class User(Base):
 
     roles = relationship("Role", secondary="usuario_rol", back_populates="users")
     estado = relationship("EstadoUsuario")
+    confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade="all, delete-orphan")

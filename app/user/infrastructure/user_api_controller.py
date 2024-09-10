@@ -1,4 +1,3 @@
-#app/user/infrastructure/user_api_controller.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.user.application.user_creation_use_case import UserCreationUseCase
@@ -6,8 +5,9 @@ from app.user.application.user_authentication_use_case import AuthUseCase
 from app.user.infrastructure.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse
-
-router = APIRouter()
+from app.core.services.email_service import create_user_with_confirmation, confirm_user, handle_failed_confirmation
+from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionUsuario
+from app.user.infrastructure.user_orm_model import User as UserModel
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -20,30 +20,57 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
 
     existing_user = user_repository.get_user_by_email(user.email)
     if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El usuario con este correo electrónico ya existe.",
-        )
+        # Verificar si el usuario existente está en estado pendiente
+        pending_confirmation = db.query(ConfirmacionUsuario).filter(
+            ConfirmacionUsuario.usuario_id == existing_user.id
+        ).first()
+        
+        if pending_confirmation:
+            # Si hay una confirmación pendiente, la eliminamos junto con el usuario
+            db_user = db.query(UserModel).filter(UserModel.id == existing_user.id).first()
+            if db_user:
+                db.delete(db_user)
+                db.commit()
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El usuario con este correo electrónico ya existe.",
+            )
 
     try:
-        creation_successful = creation_use_case.create_user(
+        new_user = creation_use_case.create_user(
             nombre=user.nombre,
             apellido=user.apellido,
             email=user.email,
             password=user.password,
         )
+        if create_user_with_confirmation(db, new_user):
+            return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
+        else:
+            # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
+            db_user = db.query(UserModel).filter(UserModel.id == new_user.id).first()
+            if db_user:
+                db.delete(db_user)
+                db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error al crear el usuario o enviar el email de confirmación. Por favor, intenta nuevamente."
+            )
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
 
-    if creation_successful:
-        return UserCreationResponse(message="User created successfully")
+@router.post("/confirm", status_code=status.HTTP_200_OK)
+async def confirm_user_registration(user_id: int, pin: str, db: Session = Depends(getDb)):
+    if confirm_user(db, user_id, pin):
+        return {"message": "Usuario confirmado exitosamente"}
     else:
+        handle_failed_confirmation(db, user_id)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo crear el usuario"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="PIN inválido o expirado"
         )
 
 @router.post("/login", response_model=TokenResponse)
