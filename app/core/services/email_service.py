@@ -2,7 +2,6 @@ import os
 import secrets
 import hashlib
 from datetime import datetime, timedelta
-from mailersend import emails
 from sqlalchemy.orm import Session
 from app.user.infrastructure.user_orm_model import User
 from app.user.infrastructure.estado_usuario_orm_model import EstadoUsuario
@@ -12,10 +11,6 @@ from app.user.infrastructure.sql_user_repository import UserRepository
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
-# Cambiar estas variables para utilizar MailerSend
-MAILERSEND_API_KEY = os.getenv('MAILERSEND_API_KEY')  # API Key de MailerSend
-FROM_EMAIL = os.getenv('FROM_EMAIL')  # El email de envío verificado en MailerSend
 
 # Configuración de Gmail SMTP
 GMAIL_USER = os.getenv('GMAIL_USER')
@@ -30,39 +25,46 @@ def generate_pin():
     pin_hash = hashlib.sha256(pin.encode()).hexdigest()
     return pin, pin_hash
 
-def send_confirmation_email(email: str, pin: str):
+def send_email(to_email: str, subject: str, text_content: str, html_content: str):
     try:
-        # Crear mensaje
         message = MIMEMultipart("alternative")
-        message["Subject"] = "Confirma tu registro en AgroInSight"
+        message["Subject"] = subject
         message["From"] = GMAIL_USER
-        message["To"] = email
+        message["To"] = to_email
 
-        # Crear versiones HTML y de texto plano del mensaje
-        text = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
-        html = f"<html><body><p><strong>Tu PIN de confirmación es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
-
-        part1 = MIMEText(text, "plain")
-        part2 = MIMEText(html, "html")
+        part1 = MIMEText(text_content, "plain")
+        part2 = MIMEText(html_content, "html")
 
         message.attach(part1)
         message.attach(part2)
 
-        # Iniciar conexión segura con el servidor SMTP de Gmail
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(GMAIL_USER, GMAIL_PASSWORD)
-            server.sendmail(GMAIL_USER, email, message.as_string())
+            server.sendmail(GMAIL_USER, to_email, message.as_string())
 
-        print(f"Email sent successfully to {email}")
+        print(f"Email sent successfully to {to_email}")
         return True
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return False
 
+def send_confirmation_email(email: str, pin: str):
+    subject = "Confirma tu registro en AgroInSight"
+    text_content = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
+    html_content = f"<html><body><p><strong>Tu PIN de confirmación es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
+    
+    return send_email(email, subject, text_content, html_content)
+
+def send_two_factor_pin(email: str, pin: str):
+    subject = "Código de verificación en dos pasos - AgroInSight"
+    text_content = f"Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 5 minutos."
+    html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 5 minutos.</p></body></html>"
+    
+    return send_email(email, subject, text_content, html_content)
+
 def create_user_with_confirmation(db: Session, user: User) -> bool:
     try:
-        # Generar PIN y su hash
         pin, pin_hash = generate_pin()
         confirmation = ConfirmacionUsuario(
             usuario_id=user.id,
@@ -72,7 +74,6 @@ def create_user_with_confirmation(db: Session, user: User) -> bool:
         db.add(confirmation)
         db.commit()
         
-        # Enviar el email de confirmación con el PIN de 4 dígitos
         if send_confirmation_email(user.email, pin):
             return True
         else:
@@ -83,6 +84,30 @@ def create_user_with_confirmation(db: Session, user: User) -> bool:
         print(f"Error al crear la confirmación del usuario: {str(e)}")
         return False
 
+def create_two_factor_verification(db: Session, user: User) -> bool:
+    try:
+        db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
+        
+        pin, pin_hash = generate_pin()
+        
+        verification = VerificacionDospasos(
+            usuario_id=user.id,
+            pin=pin_hash,
+            expiracion=datetime.utcnow() + timedelta(minutes=5)
+        )
+        db.add(verification)
+        db.commit()
+        
+        if send_two_factor_pin(user.email, pin):
+            return True
+        else:
+            db.rollback()
+            return False
+    except Exception as e:
+        db.rollback()
+        print(f"Error al crear la verificación en dos pasos: {str(e)}")
+        return False
+    
 def confirm_user(db: Session, user_id: int, pin_hash: str):
     confirmation = db.query(ConfirmacionUsuario).filter(
         ConfirmacionUsuario.usuario_id == user_id,
@@ -115,7 +140,7 @@ def handle_failed_confirmation(db: Session, user_id: int):
             db.delete(user)  # Esto también eliminará la confirmación debido a ON DELETE CASCADE
         else:
             db.commit()
-
+            
 def clean_expired_registrations(db: Session):
     expired_confirmations = db.query(ConfirmacionUsuario).filter(
         ConfirmacionUsuario.expiracion < datetime.utcnow()
@@ -127,58 +152,3 @@ def clean_expired_registrations(db: Session):
             db.delete(user)  # Esto también eliminará la confirmación debido a ON DELETE CASCADE
     
     db.commit()
-    
-def send_two_factor_pin(email: str, pin: str):
-    mailer = emails.NewEmail(MAILERSEND_API_KEY)
-    
-    try:
-        response = mailer.send(
-            {
-                "from": {
-                    "email": FROM_EMAIL,
-                    "name": "AgroInSight"
-                },
-                "to": [
-                    {
-                        "email": email
-                    }
-                ],
-                "subject": "Código de verificación en dos pasos - AgroInSight",
-                "html": f"<strong>Tu código de verificación en dos pasos es: {pin}</strong><br>Este código expirará en 5 minutos."
-            }
-        )
-        print(f"Email sent. Status Code: {response}")
-        return True
-    except Exception as e:
-        print(f"Error sending email: {str(e)}")
-        return False
-
-def create_two_factor_verification(db: Session, user: User) -> bool:
-    try:
-        # Eliminar cualquier verificación anterior
-        db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
-        
-        # Generar un PIN de 4 dígitos
-        pin = ''.join(secrets.choice('0123456789') for _ in range(4))
-        
-        # Crear el hash del PIN
-        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
-        
-        verification = VerificacionDospasos(
-            usuario_id=user.id,
-            pin=pin_hash,  # Almacenamos el hash, no el PIN original
-            expiracion=datetime.utcnow() + timedelta(minutes=5)
-        )
-        db.add(verification)
-        db.commit()
-        
-        # Enviar el PIN original (no el hash) por correo electrónico
-        if send_two_factor_pin(user.email, pin):
-            return True
-        else:
-            db.rollback()
-            return False
-    except Exception as e:
-        db.rollback()
-        print(f"Error al crear la verificación en dos pasos: {str(e)}")
-        return False
