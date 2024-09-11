@@ -9,10 +9,19 @@ from app.user.infrastructure.estado_usuario_orm_model import EstadoUsuario
 from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionUsuario
 from app.user.infrastructure.verificacion_dos_pasos_orm_model import VerificacionDospasos
 from app.user.infrastructure.sql_user_repository import UserRepository
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # Cambiar estas variables para utilizar MailerSend
 MAILERSEND_API_KEY = os.getenv('MAILERSEND_API_KEY')  # API Key de MailerSend
 FROM_EMAIL = os.getenv('FROM_EMAIL')  # El email de envío verificado en MailerSend
+
+# Configuración de Gmail SMTP
+GMAIL_USER = os.getenv('GMAIL_USER')
+GMAIL_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
 
 def generate_pin():
     # Generar un PIN de 4 dígitos
@@ -22,27 +31,30 @@ def generate_pin():
     return pin, pin_hash
 
 def send_confirmation_email(email: str, pin: str):
-    # Crear el cliente de MailerSend
-    mailer = emails.NewEmail(MAILERSEND_API_KEY)
-    
-    # Construir el contenido del correo
     try:
-        response = mailer.send(
-            {
-                "from": {
-                    "email": FROM_EMAIL,
-                    "name": "AgroInSight"
-                },
-                "to": [
-                    {
-                        "email": email
-                    }
-                ],
-                "subject": "Confirma tu registro en AgroInSight",
-                "html": f"<strong>Tu PIN de confirmación es: {pin}</strong><br>Este PIN expirará en 10 minutos."
-            }
-        )
-        print(f"Email sent. Status Code: {response}")
+        # Crear mensaje
+        message = MIMEMultipart("alternative")
+        message["Subject"] = "Confirma tu registro en AgroInSight"
+        message["From"] = GMAIL_USER
+        message["To"] = email
+
+        # Crear versiones HTML y de texto plano del mensaje
+        text = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
+        html = f"<html><body><p><strong>Tu PIN de confirmación es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
+
+        part1 = MIMEText(text, "plain")
+        part2 = MIMEText(html, "html")
+
+        message.attach(part1)
+        message.attach(part2)
+
+        # Iniciar conexión segura con el servidor SMTP de Gmail
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(GMAIL_USER, GMAIL_PASSWORD)
+            server.sendmail(GMAIL_USER, email, message.as_string())
+
+        print(f"Email sent successfully to {email}")
         return True
     except Exception as e:
         print(f"Error sending email: {str(e)}")
