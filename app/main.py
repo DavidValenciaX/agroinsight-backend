@@ -9,7 +9,7 @@ from app.core.services.email_service import clean_expired_registrations
 app = FastAPI()
 
 # Crea todas las tablas
-Base.metadata.create_all(bind=engine)
+#Base.metadata.create_all(bind=engine)
 
 app.include_router(router)
 

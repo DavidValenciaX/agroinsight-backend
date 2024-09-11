@@ -65,3 +65,7 @@ class TokenResponse(BaseModel):
     
 class ConfirmationRequest(BaseModel):
     pin: str
+
+class TwoFactorAuthRequest(BaseModel):
+    email: EmailStr
+    pin: str = Field(..., min_length=4, max_length=4)

@@ -17,3 +17,4 @@ class User(Base):
     roles = relationship("Role", secondary="usuario_rol", back_populates="users")
     estado = relationship("EstadoUsuario")
     confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
+    verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade="all, delete-orphan")

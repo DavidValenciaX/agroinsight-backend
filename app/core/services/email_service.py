@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.user.infrastructure.user_orm_model import User
 from app.user.infrastructure.estado_usuario_orm_model import EstadoUsuario
 from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionUsuario
+from app.user.infrastructure.verificacion_dos_pasos_orm_model import VerificacionDospasos
 
 # Cambiar estas variables para utilizar MailerSend
 MAILERSEND_API_KEY = os.getenv('MAILERSEND_API_KEY')  # API Key de MailerSend
@@ -109,3 +110,58 @@ def clean_expired_registrations(db: Session):
             db.delete(user)  # Esto también eliminará la confirmación debido a ON DELETE CASCADE
     
     db.commit()
+    
+def send_two_factor_pin(email: str, pin: str):
+    mailer = emails.NewEmail(MAILERSEND_API_KEY)
+    
+    try:
+        response = mailer.send(
+            {
+                "from": {
+                    "email": FROM_EMAIL,
+                    "name": "AgroInSight"
+                },
+                "to": [
+                    {
+                        "email": email
+                    }
+                ],
+                "subject": "Código de verificación en dos pasos - AgroInSight",
+                "html": f"<strong>Tu código de verificación en dos pasos es: {pin}</strong><br>Este código expirará en 5 minutos."
+            }
+        )
+        print(f"Email sent. Status Code: {response}")
+        return True
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        return False
+
+def create_two_factor_verification(db: Session, user: User) -> bool:
+    try:
+        # Eliminar cualquier verificación anterior
+        db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
+        
+        # Generar un PIN de 4 dígitos
+        pin = ''.join(secrets.choice('0123456789') for _ in range(4))
+        
+        # Crear el hash del PIN
+        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+        
+        verification = VerificacionDospasos(
+            usuario_id=user.id,
+            pin=pin_hash,  # Almacenamos el hash, no el PIN original
+            expiracion=datetime.utcnow() + timedelta(minutes=5)
+        )
+        db.add(verification)
+        db.commit()
+        
+        # Enviar el PIN original (no el hash) por correo electrónico
+        if send_two_factor_pin(user.email, pin):
+            return True
+        else:
+            db.rollback()
+            return False
+    except Exception as e:
+        db.rollback()
+        print(f"Error al crear la verificación en dos pasos: {str(e)}")
+        return False
