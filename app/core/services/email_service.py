@@ -8,6 +8,7 @@ from app.user.infrastructure.user_orm_model import User
 from app.user.infrastructure.estado_usuario_orm_model import EstadoUsuario
 from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionUsuario
 from app.user.infrastructure.verificacion_dos_pasos_orm_model import VerificacionDospasos
+from app.user.infrastructure.sql_user_repository import UserRepository
 
 # Cambiar estas variables para utilizar MailerSend
 MAILERSEND_API_KEY = os.getenv('MAILERSEND_API_KEY')  # API Key de MailerSend
@@ -80,9 +81,13 @@ def confirm_user(db: Session, user_id: int, pin_hash: str):
     if not confirmation:
         return False
     
+    user_repository = UserRepository(db)
     user = db.query(User).filter(User.id == user_id).first()
     active_state = db.query(EstadoUsuario).filter(EstadoUsuario.nombre == 'active').first()
     user.state_id = active_state.id
+    
+    # Cambiar el rol del usuario
+    user_repository.change_user_role(user.id, "Usuario No Confirmado", "Usuario")
     
     db.delete(confirmation)
     db.commit()

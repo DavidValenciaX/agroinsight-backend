@@ -46,8 +46,10 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
         else:
             # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
-            db.delete(new_user)
-            db.commit()
+            db_user = db.query(UserModel).filter(UserModel.id == new_user.id).first()
+            if db_user:
+                db.delete(db_user)
+                db.commit()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al crear el usuario o enviar el email de confirmación. Por favor, intenta nuevamente."
@@ -57,8 +59,6 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
-
-# app/user/infrastructure/user_api_controller.py
 
 @router.post("/confirm", status_code=status.HTTP_200_OK)
 async def confirm_user_registration(
@@ -88,13 +88,19 @@ async def confirm_user_registration(
             detail="PIN inválido o expirado"
         )
     
-    if confirm_user(db, user.id, pin_hash):
-        return {"message": "Usuario confirmado exitosamente"}
-    else:
+    try:
+        if confirm_user(db, user.id, pin_hash):
+            return {"message": "Usuario confirmado exitosamente"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error al confirmar el usuario"
+            )
+    except Exception as e:
         handle_failed_confirmation(db, user.id)
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error al confirmar el usuario"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al confirmar el usuario: {str(e)}"
         )
 
 @router.post("/login")

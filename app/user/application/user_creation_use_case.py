@@ -7,10 +7,6 @@ class UserCreationUseCase:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
-class UserCreationUseCase:
-    def __init__(self, user_repository: UserRepository):
-        self.user_repository = user_repository
-
     def create_user(self, user_data: UserCreate) -> UserModel:
         hashed_password = hash_password(user_data.password)
         

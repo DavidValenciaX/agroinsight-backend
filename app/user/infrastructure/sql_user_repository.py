@@ -26,11 +26,11 @@ class UserRepository(UserRepositoryInterface):
             return UserDomain.from_orm(user_model)
         return None
     
-    def create_user(self, user: UserModel) -> UserDomain:
+    def create_user(self, user: UserModel) -> UserModel:
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
-        return UserDomain.from_orm(user)
+        return user
     
     def get_active_user_state(self):
         return self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "active").first()
@@ -48,3 +48,20 @@ class UserRepository(UserRepositoryInterface):
         user_role = UserRole(usuario_id=user_id, rol_id=role_id)
         self.db.add(user_role)
         self.db.commit()
+        
+    def change_user_role(self, user_id: int, old_role_name: str, new_role_name: str):
+        old_role = self.db.query(Role).filter(Role.nombre == old_role_name).first()
+        new_role = self.db.query(Role).filter(Role.nombre == new_role_name).first()
+
+        if old_role and new_role:
+            user_role = self.db.query(UserRole).filter(
+                UserRole.usuario_id == user_id,
+                UserRole.rol_id == old_role.id
+            ).first()
+
+            if user_role:
+                user_role.rol_id = new_role.id
+                self.db.commit()
+                return True
+
+        return False
