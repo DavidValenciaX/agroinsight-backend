@@ -64,6 +64,7 @@ class TokenResponse(BaseModel):
     token_type: str
     
 class ConfirmationRequest(BaseModel):
+    email: EmailStr
     pin: str
 
 class TwoFactorAuthRequest(BaseModel):

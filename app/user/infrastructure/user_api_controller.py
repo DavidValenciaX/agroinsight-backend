@@ -58,6 +58,8 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             detail=str(e)
         )
 
+# app/user/infrastructure/user_api_controller.py
+
 @router.post("/confirm", status_code=status.HTTP_200_OK)
 async def confirm_user_registration(
     confirmation: ConfirmationRequest,
@@ -66,20 +68,33 @@ async def confirm_user_registration(
     # Hashear el PIN ingresado por el usuario
     pin_hash = hashlib.sha256(confirmation.pin.encode()).hexdigest()
     
-    confirmation_record = db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.pin == pin_hash).first()
-    if not confirmation_record:
+    # Buscar al usuario por email
+    user = db.query(UserModel).filter(UserModel.email == confirmation.email).first()
+    if not user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="PIN inválido"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
-    if confirm_user(db, confirmation_record.usuario_id, pin_hash):
-        return {"message": "Usuario confirmado exitosamente"}
-    else:
-        handle_failed_confirmation(db, confirmation_record.usuario_id)
+    confirmation_record = db.query(ConfirmacionUsuario).filter(
+        ConfirmacionUsuario.usuario_id == user.id,
+        ConfirmacionUsuario.pin == pin_hash
+    ).first()
+    
+    if not confirmation_record:
+        handle_failed_confirmation(db, user.id)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="PIN inválido o expirado"
+        )
+    
+    if confirm_user(db, user.id, pin_hash):
+        return {"message": "Usuario confirmado exitosamente"}
+    else:
+        handle_failed_confirmation(db, user.id)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error al confirmar el usuario"
         )
 
 @router.post("/login")
