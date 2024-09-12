@@ -18,3 +18,4 @@ class User(Base):
     estado = relationship("EstadoUsuario") 
     confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
     verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
+    recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade="all, delete-orphan")

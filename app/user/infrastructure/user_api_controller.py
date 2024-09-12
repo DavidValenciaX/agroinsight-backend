@@ -15,6 +15,8 @@ from app.user.domain.user_entities import UserResponse
 from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
 from app.user.domain.user_entities import TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest
 from app.user.infrastructure.user_state_orm_model import EstadoUsuario
+from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
+from app.user.domain.user_entities import PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -217,3 +219,64 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_use
         estado=estado_nombre,
         rol=user_role
     )
+    
+@router.post("/password-recovery", status_code=status.HTTP_200_OK)
+async def initiate_password_recovery(
+    recovery_request: PasswordRecoveryRequest,
+    db: Session = Depends(getDb)
+):
+    password_recovery_use_case = PasswordRecoveryUseCase(db)
+    success = password_recovery_use_case.initiate_password_recovery(recovery_request.email)
+    if success:
+        return {"message": "Se ha enviado un código de recuperación a tu correo electrónico."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo iniciar el proceso de recuperación de contraseña. Verifica el correo electrónico e intenta nuevamente."
+        )
+        
+@router.post("/resend-recovery-pin", status_code=status.HTTP_200_OK)
+async def resend_recovery_pin(
+    recovery_request: PasswordRecoveryRequest,
+    db: Session = Depends(getDb)
+):
+    password_recovery_use_case = PasswordRecoveryUseCase(db)
+    success = password_recovery_use_case.resend_recovery_pin(recovery_request.email)
+    if success:
+        return {"message": "Se ha reenviado el código de recuperación a tu correo electrónico."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo reenviar el código de recuperación. Verifica el correo electrónico e intenta nuevamente."
+        )
+        
+@router.post("/confirm-recovery-pin", status_code=status.HTTP_200_OK)
+async def confirm_recovery_pin(
+    pin_confirmation: PinConfirmationRequest,
+    db: Session = Depends(getDb)
+):
+    password_recovery_use_case = PasswordRecoveryUseCase(db)
+    pin_hash = hashlib.sha256(pin_confirmation.pin.encode()).hexdigest()
+    success = password_recovery_use_case.confirm_recovery_pin(pin_confirmation.email, pin_hash)
+    if success:
+        return {"message": "Código de recuperación confirmado correctamente."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Código de recuperación inválido o expirado."
+        )
+        
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+async def reset_password(
+    reset_request: PasswordResetRequest,
+    db: Session = Depends(getDb)
+):
+    password_recovery_use_case = PasswordRecoveryUseCase(db)
+    success = password_recovery_use_case.reset_password(reset_request.email, reset_request.new_password)
+    if success:
+        return {"message": "Contraseña restablecida correctamente."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se pudo restablecer la contraseña. Asegúrate de que la nueva contraseña sea diferente de la anterior y que hayas confirmado el código de recuperación."
+        )

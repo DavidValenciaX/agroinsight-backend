@@ -63,6 +63,13 @@ def send_two_factor_pin(email: str, pin: str):
     
     return send_email(email, subject, text_content, html_content)
 
+def send_password_recovery_email(email: str, pin: str) -> bool:
+    subject = "Recuperación de contraseña - AgroInSight"
+    text_content = f"Tu código de recuperación de contraseña es: {pin}\nEste código expirará en 10 minutos."
+    html_content = f"<html><body><p><strong>Tu código de recuperación de contraseña es: {pin}</strong></p><p>Este código expirará en 10 minutos.</p></body></html>"
+    
+    return send_email(email, subject, text_content, html_content)
+
 def create_user_with_confirmation(db: Session, user: User) -> bool:
     try:
         # Eliminar confirmaciones anteriores si existen
