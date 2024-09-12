@@ -11,6 +11,9 @@ from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionU
 from app.user.infrastructure.user_orm_model import User as UserModel
 from app.user.application.two_factor_auth_use_case import TwoFactorAuthUseCase
 from app.user.domain.user_entities import TwoFactorAuthRequest
+from app.user.domain.user_entities import ResendPinRequest
+from app.core.services.email_service import resend_confirmation_pin
+
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -101,6 +104,26 @@ async def confirm_user_registration(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al confirmar el usuario: {str(e)}"
+        )
+        
+@router.post("/resend-pin", status_code=status.HTTP_200_OK)
+async def resend_confirmation_pin_endpoint(
+    resend_request: ResendPinRequest,
+    db: Session = Depends(getDb)
+):
+    try:
+        success = resend_confirmation_pin(db, resend_request.email)
+        if success:
+            return {"message": "PIN de confirmación reenviado con éxito"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde."
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al reenviar el PIN: {str(e)}"
         )
 
 @router.post("/login")

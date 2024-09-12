@@ -131,6 +131,27 @@ def confirm_user(db: Session, user_id: int, pin_hash: str):
     
     return True
 
+def resend_confirmation_pin(db: Session, email: str) -> bool:
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return False
+    
+    # Eliminar la confirmación existente si la hay
+    db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user.id).delete()
+    
+    # Crear una nueva confirmación
+    pin, pin_hash = generate_pin()
+    confirmation = ConfirmacionUsuario(
+        usuario_id=user.id,
+        pin=pin_hash,
+        expiracion=datetime.utcnow() + timedelta(minutes=10)
+    )
+    db.add(confirmation)
+    db.commit()
+    
+    # Enviar el nuevo PIN por correo electrónico
+    return send_confirmation_email(email, pin)
+
 def handle_failed_confirmation(db: Session, user_id: int):
     confirmation = db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user_id).first()
     if confirmation:

@@ -70,3 +70,6 @@ class ConfirmationRequest(BaseModel):
 class TwoFactorAuthRequest(BaseModel):
     email: EmailStr
     pin: str = Field(..., min_length=4, max_length=4)
+    
+class ResendPinRequest(BaseModel):
+    email: EmailStr
