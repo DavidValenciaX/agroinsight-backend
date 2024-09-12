@@ -73,3 +73,6 @@ class TwoFactorAuthRequest(BaseModel):
     
 class ResendPinRequest(BaseModel):
     email: EmailStr
+    
+class Resend2FARequest(BaseModel):
+    email: EmailStr

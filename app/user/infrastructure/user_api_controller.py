@@ -13,6 +13,7 @@ from app.user.application.two_factor_auth_use_case import TwoFactorAuthUseCase
 from app.user.domain.user_entities import TwoFactorAuthRequest
 from app.user.domain.user_entities import ResendPinRequest
 from app.core.services.email_service import resend_confirmation_pin
+from app.user.domain.user_entities import Resend2FARequest
 
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -177,3 +178,24 @@ async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends
     else:
         two_factor_use_case.handle_failed_verification(user.id)
         raise HTTPException(status_code=400, detail="Código de verificación inválido o expirado")
+    
+@router.post("/resend-2fa-pin", status_code=status.HTTP_200_OK)
+async def resend_2fa_pin_endpoint(
+    resend_request: Resend2FARequest,
+    db: Session = Depends(getDb)
+):
+    two_factor_use_case = TwoFactorAuthUseCase(db)
+    try:
+        success = two_factor_use_case.resend_2fa_pin(resend_request.email)
+        if success:
+            return {"message": "PIN de verificación en dos pasos reenviado con éxito"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde."
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al reenviar el PIN: {str(e)}"
+        )

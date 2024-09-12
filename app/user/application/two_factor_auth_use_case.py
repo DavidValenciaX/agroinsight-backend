@@ -27,6 +27,18 @@ class TwoFactorAuthUseCase:
         self.db.delete(verification)
         self.db.commit()
         return True
+    
+    def resend_2fa_pin(self, email: str) -> bool:
+        user = self.db.query(User).filter(User.email == email).first()
+        if not user:
+            return False
+        
+        # Eliminar la verificación existente si la hay
+        self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
+        self.db.commit()
+        
+        # Crear una nueva verificación y enviar el nuevo PIN
+        return create_two_factor_verification(self.db, user)
 
     def handle_failed_verification(self, user_id: int):
         verification = self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).first()
