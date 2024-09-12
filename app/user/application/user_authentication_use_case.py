@@ -4,13 +4,8 @@ from app.user.domain.user_repository_interface import UserRepositoryInterface
 from jose import jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
-from dotenv import load_dotenv
-import os
+from app.core.config.settings import SECRET_KEY, ALGORITHM
 
-load_dotenv()
-
-SECRET_KEY = os.getenv('SECRET_KEY')
-ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_TIME = timedelta(minutes=5)

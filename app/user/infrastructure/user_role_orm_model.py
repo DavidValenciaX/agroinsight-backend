@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, ForeignKey
 from app.infrastructure.db.connection import Base
 
 class UserRole(Base):

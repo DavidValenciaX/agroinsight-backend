@@ -1,6 +1,6 @@
 import re
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
 
 class UserCreate(BaseModel):
@@ -29,6 +29,10 @@ class UserCreate(BaseModel):
 
         return v
 
+class RoleInfo(BaseModel):
+    id: int
+    nombre: str
+
 class UserInDB(BaseModel):
     id: int
     nombre: str
@@ -38,6 +42,7 @@ class UserInDB(BaseModel):
     failed_attempts: int
     locked_until: Optional[datetime]
     state_id: int
+    roles: List[RoleInfo] = []
 
     class Config:
         from_attributes = True
@@ -48,6 +53,8 @@ class UserResponse(BaseModel):
     nombre: str
     apellido: str
     email: EmailStr
+    estado: str
+    rol: str
 
     class Config:
         from_attributes = True

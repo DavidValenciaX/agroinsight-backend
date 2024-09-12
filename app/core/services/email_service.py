@@ -4,9 +4,9 @@ import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from app.user.infrastructure.user_orm_model import User
-from app.user.infrastructure.estado_usuario_orm_model import EstadoUsuario
-from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionUsuario
-from app.user.infrastructure.verificacion_dos_pasos_orm_model import VerificacionDospasos
+from app.user.infrastructure.user_state_orm_model import EstadoUsuario
+from app.user.infrastructure.user_confirmation_orm_model import ConfirmacionUsuario
+from app.user.infrastructure.two_factor_verify_orm_model import VerificacionDospasos
 from app.user.infrastructure.sql_user_repository import UserRepository
 import smtplib
 from email.mime.text import MIMEText

@@ -5,16 +5,16 @@ from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.user_authentication_use_case import AuthUseCase
 from app.user.infrastructure.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest
 from app.core.services.email_service import create_user_with_confirmation, confirm_user, handle_failed_confirmation
-from app.user.infrastructure.confirmacion_usuario_orm_model import ConfirmacionUsuario
+from app.user.infrastructure.user_confirmation_orm_model import ConfirmacionUsuario
 from app.user.infrastructure.user_orm_model import User as UserModel
 from app.user.application.two_factor_auth_use_case import TwoFactorAuthUseCase
-from app.user.domain.user_entities import TwoFactorAuthRequest
-from app.user.domain.user_entities import ResendPinRequest
 from app.core.services.email_service import resend_confirmation_pin
-from app.user.domain.user_entities import Resend2FARequest
-
+from app.core.security.jwt_middleware import get_current_user
+from app.user.domain.user_entities import UserResponse
+from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
+from app.user.domain.user_entities import TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest
+from app.user.infrastructure.user_state_orm_model import EstadoUsuario
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -199,3 +199,21 @@ async def resend_2fa_pin_endpoint(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al reenviar el PIN: {str(e)}"
         )
+        
+@router.get("/me", response_model=UserResponse)
+async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
+    # Obtener el estado del usuario
+    estado = db.query(EstadoUsuario).filter(EstadoUsuario.id == current_user.state_id).first()
+    estado_nombre = estado.nombre if estado else "Desconocido"
+    
+    # Obtener el rol del usuario
+    user_role = current_user.roles[0].nombre if current_user.roles else "Sin rol asignado"
+    
+    return UserResponse(
+        id=current_user.id,
+        nombre=current_user.nombre,
+        apellido=current_user.apellido,
+        email=current_user.email,
+        estado=estado_nombre,
+        rol=user_role
+    )

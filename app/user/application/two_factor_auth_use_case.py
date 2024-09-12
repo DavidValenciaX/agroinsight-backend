@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from app.user.infrastructure.verificacion_dos_pasos_orm_model import VerificacionDospasos
+from app.user.infrastructure.two_factor_verify_orm_model import VerificacionDospasos
 from app.user.infrastructure.user_orm_model import User
 from app.core.services.email_service import create_two_factor_verification
 import hashlib

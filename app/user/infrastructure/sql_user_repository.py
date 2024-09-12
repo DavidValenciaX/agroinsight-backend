@@ -1,8 +1,9 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.user.domain.user_entities import UserInDB as UserDomain
+from app.user.domain.user_entities import UserInDB, RoleInfo
 from app.user.infrastructure.user_orm_model import User as UserModel
 from app.user.domain.user_repository_interface import UserRepositoryInterface
-from app.user.infrastructure.estado_usuario_orm_model import EstadoUsuario
+from app.user.infrastructure.user_state_orm_model import EstadoUsuario
 from app.user.infrastructure.role_orm_model import Role
 from app.user.infrastructure.user_role_orm_model import UserRole
 
@@ -10,20 +11,39 @@ class UserRepository(UserRepositoryInterface):
     def __init__(self, db: Session):
         self.db = db
 
-    def get_user_by_email(self, email: str) -> UserDomain:
-        user_model = self.db.query(UserModel).filter(UserModel.email == email).first()
+    def get_user_by_email(self, email: str) -> UserInDB:
+        user_model = self.db.query(UserModel).options(joinedload(UserModel.roles)).filter(UserModel.email == email).first()
         if user_model:
-            return UserDomain.from_orm(user_model)
+            roles = [RoleInfo(id=role.id, nombre=role.nombre) for role in user_model.roles]
+            return UserInDB(
+                id=user_model.id,
+                nombre=user_model.nombre,
+                apellido=user_model.apellido,
+                email=user_model.email,
+                password=user_model.password,
+                failed_attempts=user_model.failed_attempts,
+                locked_until=user_model.locked_until,
+                state_id=user_model.state_id,
+                roles=roles
+            )
         return None
 
-    def update_user(self, user: UserDomain) -> UserDomain:
+    def update_user(self, user: UserInDB) -> UserInDB:
         user_model = self.db.query(UserModel).filter(UserModel.id == user.id).first()
         if user_model:
-            for key, value in user.dict().items():
-                setattr(user_model, key, value)
+            user_model.nombre = user.nombre
+            user_model.apellido = user.apellido
+            user_model.email = user.email
+            user_model.password = user.password
+            user_model.failed_attempts = user.failed_attempts
+            user_model.locked_until = user.locked_until
+            user_model.state_id = user.state_id
+            
+            # No actualizamos los roles aquí para evitar el conflicto
+            
             self.db.commit()
             self.db.refresh(user_model)
-            return UserDomain.from_orm(user_model)
+            return self.get_user_by_email(user_model.email)  # Usamos get_user_by_email para obtener los roles correctamente
         return None
     
     def create_user(self, user: UserModel) -> UserModel:

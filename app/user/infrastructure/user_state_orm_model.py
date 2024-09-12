@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String
 from app.infrastructure.db.connection import Base
 
 class EstadoUsuario(Base):
