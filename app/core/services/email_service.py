@@ -65,6 +65,9 @@ def send_two_factor_pin(email: str, pin: str):
 
 def create_user_with_confirmation(db: Session, user: User) -> bool:
     try:
+        # Eliminar confirmaciones anteriores si existen
+        db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user.id).delete()
+        
         pin, pin_hash = generate_pin()
         confirmation = ConfirmacionUsuario(
             usuario_id=user.id,
