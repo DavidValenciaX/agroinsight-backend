@@ -32,4 +32,5 @@ def send_email(to_email: str, subject: str, text_content: str, html_content: str
             server.sendmail(GMAIL_USER, to_email, message.as_string())
         return True
     except Exception as e:
+        print(f"Error al enviar el correo electrónico: {e}")
         return False
