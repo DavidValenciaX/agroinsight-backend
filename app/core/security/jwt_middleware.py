@@ -5,10 +5,15 @@ from datetime import datetime, timezone
 from app.core.config.settings import SECRET_KEY, ALGORITHM
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
 security = HTTPBearer()
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)):
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(getDb)
+):
     token = credentials.credentials
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -23,7 +28,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
     except JWTError:
         raise HTTPException(status_code=401, detail="Could not validate credentials")
     
-    db = next(getDb())
     user_repository = UserRepository(db)
     user = user_repository.get_user_by_email(email)
     if user is None:

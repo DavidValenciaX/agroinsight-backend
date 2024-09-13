@@ -207,8 +207,12 @@ async def resend_2fa_pin_endpoint(
         
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
+    
+    # Obtener el repositorio de usuarios
+    user_repository = UserRepository(db)
+    
     # Obtener el estado del usuario
-    estado = db.query(EstadoUsuario).filter(EstadoUsuario.id == current_user.state_id).first()
+    estado = user_repository.get_state_by_id(current_user.state_id)
     estado_nombre = estado.nombre if estado else "Desconocido"
     
     # Obtener el rol del usuario

@@ -50,6 +50,9 @@ class UserRepository:
         self.db.refresh(user)
         return user
     
+    def get_state_by_id(self, state_id: int):
+        return self.db.query(EstadoUsuario).filter(EstadoUsuario.id == state_id).first()
+    
     def get_active_user_state(self):
         return self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "active").first()
 
