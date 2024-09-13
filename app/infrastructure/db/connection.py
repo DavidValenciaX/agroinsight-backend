@@ -8,7 +8,7 @@ from databases import Database
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 # Asegúrate de que DATABASE_URL esté en el formato correcto para PyMySQL
 DATABASE_URL = os.getenv('MYSQL_PUBLIC_URL')
@@ -20,9 +20,6 @@ engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Conexión asincrónica para el manejo con FastAPI
-database = Database(DATABASE_URL)
-
 # Función para obtener la sesión de la base de datos
 def getDb():
     db = SessionLocal()
@@ -30,10 +27,3 @@ def getDb():
         yield db
     finally:
         db.close()
-
-# Funciones para manejar la conexión asíncrona
-async def conectar():
-    await database.connect()
-
-async def desconectar():
-    await database.disconnect()
