@@ -25,9 +25,9 @@ class TwoFactorAuthUseCase:
                 expiracion=datetime.utcnow() + timedelta(minutes=5)
             )
             db.add(verification)
-            db.commit()
             
             if self.send_two_factor_pin(user.email, pin):
+                db.commit()
                 return True
             else:
                 db.rollback()
@@ -65,12 +65,33 @@ class TwoFactorAuthUseCase:
         if not user:
             return False
         
-        # Eliminar la verificación existente si la hay
-        self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
-        self.db.commit()
-        
-        # Crear una nueva verificación y enviar el nuevo PIN
-        return self.create_two_factor_verification(self.db, user)
+        try:
+            
+            # Iniciar una transacción
+            self.db.begin_nested()
+            # Eliminar la verificación existente si la hay
+            self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
+            
+            # Crear una nueva verificación
+            pin, pin_hash = generate_pin()
+            
+            verification = VerificacionDospasos(
+                usuario_id=user.id,
+                pin=pin_hash,
+                expiracion=datetime.utcnow() + timedelta(minutes=5)
+            )
+            self.db.add(verification)
+            
+            if self.send_two_factor_pin(user.email, pin):
+                self.db.commit()
+                return True
+            else:
+                self.db.rollback()
+                return False
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al reenviar el PIN de doble verificación: {str(e)}")
+            return False
 
     def handle_failed_verification(self, user_id: int):
         verification = self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).first()

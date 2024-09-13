@@ -24,9 +24,9 @@ class UserConfirmationUseCase:
                 expiracion=datetime.utcnow() + timedelta(minutes=10)
             )
             self.db.add(confirmation)
-            self.db.commit()
             
             if self.send_confirmation_email(user.email, pin):
+                self.db.commit()
                 return True
             else:
                 self.db.rollback()
@@ -71,21 +71,36 @@ class UserConfirmationUseCase:
         if not user:
             return False
         
-        # Eliminar la confirmación existente si la hay
-        self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user.id).delete()
-        
-        # Crear una nueva confirmación
-        pin, pin_hash = generate_pin()
-        confirmation = ConfirmacionUsuario(
-            usuario_id=user.id,
-            pin=pin_hash,
-            expiracion=datetime.utcnow() + timedelta(minutes=10)
-        )
-        self.db.add(confirmation)
-        self.db.commit()
-        
-        # Enviar el nuevo PIN por correo electrónico
-        return self.send_confirmation_email(email, pin)
+        try:
+            # Iniciar una transacción
+            self.db.begin_nested()
+            
+            # Eliminar la confirmación existente si la hay
+            self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user.id).delete()
+            
+            # Crear una nueva confirmación
+            pin, pin_hash = generate_pin()
+            confirmation = ConfirmacionUsuario(
+                usuario_id=user.id,
+                pin=pin_hash,
+                expiracion=datetime.utcnow() + timedelta(minutes=10)
+            )
+            self.db.add(confirmation)
+            
+            # Intentar enviar el correo electrónico
+            if self.send_confirmation_email(email, pin):
+                # Si el envío del correo es exitoso, confirmar la transacción
+                self.db.commit()
+                return True
+            else:
+                # Si el envío del correo falla, revertir la transacción
+                self.db.rollback()
+                return False
+        except Exception as e:
+            # En caso de cualquier error, revertir la transacción
+            self.db.rollback()
+            print(f"Error al reenviar el PIN de confirmación: {str(e)}")
+            return False
     
     def handle_failed_confirmation(self, user_id: int):
         confirmation = self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user_id).first()
@@ -93,6 +108,6 @@ class UserConfirmationUseCase:
             confirmation.intentos += 1
             if confirmation.intentos >= 3:
                 user = self.db.query(User).filter(User.id == user_id).first()
-                self.db.delete(user)  # Esto también eliminará la confirmación debido a ON DELETE CASCADE
+                self.db.delete(user)
             else:
                 self.db.commit()

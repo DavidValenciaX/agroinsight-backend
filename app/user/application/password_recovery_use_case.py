@@ -16,21 +16,37 @@ class PasswordRecoveryUseCase:
         if not user:
             return False
 
-        # Eliminar recuperaciones anteriores si existen
-        self.db.query(RecuperacionContrasena).filter(RecuperacionContrasena.usuario_id == user.id).delete()
+        try:
+            # Iniciar una transacción
+            self.db.begin_nested()
 
-        pin = ''.join(secrets.choice('0123456789') for _ in range(4))
-        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+            # Eliminar recuperaciones anteriores si existen
+            self.db.query(RecuperacionContrasena).filter(RecuperacionContrasena.usuario_id == user.id).delete()
 
-        recovery = RecuperacionContrasena(
-            usuario_id=user.id,
-            pin=pin_hash,
-            expiracion=datetime.utcnow() + timedelta(minutes=10)
-        )
-        self.db.add(recovery)
-        self.db.commit()
+            pin = ''.join(secrets.choice('0123456789') for _ in range(4))
+            pin_hash = hashlib.sha256(pin.encode()).hexdigest()
 
-        return self.send_password_recovery_email(email, pin)
+            recovery = RecuperacionContrasena(
+                usuario_id=user.id,
+                pin=pin_hash,
+                expiracion=datetime.utcnow() + timedelta(minutes=10)
+            )
+            self.db.add(recovery)
+
+            # Intentar enviar el correo electrónico
+            if self.send_password_recovery_email(email, pin):
+                # Si el envío del correo es exitoso, confirmar la transacción
+                self.db.commit()
+                return True
+            else:
+                # Si el envío del correo falla, revertir la transacción
+                self.db.rollback()
+                return False
+        except Exception as e:
+            # En caso de cualquier error, revertir la transacción
+            self.db.rollback()
+            print(f"Error al iniciar la recuperación de contraseña: {str(e)}")
+            return False
     
     def send_password_recovery_email(self, email: str, pin: str) -> bool:
         subject = "Recuperación de contraseña - AgroInSight"
@@ -44,23 +60,40 @@ class PasswordRecoveryUseCase:
         if not user:
             return False
 
-        recovery = self.db.query(RecuperacionContrasena).filter(
-            RecuperacionContrasena.usuario_id == user.id,
-            RecuperacionContrasena.expiracion > datetime.utcnow()
-        ).first()
+        try:
+            # Iniciar una transacción
+            self.db.begin_nested()
 
-        if not recovery:
-            return self.initiate_password_recovery(email)
+            recovery = self.db.query(RecuperacionContrasena).filter(
+                RecuperacionContrasena.usuario_id == user.id,
+                RecuperacionContrasena.expiracion > datetime.utcnow()
+            ).first()
 
-        pin = ''.join(secrets.choice('0123456789') for _ in range(4))
-        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+            if not recovery:
+                # Si no hay recuperación activa, iniciar una nueva
+                return self.initiate_password_recovery(email)
 
-        recovery.pin = pin_hash
-        recovery.expiracion = datetime.utcnow() + timedelta(minutes=15)
-        recovery.intentos = 0
-        self.db.commit()
+            pin = ''.join(secrets.choice('0123456789') for _ in range(4))
+            pin_hash = hashlib.sha256(pin.encode()).hexdigest()
 
-        return self.send_password_recovery_email(email, pin)
+            recovery.pin = pin_hash
+            recovery.expiracion = datetime.utcnow() + timedelta(minutes=15)
+            recovery.intentos = 0
+
+            # Intentar enviar el correo electrónico
+            if self.send_password_recovery_email(email, pin):
+                # Si el envío del correo es exitoso, confirmar la transacción
+                self.db.commit()
+                return True
+            else:
+                # Si el envío del correo falla, revertir la transacción
+                self.db.rollback()
+                return False
+        except Exception as e:
+            # En caso de cualquier error, revertir la transacción
+            self.db.rollback()
+            print(f"Error al reenviar el PIN de recuperación: {str(e)}")
+            return False
 
     def confirm_recovery_pin(self, email: str, pin_hash: str) -> bool:
         user = self.db.query(User).filter(User.email == email).first()
