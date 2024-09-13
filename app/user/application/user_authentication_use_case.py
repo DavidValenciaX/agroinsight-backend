@@ -1,9 +1,10 @@
 from datetime import timedelta, datetime, timezone
 from app.user.domain.user_entities import UserInDB
-from app.user.domain.user_repository_interface import UserRepositoryInterface
 from jose import jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.core.config.settings import SECRET_KEY, ALGORITHM
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -13,8 +14,8 @@ LOCKOUT_TIME = timedelta(minutes=5)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AuthUseCase:
-    def __init__(self, user_repository: UserRepositoryInterface):
-        self.user_repository = user_repository
+    def __init__(self, db: Session):
+        self.user_repository = UserRepository(db)
 
     def verify_password(self, plain_password, hashed_password):
         return pwd_context.verify(plain_password, hashed_password)

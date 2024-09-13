@@ -1,12 +1,11 @@
 from sqlalchemy.orm import Session, joinedload
 from app.user.domain.user_entities import UserInDB, RoleInfo
 from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
-from app.user.domain.user_repository_interface import UserRepositoryInterface
 from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
 from app.user.infrastructure.orm_models.role_orm_model import Role
 from app.user.infrastructure.orm_models.user_role_orm_model import UserRole
 
-class UserRepository(UserRepositoryInterface):
+class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 

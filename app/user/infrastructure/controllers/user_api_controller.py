@@ -135,7 +135,7 @@ async def resend_confirmation_pin_endpoint(
 @router.post("/login")
 async def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
     user_repository = UserRepository(db)
-    auth_use_case = AuthUseCase(user_repository)
+    auth_use_case = AuthUseCase(db)
 
     # Obtener el usuario
     user = user_repository.get_user_by_email(login_request.email)
@@ -170,7 +170,7 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
 async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
     two_factor_use_case = TwoFactorAuthUseCase(db)
     user_repository = UserRepository(db)
-    auth_use_case = AuthUseCase(user_repository)
+    auth_use_case = AuthUseCase(db)
     
     user = user_repository.get_user_by_email(auth_request.email)
     if not user:
