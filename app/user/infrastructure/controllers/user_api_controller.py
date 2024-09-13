@@ -3,18 +3,17 @@ from sqlalchemy.orm import Session
 import hashlib
 from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.user_authentication_use_case import AuthUseCase
-from app.user.infrastructure.sql_user_repository import UserRepository
+from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.core.services.email_service import create_user_with_confirmation, confirm_user, handle_failed_confirmation
-from app.user.infrastructure.user_confirmation_orm_model import ConfirmacionUsuario
-from app.user.infrastructure.user_orm_model import User as UserModel
+from app.user.application.user_confirmation_use_case import UserConfirmationUseCase
+from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
+from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
 from app.user.application.two_factor_auth_use_case import TwoFactorAuthUseCase
-from app.core.services.email_service import resend_confirmation_pin
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.user_entities import UserResponse
 from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
 from app.user.domain.user_entities import TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest
-from app.user.infrastructure.user_state_orm_model import EstadoUsuario
+from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.domain.user_entities import PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
 
@@ -48,7 +47,8 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
 
     try:
         new_user = creation_use_case.create_user(user)
-        if create_user_with_confirmation(db, new_user):
+        user_confirmation_use_case = UserConfirmationUseCase(db)
+        if user_confirmation_use_case.create_user_with_confirmation(new_user):
             return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
         else:
             # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
@@ -87,15 +87,17 @@ async def confirm_user_registration(
         ConfirmacionUsuario.pin == pin_hash
     ).first()
     
+    user_confirmation_use_case = UserConfirmationUseCase(db)
+    
     if not confirmation_record:
-        handle_failed_confirmation(db, user.id)
+        user_confirmation_use_case.handle_failed_confirmation(user.id)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="PIN inválido o expirado"
         )
     
     try:
-        if confirm_user(db, user.id, pin_hash):
+        if user_confirmation_use_case.confirm_user(user.id, pin_hash):
             return {"message": "Usuario confirmado exitosamente"}
         else:
             raise HTTPException(
@@ -103,7 +105,7 @@ async def confirm_user_registration(
                 detail="Error al confirmar el usuario"
             )
     except Exception as e:
-        handle_failed_confirmation(db, user.id)
+        user_confirmation_use_case.handle_failed_confirmation(user.id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al confirmar el usuario: {str(e)}"
@@ -115,7 +117,8 @@ async def resend_confirmation_pin_endpoint(
     db: Session = Depends(getDb)
 ):
     try:
-        success = resend_confirmation_pin(db, resend_request.email)
+        user_confirmation_use_case = UserConfirmationUseCase(db)
+        success = user_confirmation_use_case.resend_confirmation_pin(resend_request.email)
         if success:
             return {"message": "PIN de confirmación reenviado con éxito"}
         else:

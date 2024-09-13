@@ -1,6 +1,6 @@
 from app.user.domain.user_entities import UserCreate
-from app.user.infrastructure.user_orm_model import User as UserModel
-from app.user.infrastructure.sql_user_repository import UserRepository
+from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
+from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.core.security.security_utils import hash_password
 
 class UserCreationUseCase:

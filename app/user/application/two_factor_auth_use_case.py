@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from app.user.infrastructure.two_factor_verify_orm_model import VerificacionDospasos
-from app.user.infrastructure.user_orm_model import User
-from app.core.services.email_service import create_two_factor_verification
+from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
+from app.user.infrastructure.orm_models.user_orm_model import User
+from app.core.services.pin_service import generate_pin
+from app.core.services.email_service import send_email
 import hashlib
 
 class TwoFactorAuthUseCase:
@@ -10,7 +11,38 @@ class TwoFactorAuthUseCase:
         self.db = db
 
     def initiate_two_factor_auth(self, user: User) -> bool:
-        return create_two_factor_verification(self.db, user)
+        return self.create_two_factor_verification(self.db, user)
+    
+    def create_two_factor_verification(self, db: Session, user: User) -> bool:
+        try:
+            db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
+            
+            pin, pin_hash = generate_pin()
+            
+            verification = VerificacionDospasos(
+                usuario_id=user.id,
+                pin=pin_hash,
+                expiracion=datetime.utcnow() + timedelta(minutes=5)
+            )
+            db.add(verification)
+            db.commit()
+            
+            if self.send_two_factor_pin(user.email, pin):
+                return True
+            else:
+                db.rollback()
+                return False
+        except Exception as e:
+            db.rollback()
+            print(f"Error al crear la verificación en dos pasos: {str(e)}")
+            return False
+        
+    def send_two_factor_pin(self, email: str, pin: str):
+        subject = "Código de verificación en dos pasos - AgroInSight"
+        text_content = f"Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 5 minutos."
+        html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 5 minutos.</p></body></html>"
+        
+        return send_email(email, subject, text_content, html_content)
 
     def verify_two_factor_pin(self, user_id: int, pin: str) -> bool:
         pin_hash = hashlib.sha256(pin.encode()).hexdigest()
@@ -38,7 +70,7 @@ class TwoFactorAuthUseCase:
         self.db.commit()
         
         # Crear una nueva verificación y enviar el nuevo PIN
-        return create_two_factor_verification(self.db, user)
+        return self.create_two_factor_verification(self.db, user)
 
     def handle_failed_verification(self, user_id: int):
         verification = self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).first()

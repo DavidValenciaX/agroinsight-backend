@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt, JWTError
 from datetime import datetime, timezone
 from app.core.config.settings import SECRET_KEY, ALGORITHM
-from app.user.infrastructure.sql_user_repository import UserRepository
+from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 
 security = HTTPBearer()

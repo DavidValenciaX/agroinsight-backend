@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from app.user.infrastructure.user_orm_model import User
-from app.user.infrastructure.password_recovery_orm_model import RecuperacionContrasena
+from app.user.infrastructure.orm_models.user_orm_model import User
+from app.user.infrastructure.orm_models.password_recovery_orm_model import RecuperacionContrasena
 from app.core.security.security_utils import hash_password, verify_password
-from app.core.services.email_service import send_password_recovery_email
+from app.core.services.email_service import send_email
 from datetime import datetime, timedelta
 import secrets
 import hashlib
@@ -30,7 +30,14 @@ class PasswordRecoveryUseCase:
         self.db.add(recovery)
         self.db.commit()
 
-        return send_password_recovery_email(email, pin)
+        return self.send_password_recovery_email(email, pin)
+    
+    def send_password_recovery_email(self, email: str, pin: str) -> bool:
+        subject = "Recuperación de contraseña - AgroInSight"
+        text_content = f"Tu código de recuperación de contraseña es: {pin}\nEste código expirará en 10 minutos."
+        html_content = f"<html><body><p><strong>Tu código de recuperación de contraseña es: {pin}</strong></p><p>Este código expirará en 10 minutos.</p></body></html>"
+        
+        return send_email(email, subject, text_content, html_content)
 
     def resend_recovery_pin(self, email: str) -> bool:
         user = self.db.query(User).filter(User.email == email).first()
@@ -53,7 +60,7 @@ class PasswordRecoveryUseCase:
         recovery.intentos = 0
         self.db.commit()
 
-        return send_password_recovery_email(email, pin)
+        return self.send_password_recovery_email(email, pin)
 
     def confirm_recovery_pin(self, email: str, pin_hash: str) -> bool:
         user = self.db.query(User).filter(User.email == email).first()
