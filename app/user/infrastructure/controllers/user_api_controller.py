@@ -139,7 +139,7 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
 
     # Obtener el usuario
     user = user_repository.get_user_by_email(login_request.email)
-    if user:
+    if user and user.state_id == 3:
         # Intentar desbloquear si está bloqueado
         auth_use_case.unlock_user(user)
 

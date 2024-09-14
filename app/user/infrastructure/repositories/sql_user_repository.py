@@ -4,6 +4,7 @@ from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
 from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
 from app.user.infrastructure.orm_models.role_orm_model import Role
 from app.user.infrastructure.orm_models.user_role_orm_model import UserRole
+from datetime import datetime, timezone, timedelta
 
 class UserRepository:
     def __init__(self, db: Session):
@@ -37,11 +38,9 @@ class UserRepository:
             user_model.locked_until = user.locked_until
             user_model.state_id = user.state_id
             
-            # No actualizamos los roles aquí para evitar el conflicto
-            
             self.db.commit()
             self.db.refresh(user_model)
-            return self.get_user_by_email(user_model.email)  # Usamos get_user_by_email para obtener los roles correctamente
+            return self.get_user_by_email(user_model.email)
         return None
     
     def create_user(self, user: UserModel) -> UserModel:
@@ -49,6 +48,25 @@ class UserRepository:
         self.db.commit()
         self.db.refresh(user)
         return user
+    
+    def block_user(self, user_id: int, lock_duration: timedelta):
+        user = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+        if user:
+            user.locked_until = datetime.now(timezone.utc) + lock_duration
+            user.state_id = 3  # Estado bloqueado
+            self.db.commit()
+            return True
+        return False
+    
+    def unblock_user(self, user_id: int):
+        user = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+        if user:
+            user.locked_until = None
+            user.state_id = 1  # Estado activo
+            user.failed_attempts = 0
+            self.db.commit()
+            return True
+        return False
     
     def get_state_by_id(self, state_id: int):
         return self.db.query(EstadoUsuario).filter(EstadoUsuario.id == state_id).first()

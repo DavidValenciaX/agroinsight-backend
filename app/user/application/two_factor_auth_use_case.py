@@ -98,8 +98,8 @@ class TwoFactorAuthUseCase:
         if verification:
             verification.intentos += 1
             if verification.intentos >= 3:
-                # Si hay demasiados intentos fallidos, eliminar la verificación y bloquear al usuario
                 user = self.db.query(User).filter(User.id == user_id).first()
                 user.locked_until = datetime.utcnow() + timedelta(minutes=30)
+                user.state_id = 3  # Estado bloqueado
                 self.db.delete(verification)
             self.db.commit()

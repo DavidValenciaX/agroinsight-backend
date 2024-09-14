@@ -44,7 +44,7 @@ class AuthUseCase:
             )
 
         if not self.verify_password(password, user.password):
-            self._handle_failed_login_attempt(user)
+            self.handle_failed_login_attempt(user)
             return None
         
         # Resetear intentos fallidos en caso de éxito
@@ -63,11 +63,11 @@ class AuthUseCase:
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
-    def _handle_failed_login_attempt(self, user: UserInDB):
+    def handle_failed_login_attempt(self, user: UserInDB):
         user.failed_attempts += 1
         if user.failed_attempts >= MAX_FAILED_ATTEMPTS:
             user.locked_until = datetime.now(timezone.utc) + LOCKOUT_TIME
-            user.state_id = 3  # 3 corresponde a 'locked'
+            user.state_id = 3  # Estado bloqueado
             self.user_repository.update_user(user)
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -78,12 +78,11 @@ class AuthUseCase:
     def unlock_user(self, user: UserInDB):
         current_time = datetime.now(timezone.utc)
         
-        # Convertir user.locked_until a un datetime consciente de zona horaria
         if user.locked_until:
             user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
         
         if user.state_id == 3 and user.locked_until and current_time > user.locked_until:
             user.failed_attempts = 0
             user.locked_until = None
-            user.state_id = 1  # Volver a estado "active"
+            user.state_id = 1  # Estado activo
             self.user_repository.update_user(user)
