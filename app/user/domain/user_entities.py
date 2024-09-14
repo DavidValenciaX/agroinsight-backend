@@ -2,6 +2,7 @@ import re
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import List, Optional
 from datetime import datetime
+from app.core.security.security_utils import validate_password
 
 class UserCreate(BaseModel):
     nombre: str = Field(..., min_length=2, max_length=50)
@@ -10,24 +11,11 @@ class UserCreate(BaseModel):
     password: str = Field(..., min_length=12)
     
     @field_validator('password')
-    def validate_password(cls, v):
-        # Longitud mínima
-        if len(v) < 12:
-            raise ValueError('Password must be at least 12 characters long')
-
-        # Debe contener al menos un número
-        if not re.search(r'\d', v):
-            raise ValueError('Password must contain at least one number')
-
-        # Debe contener al menos una letra
-        if not re.search(r'[a-zA-Z]', v):
-            raise ValueError('Password must contain at least one letter')
-
-        # Debe contener al menos un símbolo especial
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
-            raise ValueError('Password must contain at least one special character')
-
-        return v
+    def validate_user_password(cls, v):
+        try:
+            return validate_password(v)
+        except ValueError as e:
+            raise ValueError(str(e))
 
 class RoleInfo(BaseModel):
     id: int
@@ -95,21 +83,8 @@ class PasswordResetRequest(BaseModel):
     new_password: str = Field(..., min_length=12)
     
     @field_validator('new_password')
-    def validate_password(cls, v):
-        # Longitud mínima
-        if len(v) < 12:
-            raise ValueError('Password must be at least 12 characters long')
-
-        # Debe contener al menos un número
-        if not re.search(r'\d', v):
-            raise ValueError('Password must contain at least one number')
-
-        # Debe contener al menos una letra
-        if not re.search(r'[a-zA-Z]', v):
-            raise ValueError('Password must contain at least one letter')
-
-        # Debe contener al menos un símbolo especial
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
-            raise ValueError('Password must contain at least one special character')
-
-        return v
+    def validate_reset_password(cls, v):
+        try:
+            return validate_password(v)
+        except ValueError as e:
+            raise ValueError(str(e))
