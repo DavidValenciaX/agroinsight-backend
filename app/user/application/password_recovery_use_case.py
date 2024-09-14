@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+import secrets
+import hashlib
 from app.user.infrastructure.orm_models.user_orm_model import User
 from app.user.infrastructure.orm_models.password_recovery_orm_model import RecuperacionContrasena
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
-from datetime import datetime, timedelta
-import secrets
-import hashlib
 
 class PasswordRecoveryUseCase:
     def __init__(self, db: Session):
@@ -17,10 +17,7 @@ class PasswordRecoveryUseCase:
             return False
 
         try:
-            # Iniciar una transacción
             self.db.begin_nested()
-
-            # Eliminar recuperaciones anteriores si existen
             self.db.query(RecuperacionContrasena).filter(RecuperacionContrasena.usuario_id == user.id).delete()
 
             pin = ''.join(secrets.choice('0123456789') for _ in range(4))
@@ -33,17 +30,13 @@ class PasswordRecoveryUseCase:
             )
             self.db.add(recovery)
 
-            # Intentar enviar el correo electrónico
             if self.send_password_recovery_email(email, pin):
-                # Si el envío del correo es exitoso, confirmar la transacción
                 self.db.commit()
                 return True
             else:
-                # Si el envío del correo falla, revertir la transacción
                 self.db.rollback()
                 return False
         except Exception as e:
-            # En caso de cualquier error, revertir la transacción
             self.db.rollback()
             print(f"Error al iniciar la recuperación de contraseña: {str(e)}")
             return False
@@ -61,16 +54,13 @@ class PasswordRecoveryUseCase:
             return False
 
         try:
-            # Iniciar una transacción
             self.db.begin_nested()
-
             recovery = self.db.query(RecuperacionContrasena).filter(
                 RecuperacionContrasena.usuario_id == user.id,
                 RecuperacionContrasena.expiracion > datetime.utcnow()
             ).first()
 
             if not recovery:
-                # Si no hay recuperación activa, iniciar una nueva
                 return self.initiate_password_recovery(email)
 
             pin = ''.join(secrets.choice('0123456789') for _ in range(4))
@@ -80,17 +70,13 @@ class PasswordRecoveryUseCase:
             recovery.expiracion = datetime.utcnow() + timedelta(minutes=15)
             recovery.intentos = 0
 
-            # Intentar enviar el correo electrónico
             if self.send_password_recovery_email(email, pin):
-                # Si el envío del correo es exitoso, confirmar la transacción
                 self.db.commit()
                 return True
             else:
-                # Si el envío del correo falla, revertir la transacción
                 self.db.rollback()
                 return False
         except Exception as e:
-            # En caso de cualquier error, revertir la transacción
             self.db.rollback()
             print(f"Error al reenviar el PIN de recuperación: {str(e)}")
             return False
@@ -132,9 +118,8 @@ class PasswordRecoveryUseCase:
         if not recovery:
             return False
 
-        # Verificar que la nueva contraseña no sea igual a la anterior
         if verify_password(new_password, user.password):
-            return False  # La nueva contraseña es igual a la anterior
+            return False
 
         user.password = hash_password(new_password)
         self.db.delete(recovery)

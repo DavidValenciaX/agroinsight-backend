@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-# Configuración de Gmail SMTP
 GMAIL_USER = os.getenv('GMAIL_USER')
 GMAIL_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
 SMTP_SERVER = "smtp.gmail.com"

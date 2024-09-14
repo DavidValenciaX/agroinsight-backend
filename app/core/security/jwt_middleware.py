@@ -1,12 +1,11 @@
-from fastapi import HTTPException, Security
+from fastapi import HTTPException, Security, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt, JWTError
 from datetime import datetime, timezone
+from sqlalchemy.orm import Session
 from app.core.config.settings import SECRET_KEY, ALGORITHM
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from fastapi import Depends
-from sqlalchemy.orm import Session
 
 security = HTTPBearer()
 

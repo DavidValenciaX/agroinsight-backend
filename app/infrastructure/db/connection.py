@@ -1,26 +1,21 @@
+import os
+from dotenv import load_dotenv
 import pymysql
-pymysql.install_as_MySQLdb()
-
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from databases import Database
-import os
-from dotenv import load_dotenv
 
+pymysql.install_as_MySQLdb()
 load_dotenv(override=True)
 
-# Asegúrate de que DATABASE_URL esté en el formato correcto para PyMySQL
 DATABASE_URL = os.getenv('MYSQL_PUBLIC_URL')
 if DATABASE_URL and DATABASE_URL.startswith('mysql://'):
     DATABASE_URL = DATABASE_URL.replace('mysql://', 'mysql+pymysql://', 1)
 
-# Configuración de SQLAlchemy
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Función para obtener la sesión de la base de datos
 def getDb():
     db = SessionLocal()
     try:
