@@ -1,11 +1,16 @@
 from datetime import timedelta, datetime, timezone
-from app.user.domain.user_entities import UserInDB
+from sqlalchemy.orm import Session
 from jose import jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from app.user.domain.user_entities import UserInDB
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
+from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
+from app.user.infrastructure.orm_models.user_orm_model import User
+from app.core.services.pin_service import generate_pin
+from app.core.services.email_service import send_email
 from app.core.config.settings import SECRET_KEY, ALGORITHM
+import hashlib
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 MAX_FAILED_ATTEMPTS = 5
@@ -13,8 +18,9 @@ LOCKOUT_TIME = timedelta(minutes=5)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-class AuthUseCase:
+class AuthenticationUseCase:
     def __init__(self, db: Session):
+        self.db = db
         self.user_repository = UserRepository(db)
 
     def verify_password(self, plain_password, hashed_password):
@@ -28,14 +34,12 @@ class AuthUseCase:
                 detail="Usuario no encontrado.",
             )
         
-        # Verificar si el usuario está activo
         if user.state_id != 1:  # 1 corresponde a 'active'
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="La cuenta no está activa o está bloqueada.",
             )
         
-        # Verificar si la cuenta está bloqueada temporalmente
         if user.locked_until and user.locked_until > datetime.now(timezone.utc):
             time_left = user.locked_until - datetime.now(timezone.utc)
             raise HTTPException(
@@ -47,7 +51,6 @@ class AuthUseCase:
             self.handle_failed_login_attempt(user)
             return None
         
-        # Resetear intentos fallidos en caso de éxito
         user.failed_attempts = 0
         user.locked_until = None
         self.user_repository.update_user(user)
@@ -86,3 +89,93 @@ class AuthUseCase:
             user.locked_until = None
             user.state_id = 1  # Estado activo
             self.user_repository.update_user(user)
+
+    # Métodos de autenticación de dos factores
+    def initiate_two_factor_auth(self, user: User) -> bool:
+        return self.create_two_factor_verification(self.db, user)
+    
+    def create_two_factor_verification(self, db: Session, user: User) -> bool:
+        try:
+            db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
+            
+            pin, pin_hash = generate_pin()
+            
+            verification = VerificacionDospasos(
+                usuario_id=user.id,
+                pin=pin_hash,
+                expiracion=datetime.utcnow() + timedelta(minutes=5)
+            )
+            db.add(verification)
+            
+            if self.send_two_factor_pin(user.email, pin):
+                db.commit()
+                return True
+            else:
+                db.rollback()
+                return False
+        except Exception as e:
+            db.rollback()
+            print(f"Error al crear la verificación en dos pasos: {str(e)}")
+            return False
+        
+    def send_two_factor_pin(self, email: str, pin: str):
+        subject = "Código de verificación en dos pasos - AgroInSight"
+        text_content = f"Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 5 minutos."
+        html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 5 minutos.</p></body></html>"
+        
+        return send_email(email, subject, text_content, html_content)
+
+    def verify_two_factor_pin(self, user_id: int, pin: str) -> bool:
+        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+        verification = self.db.query(VerificacionDospasos).filter(
+            VerificacionDospasos.usuario_id == user_id,
+            VerificacionDospasos.pin == pin_hash,
+            VerificacionDospasos.expiracion > datetime.utcnow()
+        ).first()
+
+        if not verification:
+            return False
+
+        self.db.delete(verification)
+        self.db.commit()
+        return True
+    
+    def resend_2fa_pin(self, email: str) -> bool:
+        user = self.user_repository.get_user_by_email(email)
+        if not user:
+            return False
+        
+        try:
+            self.db.begin_nested()
+            self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
+            
+            pin, pin_hash = generate_pin()
+            
+            verification = VerificacionDospasos(
+                usuario_id=user.id,
+                pin=pin_hash,
+                expiracion=datetime.utcnow() + timedelta(minutes=5)
+            )
+            self.db.add(verification)
+            
+            if self.send_two_factor_pin(user.email, pin):
+                self.db.commit()
+                return True
+            else:
+                self.db.rollback()
+                return False
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al reenviar el PIN de doble verificación: {str(e)}")
+            return False
+
+    def handle_failed_verification(self, user_id: int):
+        verification = self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).first()
+        if verification:
+            verification.intentos += 1
+            if verification.intentos >= 3:
+                user = self.db.query(User).filter(User.id == user_id).first()
+                user.locked_until = datetime.utcnow() + timedelta(minutes=30)
+                user.state_id = 3  # Estado bloqueado
+                self.db.delete(verification)
+            self.db.commit()

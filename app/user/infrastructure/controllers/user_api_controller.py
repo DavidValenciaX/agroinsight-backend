@@ -2,13 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import hashlib
 from app.user.application.user_creation_use_case import UserCreationUseCase
-from app.user.application.user_authentication_use_case import AuthUseCase
+from app.user.application.user_authentication_use_case import AuthenticationUseCase
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.user.application.user_confirmation_use_case import UserConfirmationUseCase
 from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
 from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
-from app.user.application.two_factor_auth_use_case import TwoFactorAuthUseCase
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.user_entities import UserResponse
 from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
@@ -111,7 +110,7 @@ async def confirm_user_registration(
             detail=f"Error al confirmar el usuario: {str(e)}"
         )
         
-@router.post("/resend-pin", status_code=status.HTTP_200_OK)
+@router.post("/resend-confirm-pin", status_code=status.HTTP_200_OK)
 async def resend_confirmation_pin_endpoint(
     resend_request: ResendPinRequest,
     db: Session = Depends(getDb)
@@ -135,7 +134,7 @@ async def resend_confirmation_pin_endpoint(
 @router.post("/login")
 async def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
     user_repository = UserRepository(db)
-    auth_use_case = AuthUseCase(db)
+    auth_use_case = AuthenticationUseCase(db)
 
     # Obtener el usuario
     user = user_repository.get_user_by_email(login_request.email)
@@ -157,8 +156,7 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
         )
     
     # Iniciar verificación en dos pasos
-    two_factor_use_case = TwoFactorAuthUseCase(db)
-    if two_factor_use_case.initiate_two_factor_auth(authenticated_user):
+    if auth_use_case.initiate_two_factor_auth(authenticated_user):
         return {"message": "Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
     else:
         raise HTTPException(
@@ -168,20 +166,19 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
         
 @router.post("/login/verify", response_model=TokenResponse)
 async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
-    two_factor_use_case = TwoFactorAuthUseCase(db)
+    auth_use_case = AuthenticationUseCase(db)
     user_repository = UserRepository(db)
-    auth_use_case = AuthUseCase(db)
     
     user = user_repository.get_user_by_email(auth_request.email)
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
-    if two_factor_use_case.verify_two_factor_pin(user.id, auth_request.pin):
+    if auth_use_case.verify_two_factor_pin(user.id, auth_request.pin):
         # Generar y devolver el token de acceso
         access_token = auth_use_case.create_access_token(data={"sub": user.email})
         return {"access_token": access_token, "token_type": "bearer"}
     else:
-        two_factor_use_case.handle_failed_verification(user.id)
+        auth_use_case.handle_failed_verification(user.id)
         raise HTTPException(status_code=400, detail="Código de verificación inválido o expirado")
     
 @router.post("/resend-2fa-pin", status_code=status.HTTP_200_OK)
@@ -189,9 +186,9 @@ async def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
     db: Session = Depends(getDb)
 ):
-    two_factor_use_case = TwoFactorAuthUseCase(db)
+    auth_use_case = AuthenticationUseCase(db)
     try:
-        success = two_factor_use_case.resend_2fa_pin(resend_request.email)
+        success = auth_use_case.resend_2fa_pin(resend_request.email)
         if success:
             return {"message": "PIN de verificación en dos pasos reenviado con éxito"}
         else:
