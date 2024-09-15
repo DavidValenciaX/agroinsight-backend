@@ -21,12 +21,6 @@ class UserRepository:
     def get_user_by_id(self, user_id: int) -> Optional[User]:
         user = self.db.query(User).options(joinedload(User.roles)).get(user_id)
         return user
-    
-    def get_roles_by_user(self, user_id: int):
-        user = self.db.query(User).get(user_id)
-        if user is None:
-            return []
-        return [RoleInfo(id=role.id, nombre=role.nombre) for role in user.roles]
 
     def update_user(self, user: User) -> Optional[User]:
         user_in_db = self.db.query(User).get(user.id)  # Cargar el usuario desde la base de datos
@@ -77,16 +71,6 @@ class UserRepository:
             return True
         return False
     
-    def unblock_user(self, user_id: int):
-        user = self.db.query(User).filter(User.id == user_id).first()
-        if user:
-            user.locked_until = None
-            user.state_id = 1  # Estado activo
-            user.failed_attempts = 0
-            self.db.commit()
-            return True
-        return False
-    
     # Métodos relacionados con estados y roles
     def get_state_by_id(self, state_id: int):
         return self.db.query(EstadoUsuario).filter(EstadoUsuario.id == state_id).first()
@@ -96,9 +80,6 @@ class UserRepository:
 
     def get_pending_user_state(self):
         return self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "pending").first()
-
-    def get_default_role(self):
-        return self.db.query(Role).filter(Role.nombre == "Usuario").first()
 
     def get_unconfirmed_user_role(self):
         return self.db.query(Role).filter(Role.nombre == "Usuario No Confirmado").first()
@@ -139,13 +120,6 @@ class UserRepository:
             RecuperacionContrasena.usuario_id == user_id,
             RecuperacionContrasena.expiracion > datetime.utcnow()
         ).first()
-        
-    def get_password_recovery_with_pin(self, user_id: int, pin_hash: str):
-        # Llamamos al método base para obtener la recuperación activa
-        recovery = self.get_password_recovery(user_id)
-        if recovery and recovery.pin == pin_hash:
-            return recovery
-        return None
 
     def delete_recovery(self, recovery: PasswordRecovery):
         self.db.delete(recovery)
@@ -167,10 +141,6 @@ class UserRepository:
             VerificacionDospasos.pin == pin_hash,
             VerificacionDospasos.expiracion > datetime.now(timezone.utc)  # timezone-aware
         ).first()
-
-    def delete_two_factor_verification_entry(self, verification: TwoFactorAuth):
-        self.db.delete(verification)
-        self.db.commit()
         
     def increment_two_factor_attempts(self, user_id: int):
         accessTokenExpireMinutes = 10
@@ -202,10 +172,6 @@ class UserRepository:
             ConfirmacionUsuario.pin == pin_hash,
             ConfirmacionUsuario.expiracion > datetime.utcnow()
         ).first()
-    
-    def increase_confirmation_attempts(self, confirmation: Confirmation):
-        confirmation.intentos += 1
-        self.db.commit()
 
     def increment_confirmation_attempts(self, user_id: int):
         confirmation = self.get_active_confirmation(user_id)
@@ -214,15 +180,6 @@ class UserRepository:
             self.db.commit()
             return confirmation.intentos
         return 0
-
-    def get_user_with_confirmation(self, email: str) -> tuple:
-        user = self.db.query(User).filter(User.email == email).first()
-        if user:
-            confirmation = self.db.query(ConfirmacionUsuario).filter(
-                ConfirmacionUsuario.usuario_id == user.id
-            ).first()
-            return user, confirmation
-        return None, None
 
     def get_active_confirmation(self, user_id: int):
         return self.db.query(ConfirmacionUsuario).filter(
@@ -242,45 +199,4 @@ class UserRepository:
                 self.db.rollback()
                 print(f"Error al hacer commit: {e}")
                 return False
-        return False
-
-
-    def get_user_with_recovery(self, email: str) -> tuple:
-        user = self.db.query(User).filter(User.email == email).first()
-        if user:
-            recovery = self.db.query(RecuperacionContrasena).filter(
-                RecuperacionContrasena.usuario_id == user.id,
-                RecuperacionContrasena.expiracion > datetime.utcnow()
-            ).first()
-            return user, recovery
-        return None, None
-
-    def update_password(self, user_id: int, new_password: str):
-        user = self.get_user_by_id(user_id)
-        if user:
-            user.password = new_password
-            self.db.commit()
-            return True
-        return False
-
-    def get_active_two_factor_verification(self, user_id: int):
-        return self.db.query(VerificacionDospasos).filter(
-            VerificacionDospasos.usuario_id == user_id,
-            VerificacionDospasos.expiracion > datetime.utcnow()
-        ).first()
-
-    def increment_failed_attempts(self, user_id: int):
-        user = self.get_user_by_id(user_id)
-        if user:
-            user.failed_attempts += 1
-            self.db.commit()
-            return user.failed_attempts
-        return 0
-
-    def reset_failed_attempts(self, user_id: int):
-        user = self.get_user_by_id(user_id)
-        if user:
-            user.failed_attempts = 0
-            self.db.commit()
-            return True
         return False
