@@ -1,83 +1,88 @@
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from app.user.infrastructure.orm_models.user_orm_model import User
 from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
 from app.core.services.email_service import send_email
 from app.core.services.pin_service import generate_pin
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
-from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
+from app.user.domain.user_entities import UserInDB
+from app.user.domain.exceptions import TooManyConfirmationAttempts
 
 class UserConfirmationUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def create_user_with_confirmation(self, user: User) -> bool:
+    def create_user_with_confirmation(self, user: UserInDB) -> bool:
         try:
-            # Eliminar confirmaciones anteriores si existen
-            self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user.id).delete()
             
+            unconfirmed_user = self.user_repository.get_user_by_email(user.email)
+            
+            # Eliminar confirmaciones anteriores si existen
+            self.user_repository.delete_user_confirmations(unconfirmed_user.id)
+            
+            # Generar PIN y su hash
             pin, pin_hash = generate_pin()
             confirmation = ConfirmacionUsuario(
                 usuario_id=user.id,
                 pin=pin_hash,
                 expiracion=datetime.utcnow() + timedelta(minutes=10)
             )
-            self.db.add(confirmation)
             
+            # Enviar correo de confirmación
             if self.send_confirmation_email(user.email, pin):
-                self.db.commit()
+                self.user_repository.add_user_confirmation(confirmation)
                 return True
             else:
-                self.db.rollback()
                 return False
         except Exception as e:
-            self.db.rollback()
+            # Manejar excepción (puede mejorarse con un sistema de logging)
             print(f"Error al crear la confirmación del usuario: {str(e)}")
             return False
         
-    def send_confirmation_email(self, email: str, pin: str):
+    def send_confirmation_email(self, email: str, pin: str) -> bool:
+        """Envía un correo electrónico con el PIN de confirmación."""
         subject = "Confirma tu registro en AgroInSight"
         text_content = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
-        html_content = f"<html><body><p><strong>Tu PIN de confirmación es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
-        
+        html_content = f"""
+        <html>
+            <body>
+                <p><strong>Tu PIN de confirmación es: {pin}</strong></p>
+                <p>Este PIN expirará en 10 minutos.</p>
+            </body>
+        </html>
+        """
         return send_email(email, subject, text_content, html_content)
         
-    def confirm_user(self, user_id: int, pin_hash: str):
-        confirmation = self.db.query(ConfirmacionUsuario).filter(
-            ConfirmacionUsuario.usuario_id == user_id,
-            ConfirmacionUsuario.pin == pin_hash,
-            ConfirmacionUsuario.expiracion > datetime.utcnow()
-        ).first()
-        
+    def confirm_user(self, user_id: int, pin_hash: str) -> bool:
+        confirmation = self.user_repository.get_user_confirmation(user_id, pin_hash)
+            
         if not confirmation:
             return False
-        
-        user_repository = UserRepository(self.db)
-        user = self.db.query(User).filter(User.id == user_id).first()
-        active_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == 'active').first()
-        user.state_id = active_state.id
-        
-        # Cambiar el rol del usuario
-        user_repository.change_user_role(user.id, "Usuario No Confirmado", "Usuario")
-        
-        self.db.delete(confirmation)
-        self.db.commit()
-        
+            
+        # Actualizar el estado del usuario a 'active'
+        active_state = self.user_repository.get_active_user_state()
+        if not active_state:
+            # Manejar el caso donde el estado 'active' no existe
+            return False
+        self.user_repository.update_user_state(user_id, active_state.id)
+            
+        # Cambiar el rol del usuario de "Usuario No Confirmado" a "Usuario"
+        self.user_repository.change_user_role(user_id, "Usuario No Confirmado", "Usuario")
+            
+        # Eliminar la confirmación
+        self.user_repository.delete_user_confirmations(user_id)
+            
         return True
     
     def resend_confirmation_pin(self, email: str) -> bool:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             return False
-        
+            
         try:
-            # Iniciar una transacción
-            self.db.begin_nested()
-            
-            # Eliminar la confirmación existente si la hay
-            self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user.id).delete()
-            
+            # Eliminar la confirmación existente
+            self.user_repository.delete_user_confirmations(user.id)
+                
             # Crear una nueva confirmación
             pin, pin_hash = generate_pin()
             confirmation = ConfirmacionUsuario(
@@ -85,29 +90,24 @@ class UserConfirmationUseCase:
                 pin=pin_hash,
                 expiracion=datetime.utcnow() + timedelta(minutes=10)
             )
-            self.db.add(confirmation)
-            
+                
             # Intentar enviar el correo electrónico
             if self.send_confirmation_email(email, pin):
-                # Si el envío del correo es exitoso, confirmar la transacción
-                self.db.commit()
+                self.user_repository.add_user_confirmation(confirmation)
                 return True
             else:
-                # Si el envío del correo falla, revertir la transacción
-                self.db.rollback()
                 return False
         except Exception as e:
-            # En caso de cualquier error, revertir la transacción
-            self.db.rollback()
+            # Manejar excepción
             print(f"Error al reenviar el PIN de confirmación: {str(e)}")
             return False
     
     def handle_failed_confirmation(self, user_id: int):
-        confirmation = self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user_id).first()
-        if confirmation:
-            confirmation.intentos += 1
-            if confirmation.intentos >= 3:
-                user = self.db.query(User).filter(User.id == user_id).first()
-                self.db.delete(user)
-            else:
-                self.db.commit()
+        """Maneja los intentos fallidos de confirmación."""
+        intentos = self.user_repository.increment_confirmation_attempts(user_id)
+        if intentos >= 3:
+            user = self.user_repository.get_user_by_id(user_id)
+            if user:
+                self.user_repository.delete_user_confirmations(user_id)
+                self.user_repository.delete_user(user)
+                raise TooManyConfirmationAttempts()

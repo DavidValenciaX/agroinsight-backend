@@ -6,6 +6,7 @@ from app.user.infrastructure.orm_models.password_recovery_orm_model import Recup
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
+from app.user.domain.exceptions import TooManyRecoveryAttempts
 
 class PasswordRecoveryUseCase:
     def __init__(self, db: Session):
@@ -73,25 +74,39 @@ class PasswordRecoveryUseCase:
             print(f"Error al reenviar el PIN de recuperación: {str(e)}")
             return False
 
-    def confirm_recovery_pin(self, email: str, pin_hash: str) -> bool:
+    def confirm_recovery_pin(self, email: str, pin: str) -> bool:
+        """Confirma el PIN de recuperación de contraseña."""
         user = self.user_repository.get_user_by_email(email)
         if not user:
             return False
 
-        recovery = self.user_repository.get_password_recovery_with_pin(user.id, pin_hash)
+        recovery = self.user_repository.get_password_recovery(user.id)
         if not recovery:
             return False
 
-        # Aumentar el contador de intentos
-        recovery.intentos += 1
-        self.user_repository.add_password_recovery(recovery)
-
-        # Si el número de intentos supera el límite, eliminar el registro de recuperación
-        if recovery.intentos >= 3:
+        # Verificar si el PIN proporcionado coincide
+        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+        if pin_hash == recovery.pin:
+            # PIN correcto, eliminar el registro de recuperación
             self.user_repository.delete_recovery(recovery)
+            return True
+        else:
+            # PIN incorrecto, incrementar los intentos
+            recovery.intentos += 1
+            if recovery.intentos >= 3:
+                self.handle_failed_recovery_confirmation(user.id)
+            else:
+                self.user_repository.add_password_recovery(recovery)
             return False
-
-        return True
+        
+    def handle_failed_recovery_confirmation(self, user_id: int):
+        """Maneja el bloqueo del usuario tras demasiados intentos fallidos de confirmación de recuperación."""
+        self.user_repository.delete_password_recovery(user_id)
+        locked = self.user_repository.block_user(user_id, timedelta(minutes=10))
+        if locked:
+            raise TooManyRecoveryAttempts()
+        else:
+            raise Exception("No se pudo bloquear al usuario debido a un error interno.")
 
     def reset_password(self, email: str, new_password: str) -> bool:
         user = self.user_repository.get_user_by_email(email)

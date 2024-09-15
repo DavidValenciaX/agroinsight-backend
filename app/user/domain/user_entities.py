@@ -1,5 +1,4 @@
-import re
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, conint, constr
 from typing import List, Optional
 from datetime import datetime
 from app.core.security.security_utils import validate_password
@@ -57,6 +56,12 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     
+class Confirmation(BaseModel):
+    usuario_id: int
+    pin: str = Field(..., min_length=1, max_length=64)
+    expiracion: datetime
+    intentos: int = Field(default=0, ge=0)
+    
 class ConfirmationRequest(BaseModel):
     email: EmailStr
     pin: str
@@ -64,6 +69,12 @@ class ConfirmationRequest(BaseModel):
 class TwoFactorAuthRequest(BaseModel):
     email: EmailStr
     pin: str = Field(..., min_length=4, max_length=4)
+    
+class TwoFactorAuth(BaseModel):
+    usuario_id: int
+    pin: str = Field(..., min_length=1, max_length=64)
+    expiracion: datetime
+    intentos: int = Field(default=0, ge=0)
     
 class ResendPinRequest(BaseModel):
     email: EmailStr
@@ -73,6 +84,12 @@ class Resend2FARequest(BaseModel):
     
 class PasswordRecoveryRequest(BaseModel):
     email: EmailStr
+    
+class PasswordRecovery(BaseModel):
+    usuario_id: int
+    pin: str = Field(..., min_length=1, max_length=64)
+    expiracion: datetime
+    intentos: int = Field(default=0, ge=0)
 
 class PinConfirmationRequest(BaseModel):
     email: EmailStr

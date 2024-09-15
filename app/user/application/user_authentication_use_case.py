@@ -110,14 +110,12 @@ class AuthenticationUseCase:
                 pin=pin_hash,
                 expiracion=datetime.now(timezone.utc) + timedelta(minutes=5)
             )
-            self.user_repository.add_two_factor_verification(verification)
             
             # Enviar el PIN al correo electrónico del usuario
             if self.send_two_factor_pin(user.email, pin):
+                self.user_repository.add_two_factor_verification(verification)
                 return True
             else:
-                # Si el envío falla, eliminar la verificación
-                self.user_repository.delete_two_factor_verification(user.id)
                 return False
         except Exception as e:
             print(f"Error al iniciar la verificación en dos pasos: {str(e)}")
@@ -190,7 +188,6 @@ class AuthenticationUseCase:
     def handle_failed_verification(self, user_id: int):
         attempts = self.user_repository.increment_two_factor_attempts(user_id)
 
-        print(f"intentos: {attempts}")
         if attempts >= 3:
             raise HTTPException(
                 status_code=403,

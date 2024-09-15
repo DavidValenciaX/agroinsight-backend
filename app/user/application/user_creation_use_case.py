@@ -2,10 +2,12 @@ from app.user.domain.user_entities import UserCreate
 from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.core.security.security_utils import hash_password
+from sqlalchemy.orm import Session
 
 class UserCreationUseCase:
-    def __init__(self, user_repository: UserRepository):
-        self.user_repository = user_repository
+    def __init__(self, db: Session):
+        self.db = db
+        self.user_repository = UserRepository(db)
 
     def create_user(self, user_data: UserCreate) -> UserModel:
         hashed_password = hash_password(user_data.password)

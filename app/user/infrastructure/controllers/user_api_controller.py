@@ -7,14 +7,15 @@ from app.user.infrastructure.repositories.sql_user_repository import UserReposit
 from app.infrastructure.db.connection import getDb
 from app.user.application.user_confirmation_use_case import UserConfirmationUseCase
 from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
-from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
+from app.user.infrastructure.orm_models.user_orm_model import User
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.user_entities import UserResponse
 from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
 from app.user.domain.user_entities import TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest
-from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.domain.user_entities import PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
+from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
+
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -23,7 +24,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 )
 async def create_user(user: UserCreate, db: Session = Depends(getDb)):
     user_repository = UserRepository(db)
-    creation_use_case = UserCreationUseCase(user_repository)
+    creation_use_case = UserCreationUseCase(db)
 
     existing_user = user_repository.get_user_by_email(user.email)
     if existing_user:
@@ -34,7 +35,7 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
         
         if pending_confirmation:
             # Si hay una confirmación pendiente, la eliminamos junto con el usuario
-            db_user = db.query(UserModel).filter(UserModel.id == existing_user.id).first()
+            db_user = db.query(User).filter(User.id == existing_user.id).first()
             if db_user:
                 db.delete(db_user)
                 db.commit()
@@ -51,7 +52,7 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
         else:
             # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
-            db_user = db.query(UserModel).filter(UserModel.id == new_user.id).first()
+            db_user = db.query(User).filter(User.id == new_user.id).first()
             if db_user:
                 db.delete(db_user)
                 db.commit()
@@ -74,7 +75,7 @@ async def confirm_user_registration(
     pin_hash = hashlib.sha256(confirmation.pin.encode()).hexdigest()
     
     # Buscar al usuario por email
-    user = db.query(UserModel).filter(UserModel.email == confirmation.email).first()
+    user = db.query(User).filter(User.email == confirmation.email).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -89,7 +90,13 @@ async def confirm_user_registration(
     user_confirmation_use_case = UserConfirmationUseCase(db)
     
     if not confirmation_record:
-        user_confirmation_use_case.handle_failed_confirmation(user.id)
+        try:
+            user_confirmation_use_case.handle_failed_confirmation(user.id)
+        except TooManyConfirmationAttempts as e:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=e.message
+            )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="PIN inválido o expirado"
@@ -103,6 +110,11 @@ async def confirm_user_registration(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al confirmar el usuario"
             )
+    except TooManyConfirmationAttempts as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=e.message
+        )
     except Exception as e:
         user_confirmation_use_case.handle_failed_confirmation(user.id)
         raise HTTPException(
@@ -245,14 +257,24 @@ async def confirm_recovery_pin(
     db: Session = Depends(getDb)
 ):
     password_recovery_use_case = PasswordRecoveryUseCase(db)
-    pin_hash = hashlib.sha256(pin_confirmation.pin.encode()).hexdigest()
-    success = password_recovery_use_case.confirm_recovery_pin(pin_confirmation.email, pin_hash)
-    if success:
-        return {"message": "Código de recuperación confirmado correctamente."}
-    else:
+    try:
+        success = password_recovery_use_case.confirm_recovery_pin(pin_confirmation.email, pin_confirmation.pin)
+        if success:
+            return {"message": "Código de recuperación confirmado correctamente."}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Código de recuperación inválido o expirado."
+            )
+    except TooManyRecoveryAttempts as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Código de recuperación inválido o expirado."
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=e.message
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al confirmar el código de recuperación: {str(e)}"
         )
         
 @router.post("/reset-password", status_code=status.HTTP_200_OK)

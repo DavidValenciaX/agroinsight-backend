@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from app.user.domain.user_entities import UserInDB, RoleInfo
+from app.user.domain.user_entities import UserCreate, UserInDB, RoleInfo, Confirmation, TwoFactorAuth, PasswordRecovery
 from app.user.infrastructure.orm_models.user_orm_model import User
 from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
 from app.user.infrastructure.orm_models.role_orm_model import Role
@@ -8,47 +8,19 @@ from app.user.infrastructure.orm_models.password_recovery_orm_model import Recup
 from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
 from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
 from datetime import datetime, timezone, timedelta
+from typing import Optional
 
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
     # Métodos relacionados con el usuario
-    def get_user_by_email(self, email: str) -> UserInDB:
-        # Usamos joinedload para cargar la relación muchos a muchos de roles
-        user = self.db.query(User).options(joinedload(User.roles)).filter(User.email == email).first()
-        if user:
-            # Cargar los roles asociados al usuario
-            roles = [RoleInfo(id=role.id, nombre=role.nombre) for role in user.roles]
-            return UserInDB(
-                id=user.id,
-                nombre=user.nombre,
-                apellido=user.apellido,
-                email=user.email,
-                password=user.password,
-                failed_attempts=user.failed_attempts,
-                locked_until=user.locked_until,
-                state_id=user.state_id,
-                roles=roles
-            )
-        return None
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        return self.db.query(User).filter(User.email == email).first()
     
-    def get_user_by_id(self, user_id: int) -> UserInDB:
-        user = self.db.query(User).options(joinedload(User.roles)).filter(User.id == user_id).first()
-        if user:
-            roles = [RoleInfo(id=role.id, nombre=role.nombre) for role in user.roles]
-            return UserInDB(
-                id=user.id,
-                nombre=user.nombre,
-                apellido=user.apellido,
-                email=user.email,
-                password=user.password,
-                failed_attempts=user.failed_attempts,
-                locked_until=user.locked_until,
-                state_id=user.state_id,
-                roles=roles
-            )
-        return None
+    def get_user_by_id(self, user_id: int) -> Optional[User]:
+        user = self.db.query(User).options(joinedload(User.roles)).get(user_id)
+        return user
     
     def get_roles_by_user(self, user_id: int):
         user = self.db.query(User).get(user_id)
@@ -56,7 +28,7 @@ class UserRepository:
             return []
         return [RoleInfo(id=role.id, nombre=role.nombre) for role in user.roles]
 
-    def update_user(self, user: UserInDB) -> UserInDB:
+    def update_user(self, user: User) -> Optional[User]:
         user_in_db = self.db.query(User).get(user.id)  # Cargar el usuario desde la base de datos
         if user_in_db:
             # Actualizar los campos del usuario en la base de datos con los valores del user proporcionado
@@ -69,20 +41,32 @@ class UserRepository:
             user_in_db.state_id = user.state_id
 
             # Confirmar los cambios en la base de datos
-            self.db.commit()
-            self.db.refresh(user_in_db)  # Refrescar para obtener los datos actualizados
-            return self.get_user_by_email(user.email)  # Devolver el usuario actualizado
+            try:
+                self.db.commit()
+                self.db.refresh(user_in_db)  # Refrescar para obtener los datos actualizados
+                return user_in_db  # Devolver el usuario actualizado como modelo ORM
+            except Exception as e:
+                self.db.rollback()
+                print(f"Error al hacer commit: {e}")
+                return None
         return None
     
-    def create_user(self, user: User) -> User:
+    def create_user(self, user: UserCreate) -> Optional[User]:
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
         return user
     
-    def delete_user(self, user: User):
-        self.db.delete(user)
-        self.db.commit()
+    def delete_user(self, user: UserInDB):
+        """Elimina una instancia gestionada de User."""
+        try:
+            self.db.delete(user)
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al eliminar el usuario: {str(e)}")
+            return False
     
     def block_user(self, user_id: int, lock_duration: timedelta):
         user = self.db.query(User).filter(User.id == user_id).first()
@@ -146,7 +130,7 @@ class UserRepository:
         self.db.query(RecuperacionContrasena).filter(RecuperacionContrasena.usuario_id == user_id).delete()
         self.db.commit()
     
-    def add_password_recovery(self, recovery: RecuperacionContrasena):
+    def add_password_recovery(self, recovery: PasswordRecovery):
         self.db.add(recovery)
         self.db.commit()
     
@@ -163,7 +147,7 @@ class UserRepository:
             return recovery
         return None
 
-    def delete_recovery(self, recovery: RecuperacionContrasena):
+    def delete_recovery(self, recovery: PasswordRecovery):
         self.db.delete(recovery)
         self.db.commit()
 
@@ -173,7 +157,7 @@ class UserRepository:
         self.db.commit()
         return deleted
     
-    def add_two_factor_verification(self, verification: VerificacionDospasos):
+    def add_two_factor_verification(self, verification: TwoFactorAuth):
         self.db.add(verification)
         self.db.commit()
     
@@ -184,7 +168,7 @@ class UserRepository:
             VerificacionDospasos.expiracion > datetime.now(timezone.utc)  # timezone-aware
         ).first()
 
-    def delete_two_factor_verification_entry(self, verification: VerificacionDospasos):
+    def delete_two_factor_verification_entry(self, verification: TwoFactorAuth):
         self.db.delete(verification)
         self.db.commit()
         
@@ -204,11 +188,11 @@ class UserRepository:
         return 0
 
     # Métodos relacionados con la confirmación de usuario
-    def delete_user_confirmation(self, user_id: int):
+    def delete_user_confirmations(self, user_id: int):
         self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user_id).delete()
         self.db.commit()
 
-    def add_user_confirmation(self, confirmation: ConfirmacionUsuario):
+    def add_user_confirmation(self, confirmation: Confirmation):
         self.db.add(confirmation)
         self.db.commit()
     
@@ -218,22 +202,18 @@ class UserRepository:
             ConfirmacionUsuario.pin == pin_hash,
             ConfirmacionUsuario.expiracion > datetime.utcnow()
         ).first()
-
-    def delete_confirmation(self, confirmation: ConfirmacionUsuario):
-        self.db.delete(confirmation)
-        self.db.commit()
     
-    def increase_confirmation_attempts(self, confirmation: ConfirmacionUsuario):
+    def increase_confirmation_attempts(self, confirmation: Confirmation):
         confirmation.intentos += 1
         self.db.commit()
-    
-    def delete_user(self, user: User):
-        self.db.delete(user)
-        self.db.commit()
 
-    # Nuevos métodos centralizados
-    def get_user_by_id(self, user_id: int) -> User:
-        return self.db.query(User).get(user_id)
+    def increment_confirmation_attempts(self, user_id: int):
+        confirmation = self.get_active_confirmation(user_id)
+        if confirmation:
+            confirmation.intentos += 1
+            self.db.commit()
+            return confirmation.intentos
+        return 0
 
     def get_user_with_confirmation(self, email: str) -> tuple:
         user = self.db.query(User).filter(User.email == email).first()
@@ -254,9 +234,16 @@ class UserRepository:
         user = self.get_user_by_id(user_id)
         if user:
             user.state_id = new_state_id
-            self.db.commit()
-            return True
+            try:
+                self.db.commit()
+                self.db.refresh(user)  # Refresca el objeto para asegurar que los cambios se han aplicado
+                return True
+            except Exception as e:
+                self.db.rollback()
+                print(f"Error al hacer commit: {e}")
+                return False
         return False
+
 
     def get_user_with_recovery(self, email: str) -> tuple:
         user = self.db.query(User).filter(User.email == email).first()
