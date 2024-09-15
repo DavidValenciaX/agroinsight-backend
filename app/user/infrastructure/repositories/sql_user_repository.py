@@ -45,20 +45,23 @@ class UserRepository:
             return []
 
     def update_user(self, user: UserInDB) -> UserInDB:
-        user = self.db.query(User).get(user.id)
-        if user:
-            user.nombre = user.nombre
-            user.apellido = user.apellido
-            user.email = user.email
-            user.password = user.password
-            user.failed_attempts = user.failed_attempts
-            user.locked_until = user.locked_until
-            user.state_id = user.state_id
-            
+        user_in_db = self.db.query(User).get(user.id)  # Cargar el usuario desde la base de datos
+        if user_in_db:
+            # Actualizar los campos del usuario en la base de datos con los valores del user proporcionado
+            user_in_db.nombre = user.nombre
+            user_in_db.apellido = user.apellido
+            user_in_db.email = user.email
+            user_in_db.password = user.password
+            user_in_db.failed_attempts = user.failed_attempts
+            user_in_db.locked_until = user.locked_until
+            user_in_db.state_id = user.state_id
+
+            # Confirmar los cambios en la base de datos
             self.db.commit()
-            self.db.refresh(user)
-            return self.get_user_by_email(user.email)
+            self.db.refresh(user_in_db)  # Refrescar para obtener los datos actualizados
+            return self.get_user_by_email(user.email)  # Devolver el usuario actualizado
         return None
+
     
     def create_user(self, user: User) -> User:
         self.db.add(user)

@@ -133,36 +133,27 @@ async def resend_confirmation_pin_endpoint(
 
 @router.post("/login")
 async def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
-    user_repository = UserRepository(db)
     auth_use_case = AuthenticationUseCase(db)
 
-    # Obtener el usuario
-    user = user_repository.get_user_by_email(login_request.email)
-    if user and user.state_id == 3:
-        # Intentar desbloquear si está bloqueado
-        auth_use_case.unlock_user(user)
-
-    # Intentar autenticar al usuario
     try:
         authenticated_user = auth_use_case.authenticate_user(login_request.email, login_request.password)
+        if authenticated_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Correo electrónico o contraseña incorrectos",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Iniciar verificación en dos pasos
+        if auth_use_case.initiate_two_factor_auth(authenticated_user):
+            return {"message": "Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error al iniciar la verificación en dos pasos"
+            )
     except HTTPException as e:
         raise e  # Re-lanza la excepción para mantener el mensaje detallado
-
-    if not authenticated_user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Correo electrónico o contraseña incorrectos",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Iniciar verificación en dos pasos
-    if auth_use_case.initiate_two_factor_auth(authenticated_user):
-        return {"message": "Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error al iniciar la verificación en dos pasos"
-        )
         
 @router.post("/login/verify", response_model=TokenResponse)
 async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):

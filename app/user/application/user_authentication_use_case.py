@@ -1,7 +1,6 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from jose import jwt
-from passlib.context import CryptContext
 from fastapi import HTTPException, status
 from app.user.domain.user_entities import UserInDB
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
@@ -10,21 +9,13 @@ from app.user.infrastructure.orm_models.user_orm_model import User
 from app.core.services.pin_service import generate_pin
 from app.core.services.email_service import send_email
 from app.core.config.settings import SECRET_KEY, ALGORITHM
+from app.core.security.security_utils import verify_password
 import hashlib
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-MAX_FAILED_ATTEMPTS = 5
-LOCKOUT_TIME = timedelta(minutes=5)
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AuthenticationUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
-
-    def verify_password(self, plain_password, hashed_password):
-        return pwd_context.verify(plain_password, hashed_password)
 
     def authenticate_user(self, email: str, password: str) -> UserInDB:
         user = self.user_repository.get_user_by_email(email)
@@ -33,6 +24,12 @@ class AuthenticationUseCase:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Usuario no encontrado.",
             )
+        
+        # Intentar desbloquear si está bloqueado y el tiempo de bloqueo ha pasado
+        if user.state_id == 3:  # 3 corresponde a 'locked'
+            self.unlock_user(user)
+            # Recargar el usuario después del desbloqueo
+            user = self.user_repository.get_user_by_email(email)
         
         if user.state_id != 1:  # 1 corresponde a 'active'
             raise HTTPException(
@@ -47,36 +44,43 @@ class AuthenticationUseCase:
                 detail=f"La cuenta está bloqueada temporalmente. Intenta nuevamente en {time_left.seconds // 60} minutos.",
             )
 
-        if not self.verify_password(password, user.password):
-            self.handle_failed_login_attempt(user)
-            return None
+        if not verify_password(password, user.password):
+            return self.handle_failed_login_attempt(user)
         
+        # Autenticación exitosa
         user.failed_attempts = 0
         user.locked_until = None
-        self.user_repository.update_user(user)
-        return user
+        return self.user_repository.update_user(user)
 
     def create_access_token(self, data: dict, expires_delta: timedelta = None):
+        accessTokenExpireMinutes = 30
         to_encode = data.copy()
+        
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            expire = datetime.now(timezone.utc) + timedelta(minutes=accessTokenExpireMinutes)
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
-    def handle_failed_login_attempt(self, user: UserInDB):
+    def handle_failed_login_attempt(self, user: UserInDB) -> None:        
+        maxFailedAttempts = 5
+        lockOutTime = timedelta(minutes=5)
+        
         user.failed_attempts += 1
-        if user.failed_attempts >= MAX_FAILED_ATTEMPTS:
-            user.locked_until = datetime.now(timezone.utc) + LOCKOUT_TIME
+        
+        if user.failed_attempts >= maxFailedAttempts:
+            user.locked_until = datetime.now(timezone.utc) + lockOutTime
             user.state_id = 3  # Estado bloqueado
             self.user_repository.update_user(user)
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente después de {LOCKOUT_TIME.seconds // 60} minutos.",
+                detail=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente después de {lockOutTime.seconds // 60} minutos.",
             )
+        
         self.user_repository.update_user(user)
+        return None
 
     def unlock_user(self, user: UserInDB):
         current_time = datetime.now(timezone.utc)
