@@ -67,7 +67,7 @@ class UserConfirmationUseCase:
         return True
     
     def resend_confirmation_pin(self, email: str) -> bool:
-        user = self.db.query(User).filter(User.email == email).first()
+        user = self.user_repository.get_user_by_email(email)
         if not user:
             return False
         

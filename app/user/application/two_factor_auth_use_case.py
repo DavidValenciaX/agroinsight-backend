@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
 from app.user.infrastructure.orm_models.user_orm_model import User
+from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.core.services.pin_service import generate_pin
 from app.core.services.email_service import send_email
 import hashlib
@@ -9,6 +10,7 @@ import hashlib
 class TwoFactorAuthUseCase:
     def __init__(self, db: Session):
         self.db = db
+        self.user_repository = UserRepository(db)
 
     def initiate_two_factor_auth(self, user: User) -> bool:
         return self.create_two_factor_verification(self.db, user)
@@ -61,7 +63,7 @@ class TwoFactorAuthUseCase:
         return True
     
     def resend_2fa_pin(self, email: str) -> bool:
-        user = self.db.query(User).filter(User.email == email).first()
+        user = self.user_repository.get_user_by_email(email)
         if not user:
             return False
         

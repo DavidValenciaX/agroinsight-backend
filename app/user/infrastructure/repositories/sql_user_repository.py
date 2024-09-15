@@ -1,56 +1,73 @@
 from sqlalchemy.orm import Session, joinedload
 from app.user.domain.user_entities import UserInDB, RoleInfo
-from app.user.infrastructure.orm_models.user_orm_model import User as UserModel
+from app.user.infrastructure.orm_models.user_orm_model import User
 from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
 from app.user.infrastructure.orm_models.role_orm_model import Role
 from app.user.infrastructure.orm_models.user_role_orm_model import UserRole
+from app.user.infrastructure.orm_models.password_recovery_orm_model import RecuperacionContrasena
+from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
+from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
 from datetime import datetime, timezone, timedelta
 
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
+    # Métodos relacionados con el usuario
     def get_user_by_email(self, email: str) -> UserInDB:
-        user_model = self.db.query(UserModel).options(joinedload(UserModel.roles)).filter(UserModel.email == email).first()
-        if user_model:
-            roles = [RoleInfo(id=role.id, nombre=role.nombre) for role in user_model.roles]
+        # Usamos joinedload para cargar la relación muchos a muchos de roles
+        user = self.db.query(User).options(joinedload(User.roles)).filter(User.email == email).first()
+        if user:
+            # Cargar los roles asociados al usuario
+            roles = [RoleInfo(id=role.id, nombre=role.nombre) for role in user.roles]
             return UserInDB(
-                id=user_model.id,
-                nombre=user_model.nombre,
-                apellido=user_model.apellido,
-                email=user_model.email,
-                password=user_model.password,
-                failed_attempts=user_model.failed_attempts,
-                locked_until=user_model.locked_until,
-                state_id=user_model.state_id,
+                id=user.id,
+                nombre=user.nombre,
+                apellido=user.apellido,
+                email=user.email,
+                password=user.password,
+                failed_attempts=user.failed_attempts,
+                locked_until=user.locked_until,
+                state_id=user.state_id,
                 roles=roles
             )
         return None
+    
+    def get_roles_by_user(self, user_id: int):
+        try:
+            user = self.db.query(User).get(user_id)
+            if user is None:
+                return []
+            return [RoleInfo(id=role.id, nombre=role.nombre) for role in user.roles]
+        except Exception as e:
+            # Manejar el error
+            print(f"Error: {str(e)}")
+            return []
 
     def update_user(self, user: UserInDB) -> UserInDB:
-        user_model = self.db.query(UserModel).filter(UserModel.id == user.id).first()
-        if user_model:
-            user_model.nombre = user.nombre
-            user_model.apellido = user.apellido
-            user_model.email = user.email
-            user_model.password = user.password
-            user_model.failed_attempts = user.failed_attempts
-            user_model.locked_until = user.locked_until
-            user_model.state_id = user.state_id
+        user = self.db.query(User).get(user.id)
+        if user:
+            user.nombre = user.nombre
+            user.apellido = user.apellido
+            user.email = user.email
+            user.password = user.password
+            user.failed_attempts = user.failed_attempts
+            user.locked_until = user.locked_until
+            user.state_id = user.state_id
             
             self.db.commit()
-            self.db.refresh(user_model)
-            return self.get_user_by_email(user_model.email)
+            self.db.refresh(user)
+            return self.get_user_by_email(user.email)
         return None
     
-    def create_user(self, user: UserModel) -> UserModel:
+    def create_user(self, user: User) -> User:
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
         return user
     
     def block_user(self, user_id: int, lock_duration: timedelta):
-        user = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+        user = self.db.query(User).filter(User.id == user_id).first()
         if user:
             user.locked_until = datetime.now(timezone.utc) + lock_duration
             user.state_id = 3  # Estado bloqueado
@@ -59,7 +76,7 @@ class UserRepository:
         return False
     
     def unblock_user(self, user_id: int):
-        user = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+        user = self.db.query(User).filter(User.id == user_id).first()
         if user:
             user.locked_until = None
             user.state_id = 1  # Estado activo
@@ -104,3 +121,74 @@ class UserRepository:
                 return True
 
         return False
+
+    # Métodos relacionados con la recuperación de contraseña
+    def delete_password_recovery(self, user_id: int):
+        self.db.query(RecuperacionContrasena).filter(RecuperacionContrasena.usuario_id == user_id).delete()
+    
+    def add_password_recovery(self, recovery: RecuperacionContrasena):
+        self.db.add(recovery)
+        self.db.commit()
+    
+    def get_password_recovery(self, user_id: int):
+        return self.db.query(RecuperacionContrasena).filter(
+            RecuperacionContrasena.usuario_id == user_id,
+            RecuperacionContrasena.expiracion > datetime.utcnow()
+        ).first()
+        
+    def get_password_recovery_with_pin(self, user_id: int, pin_hash: str):
+        # Llamamos al método base para obtener la recuperación activa
+        recovery = self.get_password_recovery(user_id)
+        if recovery and recovery.pin == pin_hash:
+            return recovery
+        return None
+
+    def delete_recovery(self, recovery: RecuperacionContrasena):
+        self.db.delete(recovery)
+        self.db.commit()
+
+    # Métodos relacionados con la verificación en dos pasos
+    def delete_two_factor_verification(self, user_id: int):
+        self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).delete()
+    
+    def add_two_factor_verification(self, verification: VerificacionDospasos):
+        self.db.add(verification)
+        self.db.commit()
+    
+    def get_two_factor_verification(self, user_id: int, pin_hash: str):
+        return self.db.query(VerificacionDospasos).filter(
+            VerificacionDospasos.usuario_id == user_id,
+            VerificacionDospasos.pin == pin_hash,
+            VerificacionDospasos.expiracion > datetime.utcnow()
+        ).first()
+
+    def delete_two_factor_verification_entry(self, verification: VerificacionDospasos):
+        self.db.delete(verification)
+        self.db.commit()
+
+    # Métodos relacionados con la confirmación de usuario
+    def delete_user_confirmation(self, user_id: int):
+        self.db.query(ConfirmacionUsuario).filter(ConfirmacionUsuario.usuario_id == user_id).delete()
+
+    def add_user_confirmation(self, confirmation: ConfirmacionUsuario):
+        self.db.add(confirmation)
+        self.db.commit()
+    
+    def get_user_confirmation(self, user_id: int, pin_hash: str):
+        return self.db.query(ConfirmacionUsuario).filter(
+            ConfirmacionUsuario.usuario_id == user_id,
+            ConfirmacionUsuario.pin == pin_hash,
+            ConfirmacionUsuario.expiracion > datetime.utcnow()
+        ).first()
+
+    def delete_confirmation(self, confirmation: ConfirmacionUsuario):
+        self.db.delete(confirmation)
+        self.db.commit()
+    
+    def increase_confirmation_attempts(self, confirmation: ConfirmacionUsuario):
+        confirmation.intentos += 1
+        self.db.commit()
+    
+    def delete_user(self, user: User):
+        self.db.delete(user)
+        self.db.commit()
