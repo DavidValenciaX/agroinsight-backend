@@ -95,15 +95,15 @@ class AuthenticationUseCase:
             self.user_repository.update_user(user)
 
     # Métodos de autenticación de dos factores
-    def initiate_two_factor_auth(self, user: User) -> bool:
-        return self.create_two_factor_verification(self.db, user)
-    
-    def create_two_factor_verification(self, db: Session, user: User) -> bool:
+    def initiate_two_factor_auth(self, db: Session, user: User) -> bool:
         try:
+            # Eliminar cualquier verificación anterior
             db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user.id).delete()
             
+            # Generar el PIN y su hash
             pin, pin_hash = generate_pin()
             
+            # Crear un nuevo registro de verificación en la base de datos
             verification = VerificacionDospasos(
                 usuario_id=user.id,
                 pin=pin_hash,
@@ -111,16 +111,18 @@ class AuthenticationUseCase:
             )
             db.add(verification)
             
+            # Enviar el PIN al correo electrónico del usuario
             if self.send_two_factor_pin(user.email, pin):
-                db.commit()
+                db.commit()  # Confirmar la transacción si el correo fue enviado con éxito
                 return True
             else:
-                db.rollback()
+                db.rollback()  # Revertir los cambios si no se pudo enviar el correo
                 return False
         except Exception as e:
-            db.rollback()
-            print(f"Error al crear la verificación en dos pasos: {str(e)}")
+            db.rollback()  # Revertir los cambios si hubo algún error
+            print(f"Error al iniciar la verificación en dos pasos: {str(e)}")
             return False
+
         
     def send_two_factor_pin(self, email: str, pin: str):
         subject = "Código de verificación en dos pasos - AgroInSight"
@@ -128,21 +130,38 @@ class AuthenticationUseCase:
         html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 5 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)
+            
+    def verify_two_factor_auth(self, email: str, pin: str) -> UserInDB:
+        user = self.user_repository.get_user_by_email(email)
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    def verify_two_factor_pin(self, user_id: int, pin: str) -> bool:
+        # Verificar si la cuenta del usuario está bloqueada
+        if user.state_id == 3 and user.locked_until > datetime.utcnow():
+            time_left = user.locked_until - datetime.utcnow()
+            raise HTTPException(
+                status_code=403,
+                detail=f"Su cuenta está bloqueada. Intente nuevamente en {time_left.seconds // 60} minutos."
+            )
+
+        # Verificar si el PIN es correcto y no ha expirado
         pin_hash = hashlib.sha256(pin.encode()).hexdigest()
         verification = self.db.query(VerificacionDospasos).filter(
-            VerificacionDospasos.usuario_id == user_id,
+            VerificacionDospasos.usuario_id == user.id,
             VerificacionDospasos.pin == pin_hash,
             VerificacionDospasos.expiracion > datetime.utcnow()
         ).first()
 
         if not verification:
-            return False
+            self.handle_failed_verification(user.id)
+            raise HTTPException(status_code=400, detail="Código de verificación inválido o expirado")
 
+        # Eliminar el registro de verificación si el PIN es correcto
         self.db.delete(verification)
         self.db.commit()
-        return True
+
+        # Devolver el usuario autenticado
+        return user
     
     def resend_2fa_pin(self, email: str) -> bool:
         user = self.user_repository.get_user_by_email(email)
@@ -175,11 +194,25 @@ class AuthenticationUseCase:
 
     def handle_failed_verification(self, user_id: int):
         verification = self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).first()
+
         if verification:
             verification.intentos += 1
+
             if verification.intentos >= 3:
+                # Bloquear la cuenta del usuario si supera el número de intentos fallidos
                 user = self.db.query(User).filter(User.id == user_id).first()
                 user.locked_until = datetime.utcnow() + timedelta(minutes=30)
                 user.state_id = 3  # Estado bloqueado
+
+                # Eliminar la verificación ya que se han excedido los intentos
                 self.db.delete(verification)
+                self.db.commit()
+
+                # Lanzar excepción indicando que la cuenta ha sido bloqueada
+                raise HTTPException(
+                    status_code=403,
+                    detail="Su cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en 30 minutos."
+                )
+
+            # Si aún no ha alcanzado el límite de intentos, solo guarda el intento fallido
             self.db.commit()

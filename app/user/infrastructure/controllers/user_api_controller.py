@@ -145,7 +145,7 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
             )
         
         # Iniciar verificación en dos pasos
-        if auth_use_case.initiate_two_factor_auth(authenticated_user):
+        if auth_use_case.initiate_two_factor_auth(db, authenticated_user):
             return {"message": "Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
         else:
             raise HTTPException(
@@ -158,19 +158,13 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
 @router.post("/login/verify", response_model=TokenResponse)
 async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
     auth_use_case = AuthenticationUseCase(db)
-    user_repository = UserRepository(db)
     
-    user = user_repository.get_user_by_email(auth_request.email)
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    
-    if auth_use_case.verify_two_factor_pin(user.id, auth_request.pin):
-        # Generar y devolver el token de acceso
+    try:
+        user = auth_use_case.verify_two_factor_auth(auth_request.email, auth_request.pin)
         access_token = auth_use_case.create_access_token(data={"sub": user.email})
         return {"access_token": access_token, "token_type": "bearer"}
-    else:
-        auth_use_case.handle_failed_verification(user.id)
-        raise HTTPException(status_code=400, detail="Código de verificación inválido o expirado")
+    except HTTPException as e:
+        raise e  # Re-lanza la excepción para mantener el mensaje detallado
     
 @router.post("/resend-2fa-pin", status_code=status.HTTP_200_OK)
 async def resend_2fa_pin_endpoint(
