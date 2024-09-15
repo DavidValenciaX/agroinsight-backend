@@ -169,8 +169,9 @@ class UserRepository:
 
     # Métodos relacionados con la verificación en dos pasos        
     def delete_two_factor_verification(self, user_id: int):
-        self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).delete()
+        deleted = self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).delete()
         self.db.commit()
+        return deleted
     
     def add_two_factor_verification(self, verification: VerificacionDospasos):
         self.db.add(verification)
@@ -180,12 +181,27 @@ class UserRepository:
         return self.db.query(VerificacionDospasos).filter(
             VerificacionDospasos.usuario_id == user_id,
             VerificacionDospasos.pin == pin_hash,
-            VerificacionDospasos.expiracion > datetime.utcnow()
+            VerificacionDospasos.expiracion > datetime.now(timezone.utc)  # timezone-aware
         ).first()
 
     def delete_two_factor_verification_entry(self, verification: VerificacionDospasos):
         self.db.delete(verification)
         self.db.commit()
+        
+    def increment_two_factor_attempts(self, user_id: int):
+        accessTokenExpireMinutes = 10
+        verification = self.db.query(VerificacionDospasos).filter(VerificacionDospasos.usuario_id == user_id).first()
+        if verification:
+            verification.intentos += 1
+            current_intentos = verification.intentos  # Almacenar antes de posibles cambios
+            if current_intentos >= 3:
+                # Bloquear el usuario
+                self.block_user(user_id, timedelta(minutes=accessTokenExpireMinutes))
+                # Eliminar la verificación
+                self.delete_two_factor_verification(user_id)
+            self.db.commit()
+            return current_intentos  # Devolver el valor almacenado
+        return 0
 
     # Métodos relacionados con la confirmación de usuario
     def delete_user_confirmation(self, user_id: int):

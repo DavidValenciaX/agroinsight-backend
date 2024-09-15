@@ -145,7 +145,7 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
             )
         
         # Iniciar verificación en dos pasos
-        if auth_use_case.initiate_two_factor_auth(db, authenticated_user):
+        if auth_use_case.initiate_two_factor_auth(authenticated_user):
             return {"message": "Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
         else:
             raise HTTPException(
