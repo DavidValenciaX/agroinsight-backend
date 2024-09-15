@@ -5,7 +5,6 @@ from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.user_authentication_use_case import AuthenticationUseCase
 from app.user.infrastructure.repositories.sql_user_repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.user.application.user_confirmation_use_case import UserConfirmationUseCase
 from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
 from app.user.infrastructure.orm_models.user_orm_model import User
 from app.core.security.jwt_middleware import get_current_user
@@ -47,8 +46,7 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
 
     try:
         new_user = creation_use_case.create_user(user)
-        user_confirmation_use_case = UserConfirmationUseCase(db)
-        if user_confirmation_use_case.create_user_with_confirmation(new_user):
+        if creation_use_case.create_user_with_confirmation(new_user):
             return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
         else:
             # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
@@ -87,11 +85,11 @@ async def confirm_user_registration(
         ConfirmacionUsuario.pin == pin_hash
     ).first()
     
-    user_confirmation_use_case = UserConfirmationUseCase(db)
+    creation_use_case = UserCreationUseCase(db)
     
     if not confirmation_record:
         try:
-            user_confirmation_use_case.handle_failed_confirmation(user.id)
+            creation_use_case.handle_failed_confirmation(user.id)
         except TooManyConfirmationAttempts as e:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -103,7 +101,7 @@ async def confirm_user_registration(
         )
     
     try:
-        if user_confirmation_use_case.confirm_user(user.id, pin_hash):
+        if creation_use_case.confirm_user(user.id, pin_hash):
             return {"message": "Usuario confirmado exitosamente"}
         else:
             raise HTTPException(
@@ -116,7 +114,7 @@ async def confirm_user_registration(
             detail=e.message
         )
     except Exception as e:
-        user_confirmation_use_case.handle_failed_confirmation(user.id)
+        creation_use_case.handle_failed_confirmation(user.id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al confirmar el usuario: {str(e)}"
@@ -128,8 +126,8 @@ async def resend_confirmation_pin_endpoint(
     db: Session = Depends(getDb)
 ):
     try:
-        user_confirmation_use_case = UserConfirmationUseCase(db)
-        success = user_confirmation_use_case.resend_confirmation_pin(resend_request.email)
+        creation_use_case = UserCreationUseCase(db)
+        success = creation_use_case.resend_confirmation_pin(resend_request.email)
         if success:
             return {"message": "PIN de confirmación reenviado con éxito"}
         else:
