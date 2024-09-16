@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 import hashlib
 from app.user.infrastructure.orm_models import RecuperacionContrasena
@@ -27,7 +27,7 @@ class PasswordRecoveryUseCase:
             recovery = RecuperacionContrasena(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.utcnow() + timedelta(minutes=10)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
             )
             
             if self.send_password_recovery_email(email, pin):
@@ -64,7 +64,7 @@ class PasswordRecoveryUseCase:
 
             if self.send_password_recovery_email(email, pin):
                 recovery.pin = pin_hash
-                recovery.expiracion = datetime.utcnow() + timedelta(minutes=15)
+                recovery.expiracion = datetime.now(timezone.utc) + timedelta(minutes=15)
                 recovery.intentos = 0
                 self.user_repository.add_password_recovery(recovery)
                 return True
@@ -88,7 +88,6 @@ class PasswordRecoveryUseCase:
         pin_hash = hashlib.sha256(pin.encode()).hexdigest()
         if pin_hash == recovery.pin:
             # PIN correcto, eliminar el registro de recuperación
-            self.user_repository.delete_recovery(recovery)
             return True
         else:
             # PIN incorrecto, incrementar los intentos

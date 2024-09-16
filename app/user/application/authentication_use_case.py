@@ -25,16 +25,21 @@ class AuthenticationUseCase:
             )
         
         # Intentar desbloquear si está bloqueado y el tiempo de bloqueo ha pasado
-        if user.state_id == 3:  # 3 corresponde a 'locked'
+        locked_state_id = self.user_repository.get_locked_user_state_id()
+        if user.state_id == locked_state_id:
             self.unlock_user(user)
             # Recargar el usuario después del desbloqueo
             user = self.user_repository.get_user_by_email(email)
         
-        if user.state_id != 1:  # 1 corresponde a 'active'
+        active_state_id = self.user_repository.get_active_user_state_id()
+        if user.state_id != active_state_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="La cuenta no está activa o está bloqueada.",
             )
+        
+        if user.locked_until:
+            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
         
         if user.locked_until and user.locked_until > datetime.now(timezone.utc):
             time_left = user.locked_until - datetime.now(timezone.utc)
@@ -72,7 +77,7 @@ class AuthenticationUseCase:
         
         if user.failed_attempts >= maxFailedAttempts:
             user.locked_until = datetime.now(timezone.utc) + lockOutTime
-            user.state_id = 3  # Estado bloqueado
+            user.state_id = self.user_repository.get_locked_user_state_id()  # Estado bloqueado
             self.user_repository.update_user(user)
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -91,7 +96,7 @@ class AuthenticationUseCase:
         if user.locked_until and current_time > user.locked_until:
             user.failed_attempts = 0
             user.locked_until = None
-            user.state_id = 1  # Estado activo
+            user.state_id = self.user_repository.get_active_user_state_id()  # Estado activo
             self.user_repository.update_user(user)
 
     # Métodos de autenticación de dos factores
@@ -127,7 +132,7 @@ class AuthenticationUseCase:
         
         return send_email(email, subject, text_content, html_content)
             
-    def verify_two_factor_auth(self, email: str, pin: str) -> UserInDB:
+    def verify_two_factor_auth(self, email: str, pin: str):
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
@@ -136,7 +141,8 @@ class AuthenticationUseCase:
             user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
 
         # Verificar si la cuenta del usuario está bloqueada
-        if user.state_id == 3 and user.locked_until > datetime.now(timezone.utc):
+        locked_state_id = self.user_repository.get_locked_user_state_id()
+        if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
             
             time_left = user.locked_until - datetime.now(timezone.utc)
             raise HTTPException(
@@ -171,7 +177,7 @@ class AuthenticationUseCase:
             verification = VerificacionDospasos(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.utcnow() + timedelta(minutes=5)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=5)
             )
             self.user_repository.add_two_factor_verification(verification)
             

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.user.infrastructure.orm_models import ConfirmacionUsuario
 from app.user.infrastructure.orm_models import User
-from app.core.security.security_utils import hash_password, verify_password
+from app.core.security.security_utils import hash_password
 from app.core.services.email_service import send_email
 from app.core.services.pin_service import generate_pin
 from app.user.infrastructure.repository import UserRepository
@@ -18,8 +18,8 @@ class UserCreationUseCase:
     def create_user(self, user_data: UserCreate) -> User:
         hashed_password = hash_password(user_data.password)
         
-        pending_state = self.user_repository.get_pending_user_state()
-        if not pending_state:
+        pending_state_id = self.user_repository.get_pending_user_state_id()
+        if not pending_state_id:
             raise ValueError("No se pudo encontrar el estado de usuario pendiente")
 
         new_user = User(
@@ -27,7 +27,7 @@ class UserCreationUseCase:
             apellido=user_data.apellido,
             email=user_data.email,
             password=hashed_password,
-            state_id=pending_state.id
+            state_id=pending_state_id
         )
         created_user = self.user_repository.create_user(new_user)
         
@@ -49,7 +49,7 @@ class UserCreationUseCase:
             confirmation = ConfirmacionUsuario(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.utcnow() + timedelta(minutes=10)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
             )
             
             # Enviar correo de confirmación
@@ -84,11 +84,11 @@ class UserCreationUseCase:
             return False
             
         # Actualizar el estado del usuario a 'active'
-        active_state = self.user_repository.get_active_user_state()
-        if not active_state:
+        active_state_id = self.user_repository.get_active_user_state_id()
+        if not active_state_id:
             # Manejar el caso donde el estado 'active' no existe
             return False
-        self.user_repository.update_user_state(user_id, active_state.id)
+        self.user_repository.update_user_state(user_id, active_state_id)
             
         # Cambiar el rol del usuario de "Usuario No Confirmado" a "Usuario"
         self.user_repository.change_user_role(user_id, "Usuario No Confirmado", "Usuario")
@@ -112,7 +112,7 @@ class UserCreationUseCase:
             confirmation = ConfirmacionUsuario(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.utcnow() + timedelta(minutes=10)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
             )
                 
             # Intentar enviar el correo electrónico

@@ -65,7 +65,7 @@ class UserRepository:
         user = self.get_user_by_id(user_id)
         if user:
             user.locked_until = datetime.now(timezone.utc) + lock_duration
-            user.state_id = 3  # Estado bloqueado
+            user.state_id = self.get_locked_user_state_id()  # Estado bloqueado
             self.db.commit()
             return True
         return False
@@ -73,12 +73,18 @@ class UserRepository:
     # Métodos relacionados con estados y roles
     def get_state_by_id(self, state_id: int):
         return self.db.query(EstadoUsuario).filter(EstadoUsuario.id == state_id).first()
-    
-    def get_active_user_state(self):
-        return self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "active").first()
+        
+    def get_active_user_state_id(self) -> Optional[int]:
+        active_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "active").first()
+        return active_state.id if active_state else None
 
-    def get_pending_user_state(self):
-        return self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "pending").first()
+    def get_locked_user_state_id(self) -> Optional[int]:
+        locked_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "locked").first()
+        return locked_state.id if locked_state else None
+    
+    def get_pending_user_state_id(self) -> Optional[int]:
+        locked_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "pending").first()
+        return locked_state.id if locked_state else None
 
     def get_unconfirmed_user_role(self):
         return self.db.query(Role).filter(Role.nombre == "Usuario No Confirmado").first()
@@ -117,7 +123,7 @@ class UserRepository:
     def get_password_recovery(self, user_id: int):
         return self.db.query(RecuperacionContrasena).filter(
             RecuperacionContrasena.usuario_id == user_id,
-            RecuperacionContrasena.expiracion > datetime.utcnow()
+            RecuperacionContrasena.expiracion > datetime.now(timezone.utc)
         ).first()
 
     def delete_recovery(self, recovery: PasswordRecovery):
@@ -174,7 +180,7 @@ class UserRepository:
         return self.db.query(ConfirmacionUsuario).filter(
             ConfirmacionUsuario.usuario_id == user_id,
             ConfirmacionUsuario.pin == pin_hash,
-            ConfirmacionUsuario.expiracion > datetime.utcnow()
+            ConfirmacionUsuario.expiracion > datetime.now(timezone.utc)
         ).first()
 
     def increment_confirmation_attempts(self, user_id: int):
@@ -188,7 +194,7 @@ class UserRepository:
     def get_active_confirmation(self, user_id: int):
         return self.db.query(ConfirmacionUsuario).filter(
             ConfirmacionUsuario.usuario_id == user_id,
-            ConfirmacionUsuario.expiracion > datetime.utcnow()
+            ConfirmacionUsuario.expiracion > datetime.now(timezone.utc)
         ).first()
 
     def update_user_state(self, user_id: int, new_state_id: int):
