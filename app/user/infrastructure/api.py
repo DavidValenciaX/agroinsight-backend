@@ -17,6 +17,28 @@ security_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/user", tags=["user"])
 
+@router.get("/me", response_model=UserResponse)
+async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
+    
+    # Obtener el repositorio de usuarios
+    user_repository = UserRepository(db)
+    
+    # Obtener el estado del usuario
+    estado = user_repository.get_state_by_id(current_user.state_id)
+    estado_nombre = estado.nombre if estado else "Desconocido"
+    
+    # Obtener el rol del usuario
+    user_role = ", ".join([role.nombre for role in current_user.roles]) if current_user.roles else "Sin rol asignado"
+    
+    return UserResponse(
+        id=current_user.id,
+        nombre=current_user.nombre,
+        apellido=current_user.apellido,
+        email=current_user.email,
+        estado=estado_nombre,
+        rol=user_role
+    )
+
 @router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
 async def deactivate_user(
     user_id: int, 
@@ -63,7 +85,7 @@ async def list_users(db: Session = Depends(getDb), current_user=Depends(get_curr
         apellido=user.apellido,
         email=user.email,
         estado=user.estado.nombre,  # Nombre del estado
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol"  # Nombre del primer rol o "Sin rol"
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"  # Nombre del primer rol o "Sin rol"
     ) for user in users]
     
 @router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
@@ -84,10 +106,9 @@ async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_use
         apellido=user.apellido,
         email=user.email,
         estado=user.estado.nombre,  # Nombre del estado
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol"
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
     )
-
-
+    
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(
     current_user: UserInDB = Depends(get_current_user),
@@ -283,28 +304,6 @@ async def resend_2fa_pin_endpoint(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al reenviar el PIN: {str(e)}"
         )
-        
-@router.get("/me", response_model=UserResponse)
-async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
-    
-    # Obtener el repositorio de usuarios
-    user_repository = UserRepository(db)
-    
-    # Obtener el estado del usuario
-    estado = user_repository.get_state_by_id(current_user.state_id)
-    estado_nombre = estado.nombre if estado else "Desconocido"
-    
-    # Obtener el rol del usuario
-    user_role = current_user.roles[0].nombre if current_user.roles else "Sin rol asignado"
-    
-    return UserResponse(
-        id=current_user.id,
-        nombre=current_user.nombre,
-        apellido=current_user.apellido,
-        email=current_user.email,
-        estado=estado_nombre,
-        rol=user_role
-    )
     
 @router.post("/password-recovery", status_code=status.HTTP_200_OK)
 async def initiate_password_recovery(
