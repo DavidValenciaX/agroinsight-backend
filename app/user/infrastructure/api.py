@@ -36,8 +36,30 @@ async def list_users(db: Session = Depends(getDb), current_user=Depends(get_curr
         apellido=user.apellido,
         email=user.email,
         estado=user.estado.nombre,  # Nombre del estado
-        rol=user.roles[0].nombre if user.roles else "Sin rol"  # Nombre del primer rol o "Sin rol"
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol"  # Nombre del primer rol o "Sin rol"
     ) for user in users]
+    
+@router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+    """
+    Endpoint para obtener un usuario por su ID.
+    """
+    user_repository = UserRepository(db)
+    user = user_repository.get_user_by_id(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
+    
+    # Mapeamos el usuario a UserResponse para devolver la información formateada
+    return UserResponse(
+        id=user.id,
+        nombre=user.nombre,
+        apellido=user.apellido,
+        email=user.email,
+        estado=user.estado.nombre,  # Nombre del estado
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol"
+    )
+
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(
