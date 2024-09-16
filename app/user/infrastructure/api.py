@@ -17,6 +17,33 @@ security_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/user", tags=["user"])
 
+@router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
+async def deactivate_user(
+    user_id: int, 
+    db: Session = Depends(getDb), 
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Endpoint para desactivar (inactivar) un usuario en lugar de eliminarlo.
+    """
+    user_repository = UserRepository(db)
+
+    # Verificar si el usuario existe
+    user = user_repository.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
+    
+    # Desactivar el usuario
+    success = user_repository.deactivate_user(user_id)
+    
+    if success:
+        return {"message": "Usuario desactivado exitosamente."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo desactivar el usuario. Intenta nuevamente."
+        )
+
 # Endpoint para listar todos los usuarios
 @router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
 async def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):

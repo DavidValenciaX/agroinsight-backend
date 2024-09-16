@@ -80,6 +80,34 @@ class UserRepository:
     def get_pending_user_state_id(self) -> Optional[int]:
         locked_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "pending").first()
         return locked_state.id if locked_state else None
+    
+    def get_inactive_user_state_id(self) -> Optional[int]:
+        """
+        Retorna el ID del estado 'inactive' para los usuarios.
+        """
+        inactive_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "inactive").first()
+        return inactive_state.id if inactive_state else None
+
+    def deactivate_user(self, user_id: int) -> bool:
+        """
+        Cambia el estado del usuario a 'inactive'.
+        """
+        user = self.get_user_by_id(user_id)
+        if user:
+            inactive_state_id = self.get_inactive_user_state_id()
+            if not inactive_state_id:
+                print("No se encontró el estado 'inactive'.")
+                return False
+
+            user.state_id = inactive_state_id
+            try:
+                self.db.commit()
+                return True
+            except Exception as e:
+                self.db.rollback()
+                print(f"Error al actualizar el estado del usuario: {e}")
+                return False
+        return False
 
     def get_unconfirmed_user_role(self):
         return self.db.query(Role).filter(Role.nombre == "Usuario No Confirmado").first()
