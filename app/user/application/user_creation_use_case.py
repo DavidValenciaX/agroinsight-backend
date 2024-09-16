@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
-from app.user.infrastructure.orm_models import ConfirmacionUsuario
-from app.user.infrastructure.orm_models import User
+from app.user.infrastructure.orm_models import ConfirmacionUsuario, User
 from app.core.security.security_utils import hash_password
 from app.core.services.email_service import send_email
 from app.core.services.pin_service import generate_pin

@@ -1,12 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-import hashlib
 from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.authentication_use_case import AuthenticationUseCase
 from app.user.infrastructure.repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.user.infrastructure.orm_models import ConfirmacionUsuario
-from app.user.infrastructure.orm_models import User
+from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserResponse
 from app.user.domain.schemas import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
@@ -68,7 +66,7 @@ async def confirm_user_registration(
     user_repository = UserRepository(db)
     creation_use_case = UserCreationUseCase(db)
     # Hashear el PIN ingresado por el usuario
-    pin_hash = hashlib.sha256(confirmation.pin.encode()).hexdigest()
+    pin_hash = hash_pin(confirmation.pin)
     
     # Buscar al usuario por email
     user = user_repository.get_user_by_email(confirmation.email)

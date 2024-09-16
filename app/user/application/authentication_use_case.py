@@ -5,11 +5,10 @@ from fastapi import HTTPException, status
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.orm_models import VerificacionDospasos
 from app.user.infrastructure.repository import UserRepository
-from app.core.services.pin_service import generate_pin
+from app.core.services.pin_service import generate_pin, hash_pin
 from app.core.services.email_service import send_email
 from app.core.config.settings import SECRET_KEY, ALGORITHM
 from app.core.security.security_utils import verify_password
-import hashlib
 
 class AuthenticationUseCase:
     def __init__(self, db: Session):
@@ -151,7 +150,7 @@ class AuthenticationUseCase:
             )
 
         # Verificar si el PIN es correcto y no ha expirado
-        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+        pin_hash = hash_pin(pin)
         verification = self.user_repository.get_two_factor_verification(user.id, pin_hash)
 
         if not verification:

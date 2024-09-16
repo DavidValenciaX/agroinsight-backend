@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
-import secrets
-import hashlib
+from app.core.services.pin_service import generate_pin, hash_pin
 from app.user.infrastructure.orm_models import RecuperacionContrasena
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
@@ -21,8 +20,7 @@ class PasswordRecoveryUseCase:
         try:
             self.user_repository.delete_password_recovery(user.id)
 
-            pin = ''.join(secrets.choice('0123456789') for _ in range(4))
-            pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+            pin, pin_hash = generate_pin()
 
             recovery = RecuperacionContrasena(
                 usuario_id=user.id,
@@ -59,8 +57,7 @@ class PasswordRecoveryUseCase:
                 return self.initiate_password_recovery(email)
 
             # Generar un nuevo PIN y su hash
-            pin = ''.join(secrets.choice('0123456789') for _ in range(4))
-            pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+            pin, pin_hash = generate_pin()
 
             if self.send_password_recovery_email(email, pin):
                 recovery.pin = pin_hash
@@ -85,7 +82,7 @@ class PasswordRecoveryUseCase:
             return False
 
         # Verificar si el PIN proporcionado coincide
-        pin_hash = hashlib.sha256(pin.encode()).hexdigest()
+        pin_hash = hash_pin(pin)
         if pin_hash == recovery.pin:
             # PIN correcto, eliminar el registro de recuperación
             return True
