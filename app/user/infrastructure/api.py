@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.authentication_use_case import AuthenticationUseCase
@@ -6,15 +7,38 @@ from app.user.infrastructure.repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserResponse
-from app.user.domain.schemas import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
-from app.user.domain.schemas import TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest
+from app.user.domain.schemas import UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
-from app.user.domain.schemas import PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
 from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
 
+# Crear una instancia de HTTPBearer
+security_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/user", tags=["user"])
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(
+    current_user: UserInDB = Depends(get_current_user),
+    db: Session = Depends(getDb),
+    credentials: HTTPAuthorizationCredentials = Security(security_scheme)
+):
+    """
+    Cierra la sesión del usuario actual invalidando su token.
+    """
+    token = credentials.credentials
+    user_repository = UserRepository(db)
+    
+    # Ahora pasas el usuario_id del current_user
+    success = user_repository.blacklist_token(token, current_user.id)
+    
+    if success:
+        return {"message": "Sesión cerrada exitosamente."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo cerrar la sesión. Intenta nuevamente."
+        )
+
 
 @router.post(
     "/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED

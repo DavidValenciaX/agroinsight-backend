@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
+from datetime import datetime, timezone
 
 class User(Base):
     __tablename__ = "usuario"
@@ -14,11 +15,16 @@ class User(Base):
     locked_until = Column(DateTime, nullable=True)
     state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
 
+    # Relación con la tabla roles
     roles = relationship("Role", secondary="usuario_rol", back_populates="users")
-    estado = relationship("EstadoUsuario") 
+    # Relación con la tabla estado_usuario
+    estado = relationship("EstadoUsuario")
+    # Relaciones para confirmación, verificación y recuperación
     confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
     verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
     recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
+    # Relación con la tabla blacklisted_tokens
+    blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
     
 class UserRole(Base):
     __tablename__ = "usuario_rol"
@@ -74,3 +80,16 @@ class RecuperacionContrasena(Base):
     intentos = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="recuperacion_contrasena")
+    
+class BlacklistedToken(Base):
+    __tablename__ = "blacklisted_tokens"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String(500), unique=True, nullable=False, index=True)
+    blacklisted_at = Column(DateTime, default=datetime.now(timezone.utc))
+    
+    # Agregando la clave foránea para relacionar con la tabla usuario
+    usuario_id = Column(Integer, ForeignKey('usuario.id'), nullable=False)
+    
+    # Relación con el modelo User
+    usuario = relationship("User", back_populates="blacklisted_tokens")

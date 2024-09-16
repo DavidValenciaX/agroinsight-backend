@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from app.user.domain.schemas import UserCreate, UserInDB, Confirmation, TwoFactorAuth, PasswordRecovery
 from app.user.infrastructure.orm_models import User, EstadoUsuario, Role, UserRole, RecuperacionContrasena, VerificacionDospasos, ConfirmacionUsuario
+from app.user.infrastructure.orm_models import BlacklistedToken
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
@@ -204,3 +205,20 @@ class UserRepository:
                 print(f"Error al hacer commit: {e}")
                 return False
         return False
+    
+    # Métodos relacionados con la lista negra de tokens
+    def blacklist_token(self, token: str, user_id: int) -> bool:
+        try:
+            # Crear una nueva instancia del token blacklisteado, ahora con usuario_id
+            blacklisted = BlacklistedToken(token=token, usuario_id=user_id)
+            self.db.add(blacklisted)
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al blacklistear el token: {e}")
+            return False
+
+
+    def is_token_blacklisted(self, token: str) -> bool:
+        return self.db.query(BlacklistedToken).filter(BlacklistedToken.token == token).first() is not None
