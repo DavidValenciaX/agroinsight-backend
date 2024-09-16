@@ -52,7 +52,6 @@ class UserRepository:
         return user
     
     def delete_user(self, user: UserInDB):
-        """Elimina una instancia gestionada de User."""
         try:
             self.db.delete(user)
             self.db.commit()
@@ -63,7 +62,7 @@ class UserRepository:
             return False
     
     def block_user(self, user_id: int, lock_duration: timedelta):
-        user = self.db.query(User).filter(User.id == user_id).first()
+        user = self.get_user_by_id(user_id)
         if user:
             user.locked_until = datetime.now(timezone.utc) + lock_duration
             user.state_id = 3  # Estado bloqueado
@@ -165,6 +164,11 @@ class UserRepository:
     def add_user_confirmation(self, confirmation: Confirmation):
         self.db.add(confirmation)
         self.db.commit()
+        
+    def get_user_pending_confirmation(self, user_id: int):
+        return self.db.query(ConfirmacionUsuario).filter(
+        ConfirmacionUsuario.usuario_id == user_id
+        ).first()
     
     def get_user_confirmation(self, user_id: int, pin_hash: str):
         return self.db.query(ConfirmacionUsuario).filter(

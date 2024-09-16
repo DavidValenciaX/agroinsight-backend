@@ -27,17 +27,14 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
 
     existing_user = user_repository.get_user_by_email(user.email)
     if existing_user:
-        # Verificar si el usuario existente está en estado pendiente
-        pending_confirmation = db.query(ConfirmacionUsuario).filter(
-            ConfirmacionUsuario.usuario_id == existing_user.id
-        ).first()
+        # Verificar si el usuario tiene una confirmación pendiente
+        pending_confirmation = user_repository.get_user_pending_confirmation(existing_user.id)
         
         if pending_confirmation:
             # Si hay una confirmación pendiente, la eliminamos junto con el usuario
-            db_user = db.query(User).filter(User.id == existing_user.id).first()
+            db_user = user_repository.get_user_by_id(existing_user.id)
             if db_user:
-                db.delete(db_user)
-                db.commit()
+                user_repository.delete_user(db_user)
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -50,10 +47,9 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
         else:
             # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
-            db_user = db.query(User).filter(User.id == new_user.id).first()
+            db_user = user_repository.get_user_by_id(new_user.id)
             if db_user:
-                db.delete(db_user)
-                db.commit()
+                user_repository.delete_user(db_user)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al crear el usuario o enviar el email de confirmación. Por favor, intenta nuevamente."
@@ -69,23 +65,20 @@ async def confirm_user_registration(
     confirmation: ConfirmationRequest,
     db: Session = Depends(getDb)
 ):
+    user_repository = UserRepository(db)
+    creation_use_case = UserCreationUseCase(db)
     # Hashear el PIN ingresado por el usuario
     pin_hash = hashlib.sha256(confirmation.pin.encode()).hexdigest()
     
     # Buscar al usuario por email
-    user = db.query(User).filter(User.email == confirmation.email).first()
+    user = user_repository.get_user_by_email(confirmation.email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
     
-    confirmation_record = db.query(ConfirmacionUsuario).filter(
-        ConfirmacionUsuario.usuario_id == user.id,
-        ConfirmacionUsuario.pin == pin_hash
-    ).first()
-    
-    creation_use_case = UserCreationUseCase(db)
+    confirmation_record = user_repository.get_user_confirmation(user.id, pin_hash)
     
     if not confirmation_record:
         try:
