@@ -222,3 +222,7 @@ class UserRepository:
 
     def is_token_blacklisted(self, token: str) -> bool:
         return self.db.query(BlacklistedToken).filter(BlacklistedToken.token == token).first() is not None
+    
+    # Agregar el método para obtener todos los usuarios
+    def get_all_users(self):
+        return self.db.query(User).options(joinedload(User.roles), joinedload(User.estado)).all()

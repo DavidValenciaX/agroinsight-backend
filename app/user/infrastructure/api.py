@@ -10,11 +10,34 @@ from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
+from typing import List
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/user", tags=["user"])
+
+# Endpoint para listar todos los usuarios
+@router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
+async def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+    """
+    Endpoint para listar todos los usuarios.
+    """
+    user_repository = UserRepository(db)
+    users = user_repository.get_all_users()
+    
+    if not users:
+        raise HTTPException(status_code=404, detail="No se encontraron usuarios.")
+    
+    # Mapeamos los usuarios a UserResponse para devolver la información formateada
+    return [UserResponse(
+        id=user.id,
+        nombre=user.nombre,
+        apellido=user.apellido,
+        email=user.email,
+        estado=user.estado.nombre,  # Nombre del estado
+        rol=user.roles[0].nombre if user.roles else "Sin rol"  # Nombre del primer rol o "Sin rol"
+    ) for user in users]
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(
