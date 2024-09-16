@@ -5,8 +5,8 @@ from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.authentication_use_case import AuthenticationUseCase
 from app.user.infrastructure.repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
-from app.user.infrastructure.orm_models.user_orm_model import User
+from app.user.infrastructure.orm_models import ConfirmacionUsuario
+from app.user.infrastructure.orm_models import User
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserResponse
 from app.user.domain.schemas import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse

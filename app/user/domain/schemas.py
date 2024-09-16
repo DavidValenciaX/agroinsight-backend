@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator, conint, constr
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import List, Optional
 from datetime import datetime
 from app.core.security.security_utils import validate_password

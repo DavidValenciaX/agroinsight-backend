@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session, joinedload
-from app.user.domain.schemas import UserCreate, UserInDB, RoleInfo, Confirmation, TwoFactorAuth, PasswordRecovery
-from app.user.infrastructure.orm_models.user_orm_model import User
-from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
-from app.user.infrastructure.orm_models.role_orm_model import Role
-from app.user.infrastructure.orm_models.user_role_orm_model import UserRole
-from app.user.infrastructure.orm_models.password_recovery_orm_model import RecuperacionContrasena
-from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
-from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
+from app.user.domain.schemas import UserCreate, UserInDB, Confirmation, TwoFactorAuth, PasswordRecovery
+from app.user.infrastructure.orm_models import User
+from app.user.infrastructure.orm_models import EstadoUsuario
+from app.user.infrastructure.orm_models import Role
+from app.user.infrastructure.orm_models import UserRole
+from app.user.infrastructure.orm_models import RecuperacionContrasena
+from app.user.infrastructure.orm_models import VerificacionDospasos
+from app.user.infrastructure.orm_models import ConfirmacionUsuario
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 

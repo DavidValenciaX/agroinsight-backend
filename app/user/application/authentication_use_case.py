@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from jose import jwt
 from fastapi import HTTPException, status
 from app.user.domain.schemas import UserInDB
-from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
+from app.user.infrastructure.orm_models import VerificacionDospasos
 from app.user.infrastructure.repository import UserRepository
 from app.core.services.pin_service import generate_pin
 from app.core.services.email_service import send_email

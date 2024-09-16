@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from app.user.infrastructure.orm_models.password_recovery_orm_model import RecuperacionContrasena
-from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
-from app.user.infrastructure.orm_models.user_orm_model import User
+from app.user.infrastructure.orm_models import ConfirmacionUsuario
+from app.user.infrastructure.orm_models import User
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
 from app.core.services.pin_service import generate_pin
