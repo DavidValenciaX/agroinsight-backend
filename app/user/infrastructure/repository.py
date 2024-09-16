@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from app.user.domain.user_entities import UserCreate, UserInDB, RoleInfo, Confirmation, TwoFactorAuth, PasswordRecovery
+from app.user.domain.schemas import UserCreate, UserInDB, RoleInfo, Confirmation, TwoFactorAuth, PasswordRecovery
 from app.user.infrastructure.orm_models.user_orm_model import User
 from app.user.infrastructure.orm_models.user_state_orm_model import EstadoUsuario
 from app.user.infrastructure.orm_models.role_orm_model import Role

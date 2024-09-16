@@ -2,17 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import hashlib
 from app.user.application.user_creation_use_case import UserCreationUseCase
-from app.user.application.user_authentication_use_case import AuthenticationUseCase
-from app.user.infrastructure.repositories.sql_user_repository import UserRepository
+from app.user.application.authentication_use_case import AuthenticationUseCase
+from app.user.infrastructure.repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.user.infrastructure.orm_models.user_confirmation_orm_model import ConfirmacionUsuario
 from app.user.infrastructure.orm_models.user_orm_model import User
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.user_entities import UserResponse
-from app.user.domain.user_entities import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
-from app.user.domain.user_entities import TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest
+from app.user.domain.schemas import UserResponse
+from app.user.domain.schemas import UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse
+from app.user.domain.schemas import TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
-from app.user.domain.user_entities import PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
+from app.user.domain.schemas import PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
 from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
 
 

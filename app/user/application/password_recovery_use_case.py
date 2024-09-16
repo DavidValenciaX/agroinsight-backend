@@ -5,7 +5,7 @@ import hashlib
 from app.user.infrastructure.orm_models.password_recovery_orm_model import RecuperacionContrasena
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
-from app.user.infrastructure.repositories.sql_user_repository import UserRepository
+from app.user.infrastructure.repository import UserRepository
 from app.user.domain.exceptions import TooManyRecoveryAttempts
 
 class PasswordRecoveryUseCase:

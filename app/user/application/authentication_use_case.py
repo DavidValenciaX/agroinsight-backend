@@ -1,11 +1,10 @@
-# user_authentication_use_case.py
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from jose import jwt
 from fastapi import HTTPException, status
-from app.user.domain.user_entities import UserInDB
+from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.orm_models.two_factor_verify_orm_model import VerificacionDospasos
-from app.user.infrastructure.repositories.sql_user_repository import UserRepository
+from app.user.infrastructure.repository import UserRepository
 from app.core.services.pin_service import generate_pin
 from app.core.services.email_service import send_email
 from app.core.config.settings import SECRET_KEY, ALGORITHM

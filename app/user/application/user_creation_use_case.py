@@ -6,9 +6,9 @@ from app.user.infrastructure.orm_models.user_orm_model import User
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
 from app.core.services.pin_service import generate_pin
-from app.user.infrastructure.repositories.sql_user_repository import UserRepository
+from app.user.infrastructure.repository import UserRepository
 from app.user.domain.exceptions import TooManyConfirmationAttempts
-from app.user.domain.user_entities import UserCreate, UserInDB
+from app.user.domain.schemas import UserCreate, UserInDB
 
 class UserCreationUseCase:
     def __init__(self, db: Session):
