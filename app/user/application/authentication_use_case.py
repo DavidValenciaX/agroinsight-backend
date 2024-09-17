@@ -57,7 +57,7 @@ class AuthenticationUseCase:
         return user
 
     def create_access_token(self, data: dict, expires_delta: timedelta = None):
-        accessTokenExpireMinutes = 10
+        accessTokenExpireMinutes = 120
         to_encode = data.copy()
         
         if expires_delta:
