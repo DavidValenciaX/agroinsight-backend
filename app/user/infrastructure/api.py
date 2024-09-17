@@ -7,10 +7,10 @@ from app.user.infrastructure.repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
+from app.user.domain.schemas import AdminUserCreate, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
-from typing import List
+from typing import List, Optional
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
@@ -22,7 +22,10 @@ router = APIRouter(prefix="/user", tags=["user"])
 @router.post(
     "/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
 )
-async def create_user(user: UserCreate, db: Session = Depends(getDb)):
+async def create_user(
+    user: UserCreate,
+    db: Session = Depends(getDb),
+):
     user_repository = UserRepository(db)
     creation_use_case = UserCreationUseCase(db)
 
@@ -61,6 +64,46 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             detail=str(e)
         )
         
+@router.post(
+    "/admin/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
+)
+async def admin_create_user(
+    user: AdminUserCreate,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    # Verificar que el usuario actual está autenticado y es administrador
+    if current_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No autenticado"
+        )
+    user_repository = UserRepository(db)
+    admin_roles = user_repository.get_admin_roles()
+    if not any(role.id in [admin_role.id for admin_role in admin_roles] for role in current_user.roles):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para realizar esta acción."
+        )
+    # Verificar si el rol proporcionado es válido
+    role = user_repository.get_role_by_id(user.role_id)
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Rol no válido."
+        )
+    # Verificar si el correo electrónico ya existe
+    existing_user = user_repository.get_user_by_email(user.email)
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario con este correo electrónico ya existe."
+        )
+    # Crear el usuario con estado "active"
+    creation_use_case = UserCreationUseCase(db)
+    new_user = creation_use_case.create_user_by_admin(user)
+    return UserCreationResponse(message="Usuario creado exitosamente.")
+
 @router.post("/resend-confirm-pin", status_code=status.HTTP_200_OK)
 async def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,

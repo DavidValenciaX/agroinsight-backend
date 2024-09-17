@@ -16,6 +16,9 @@ class UserCreate(BaseModel):
         except ValueError as e:
             raise ValueError(str(e))
         
+class AdminUserCreate(UserCreate):
+    role_id: int
+
 class Confirmation(BaseModel):
     usuario_id: int
     pin: str = Field(..., min_length=1, max_length=64)
