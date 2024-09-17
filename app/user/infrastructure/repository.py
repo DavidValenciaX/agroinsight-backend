@@ -66,6 +66,43 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al actualizar el usuario: {e}")
             return None
+        
+    def update_user_info_by_admin(self, user: User, user_data: dict):
+        """Actualiza la información del usuario con los datos proporcionados por un administrador."""
+        if 'nombre' in user_data and user_data['nombre']:
+            user.nombre = user_data['nombre']
+        if 'apellido' in user_data and user_data['apellido']:
+            user.apellido = user_data['apellido']
+        if 'email' in user_data and user_data['email']:
+            user.email = user_data['email']
+
+        # Cambiar el estado del usuario basado en el estado_id
+        if 'estado_id' in user_data and user_data['estado_id']:
+            estado = self.db.query(EstadoUsuario).filter(EstadoUsuario.id == user_data['estado_id']).first()
+            if estado:
+                user.state_id = estado.id
+            else:
+                raise ValueError("Estado no válido")
+
+        # Cambiar el rol del usuario basado en el rol_id
+        if 'rol_id' in user_data and user_data['rol_id']:
+            nuevo_rol = self.db.query(Role).filter(Role.id == user_data['rol_id']).first()
+            if nuevo_rol:
+                # Eliminar el rol actual y asignar el nuevo rol
+                self.db.query(UserRole).filter(UserRole.usuario_id == user.id).delete()
+                user_role = UserRole(usuario_id=user.id, rol_id=nuevo_rol.id)
+                self.db.add(user_role)
+            else:
+                raise ValueError("Rol no válido")
+
+        try:
+            self.db.commit()
+            self.db.refresh(user)
+            return user
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar el usuario por admin: {e}")
+            return None
     
     def delete_user(self, user: UserInDB):
         try:
@@ -224,6 +261,13 @@ class UserRepository:
         """
         inactive_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "inactive").first()
         return inactive_state.id if inactive_state else None
+    
+    def get_admin_roles(self):
+        """
+        Obtiene los roles de 'Superusuario' y 'Administrador de finca'.
+        """
+        admin_roles = self.db.query(Role).filter(Role.nombre.in_(["Superusuario", "Administrador de finca"])).all()
+        return admin_roles
 
     def deactivate_user(self, user_id: int) -> bool:
         """

@@ -15,6 +15,22 @@ class UserCreate(BaseModel):
             return validate_password(v)
         except ValueError as e:
             raise ValueError(str(e))
+        
+class Confirmation(BaseModel):
+    usuario_id: int
+    pin: str = Field(..., min_length=1, max_length=64)
+    expiracion: datetime
+    intentos: int = Field(default=0, ge=0)
+    
+class ConfirmationRequest(BaseModel):
+    email: EmailStr
+    pin: str
+
+class ResendPinConfirmRequest(BaseModel):
+    email: EmailStr
+    
+class UserCreationResponse(BaseModel):
+    message: str
 
 class RoleInfo(BaseModel):
     id: int
@@ -45,8 +61,29 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class UserCreationResponse(BaseModel):
-    message: str
+    class Config:
+        from_attributes = True
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+    
+class TwoFactorAuthRequest(BaseModel):
+    email: EmailStr
+    pin: str = Field(..., min_length=4, max_length=4)
+    
+class Resend2FARequest(BaseModel):
+    email: EmailStr
+    
+class TwoFactorAuth(BaseModel):
+    usuario_id: int
+    pin: str = Field(..., min_length=1, max_length=64)
+    expiracion: datetime
+    intentos: int = Field(default=0, ge=0)
+    
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
     
 class UserUpdate(BaseModel):
     nombre: Optional[str] = Field(None, min_length=2, max_length=50)
@@ -55,49 +92,25 @@ class UserUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class AdminUserUpdate(BaseModel):
+    nombre: Optional[str] = Field(None, min_length=2, max_length=50)
+    apellido: Optional[str] = Field(None, min_length=2, max_length=50)
+    email: Optional[EmailStr]
+    estado_id: Optional[int]  # Ahora es el ID del estado
+    rol_id: Optional[int]     # Ahora es el ID del rol
 
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
-
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str
-    
-class Confirmation(BaseModel):
-    usuario_id: int
-    pin: str = Field(..., min_length=1, max_length=64)
-    expiracion: datetime
-    intentos: int = Field(default=0, ge=0)
-    
-class ConfirmationRequest(BaseModel):
-    email: EmailStr
-    pin: str
-
-class TwoFactorAuthRequest(BaseModel):
-    email: EmailStr
-    pin: str = Field(..., min_length=4, max_length=4)
-    
-class TwoFactorAuth(BaseModel):
-    usuario_id: int
-    pin: str = Field(..., min_length=1, max_length=64)
-    expiracion: datetime
-    intentos: int = Field(default=0, ge=0)
-    
-class ResendPinRequest(BaseModel):
-    email: EmailStr
-    
-class Resend2FARequest(BaseModel):
-    email: EmailStr
-    
-class PasswordRecoveryRequest(BaseModel):
-    email: EmailStr
+    class Config:
+        from_attributes = True
     
 class PasswordRecovery(BaseModel):
     usuario_id: int
     pin: str = Field(..., min_length=1, max_length=64)
     expiracion: datetime
     intentos: int = Field(default=0, ge=0)
+
+class PasswordRecoveryRequest(BaseModel):
+    email: EmailStr
 
 class PinConfirmationRequest(BaseModel):
     email: EmailStr

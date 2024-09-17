@@ -7,11 +7,10 @@ from app.user.infrastructure.repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest
+from app.user.domain.schemas import UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
 from typing import List
-from app.user.domain.schemas import UserUpdate
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
@@ -64,7 +63,7 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
         
 @router.post("/resend-confirm-pin", status_code=status.HTTP_200_OK)
 async def resend_confirmation_pin_endpoint(
-    resend_request: ResendPinRequest,
+    resend_request: ResendPinConfirmRequest,
     db: Session = Depends(getDb)
 ):
     try:
@@ -294,6 +293,63 @@ async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_use
         estado=user.estado.nombre,  # Nombre del estado
         rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
     )
+    
+@router.put("/{user_id}/update", response_model=UserResponse)
+async def admin_update_user(
+    user_id: int,
+    user_update: AdminUserUpdate,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Endpoint para que un administrador actualice la información de un usuario.
+    """
+    user_repository = UserRepository(db)
+
+    # Obtener los roles que tienen permisos administrativos
+    admin_roles = user_repository.get_admin_roles()
+
+    # Verificar si el usuario actual tiene uno de los roles administrativos
+    if not any(role.id in [admin_role.id for admin_role in admin_roles] for role in current_user.roles):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para realizar esta acción."
+        )
+
+    # Verificar si el usuario a actualizar existe
+    user_to_update = user_repository.get_user_by_id(user_id)
+    if not user_to_update:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado."
+        )
+
+    # Verificar si el nuevo email está en uso por otro usuario
+    if user_update.email and user_update.email != user_to_update.email:
+        existing_user = user_repository.get_user_by_email(user_update.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El email ya está en uso por otro usuario."
+            )
+
+    # Actualizar la información del usuario
+    updated_user = user_repository.update_user_info_by_admin(user_to_update, user_update.dict(exclude_unset=True))
+
+    if updated_user:
+        return UserResponse(
+            id=updated_user.id,
+            nombre=updated_user.nombre,
+            apellido=updated_user.apellido,
+            email=updated_user.email,
+            estado=updated_user.estado.nombre,
+            rol=", ".join([role.nombre for role in updated_user.roles]) if updated_user.roles else "Sin rol asignado"
+        )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo actualizar la información del usuario."
+        )
     
 @router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
 async def deactivate_user(
