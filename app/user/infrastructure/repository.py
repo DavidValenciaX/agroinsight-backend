@@ -242,6 +242,9 @@ class UserRepository:
     # Métodos relacionados con estados y roles
     def get_state_by_id(self, state_id: int):
         return self.db.query(EstadoUsuario).filter(EstadoUsuario.id == state_id).first()
+    
+    def get_role_by_id(self, role_id: int) -> Optional[Role]:
+        return self.db.query(Role).filter(Role.id == role_id).first()
         
     def get_active_user_state_id(self) -> Optional[int]:
         active_state = self.db.query(EstadoUsuario).filter(EstadoUsuario.nombre == "active").first()

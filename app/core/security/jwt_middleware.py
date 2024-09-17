@@ -6,14 +6,17 @@ from sqlalchemy.orm import Session
 from app.core.config.settings import SECRET_KEY, ALGORITHM
 from app.user.infrastructure.repository import UserRepository
 from app.infrastructure.db.connection import getDb
+from typing import Optional
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Security(security_scheme),
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(security_scheme),
     db: Session = Depends(getDb)
 ):
+    if credentials is None:
+        return None  # Usuario no autenticado
     token = credentials.credentials
     user_repository = UserRepository(db)
 
