@@ -11,127 +11,14 @@ from app.user.domain.schemas import UserResponse, UserCreate, UserCreationRespon
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
 from typing import List
+from app.user.domain.schemas import UserUpdate
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/user", tags=["user"])
 
-@router.get("/me", response_model=UserResponse)
-async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
-    
-    # Obtener el repositorio de usuarios
-    user_repository = UserRepository(db)
-    
-    # Obtener el estado del usuario
-    estado = user_repository.get_state_by_id(current_user.state_id)
-    estado_nombre = estado.nombre if estado else "Desconocido"
-    
-    # Obtener el rol del usuario
-    user_role = ", ".join([role.nombre for role in current_user.roles]) if current_user.roles else "Sin rol asignado"
-    
-    return UserResponse(
-        id=current_user.id,
-        nombre=current_user.nombre,
-        apellido=current_user.apellido,
-        email=current_user.email,
-        estado=estado_nombre,
-        rol=user_role
-    )
-
-@router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
-async def deactivate_user(
-    user_id: int, 
-    db: Session = Depends(getDb), 
-    current_user: UserInDB = Depends(get_current_user)
-):
-    """
-    Endpoint para desactivar (inactivar) un usuario en lugar de eliminarlo.
-    """
-    user_repository = UserRepository(db)
-
-    # Verificar si el usuario existe
-    user = user_repository.get_user_by_id(user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
-    
-    # Desactivar el usuario
-    success = user_repository.deactivate_user(user_id)
-    
-    if success:
-        return {"message": "Usuario desactivado exitosamente."}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo desactivar el usuario. Intenta nuevamente."
-        )
-
-# Endpoint para listar todos los usuarios
-@router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
-async def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
-    """
-    Endpoint para listar todos los usuarios.
-    """
-    user_repository = UserRepository(db)
-    users = user_repository.get_all_users()
-    
-    if not users:
-        raise HTTPException(status_code=404, detail="No se encontraron usuarios.")
-    
-    # Mapeamos los usuarios a UserResponse para devolver la información formateada
-    return [UserResponse(
-        id=user.id,
-        nombre=user.nombre,
-        apellido=user.apellido,
-        email=user.email,
-        estado=user.estado.nombre,  # Nombre del estado
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"  # Nombre del primer rol o "Sin rol"
-    ) for user in users]
-    
-@router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
-async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
-    """
-    Endpoint para obtener un usuario por su ID.
-    """
-    user_repository = UserRepository(db)
-    user = user_repository.get_user_by_id(user_id)
-    
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
-    
-    # Mapeamos el usuario a UserResponse para devolver la información formateada
-    return UserResponse(
-        id=user.id,
-        nombre=user.nombre,
-        apellido=user.apellido,
-        email=user.email,
-        estado=user.estado.nombre,  # Nombre del estado
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
-    )
-    
-@router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout(
-    current_user: UserInDB = Depends(get_current_user),
-    db: Session = Depends(getDb),
-    credentials: HTTPAuthorizationCredentials = Security(security_scheme)
-):
-    """
-    Cierra la sesión del usuario actual invalidando su token.
-    """
-    token = credentials.credentials
-    user_repository = UserRepository(db)
-    
-    # Ahora pasas el usuario_id del current_user
-    success = user_repository.blacklist_token(token, current_user.id)
-    
-    if success:
-        return {"message": "Sesión cerrada exitosamente."}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo cerrar la sesión. Intenta nuevamente."
-        )
-
+# endpoints de usuarios
 
 @router.post(
     "/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
@@ -174,7 +61,28 @@ async def create_user(user: UserCreate, db: Session = Depends(getDb)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
-
+        
+@router.post("/resend-confirm-pin", status_code=status.HTTP_200_OK)
+async def resend_confirmation_pin_endpoint(
+    resend_request: ResendPinRequest,
+    db: Session = Depends(getDb)
+):
+    try:
+        creation_use_case = UserCreationUseCase(db)
+        success = creation_use_case.resend_confirmation_pin(resend_request.email)
+        if success:
+            return {"message": "PIN de confirmación reenviado con éxito"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde."
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al reenviar el PIN: {str(e)}"
+        )
+        
 @router.post("/confirm", status_code=status.HTTP_200_OK)
 async def confirm_user_registration(
     confirmation: ConfirmationRequest,
@@ -228,27 +136,6 @@ async def confirm_user_registration(
             detail=f"Error al confirmar el usuario: {str(e)}"
         )
         
-@router.post("/resend-confirm-pin", status_code=status.HTTP_200_OK)
-async def resend_confirmation_pin_endpoint(
-    resend_request: ResendPinRequest,
-    db: Session = Depends(getDb)
-):
-    try:
-        creation_use_case = UserCreationUseCase(db)
-        success = creation_use_case.resend_confirmation_pin(resend_request.email)
-        if success:
-            return {"message": "PIN de confirmación reenviado con éxito"}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde."
-            )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al reenviar el PIN: {str(e)}"
-        )
-
 @router.post("/login")
 async def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
     auth_use_case = AuthenticationUseCase(db)
@@ -272,17 +159,6 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
             )
     except HTTPException as e:
         raise e  # Re-lanza la excepción para mantener el mensaje detallado
-        
-@router.post("/login/verify", response_model=TokenResponse)
-async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
-    auth_use_case = AuthenticationUseCase(db)
-    
-    try:
-        user = auth_use_case.verify_two_factor_auth(auth_request.email, auth_request.pin)
-        access_token = auth_use_case.create_access_token(data={"sub": user.email})
-        return {"access_token": access_token, "token_type": "bearer"}
-    except HTTPException as e:
-        raise e  # Re-lanza la excepción para mantener el mensaje detallado
     
 @router.post("/resend-2fa-pin", status_code=status.HTTP_200_OK)
 async def resend_2fa_pin_endpoint(
@@ -303,6 +179,147 @@ async def resend_2fa_pin_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al reenviar el PIN: {str(e)}"
+        )
+        
+@router.post("/login/verify", response_model=TokenResponse)
+async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
+    auth_use_case = AuthenticationUseCase(db)
+    
+    try:
+        user = auth_use_case.verify_two_factor_auth(auth_request.email, auth_request.pin)
+        access_token = auth_use_case.create_access_token(data={"sub": user.email})
+        return {"access_token": access_token, "token_type": "bearer"}
+    except HTTPException as e:
+        raise e  # Re-lanza la excepción para mantener el mensaje detallado
+        
+# Endpoint para listar todos los usuarios
+@router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
+async def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+    """
+    Endpoint para listar todos los usuarios.
+    """
+    user_repository = UserRepository(db)
+    users = user_repository.get_all_users()
+    
+    if not users:
+        raise HTTPException(status_code=404, detail="No se encontraron usuarios.")
+    
+    # Mapeamos los usuarios a UserResponse para devolver la información formateada
+    return [UserResponse(
+        id=user.id,
+        nombre=user.nombre,
+        apellido=user.apellido,
+        email=user.email,
+        estado=user.estado.nombre,  # Nombre del estado
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"  # Nombre del primer rol o "Sin rol"
+    ) for user in users]
+
+@router.get("/me", response_model=UserResponse)
+async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
+    
+    # Obtener el repositorio de usuarios
+    user_repository = UserRepository(db)
+    
+    # Obtener el estado del usuario
+    estado = user_repository.get_state_by_id(current_user.state_id)
+    estado_nombre = estado.nombre if estado else "Desconocido"
+    
+    # Obtener el rol del usuario
+    user_role = ", ".join([role.nombre for role in current_user.roles]) if current_user.roles else "Sin rol asignado"
+    
+    return UserResponse(
+        id=current_user.id,
+        nombre=current_user.nombre,
+        apellido=current_user.apellido,
+        email=current_user.email,
+        estado=estado_nombre,
+        rol=user_role
+    )
+    
+@router.put("/me/update", response_model=UserResponse)
+async def update_user_info(
+    user_update: UserUpdate,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Endpoint para que el usuario actualice su información.
+    """
+    user_repository = UserRepository(db)
+    
+    # Verificar si el email ya está en uso por otro usuario
+    if user_update.email and user_update.email != current_user.email:
+        existing_user = user_repository.get_user_by_email(user_update.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El email ya está en uso por otro usuario."
+            )
+    
+    # Actualizar la información del usuario
+    updated_user = user_repository.update_user_info(current_user, user_update.dict(exclude_unset=True))
+    
+    if updated_user:
+        return UserResponse(
+            id=updated_user.id,
+            nombre=updated_user.nombre,
+            apellido=updated_user.apellido,
+            email=updated_user.email,
+            estado=updated_user.estado.nombre,
+            rol=", ".join([role.nombre for role in updated_user.roles]) if updated_user.roles else "Sin rol asignado"
+        )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo actualizar la información del usuario."
+        )
+    
+@router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+    """
+    Endpoint para obtener un usuario por su ID.
+    """
+    user_repository = UserRepository(db)
+    user = user_repository.get_user_by_id(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
+    
+    # Mapeamos el usuario a UserResponse para devolver la información formateada
+    return UserResponse(
+        id=user.id,
+        nombre=user.nombre,
+        apellido=user.apellido,
+        email=user.email,
+        estado=user.estado.nombre,  # Nombre del estado
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
+    )
+    
+@router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
+async def deactivate_user(
+    user_id: int, 
+    db: Session = Depends(getDb), 
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Endpoint para eliminar (inactivar) un usuario en lugar de eliminarlo.
+    """
+    user_repository = UserRepository(db)
+
+    # Verificar si el usuario existe
+    user = user_repository.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
+    
+    # Desactivar el usuario
+    success = user_repository.deactivate_user(user_id)
+    
+    if success:
+        return {"message": "Usuario desactivado exitosamente."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo desactivar el usuario. Intenta nuevamente."
         )
     
 @router.post("/password-recovery", status_code=status.HTTP_200_OK)
@@ -374,4 +391,27 @@ async def reset_password(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No se pudo restablecer la contraseña. Asegúrate de que la nueva contraseña sea diferente de la anterior y que hayas confirmado el código de recuperación."
+        )
+        
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(
+    current_user: UserInDB = Depends(get_current_user),
+    db: Session = Depends(getDb),
+    credentials: HTTPAuthorizationCredentials = Security(security_scheme)
+):
+    """
+    Cierra la sesión del usuario actual invalidando su token.
+    """
+    token = credentials.credentials
+    user_repository = UserRepository(db)
+    
+    # Ahora pasas el usuario_id del current_user
+    success = user_repository.blacklist_token(token, current_user.id)
+    
+    if success:
+        return {"message": "Sesión cerrada exitosamente."}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="No se pudo cerrar la sesión. Intenta nuevamente."
         )

@@ -47,6 +47,14 @@ class UserResponse(BaseModel):
 
 class UserCreationResponse(BaseModel):
     message: str
+    
+class UserUpdate(BaseModel):
+    nombre: Optional[str] = Field(None, min_length=2, max_length=50)
+    apellido: Optional[str] = Field(None, min_length=2, max_length=50)
+    email: Optional[EmailStr]
+
+    class Config:
+        from_attributes = True
 
 class LoginRequest(BaseModel):
     email: EmailStr
