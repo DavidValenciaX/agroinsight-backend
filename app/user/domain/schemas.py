@@ -1,15 +1,22 @@
 from typing import List
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_core import PydanticCustomError
-from app.user.domain.types import EmailStrCustom, PasswordStrCustom
 import re
 
 class UserCreate(BaseModel):
-    email: EmailStrCustom
+    email: str
     nombre: str
     apellido: str
-    password: PasswordStrCustom
+    password: str
+    
+    @field_validator('email')
+    def validate_email(cls, v):
+        # Expresión regular básica para validar el formato del correo electrónico
+        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        if not re.match(email_regex, v):
+            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
+        return v
 
     @field_validator('nombre')
     def validate_nombre(cls, v):
@@ -22,6 +29,25 @@ class UserCreate(BaseModel):
         if len(v) < 2:
             raise PydanticCustomError('apellido_validation','El apellido debe tener al menos 2 caracteres.')
         return v
+
+    @field_validator('password')
+    def validate_password(cls, v):
+        errors = []
+        if len(v) < 12:
+            errors.append('La contraseña debe tener al menos 12 caracteres.')
+        if not re.search(r'\d', v):
+            errors.append('La contraseña debe contener al menos un número.')
+        if not re.search(r'[a-zA-Z]', v):
+            errors.append('La contraseña debe contener al menos una letra.')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            errors.append('La contraseña debe contener al menos un carácter especial.')
+        
+        if errors:
+            # Unir los errores en un solo mensaje
+            message = '\n'.join(errors)
+            # Levantar un error personalizado sin prefijo
+            raise PydanticCustomError('password_validation', message)
+        return v
         
 class AdminUserCreate(UserCreate):
     role_id: int
@@ -33,11 +59,11 @@ class Confirmation(BaseModel):
     intentos: int
     
 class ConfirmationRequest(BaseModel):
-    email: EmailStrCustom
+    email: EmailStr
     pin: str
 
 class ResendPinConfirmRequest(BaseModel):
-    email: EmailStrCustom
+    email: EmailStr
     
 class UserCreationResponse(BaseModel):
     message: str
@@ -50,7 +76,7 @@ class UserInDB(BaseModel):
     id: int
     nombre: str
     apellido: str
-    email: EmailStrCustom
+    email: EmailStr
     password: str
     failed_attempts: int
     locked_until: datetime
@@ -64,7 +90,7 @@ class UserResponse(BaseModel):
     id: int
     nombre: str
     apellido: str
-    email: EmailStrCustom
+    email: EmailStr
     estado: str
     rol: str
 
@@ -75,15 +101,15 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 class LoginRequest(BaseModel):
-    email: EmailStrCustom
+    email: EmailStr
     password: str
     
 class TwoFactorAuthRequest(BaseModel):
-    email: EmailStrCustom
+    email: EmailStr
     pin: str
     
 class Resend2FARequest(BaseModel):
-    email: EmailStrCustom
+    email: EmailStr
     
 class TwoFactorAuth(BaseModel):
     usuario_id: int
@@ -98,7 +124,7 @@ class TokenResponse(BaseModel):
 class UserUpdate(BaseModel):
     nombre: str
     apellido: str
-    email: EmailStrCustom
+    email: EmailStr
 
     class Config:
         from_attributes = True
@@ -106,7 +132,7 @@ class UserUpdate(BaseModel):
 class AdminUserUpdate(BaseModel):
     nombre: str
     apellido: str
-    email: EmailStrCustom
+    email: EmailStr
     estado_id: int
     rol_id: int
 
@@ -120,11 +146,31 @@ class PasswordRecovery(BaseModel):
     intentos: int
 
 class PasswordRecoveryRequest(BaseModel):
-    email: EmailStrCustom
+    email: EmailStr
 
 class PinConfirmationRequest(BaseModel):
-    email: EmailStrCustom
+    email: EmailStr
     pin: str
+
 class PasswordResetRequest(BaseModel):
-    email: EmailStrCustom
-    new_password: PasswordStrCustom
+    email: EmailStr
+    new_password: str
+    
+    @field_validator('new_password')
+    def validate_password(cls, v):
+        errors = []
+        if len(v) < 12:
+            errors.append('La contraseña debe tener al menos 12 caracteres.')
+        if not re.search(r'\d', v):
+            errors.append('La contraseña debe contener al menos un número.')
+        if not re.search(r'[a-zA-Z]', v):
+            errors.append('La contraseña debe contener al menos una letra.')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            errors.append('La contraseña debe contener al menos un carácter especial.')
+        
+        if errors:
+            # Unir los errores en un solo mensaje
+            message = '\n'.join(errors)
+            # Levantar un error personalizado sin prefijo
+            raise PydanticCustomError('password_validation', message)
+        return v
