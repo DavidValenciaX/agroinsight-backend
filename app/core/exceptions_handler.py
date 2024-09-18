@@ -8,8 +8,8 @@ from typing import Dict, List
 
 CUSTOM_MESSAGES = {
     'missing': 'El campo es requerido',
-    'value_error.missing': 'El campo es requerido',
-    # Agrega otros tipos de error y mensajes personalizados si es necesario
+    'value_error.missing': 'El campo es requerido'
+    # Agregar otros tipos de error y mensajes personalizados si es necesario
 }
 
 def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[Dict]:

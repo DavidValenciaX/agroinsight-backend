@@ -22,13 +22,6 @@ class UserCreate(BaseModel):
         if len(v) < 2:
             raise PydanticCustomError('apellido_validation','El apellido debe tener al menos 2 caracteres.')
         return v
-    
-    class Config:
-        error_message_templates = {
-            'value_error.missing': 'Este campo es obligatorio.',
-            'email_validation': 'El correo electrónico no es válido. Debe contener un @ y un dominio válido.',
-            'password_validation': 'La contraseña debe cumplir con los requisitos de seguridad.',
-        }
         
 class AdminUserCreate(UserCreate):
     role_id: int
