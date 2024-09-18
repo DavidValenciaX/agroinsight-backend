@@ -9,8 +9,8 @@ from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import AdminUserCreate, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
-from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
-from typing import List, Optional
+from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts, UserAlreadyExistsException, ConfirmationError
+from typing import List
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
@@ -26,42 +26,24 @@ async def create_user(
     user: UserCreate,
     db: Session = Depends(getDb),
 ):
-    user_repository = UserRepository(db)
     creation_use_case = UserCreationUseCase(db)
-
-    existing_user = user_repository.get_user_by_email(user.email)
-    if existing_user:
-        # Verificar si el usuario tiene una confirmación pendiente
-        pending_confirmation = user_repository.get_user_pending_confirmation(existing_user.id)
-        
-        if pending_confirmation:
-            # Si hay una confirmación pendiente, la eliminamos junto con el usuario
-            db_user = user_repository.get_user_by_id(existing_user.id)
-            if db_user:
-                user_repository.delete_user(db_user)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El usuario con este correo electrónico ya existe.",
-            )
-
     try:
-        new_user = creation_use_case.create_user(user)
-        if creation_use_case.create_user_with_confirmation(new_user):
-            return UserCreationResponse(message="Usuario creado. Por favor, revisa tu email para confirmar el registro.")
-        else:
-            # Si falla la creación de la confirmación o el envío del email, eliminamos el usuario
-            db_user = user_repository.get_user_by_id(new_user.id)
-            if db_user:
-                user_repository.delete_user(db_user)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error al crear el usuario o enviar el email de confirmación. Por favor, intenta nuevamente."
-            )
-    except ValueError as e:
+        message = creation_use_case.execute(user)
+        return UserCreationResponse(message=message)
+    except UserAlreadyExistsException as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+    except ConfirmationError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            detail=str(e),
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error inesperado al crear el usuario."
         )
         
 @router.post(

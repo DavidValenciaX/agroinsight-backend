@@ -1,6 +1,8 @@
 from passlib.context import CryptContext
 import re
 
+from app.user.domain.exceptions import PasswordValidationError
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
@@ -21,5 +23,5 @@ def validate_password(password: str) -> str:
         errors.append('La contraseña debe contener al menos un caracter especial')
     
     if errors:
-        raise ValueError(', '.join(errors))
+        raise PasswordValidationError(errors)
     return password
