@@ -4,9 +4,29 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import traceback
 from app.user.domain.exceptions import ConfirmationError, UserAlreadyExistsException
+from typing import Dict, List
+
+CUSTOM_MESSAGES = {
+    'missing': 'El campo es requerido',
+    'value_error.missing': 'El campo es requerido',
+    # Agrega otros tipos de error y mensajes personalizados si es necesario
+}
+
+def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[Dict]:
+    new_errors = []
+    for error in errors:
+        error_type = error['type']
+        custom_message = custom_messages.get(error_type)
+        if custom_message:
+            ctx = error.get('ctx', {})
+            error['msg'] = custom_message.format(**ctx) if ctx else custom_message
+        new_errors.append(error)
+    return new_errors
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
+    # Reemplaza los mensajes de error con los personalizados
+    errors = convert_errors(errors, CUSTOM_MESSAGES)
     formatted_errors = []
 
     for error in errors:
