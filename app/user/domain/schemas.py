@@ -1,32 +1,26 @@
-from typing import List, Optional
+from typing import List
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from pydantic_core import PydanticCustomError
+from app.user.domain.types import EmailStrCustom, PasswordStrCustom
 import re
 
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: EmailStrCustom
     nombre: str
     apellido: str
-    password: str
+    password: PasswordStrCustom
 
-    @field_validator('password')
-    def validate_password(cls, v):
-        errors = []
-        if len(v) < 12:
-            errors.append('La contraseña debe tener al menos 12 caracteres.')
-        if not re.search(r'\d', v):
-            errors.append('La contraseña debe contener al menos un número.')
-        if not re.search(r'[a-zA-Z]', v):
-            errors.append('La contraseña debe contener al menos una letra.')
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
-            errors.append('La contraseña debe contener al menos un carácter especial.')
-        
-        if errors:
-            # Unir los errores en un solo mensaje
-            message = '\n'.join(errors)
-            # Levantar un error personalizado sin prefijo
-            raise PydanticCustomError('password_validation', message)
+    @field_validator('nombre')
+    def validate_nombre(cls, v):
+        if len(v) < 2:
+            raise PydanticCustomError('nombre_validation','El nombre debe tener al menos 2 caracteres.')
+        return v
+
+    @field_validator('apellido')
+    def validate_apellido(cls, v):
+        if len(v) < 2:
+            raise PydanticCustomError('apellido_validation','El apellido debe tener al menos 2 caracteres.')
         return v
         
 class AdminUserCreate(UserCreate):
@@ -34,16 +28,16 @@ class AdminUserCreate(UserCreate):
 
 class Confirmation(BaseModel):
     usuario_id: int
-    pin: str = Field(..., min_length=1, max_length=64)
+    pin: str
     expiracion: datetime
-    intentos: int = Field(default=0, ge=0)
+    intentos: int
     
 class ConfirmationRequest(BaseModel):
-    email: EmailStr
+    email: EmailStrCustom
     pin: str
 
 class ResendPinConfirmRequest(BaseModel):
-    email: EmailStr
+    email: EmailStrCustom
     
 class UserCreationResponse(BaseModel):
     message: str
@@ -56,10 +50,10 @@ class UserInDB(BaseModel):
     id: int
     nombre: str
     apellido: str
-    email: EmailStr
+    email: EmailStrCustom
     password: str
     failed_attempts: int
-    locked_until: Optional[datetime]
+    locked_until: datetime
     state_id: int
     roles: List[RoleInfo] = []
 
@@ -70,7 +64,7 @@ class UserResponse(BaseModel):
     id: int
     nombre: str
     apellido: str
-    email: EmailStr
+    email: EmailStrCustom
     estado: str
     rol: str
 
@@ -81,73 +75,56 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: EmailStrCustom
     password: str
     
 class TwoFactorAuthRequest(BaseModel):
-    email: EmailStr
-    pin: str = Field(..., min_length=4, max_length=4)
+    email: EmailStrCustom
+    pin: str
     
 class Resend2FARequest(BaseModel):
-    email: EmailStr
+    email: EmailStrCustom
     
 class TwoFactorAuth(BaseModel):
     usuario_id: int
-    pin: str = Field(..., min_length=1, max_length=64)
+    pin: str
     expiracion: datetime
-    intentos: int = Field(default=0, ge=0)
+    intentos: int
     
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     
 class UserUpdate(BaseModel):
-    nombre: Optional[str] = Field(None, min_length=2, max_length=50)
-    apellido: Optional[str] = Field(None, min_length=2, max_length=50)
-    email: Optional[EmailStr]
+    nombre: str
+    apellido: str
+    email: EmailStrCustom
 
     class Config:
         from_attributes = True
         
 class AdminUserUpdate(BaseModel):
-    nombre: Optional[str] = Field(None, min_length=2, max_length=50)
-    apellido: Optional[str] = Field(None, min_length=2, max_length=50)
-    email: Optional[EmailStr]
-    estado_id: Optional[int]  # Ahora es el ID del estado
-    rol_id: Optional[int]     # Ahora es el ID del rol
+    nombre: str
+    apellido: str
+    email: EmailStrCustom
+    estado_id: int
+    rol_id: int
 
     class Config:
         from_attributes = True
     
 class PasswordRecovery(BaseModel):
     usuario_id: int
-    pin: str = Field(..., min_length=1, max_length=64)
+    pin: str
     expiracion: datetime
-    intentos: int = Field(default=0, ge=0)
+    intentos: int
 
 class PasswordRecoveryRequest(BaseModel):
-    email: EmailStr
+    email: EmailStrCustom
 
 class PinConfirmationRequest(BaseModel):
-    email: EmailStr
-    pin: str = Field(..., min_length=4, max_length=4)
-
+    email: EmailStrCustom
+    pin: str
 class PasswordResetRequest(BaseModel):
-    email: EmailStr
-    new_password: str = Field(..., min_length=12)
-    
-    @field_validator('new_password')
-    def validate_password(cls, v):
-        errors = []
-        if len(v) < 12:
-            errors.append('La contraseña debe tener al menos 12 caracteres')
-        if not re.search(r'\d', v):
-            errors.append('La contraseña debe contener al menos un número')
-        if not re.search(r'[a-zA-Z]', v):
-            errors.append('La contraseña debe contener al menos una letra')
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
-            errors.append('La contraseña debe contener al menos un caracter especial')
-        
-        if errors:
-            raise ValueError("; ".join(errors))
-        return v
+    email: EmailStrCustom
+    new_password: PasswordStrCustom

@@ -4,7 +4,7 @@ from app.core.services.pin_service import generate_pin, hash_pin
 from app.user.infrastructure.orm_models import RecuperacionContrasena
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
-from app.user.infrastructure.repository import UserRepository
+from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.exceptions import TooManyRecoveryAttempts
 
 class PasswordRecoveryUseCase:

@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.authentication_use_case import AuthenticationUseCase
-from app.user.infrastructure.repository import UserRepository
+from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
