@@ -11,9 +11,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
     for error in errors:
         formatted_errors.append({
-            "field": ".".join(map(str, error["loc"])),
-            "message": error["msg"],
-            "type": error["type"]
+            "field": error["loc"][-1],
+            "message": error["msg"]
         })
 
     return JSONResponse(
@@ -22,8 +21,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "error": {
                 "route": str(request.url),
                 "status_code": 422,
-                "errors": formatted_errors,
-                "message": "Error en la validación de los datos de entrada"
+                "type": "Error en la validación de los datos de entrada",
+                "errors": formatted_errors
             }
         },
     )

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import List, Optional
 from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic_core import PydanticCustomError
 import re
 
 class UserCreate(BaseModel):
@@ -13,16 +14,19 @@ class UserCreate(BaseModel):
     def validate_password(cls, v):
         errors = []
         if len(v) < 12:
-            errors.append('La contraseña debe tener al menos 12 caracteres')
+            errors.append('La contraseña debe tener al menos 12 caracteres.')
         if not re.search(r'\d', v):
-            errors.append('La contraseña debe contener al menos un número')
+            errors.append('La contraseña debe contener al menos un número.')
         if not re.search(r'[a-zA-Z]', v):
-            errors.append('La contraseña debe contener al menos una letra')
+            errors.append('La contraseña debe contener al menos una letra.')
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
-            errors.append('La contraseña debe contener al menos un caracter especial')
+            errors.append('La contraseña debe contener al menos un carácter especial.')
         
         if errors:
-            raise ValueError("; ".join(errors))
+            # Unir los errores en un solo mensaje
+            message = ' '.join(errors)
+            # Levantar un error personalizado sin prefijo
+            raise PydanticCustomError('password_validation', message)
         return v
         
 class AdminUserCreate(UserCreate):
