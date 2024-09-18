@@ -21,9 +21,3 @@ class ConfirmationError(Exception):
     def __init__(self, message: str = "Error al procesar la confirmación."):
         self.message = message
         super().__init__(self.message)
-        
-class PasswordValidationError(Exception):
-    """Excepción lanzada cuando la validación de la contraseña falla."""
-    def __init__(self, errors: list):
-        self.errors = errors
-        super().__init__(", ".join(errors))

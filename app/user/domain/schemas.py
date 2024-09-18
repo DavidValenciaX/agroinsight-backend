@@ -1,20 +1,29 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import List, Optional
 from datetime import datetime
-from app.core.security.security_utils import validate_password
+import re
 
 class UserCreate(BaseModel):
-    nombre: str = Field(..., min_length=2, max_length=50)
-    apellido: str = Field(..., min_length=2, max_length=50)
     email: EmailStr
-    password: str = Field(..., min_length=12)
-    
+    nombre: str
+    apellido: str
+    password: str
+
     @field_validator('password')
-    def validate_user_password(cls, v):
-        try:
-            return validate_password(v)
-        except ValueError as e:
-            raise ValueError(str(e))
+    def validate_password(cls, v):
+        errors = []
+        if len(v) < 12:
+            errors.append('La contraseña debe tener al menos 12 caracteres')
+        if not re.search(r'\d', v):
+            errors.append('La contraseña debe contener al menos un número')
+        if not re.search(r'[a-zA-Z]', v):
+            errors.append('La contraseña debe contener al menos una letra')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            errors.append('La contraseña debe contener al menos un caracter especial')
+        
+        if errors:
+            raise ValueError("; ".join(errors))
+        return v
         
 class AdminUserCreate(UserCreate):
     role_id: int
@@ -124,8 +133,17 @@ class PasswordResetRequest(BaseModel):
     new_password: str = Field(..., min_length=12)
     
     @field_validator('new_password')
-    def validate_reset_password(cls, v):
-        try:
-            return validate_password(v)
-        except ValueError as e:
-            raise ValueError(str(e))
+    def validate_password(cls, v):
+        errors = []
+        if len(v) < 12:
+            errors.append('La contraseña debe tener al menos 12 caracteres')
+        if not re.search(r'\d', v):
+            errors.append('La contraseña debe contener al menos un número')
+        if not re.search(r'[a-zA-Z]', v):
+            errors.append('La contraseña debe contener al menos una letra')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            errors.append('La contraseña debe contener al menos un caracter especial')
+        
+        if errors:
+            raise ValueError("; ".join(errors))
+        return v
