@@ -24,7 +24,7 @@ class UserCreate(BaseModel):
         
         if errors:
             # Unir los errores en un solo mensaje
-            message = ' '.join(errors)
+            message = '\n'.join(errors)
             # Levantar un error personalizado sin prefijo
             raise PydanticCustomError('password_validation', message)
         return v

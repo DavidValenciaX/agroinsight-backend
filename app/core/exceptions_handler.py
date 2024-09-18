@@ -12,7 +12,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     for error in errors:
         formatted_errors.append({
             "field": error["loc"][-1],
-            "message": error["msg"]
+            "message": error["msg"].split('\n')
         })
 
     return JSONResponse(
@@ -21,8 +21,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "error": {
                 "route": str(request.url),
                 "status_code": 422,
-                "type": "Error en la validación de los datos de entrada",
-                "errors": formatted_errors
+                "message": "Error en la validación de los datos de entrada",
+                "details": formatted_errors
             }
         },
     )
@@ -35,7 +35,7 @@ async def custom_exception_handler(request: Request, exc: Exception):
                 "route": str(request.url),
                 "status_code": 500,
                 "message": "Error interno del servidor",
-                "errors": [
+                "details": [
                     {
                         "message": str(exc),
                         "type": "exception",
@@ -54,7 +54,7 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
                 "route": str(request.url),
                 "status_code": exc.status_code,
                 "message": exc.detail,
-                "errors": []
+                "details": []
             }
         },
     )
@@ -67,7 +67,7 @@ async def business_exception_handler(request: Request, exc: UserAlreadyExistsExc
                 "route": str(request.url),
                 "status_code": 400,
                 "message": str(exc),
-                "errors": []
+                "details": []
             }
         }
     )
@@ -80,7 +80,7 @@ async def confirmation_error_handler(request: Request, exc: ConfirmationError):
                 "route": str(request.url),
                 "status_code": 500,
                 "message": str(exc),
-                "errors": []
+                "details": []
             }
         }
     )
