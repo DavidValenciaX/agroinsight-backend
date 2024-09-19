@@ -9,6 +9,7 @@ class UserCreate(BaseModel):
     nombre: str
     apellido: str
     password: str
+    state_id: int
     
     @field_validator('email')
     def validate_email(cls, v):

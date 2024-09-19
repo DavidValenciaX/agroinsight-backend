@@ -5,13 +5,18 @@ from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.authentication_use_case import AuthenticationUseCase
 from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
+from app.user.application.resend_confirmation_use_case import ResendConfirmationUseCase
+from app.user.application.confirmation_use_case import ConfirmationUseCase
+from app.user.application.resend_2fa_use_case import Resend2faUseCase
+from app.user.application.verify_use_case import VerifyUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
 from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
-from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
+from app.core.security.security_utils import create_access_token
+
 from typing import List
 
 # Crear una instancia de HTTPBearer
@@ -33,26 +38,14 @@ async def create_user(
     message = creation_use_case.execute(user)
     return UserCreationResponse(message=message)
         
-@router.post(
-    "/admin/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
-)
-async def create_user_by_admin(
-    user: UserCreateByAdmin,
-    db: Session = Depends(getDb),
-    current_user: UserInDB = Depends(get_current_user)
-):
-    user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
-    response = user_creation_by_admin_use_case.execute(user, current_user)
-    return response
-
 @router.post("/resend-confirm-pin", status_code=status.HTTP_200_OK)
 async def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
     db: Session = Depends(getDb)
 ):
     try:
-        creation_use_case = UserCreationUseCase(db)
-        success = creation_use_case.resend_confirmation_pin(resend_request.email)
+        resend_confirmation_use_case = ResendConfirmationUseCase(db)
+        success = resend_confirmation_use_case.resend_confirmation_pin(resend_request.email)
         if success:
             return {"message": "PIN de confirmación reenviado con éxito"}
         else:
@@ -72,7 +65,7 @@ async def confirm_user_registration(
     db: Session = Depends(getDb)
 ):
     user_repository = UserRepository(db)
-    creation_use_case = UserCreationUseCase(db)
+    confirmation_use_case = ConfirmationUseCase(db)
     # Hashear el PIN ingresado por el usuario
     pin_hash = hash_pin(confirmation.pin)
     
@@ -88,7 +81,7 @@ async def confirm_user_registration(
     
     if not confirmation_record:
         try:
-            creation_use_case.handle_failed_confirmation(user.id)
+            confirmation_use_case.handle_failed_confirmation(user.id)
         except TooManyConfirmationAttempts as e:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -100,7 +93,7 @@ async def confirm_user_registration(
         )
     
     try:
-        if creation_use_case.confirm_user(user.id, pin_hash):
+        if confirmation_use_case.confirm_user(user.id, pin_hash):
             return {"message": "Usuario confirmado exitosamente"}
         else:
             raise HTTPException(
@@ -113,7 +106,7 @@ async def confirm_user_registration(
             detail=e.message
         )
     except Exception as e:
-        creation_use_case.handle_failed_confirmation(user.id)
+        confirmation_use_case.handle_failed_confirmation(user.id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al confirmar el usuario: {str(e)}"
@@ -141,16 +134,16 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
                 detail="Error al iniciar la verificación en dos pasos"
             )
     except HTTPException as e:
-        raise e  # Re-lanza la excepción para mantener el mensaje detallado
+        raise e
     
 @router.post("/resend-2fa-pin", status_code=status.HTTP_200_OK)
 async def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
     db: Session = Depends(getDb)
 ):
-    auth_use_case = AuthenticationUseCase(db)
+    resend_2fa_use_case = Resend2faUseCase(db)
     try:
-        success = auth_use_case.resend_2fa_pin(resend_request.email)
+        success = resend_2fa_use_case.resend_2fa_pin(resend_request.email)
         if success:
             return {"message": "PIN de verificación en dos pasos reenviado con éxito"}
         else:
@@ -166,15 +159,27 @@ async def resend_2fa_pin_endpoint(
         
 @router.post("/login/verify", response_model=TokenResponse)
 async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
-    auth_use_case = AuthenticationUseCase(db)
+    verify_use_case = VerifyUseCase(db)
     
     try:
-        user = auth_use_case.verify_two_factor_auth(auth_request.email, auth_request.pin)
-        access_token = auth_use_case.create_access_token(data={"sub": user.email})
+        user = verify_use_case.verify_two_factor_auth(auth_request.email, auth_request.pin)
+        access_token = create_access_token(data={"sub": user.email})
         return {"access_token": access_token, "token_type": "bearer"}
     except HTTPException as e:
-        raise e  # Re-lanza la excepción para mantener el mensaje detallado
-        
+        raise e
+
+@router.post(
+    "/admin/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
+)
+async def create_user_by_admin(
+    user: UserCreateByAdmin,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
+    response = user_creation_by_admin_use_case.execute(user, current_user)
+    return response
+
 # Endpoint para listar todos los usuarios
 @router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
 async def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
@@ -318,7 +323,7 @@ async def admin_update_user(
             )
 
     # Actualizar la información del usuario
-    updated_user = user_repository.update_user_info_by_admin(user_to_update, user_update.dict(exclude_unset=True))
+    updated_user = user_repository.update_user_info_by_admin(user_to_update, user_update.model_dump(exclude_unset=True))
 
     if updated_user:
         return UserResponse(

@@ -5,7 +5,6 @@ from app.core.security.security_utils import hash_password
 from app.core.services.email_service import send_email
 from app.core.services.pin_service import generate_pin
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.exceptions import TooManyConfirmationAttempts
 from app.user.domain.schemas import UserCreate
 from app.user.domain.exceptions import UserAlreadyExistsException, ConfirmationError
 
@@ -106,62 +105,3 @@ class UserCreationUseCase:
         </html>
         """
         return send_email(email, subject, text_content, html_content)
-
-    def confirm_user(self, user_id: int, pin_hash: str) -> bool:
-        confirmation = self.user_repository.get_user_confirmation(user_id, pin_hash)
-            
-        if not confirmation:
-            return False
-            
-        # Actualizar el estado del usuario a 'active'
-        active_state_id = self.user_repository.get_active_user_state_id()
-        if not active_state_id:
-            # Manejar el caso donde el estado 'active' no existe
-            return False
-        self.user_repository.update_user_state(user_id, active_state_id)
-            
-        # Cambiar el rol del usuario de "Usuario No Confirmado" a "Usuario"
-        self.user_repository.change_user_role(user_id, "Usuario No Confirmado", "Usuario")
-            
-        # Eliminar la confirmación
-        self.user_repository.delete_user_confirmations(user_id)
-            
-        return True
-
-    def resend_confirmation_pin(self, email: str) -> bool:
-        user = self.user_repository.get_user_by_email(email)
-        if not user:
-            return False
-            
-        try:
-            # Eliminar la confirmación existente
-            self.user_repository.delete_user_confirmations(user.id)
-                
-            # Crear una nueva confirmación
-            pin, pin_hash = generate_pin()
-            confirmation = ConfirmacionUsuario(
-                usuario_id=user.id,
-                pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
-            )
-                
-            # Intentar enviar el correo electrónico
-            if self.send_confirmation_email(email, pin):
-                self.user_repository.add_user_confirmation(confirmation)
-                return True
-            else:
-                return False
-        except Exception as e:
-            # Manejar excepción
-            print(f"Error al reenviar el PIN de confirmación: {str(e)}")
-            return False
-
-    def handle_failed_confirmation(self, user_id: int):
-        """Maneja los intentos fallidos de confirmación."""
-        intentos = self.user_repository.increment_confirmation_attempts(user_id)
-        if intentos >= 3:
-            user = self.user_repository.get_user_by_id(user_id)
-            if user:
-                self.user_repository.delete_user_confirmations(user_id)
-                self.user_repository.delete_user(user)
-                raise TooManyConfirmationAttempts()

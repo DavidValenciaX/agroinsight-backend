@@ -1,13 +1,11 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
-from jose import jwt
 from fastapi import HTTPException, status
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.orm_models import VerificacionDospasos
 from app.user.infrastructure.sql_repository import UserRepository
-from app.core.services.pin_service import generate_pin, hash_pin
+from app.core.services.pin_service import generate_pin
 from app.core.services.email_service import send_email
-from app.core.config.settings import SECRET_KEY, ALGORITHM
 from app.core.security.security_utils import verify_password
 
 class AuthenticationUseCase:
@@ -55,18 +53,6 @@ class AuthenticationUseCase:
         user.locked_until = None
         self.user_repository.update_user(user)
         return user
-
-    def create_access_token(self, data: dict, expires_delta: timedelta = None):
-        accessTokenExpireMinutes = 120
-        to_encode = data.copy()
-        
-        if expires_delta:
-            expire = datetime.now(timezone.utc) + expires_delta
-        else:
-            expire = datetime.now(timezone.utc) + timedelta(minutes=accessTokenExpireMinutes)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        return encoded_jwt
 
     def handle_failed_login_attempt(self, user: UserInDB) -> None:        
         maxFailedAttempts = 5
@@ -130,70 +116,3 @@ class AuthenticationUseCase:
         html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 5 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)
-            
-    def verify_two_factor_auth(self, email: str, pin: str):
-        user = self.user_repository.get_user_by_email(email)
-        if not user:
-            raise HTTPException(status_code=404, detail="Usuario no encontrado")
-        
-        if user.locked_until:
-            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
-
-        # Verificar si la cuenta del usuario está bloqueada
-        locked_state_id = self.user_repository.get_locked_user_state_id()
-        if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
-            
-            time_left = user.locked_until - datetime.now(timezone.utc)
-            raise HTTPException(
-                status_code=403,
-                detail=f"Su cuenta está bloqueada. Intente nuevamente en {time_left.seconds // 60} minutos."
-            )
-
-        # Verificar si el PIN es correcto y no ha expirado
-        pin_hash = hash_pin(pin)
-        verification = self.user_repository.get_two_factor_verification(user.id, pin_hash)
-
-        if not verification:
-            self.handle_failed_verification(user.id)
-            raise HTTPException(status_code=400, detail="Código de verificación inválido o expirado")
-
-        # Eliminar el registro de verificación si el PIN es correcto
-        self.user_repository.delete_two_factor_verification(user.id)
-
-        # Devolver el usuario autenticado
-        return user
-    
-    def resend_2fa_pin(self, email: str) -> bool:
-        user = self.user_repository.get_user_by_email(email)
-        if not user:
-            return False
-        
-        try:
-            self.user_repository.delete_two_factor_verification(user.id)
-            
-            pin, pin_hash = generate_pin()
-            
-            verification = VerificacionDospasos(
-                usuario_id=user.id,
-                pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=5)
-            )
-            self.user_repository.add_two_factor_verification(verification)
-            
-            if self.send_two_factor_pin(user.email, pin):
-                return True
-            else:
-                self.user_repository.delete_two_factor_verification(user.id)
-                return False
-        except Exception as e:
-            print(f"Error al reenviar el PIN de doble verificación: {str(e)}")
-            return False
-
-    def handle_failed_verification(self, user_id: int):
-        attempts = self.user_repository.increment_two_factor_attempts(user_id)
-
-        if attempts >= 3:
-            raise HTTPException(
-                status_code=403,
-                detail="Su cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en 10 minutos."
-            )
