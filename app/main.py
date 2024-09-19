@@ -5,10 +5,9 @@ from app.core.exceptions_handler import (
     validation_exception_handler, 
     custom_exception_handler,
     custom_http_exception_handler,
-    business_exception_handler,
-    confirmation_error_handler
+    domain_exception_handler
 )
-from app.user.domain.exceptions import UserAlreadyExistsException, ConfirmationError
+from app.user.domain.exceptions import DomainException
 
 app = FastAPI()
 
@@ -22,5 +21,4 @@ async def root():
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, custom_exception_handler)
 app.add_exception_handler(HTTPException, custom_http_exception_handler)
-app.add_exception_handler(UserAlreadyExistsException, business_exception_handler)
-app.add_exception_handler(ConfirmationError, confirmation_error_handler)
+app.add_exception_handler(DomainException, domain_exception_handler)

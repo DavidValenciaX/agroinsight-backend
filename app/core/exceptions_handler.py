@@ -3,7 +3,7 @@ from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import traceback
-from app.user.domain.exceptions import ConfirmationError, UserAlreadyExistsException
+from app.user.domain.exceptions import DomainException
 from typing import Dict, List
 
 CUSTOM_MESSAGES = {
@@ -78,28 +78,15 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
             }
         },
     )
-
-async def business_exception_handler(request: Request, exc: UserAlreadyExistsException):
+    
+async def domain_exception_handler(request: Request, exc: DomainException):
     return JSONResponse(
-        status_code=400,
+        status_code=exc.status_code,
         content={
             "error": {
                 "route": str(request.url),
-                "status_code": 400,
-                "message": str(exc),
-                "details": []
-            }
-        }
-    )
-
-async def confirmation_error_handler(request: Request, exc: ConfirmationError):
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": {
-                "route": str(request.url),
-                "status_code": 500,
-                "message": str(exc),
+                "status_code": exc.status_code,
+                "message": exc.message,
                 "details": []
             }
         }

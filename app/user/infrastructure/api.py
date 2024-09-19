@@ -3,13 +3,14 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.user.application.user_creation_use_case import UserCreationUseCase
 from app.user.application.authentication_use_case import AuthenticationUseCase
+from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
+from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import AdminUserCreate, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
-from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
-from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts, UserAlreadyExistsException, ConfirmationError
+from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
 from typing import List
 
 # Crear una instancia de HTTPBearer
@@ -27,24 +28,9 @@ async def create_user(
     db: Session = Depends(getDb),
 ):
     creation_use_case = UserCreationUseCase(db)
-    try:
-        message = creation_use_case.execute(user)
-        return UserCreationResponse(message=message)
-    except UserAlreadyExistsException as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-    except ConfirmationError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e),
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error inesperado al crear el usuario."
-        )
+    # Llamamos al caso de uso sin manejar excepciones aquí
+    message = creation_use_case.execute(user)
+    return UserCreationResponse(message=message)
         
 @router.post(
     "/admin/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
@@ -82,7 +68,7 @@ async def admin_create_user(
             detail="El usuario con este correo electrónico ya existe."
         )
     # Crear el usuario con estado "active"
-    creation_use_case = UserCreationUseCase(db)
+    creation_use_case = UserCreationByAdminUseCase(db)
     new_user = creation_use_case.create_user_by_admin(user)
     return UserCreationResponse(message="Usuario creado exitosamente.")
 
