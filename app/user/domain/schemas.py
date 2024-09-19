@@ -49,7 +49,7 @@ class UserCreate(BaseModel):
             raise PydanticCustomError('password_validation', message)
         return v
         
-class AdminUserCreate(UserCreate):
+class UserCreateByAdmin(UserCreate):
     role_id: int
 
 class Confirmation(BaseModel):

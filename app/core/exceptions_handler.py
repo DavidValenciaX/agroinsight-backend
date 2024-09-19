@@ -8,8 +8,17 @@ from typing import Dict, List
 
 CUSTOM_MESSAGES = {
     'missing': 'El campo es requerido',
-    'value_error.missing': 'El campo es requerido'
+    'value_error.missing': 'El campo es requerido',
+    'int_parsing': 'La entrada debe ser un número entero válido'
     # Agregar otros tipos de error y mensajes personalizados si es necesario
+}
+
+HTTP_CUSTOM_MESSAGES = {
+    401: "No estás autenticado. Por favor, proporciona credenciales válidas.",
+    403: "No tienes permisos para realizar esta acción.",
+    404: "Recurso no encontrado.",
+    500: "Error interno del servidor.",
+    # Agrega más códigos de estado y mensajes según tus necesidades
 }
 
 def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[Dict]:
@@ -32,6 +41,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     for error in errors:
         formatted_errors.append({
             "field": error["loc"][-1],
+            "type": error['type'],
             "message": error["msg"].split('\n')
         })
 
@@ -67,13 +77,16 @@ async def custom_exception_handler(request: Request, exc: Exception):
     )
 
 async def custom_http_exception_handler(request: Request, exc: HTTPException):
+    # Obtener el mensaje personalizado basado en el status_code
+    message = HTTP_CUSTOM_MESSAGES.get(exc.status_code, exc.detail)
+    
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "error": {
                 "route": str(request.url),
                 "status_code": exc.status_code,
-                "message": exc.detail,
+                "message": message,
                 "details": []
             }
         },
