@@ -151,8 +151,8 @@ async def create_user_by_admin(
 ):
     user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
     try:
-        response = user_creation_by_admin_use_case.execute(user, current_user)
-        return response
+        message = user_creation_by_admin_use_case.execute(user, current_user)
+        return UserCreationResponse(message = message)
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e

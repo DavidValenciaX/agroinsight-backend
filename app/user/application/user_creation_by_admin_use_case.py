@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.schemas import UserCreateByAdmin, UserCreationResponse
+from app.user.domain.schemas import UserCreateByAdmin
 from app.user.domain.exceptions import (
     UserAlreadyExistsException,
     DomainException,
@@ -14,7 +14,7 @@ class UserCreationByAdminUseCase:
     def __init__(self, db: Session):
         self.user_repository = UserRepository(db)
 
-    def execute(self, user_data: UserCreateByAdmin, current_user) -> UserCreationResponse:
+    def execute(self, user_data: UserCreateByAdmin, current_user) -> str:
         # Verificar que el usuario actual está autenticado
         if not current_user:
             raise DomainException(
@@ -67,4 +67,4 @@ class UserCreationByAdminUseCase:
         # Asignar el rol especificado
         self.user_repository.assign_role_to_user(created_user.id, user_data.role_id)
 
-        return UserCreationResponse(message="Usuario creado exitosamente.")
+        return "Usuario creado y activado exitosamente."
