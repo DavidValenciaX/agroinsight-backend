@@ -13,8 +13,8 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
-from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts
+from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
+from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts, DomainException
 from app.core.security.security_utils import create_access_token
 
 from typing import List
@@ -38,25 +38,23 @@ async def create_user(
     message = creation_use_case.execute(user)
     return UserCreationResponse(message=message)
         
-@router.post("/resend-confirm-pin", status_code=status.HTTP_200_OK)
+@router.post("/resend-confirm-pin", response_model=ResendConfirmationResponse, status_code=status.HTTP_200_OK)
 async def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
     db: Session = Depends(getDb)
 ):
+    resend_confirmation_use_case = ResendConfirmationUseCase(db)
     try:
-        resend_confirmation_use_case = ResendConfirmationUseCase(db)
-        success = resend_confirmation_use_case.resend_confirmation_pin(resend_request.email)
-        if success:
-            return {"message": "PIN de confirmación reenviado con éxito"}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde."
-            )
-    except Exception as e:
+        message = resend_confirmation_use_case.execute(resend_request.email)
+        return ResendConfirmationResponse(message=message)
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al reenviar el PIN: {str(e)}"
+            detail="Error interno al reenviar el PIN de confirmación."
         )
         
 @router.post("/confirm", status_code=status.HTTP_200_OK)

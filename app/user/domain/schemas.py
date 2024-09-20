@@ -65,6 +65,9 @@ class ConfirmationRequest(BaseModel):
 class ResendPinConfirmRequest(BaseModel):
     email: EmailStr
     
+class ResendConfirmationResponse(BaseModel):
+    message: str
+    
 class UserCreationResponse(BaseModel):
     message: str
 

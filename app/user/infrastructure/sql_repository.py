@@ -144,8 +144,10 @@ class UserRepository:
 
         
     def get_user_pending_confirmation(self, user_id: int) -> Optional[ConfirmacionUsuario]:
+        """Verifica si el usuario tiene una confirmación pendiente."""
         return self.db.query(ConfirmacionUsuario).filter(
-            ConfirmacionUsuario.usuario_id == user_id
+            ConfirmacionUsuario.usuario_id == user_id,
+            ConfirmacionUsuario.expiracion > datetime.now(timezone.utc)
         ).first()
 
     def get_user_confirmation(self, user_id: int, pin_hash: str) -> Optional[ConfirmacionUsuario]:
@@ -156,7 +158,7 @@ class UserRepository:
         ).first()
 
     def increment_confirmation_attempts(self, user_id: int) -> int:
-        confirmation = self.get_active_confirmation(user_id)
+        confirmation = self.get_user_pending_confirmation(user_id)
         if confirmation:
             confirmation.intentos += 1
             try:
@@ -167,12 +169,6 @@ class UserRepository:
                 print(f"Error al incrementar intentos de confirmación: {e}")
                 return confirmation.intentos
         return 0
-
-    def get_active_confirmation(self, user_id: int) -> Optional[ConfirmacionUsuario]:
-        return self.db.query(ConfirmacionUsuario).filter(
-            ConfirmacionUsuario.usuario_id == user_id,
-            ConfirmacionUsuario.expiracion > datetime.now(timezone.utc)
-        ).first()
 
     def update_user_state(self, user_id: int, new_state_id: int) -> bool:
         user = self.get_user_by_id(user_id)
