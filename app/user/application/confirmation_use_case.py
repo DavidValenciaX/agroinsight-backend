@@ -28,6 +28,7 @@ class ConfirmationUseCase:
         if not active_state_id:
             # Manejar el caso donde el estado 'active' no existe
             return False
+        
         self.user_repository.update_user_state(user_id, active_state_id)
             
         # Cambiar el rol del usuario de "Usuario No Confirmado" a "Usuario"

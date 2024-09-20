@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta, timezone
-from app.user.infrastructure.orm_models import ConfirmacionUsuario, User
-from app.core.security.security_utils import hash_password
-from app.core.services.email_service import send_email
-from app.core.services.pin_service import generate_pin
+from app.user.infrastructure.orm_models import User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserCreate
+from app.core.security.security_utils import hash_password
 from app.user.domain.exceptions import UserAlreadyExistsException, ConfirmationError
+from app.user.infrastructure.orm_models import ConfirmacionUsuario
+from app.core.services.pin_service import generate_pin
+from datetime import datetime, timezone, timedelta
+from app.core.services.email_service import send_email
 
 class UserCreationUseCase:
     def __init__(self, db: Session):
@@ -21,35 +22,32 @@ class UserCreationUseCase:
             pending_confirmation = self.user_repository.get_user_pending_confirmation(existing_user.id)
             if pending_confirmation:
                 # Eliminar usuario y confirmación pendiente
-                db_user = self.user_repository.get_user_by_id(existing_user.id)
-                if db_user:
-                    self.user_repository.delete_user(db_user)
+                if self.user_repository.delete_user(existing_user):
+                    print("Usuario existente eliminado para permitir la re-creación.")
             else:
                 raise UserAlreadyExistsException("El usuario con este correo electrónico ya existe.")
-        
+
         # Crear nuevo usuario
         new_user = self.create_user(user_data)
-        
+
         # Intentar crear la confirmación y enviar el correo
         if not self.create_and_send_confirmation(new_user):
             # Si falla la confirmación, eliminar el usuario
-            db_user = self.user_repository.get_user_by_id(new_user.id)
-            if db_user:
-                self.user_repository.delete_user(db_user)
+            self.user_repository.delete_user(new_user)
             raise ConfirmationError("Error al crear el usuario o enviar el email de confirmación.")
-        
+
         return "Usuario creado. Por favor, revisa tu email para confirmar el registro."
 
     def create_user(self, user_data: UserCreate) -> User:
         # Hash del password
         hashed_password = hash_password(user_data.password)
-        
+
         # Obtener estado "pendiente" del usuario
         pending_state_id = self.user_repository.get_pending_user_state_id()
         if not pending_state_id:
             raise ValueError("No se pudo encontrar el estado de usuario pendiente")
-        
-        # Crear nuevo usuario
+
+        # Crear nuevo usuario (modelo ORM)
         new_user = User(
             nombre=user_data.nombre,
             apellido=user_data.apellido,
@@ -58,21 +56,22 @@ class UserCreationUseCase:
             state_id=pending_state_id
         )
         created_user = self.user_repository.create_user(new_user)
-        
+
         # Asignar rol de "Usuario No Confirmado"
         unconfirmed_role = self.user_repository.get_unconfirmed_user_role()
         if unconfirmed_role:
-            self.user_repository.assign_role_to_user(created_user.id, unconfirmed_role.id)
+            if not self.user_repository.assign_role_to_user(created_user.id, unconfirmed_role.id):
+                raise ValueError("No se pudo asignar el rol de Usuario No Confirmado")
         else:
             raise ValueError("No se pudo encontrar el rol de Usuario No Confirmado")
-        
+
         return created_user
 
     def create_and_send_confirmation(self, user: User) -> bool:
         try:
             # Eliminar confirmaciones anteriores
             self.user_repository.delete_user_confirmations(user.id)
-            
+
             # Generar PIN y su hash
             pin, pin_hash = generate_pin()
             confirmation = ConfirmacionUsuario(
@@ -80,15 +79,13 @@ class UserCreationUseCase:
                 pin=pin_hash,
                 expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
             )
-            
+
             # Enviar correo de confirmación
             if self.send_confirmation_email(user.email, pin):
-                self.user_repository.add_user_confirmation(confirmation)
-                return True
+                return self.user_repository.add_user_confirmation(confirmation)
             else:
                 return False
         except Exception as e:
-            # Manejar excepción (se podría agregar un sistema de logging)
             print(f"Error al crear la confirmación del usuario: {str(e)}")
             return False
 
