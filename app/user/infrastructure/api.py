@@ -11,10 +11,9 @@ from app.user.application.resend_2fa_use_case import Resend2faUseCase
 from app.user.application.verify_use_case import VerifyUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
-from app.core.services.pin_service import hash_pin
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
-from app.user.domain.exceptions import TooManyConfirmationAttempts, TooManyRecoveryAttempts, DomainException
+from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, ConfirmUsuarioResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
+from app.user.domain.exceptions import TooManyRecoveryAttempts, DomainException
 from app.core.security.security_utils import create_access_token
 
 from typing import List
@@ -35,8 +34,18 @@ async def create_user(
 ):
     creation_use_case = UserCreationUseCase(db)
     # Llamamos al caso de uso sin manejar excepciones aquí
-    message = creation_use_case.execute(user)
-    return UserCreationResponse(message=message)
+    try:
+        message = creation_use_case.execute(user)
+        return UserCreationResponse(message=message)
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno en el registro de usuario"
+        )
         
 @router.post("/resend-confirm-pin", response_model=ResendConfirmationResponse, status_code=status.HTTP_200_OK)
 async def resend_confirmation_pin_endpoint(
@@ -57,57 +66,23 @@ async def resend_confirmation_pin_endpoint(
             detail="Error interno al reenviar el PIN de confirmación."
         )
         
-@router.post("/confirm", status_code=status.HTTP_200_OK)
+@router.post("/confirm", response_model=ConfirmUsuarioResponse, status_code=status.HTTP_200_OK)
 async def confirm_user_registration(
     confirmation: ConfirmationRequest,
     db: Session = Depends(getDb)
 ):
-    user_repository = UserRepository(db)
     confirmation_use_case = ConfirmationUseCase(db)
-    # Hashear el PIN ingresado por el usuario
-    pin_hash = hash_pin(confirmation.pin)
-    
-    # Buscar al usuario por email
-    user = user_repository.get_user_by_email(confirmation.email)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
-        )
-    
-    confirmation_record = user_repository.get_user_confirmation(user.id, pin_hash)
-    
-    if not confirmation_record:
-        try:
-            confirmation_use_case.handle_failed_confirmation(user.id)
-        except TooManyConfirmationAttempts as e:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=e.message
-            )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="PIN inválido o expirado"
-        )
-    
     try:
-        if confirmation_use_case.confirm_user(user.id, pin_hash):
-            return {"message": "Usuario confirmado exitosamente"}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error al confirmar el usuario"
-            )
-    except TooManyConfirmationAttempts as e:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=e.message
-        )
-    except Exception as e:
-        confirmation_use_case.handle_failed_confirmation(user.id)
+        message = confirmation_use_case.execute(confirmation.email, confirmation.pin)
+        return ConfirmUsuarioResponse(message=message)
+    except DomainException as e:
+        # Las excepciones serán manejadas por los manejadores globales de FastAPI
+        raise e
+    except Exception:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al confirmar el usuario: {str(e)}"
+            detail="Error interno al confirmar el registro de usuario"
         )
         
 @router.post("/login")
@@ -175,8 +150,18 @@ async def create_user_by_admin(
     current_user: UserInDB = Depends(get_current_user)
 ):
     user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
-    response = user_creation_by_admin_use_case.execute(user, current_user)
-    return response
+    try:
+        response = user_creation_by_admin_use_case.execute(user, current_user)
+        return response
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno en el registro de usuario por el administrador"
+        )
 
 # Endpoint para listar todos los usuarios
 @router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
