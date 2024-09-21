@@ -167,6 +167,9 @@ class Resend2FARequest(BaseModel):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
     
+class Resend2FAResponse(BaseModel):
+    message: str
+    
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str

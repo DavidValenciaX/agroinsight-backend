@@ -205,6 +205,13 @@ class UserRepository:
             print(f"Error al agregar la verificación de dos pasos: {e}")
             return False
     
+    def get_user_pending_2fa_verification(self, user_id: int) -> Optional[VerificacionDospasos]:
+        """Verifica si el usuario tiene una verificacion 2fa pendiente."""
+        return self.db.query(VerificacionDospasos).filter(
+            VerificacionDospasos.usuario_id == user_id,
+            VerificacionDospasos.expiracion > datetime.now(timezone.utc)
+        ).first()
+    
     def get_two_factor_verification(self, user_id: int, pin_hash: str) -> Optional[VerificacionDospasos]:
         return self.db.query(VerificacionDospasos).filter(
             VerificacionDospasos.usuario_id == user_id,

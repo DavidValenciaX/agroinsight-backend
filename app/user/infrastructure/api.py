@@ -12,7 +12,7 @@ from app.user.application.verify_use_case import VerifyUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, LoginResponse, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, ConfirmUsuarioResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
+from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, LoginResponse, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, ConfirmUsuarioResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, Resend2FAResponse, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
 from app.user.domain.exceptions import TooManyRecoveryAttempts, DomainException
 from app.core.security.security_utils import create_access_token
 
@@ -99,21 +99,18 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
             detail="Error interno al procesar el inicio de sesión."
         )
     
-@router.post("/resend-2fa-pin", status_code=status.HTTP_200_OK)
+@router.post("/resend-2fa-pin", response_model=Resend2FAResponse, status_code=status.HTTP_200_OK)
 async def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
     db: Session = Depends(getDb)
 ):
     resend_2fa_use_case = Resend2faUseCase(db)
     try:
-        success = resend_2fa_use_case.resend_2fa_pin(resend_request.email)
-        if success:
-            return {"message": "PIN de verificación en dos pasos reenviado con éxito"}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde."
-            )
+        message = resend_2fa_use_case.execute(resend_request.email)
+        return Resend2FAResponse(message=message)
+    except DomainException as e:
+        # Las excepciones personalizadas serán manejadas por los manejadores globales
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

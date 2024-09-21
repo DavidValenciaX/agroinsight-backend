@@ -125,7 +125,7 @@ class LoginUseCase:
 
     def send_two_factor_pin(self, email: str, pin: str):
         subject = "Código de verificación en dos pasos - AgroInSight"
-        text_content = f"Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 5 minutos."
-        html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 5 minutos.</p></body></html>"
+        text_content = f"Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 10 minutos."
+        html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 10 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)
