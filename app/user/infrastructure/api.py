@@ -14,7 +14,6 @@ from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, LoginResponse, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, ConfirmUsuarioResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, Resend2FAResponse, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
 from app.user.domain.exceptions import TooManyRecoveryAttempts, DomainException
-from app.core.security.security_utils import create_access_token
 
 from typing import List
 
@@ -111,22 +110,29 @@ async def resend_2fa_pin_endpoint(
     except DomainException as e:
         # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al reenviar el PIN: {str(e)}"
+            detail="Error interno al reenviar el PIN de doble factor de autenticación"
         )
         
-@router.post("/login/verify", response_model=TokenResponse)
+@router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
     verify_use_case = VerifyUseCase(db)
     
     try:
-        user = verify_use_case.verify_two_factor_auth(auth_request.email, auth_request.pin)
-        access_token = create_access_token(data={"sub": user.email})
-        return {"access_token": access_token, "token_type": "bearer"}
-    except HTTPException as e:
+        # Ejecuta el caso de uso y obtiene los datos del token
+        token_data = verify_use_case.execute(auth_request.email, auth_request.pin)
+        return token_data
+    except DomainException as e:
+        # Las excepciones serán manejadas por los manejadores globales de FastAPI
         raise e
+    except Exception:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno al verificar el inicio de sesión."
+        )
 
 @router.post(
     "/admin/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
@@ -194,6 +200,27 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_use
         rol=user_role
     )
     
+@router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+    """
+    Endpoint para obtener un usuario por su ID.
+    """
+    user_repository = UserRepository(db)
+    user = user_repository.get_user_by_id(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
+    
+    # Mapeamos el usuario a UserResponse para devolver la información formateada
+    return UserResponse(
+        id=user.id,
+        nombre=user.nombre,
+        apellido=user.apellido,
+        email=user.email,
+        estado=user.estado.nombre,  # Nombre del estado
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
+    )
+    
 @router.put("/me/update", response_model=UserResponse)
 async def update_user_info(
     user_update: UserUpdate,
@@ -215,7 +242,7 @@ async def update_user_info(
             )
     
     # Actualizar la información del usuario
-    updated_user = user_repository.update_user_info(current_user, user_update.dict(exclude_unset=True))
+    updated_user = user_repository.update_user_info(current_user, user_update.model_dump(exclude_unset=True))
     
     if updated_user:
         return UserResponse(
@@ -231,27 +258,6 @@ async def update_user_info(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="No se pudo actualizar la información del usuario."
         )
-    
-@router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
-async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
-    """
-    Endpoint para obtener un usuario por su ID.
-    """
-    user_repository = UserRepository(db)
-    user = user_repository.get_user_by_id(user_id)
-    
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
-    
-    # Mapeamos el usuario a UserResponse para devolver la información formateada
-    return UserResponse(
-        id=user.id,
-        nombre=user.nombre,
-        apellido=user.apellido,
-        email=user.email,
-        estado=user.estado.nombre,  # Nombre del estado
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
-    )
     
 @router.put("/{user_id}/update", response_model=UserResponse)
 async def admin_update_user(

@@ -21,6 +21,23 @@ class ResendConfirmationUseCase:
         if user.state_id == active_state_id:
             raise DomainException(message="La cuenta ya está confirmada y activa.", status_code=400)
         
+        # Verificar si el usuario ha sido eliminado
+        inactive_state_id = self.user_repository.get_inactive_user_state_id()
+        if user.state_id == inactive_state_id:
+            raise DomainException(message="El usuario fue eliminado del sistema.", status_code=400)
+        
+        # Verificar si la cuenta del usuario está bloqueada        
+        if user.locked_until:
+            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
+
+        locked_state_id = self.user_repository.get_locked_user_state_id()
+        if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
+            time_left = user.locked_until - datetime.now(timezone.utc)
+            raise DomainException(
+                message=f"Su cuenta está bloqueada. Intente nuevamente en {time_left.seconds // 60} minutos.",
+                status_code=403
+            )
+        
         # Verificar si hay una confirmación pendiente
         pending_confirmation = self.user_repository.get_user_pending_confirmation(user.id)
         if not pending_confirmation:

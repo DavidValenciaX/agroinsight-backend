@@ -1,14 +1,10 @@
 from sqlalchemy.orm import Session
-from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserCreateByAdmin
-from app.user.domain.exceptions import (
-    UserAlreadyExistsException,
-    DomainException,
-    ConfirmationError,
-)
+from app.user.domain.exceptions import DomainException
 from app.core.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User
+
 
 class UserCreationByAdminUseCase:
     def __init__(self, db: Session):
@@ -18,30 +14,34 @@ class UserCreationByAdminUseCase:
         # Verificar que el usuario actual está autenticado
         if not current_user:
             raise DomainException(
-                message="No autenticado",
-                status_code=status.HTTP_401_UNAUTHORIZED
+                message="No autenticado", status_code=401
             )
 
         # Verificar que el usuario actual tiene roles de administrador
         admin_roles = self.user_repository.get_admin_roles()
-        if not any(role.id in [admin_role.id for admin_role in admin_roles] for role in current_user.roles):
+        if not any(
+            role.id in [admin_role.id for admin_role in admin_roles]
+            for role in current_user.roles
+        ):
             raise DomainException(
                 message="No tienes permisos para realizar esta acción.",
-                status_code=status.HTTP_403_FORBIDDEN
+                status_code=403
             )
 
         # Verificar si el rol proporcionado es válido
         role = self.user_repository.get_role_by_id(user_data.role_id)
         if not role:
             raise DomainException(
-                message="Rol no válido.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                message="Rol proporcionado no válido.", status_code=400
             )
 
         # Verificar si el correo electrónico ya existe
         existing_user = self.user_repository.get_user_by_email(user_data.email)
         if existing_user:
-            raise UserAlreadyExistsException("El usuario no se puede crear porque ya existe")
+            raise DomainException(
+                "El correo electrónico ya está registrado",
+                status_code=400
+            )
 
         # Crear el usuario con estado "active"
         hashed_password = hash_password(user_data.password)
@@ -49,7 +49,7 @@ class UserCreationByAdminUseCase:
         if not active_state_id:
             raise DomainException(
                 message="No se pudo encontrar el estado de usuario activo",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status_code=500
             )
 
         new_user = User(
@@ -57,12 +57,15 @@ class UserCreationByAdminUseCase:
             apellido=user_data.apellido,
             email=user_data.email,
             password=hashed_password,
-            state_id=active_state_id
+            state_id=active_state_id,
         )
 
         created_user = self.user_repository.create_user(new_user)
         if not created_user:
-            raise ConfirmationError()
+            raise DomainException(
+                message="Error al procesar la confirmación.",
+                status_code=500
+            )
 
         # Asignar el rol especificado
         self.user_repository.assign_role_to_user(created_user.id, user_data.role_id)

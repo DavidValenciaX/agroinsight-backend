@@ -14,18 +14,6 @@ class Resend2faUseCase:
         self.user_repository = UserRepository(db)
         
     def execute(self, email: str) -> str:
-        """
-        Reenvía el PIN de verificación en dos pasos al correo electrónico del usuario.
-        
-        Args:
-            email (str): Correo electrónico del usuario.
-        
-        Returns:
-            bool: True si el PIN se envió exitosamente, False de lo contrario.
-        
-        Raises:
-            DomainException: Si ocurre un error durante el proceso.
-        """
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
@@ -33,10 +21,27 @@ class Resend2faUseCase:
                 status_code=404
             )
             
-        # Verificar el estado del usuario
-        active_state_id = self.user_repository.get_active_user_state_id()
-        if user.state_id != active_state_id:
-            raise DomainException(message="El usuario no ha confirmado su registro o está bloqueado.", status_code=400)
+        # Verificar si la cuenta del usuario está pendiente de confirmación
+        pending_state_id = self.user_repository.get_pending_user_state_id()
+        if user.state_id == pending_state_id:
+            raise DomainException(message="La cuenta del usuario está pendiente de confirmación.", status_code=400)
+        
+        # Verificar si el usuario ha sido eliminado
+        inactive_state_id = self.user_repository.get_inactive_user_state_id()
+        if user.state_id == inactive_state_id:
+            raise DomainException(message="El usuario fue eliminado del sistema.", status_code=400)
+        
+        # Verificar si la cuenta del usuario está bloqueada
+        if user.locked_until:
+            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
+
+        locked_state_id = self.user_repository.get_locked_user_state_id()
+        if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
+            time_left = user.locked_until - datetime.now(timezone.utc)
+            raise DomainException(
+                message=f"Su cuenta está bloqueada. Intente nuevamente en {time_left.seconds // 60} minutos.",
+                status_code=403
+            )
         
         # Verificar si hay una confirmación pendiente
         pending_verification = self.user_repository.get_user_pending_2fa_verification(user.id)
@@ -56,6 +61,7 @@ class Resend2faUseCase:
                 pin=pin_hash,
                 expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
             )
+            
             self.user_repository.add_two_factor_verification(verification)
             
             # Enviar el PIN al correo electrónico del usuario
@@ -70,16 +76,6 @@ class Resend2faUseCase:
             )
         
     def send_two_factor_pin(self, email: str, pin: str) -> bool:
-        """
-        Envía el PIN de verificación en dos pasos al correo electrónico del usuario.
-        
-        Args:
-            email (str): Correo electrónico del usuario.
-            pin (str): PIN de verificación.
-        
-        Returns:
-            bool: True si el correo se envió exitosamente, False de lo contrario.
-        """
         subject = "Reenvío de código de verificación en dos pasos - AgroInSight"
         text_content = f"Reenvío: Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 10 minutos."
         html_content = f"""

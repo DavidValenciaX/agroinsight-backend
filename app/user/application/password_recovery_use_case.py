@@ -5,7 +5,7 @@ from app.user.infrastructure.orm_models import RecuperacionContrasena
 from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.exceptions import TooManyRecoveryAttempts
+from app.user.domain.exceptions import TooManyRecoveryAttempts, DomainException
 
 class PasswordRecoveryUseCase:
     def __init__(self, db: Session):

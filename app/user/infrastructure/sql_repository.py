@@ -220,23 +220,16 @@ class UserRepository:
         ).first()
         
     def increment_two_factor_attempts(self, user_id: int) -> int:
-        accessTokenExpireMinutes = 10
-        verification = self.get_two_factor_verification(user_id, '')  # Asumiendo que el pin_hash no es necesario aquí
+        verification = self.get_user_pending_2fa_verification(user_id)
         if verification:
             verification.intentos += 1
-            current_intentos = verification.intentos
-            if current_intentos >= 3:
-                # Bloquear el usuario
-                self.block_user(user_id, timedelta(minutes=accessTokenExpireMinutes))
-                # Eliminar la verificación
-                self.delete_two_factor_verification(user_id)
             try:
                 self.db.commit()
-                return current_intentos
+                return verification.intentos
             except Exception as e:
                 self.db.rollback()
-                print(f"Error al incrementar intentos de dos factores: {e}")
-                return current_intentos
+                print(f"Error al incrementar intentos de doble factor de autenticación: {e}")
+                return verification.intentos
         return 0
 
     # Métodos relacionados con la recuperación de contraseña        
@@ -339,6 +332,9 @@ class UserRepository:
 
     def get_unconfirmed_user_role(self) -> Optional[Role]:
         return self.db.query(Role).filter(Role.nombre == "Usuario No Confirmado").first()
+    
+    def get_registered_user_role(self) -> Optional[Role]:
+        return self.db.query(Role).filter(Role.nombre == "Usuario").first()
 
     def assign_role_to_user(self, user_id: int, role_id: int) -> bool:
         try:
@@ -351,10 +347,8 @@ class UserRepository:
             print(f"Error al asignar rol al usuario: {e}")
             return False
 
-    def change_user_role(self, user_id: int, old_role_name: str, new_role_name: str) -> bool:
-        old_role = self.get_role_by_name(old_role_name)
-        new_role = self.get_role_by_name(new_role_name)
-
+    def change_user_role(self, user_id: int, old_role:Role, new_role:Role) -> bool:
+        
         if old_role and new_role:
             user_role = self.db.query(UserRole).filter(
                 UserRole.usuario_id == user_id,
