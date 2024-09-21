@@ -141,6 +141,9 @@ class LoginRequest(BaseModel):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
     
+class LoginResponse(BaseModel):
+    message: str
+    
 class TwoFactorAuthRequest(BaseModel):
     email: str
     pin: str
@@ -163,12 +166,6 @@ class Resend2FARequest(BaseModel):
         if not re.match(email_regex, v):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
-    
-class TwoFactorAuth(BaseModel):
-    usuario_id: int
-    pin: str
-    expiracion: datetime
-    intentos: int
     
 class TokenResponse(BaseModel):
     access_token: str

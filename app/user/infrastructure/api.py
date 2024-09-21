@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.user.application.user_creation_use_case import UserCreationUseCase
-from app.user.application.authentication_use_case import AuthenticationUseCase
+from app.user.application.login_use_case import LoginUseCase
 from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
 from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.application.resend_confirmation_use_case import ResendConfirmationUseCase
@@ -12,7 +12,7 @@ from app.user.application.verify_use_case import VerifyUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, ConfirmUsuarioResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
+from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, LoginResponse, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, ConfirmUsuarioResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
 from app.user.domain.exceptions import TooManyRecoveryAttempts, DomainException
 from app.core.security.security_utils import create_access_token
 
@@ -25,9 +25,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 
 # endpoints de usuarios
 
-@router.post(
-    "/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(
     user: UserCreate,
     db: Session = Depends(getDb),
@@ -84,30 +82,22 @@ async def confirm_user_registration(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error interno al confirmar el registro de usuario"
         )
-        
-@router.post("/login")
+    
+@router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
 async def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
-    auth_use_case = AuthenticationUseCase(db)
-
+    login_use_case = LoginUseCase(db)
     try:
-        authenticated_user = auth_use_case.authenticate_user(login_request.email, login_request.password)
-        if authenticated_user is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Correo electrónico o contraseña incorrectos",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        
-        # Iniciar verificación en dos pasos
-        if auth_use_case.initiate_two_factor_auth(authenticated_user):
-            return {"message": "Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error al iniciar la verificación en dos pasos"
-            )
-    except HTTPException as e:
+        message = login_use_case.execute(login_request.email, login_request.password)
+        return LoginResponse(message=message)
+    except DomainException as e:
+        # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
+    except Exception:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno al procesar el inicio de sesión."
+        )
     
 @router.post("/resend-2fa-pin", status_code=status.HTTP_200_OK)
 async def resend_2fa_pin_endpoint(
