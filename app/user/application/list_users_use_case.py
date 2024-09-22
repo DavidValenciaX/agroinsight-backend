@@ -1,5 +1,5 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from fastapi import status
 from app.user.domain.exceptions import DomainException
 from app.user.domain.schemas import UserResponse
 from app.user.infrastructure.sql_repository import UserRepository
@@ -13,7 +13,8 @@ class ListUsersUseCase:
         # Verificar que el usuario actual está autenticado
         if not current_user:
             raise DomainException(
-                message="No tienes permisos para listar usuarios.", status_code=401
+                message="No autenticado",
+                status_code=status.HTTP_401_UNAUTHORIZED
             )
             
         # Verificar que el usuario actual tiene roles de administrador
@@ -24,19 +25,24 @@ class ListUsersUseCase:
         ):
             raise DomainException(
                 message="No tienes permisos para realizar esta acción.",
-                status_code=403
+                status_code=status.HTTP_403_FORBIDDEN
             )
         
         users = self.user_repository.get_all_users()
         if not users:
-            raise HTTPException(status_code=404, detail="No se encontraron usuarios.")
+            raise DomainException(
+                message="No se encontraron usuarios.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
         
         # Mapeamos los usuarios a UserResponse para devolver la información formateada
-        return [UserResponse(
-            id=user.id,
-            nombre=user.nombre,
-            apellido=user.apellido,
-            email=user.email,
-            estado=user.estado.nombre,  # Nombre del estado
-            rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"  # Nombre del primer rol o "Sin rol"
-        ) for user in users]
+        return [
+            UserResponse(
+                id=user.id,
+                nombre=user.nombre,
+                apellido=user.apellido,
+                email=user.email,
+                estado=user.estado.nombre,  # Nombre del estado
+                rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"  # Nombre de los roles o "Sin rol asignado"
+            ) for user in users
+        ]

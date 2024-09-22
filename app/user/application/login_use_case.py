@@ -20,7 +20,7 @@ class LoginUseCase:
         if not user:
             raise DomainException(
                 message="Usuario no encontrado.",
-                status_code=400,
+                status_code=status.HTTP_404_NOT_FOUND,
             )
         
         # Intentar desbloquear si está bloqueado y el tiempo de bloqueo ha pasado
@@ -33,7 +33,10 @@ class LoginUseCase:
         # Verificar si el usuario ha sido eliminado
         inactive_state_id = self.user_repository.get_inactive_user_state_id()
         if user.state_id == inactive_state_id:
-            raise DomainException(message="El usuario fue eliminado del sistema.", status_code=400)
+            raise DomainException(
+                message="El usuario fue eliminado del sistema.",
+                status_code=status.HTTP_410_GONE
+            )
         
         # Verificar si la cuenta del usuario está bloqueada
         if user.locked_until:
@@ -43,7 +46,7 @@ class LoginUseCase:
             time_left = user.locked_until - datetime.now(timezone.utc)
             raise DomainException(
                 message=f"La cuenta está bloqueada temporalmente. Intenta nuevamente en {time_left.seconds // 60} minutos.",
-                status_code=403,
+                status_code=status.HTTP_403_FORBIDDEN,
             )
 
         if not verify_password(password, user.password):
@@ -59,12 +62,12 @@ class LoginUseCase:
         else:
             raise DomainException(
                 message="Error al iniciar la verificación en dos pasos.",
-                status_code=500
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     def handle_failed_login_attempt(self, user: UserInDB) -> None:        
         maxFailedAttempts = 3
-        blocking_time = 10
+        blocking_time = 10  # minutos
         
         user.failed_attempts += 1
         
@@ -73,14 +76,14 @@ class LoginUseCase:
             user.state_id = self.user_repository.get_locked_user_state_id()
             self.user_repository.update_user(user)
             raise DomainException(
-                message=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente después de {blocking_time.seconds // 60} minutos.",
-                status_code=403
+                message=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente después de {blocking_time} minutos.",
+                status_code=status.HTTP_403_FORBIDDEN
             )
         
         self.user_repository.update_user(user)
         raise DomainException(
-            message="Contraseña incorrecta",
-            status_code=401
+            message="Contraseña incorrecta.",
+            status_code=status.HTTP_401_UNAUTHORIZED
         )
 
     def unlock_user(self, user: User):
@@ -120,7 +123,7 @@ class LoginUseCase:
             print(f"Error al iniciar la verificación en dos pasos: {str(e)}")
             return False
 
-    def send_two_factor_pin(self, email: str, pin: str):
+    def send_two_factor_pin(self, email: str, pin: str) -> bool:
         subject = "Código de verificación en dos pasos - AgroInSight"
         text_content = f"Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 10 minutos."
         html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 10 minutos.</p></body></html>"

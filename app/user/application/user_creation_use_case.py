@@ -1,13 +1,14 @@
 from sqlalchemy.orm import Session
-from app.user.infrastructure.orm_models import User
+from fastapi import status
+from app.user.infrastructure.orm_models import User, ConfirmacionUsuario
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserCreate
 from app.core.security.security_utils import hash_password
 from app.user.domain.exceptions import DomainException
-from app.user.infrastructure.orm_models import ConfirmacionUsuario
 from app.core.services.pin_service import generate_pin
-from datetime import datetime, timezone, timedelta
 from app.core.services.email_service import send_email
+from datetime import datetime, timezone, timedelta
+
 
 class UserCreationUseCase:
     def __init__(self, db: Session):
@@ -27,8 +28,8 @@ class UserCreationUseCase:
                 print("Usuario existente eliminado para permitir la re-creación.")
             else:
                 raise DomainException(
-                    "El correo electrónico ya está registrado",
-                    status_code=400,
+                    message="El correo electrónico proporcionado ya está en uso.",
+                    status_code=status.HTTP_409_CONFLICT,
                 )
 
         # Crear nuevo usuario
@@ -38,7 +39,10 @@ class UserCreationUseCase:
         if not self.create_and_send_confirmation(new_user):
             # Si falla la confirmación, eliminar el usuario
             self.user_repository.delete_user(new_user)
-            raise DomainException("Error al crear la confirmación de usuario", status_code=400)
+            raise DomainException(
+                message="Error al crear la confirmación de usuario.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         return "Usuario creado. Por favor, revisa tu email para confirmar el registro."
 
@@ -49,7 +53,10 @@ class UserCreationUseCase:
         # Obtener estado "pendiente" del usuario
         pending_state_id = self.user_repository.get_pending_user_state_id()
         if not pending_state_id:
-            raise DomainException("No se pudo encontrar el estado de usuario pendiente", status_code=403)
+            raise DomainException(
+                message="No se pudo encontrar el estado de usuario pendiente.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         # Crear nuevo usuario
         new_user = User(
@@ -65,16 +72,22 @@ class UserCreationUseCase:
         unconfirmed_role = self.user_repository.get_unconfirmed_user_role()
         if unconfirmed_role:
             if not self.user_repository.assign_role_to_user(created_user.id, unconfirmed_role.id):
-                raise DomainException("No se pudo asignar el rol de Usuario No Confirmado", status_code = 405)
+                raise DomainException(
+                    message="No se pudo asignar el rol de Usuario No Confirmado.",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
         else:
-            raise DomainException("No se pudo encontrar el rol de Usuario No Confirmado", status_code = 406)
+            raise DomainException(
+                message="No se pudo encontrar el rol de Usuario No Confirmado.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         return created_user
 
     def create_and_send_confirmation(self, user: User) -> bool:
         try:
             # Generar PIN y su hash
-            expiration_time = 10
+            expiration_time = 10  # minutos
             pin, pin_hash = generate_pin()
             confirmation = ConfirmacionUsuario(
                 usuario_id=user.id,

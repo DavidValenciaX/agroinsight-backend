@@ -5,6 +5,9 @@ from fastapi.exceptions import RequestValidationError
 import traceback
 from app.user.domain.exceptions import DomainException
 from typing import Dict, List
+import logging
+
+logger = logging.getLogger(__name__)
 
 CUSTOM_MESSAGES = {
     'missing': 'El campo es requerido',
@@ -17,7 +20,9 @@ HTTP_CUSTOM_MESSAGES = {
     401: "No estás autenticado. Por favor, proporciona credenciales válidas.",
     403: "No tienes permisos para realizar esta acción.",
     404: "Recurso no encontrado.",
-    500: "Error interno del servidor.",
+    405: "Método no permitido.",
+    406: "No aceptable.",
+    409: "Conflicto con el estado actual del recurso.",
     # Agrega más códigos de estado y mensajes según tus necesidades
 }
 
@@ -58,6 +63,7 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
     )
 
 def custom_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Error en la ruta {request.url}: {str(exc)}")
     return JSONResponse(
         status_code=500,
         content={
@@ -79,6 +85,7 @@ def custom_exception_handler(request: Request, exc: Exception):
 def custom_http_exception_handler(request: Request, exc: HTTPException):
     # Obtener el mensaje personalizado basado en el status_code
     message = HTTP_CUSTOM_MESSAGES.get(exc.status_code, exc.detail)
+    logger.info(f"HTTPException en {request.url}: {message}")
     
     return JSONResponse(
         status_code=exc.status_code,
@@ -91,8 +98,10 @@ def custom_http_exception_handler(request: Request, exc: HTTPException):
             }
         },
     )
+
     
 def domain_exception_handler(request: Request, exc: DomainException):
+    logger.warning(f"DomainException en {request.url}: {exc.message}")
     return JSONResponse(
         status_code=exc.status_code,
         content={
