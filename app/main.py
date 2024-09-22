@@ -14,7 +14,7 @@ app = FastAPI()
 app.include_router(router)
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Bienvenido a AgroinSight"}
 
 # Manejadores de excepciones (registrar los más específicos primero)

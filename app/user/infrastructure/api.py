@@ -26,7 +26,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 # endpoints de usuarios
 
 @router.post("/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED)
-async def create_user(
+def create_user(
     user: UserCreate,
     db: Session = Depends(getDb),
 ):
@@ -46,7 +46,7 @@ async def create_user(
         )
         
 @router.post("/resend-confirm-pin", response_model=ResendConfirmationResponse, status_code=status.HTTP_200_OK)
-async def resend_confirmation_pin_endpoint(
+def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
     db: Session = Depends(getDb)
 ):
@@ -65,7 +65,7 @@ async def resend_confirmation_pin_endpoint(
         )
         
 @router.post("/confirm", response_model=ConfirmUsuarioResponse, status_code=status.HTTP_200_OK)
-async def confirm_user_registration(
+def confirm_user_registration(
     confirmation: ConfirmationRequest,
     db: Session = Depends(getDb)
 ):
@@ -84,7 +84,7 @@ async def confirm_user_registration(
         )
     
 @router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
-async def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
+def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
     login_use_case = LoginUseCase(db)
     try:
         message = login_use_case.execute(login_request.email, login_request.password)
@@ -100,7 +100,7 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
         )
     
 @router.post("/resend-2fa-pin", response_model=Resend2FAResponse, status_code=status.HTTP_200_OK)
-async def resend_2fa_pin_endpoint(
+def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
     db: Session = Depends(getDb)
 ):
@@ -118,7 +118,7 @@ async def resend_2fa_pin_endpoint(
         )
         
 @router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
-async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
+def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
     verify_use_case = VerifyUseCase(db)
     
     try:
@@ -138,7 +138,7 @@ async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends
 @router.post(
     "/admin/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
 )
-async def create_user_by_admin(
+def create_user_by_admin(
     user: UserCreateByAdmin,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -159,7 +159,7 @@ async def create_user_by_admin(
 
 # Endpoint para listar todos los usuarios
 @router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
-async def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
     list_users_use_case = ListUsersUseCase(db)
     try:
         return list_users_use_case.execute(current_user)
@@ -173,7 +173,7 @@ async def list_users(db: Session = Depends(getDb), current_user=Depends(get_curr
         )
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
+def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
     
     # Obtener el repositorio de usuarios
     user_repository = UserRepository(db)
@@ -195,7 +195,7 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_use
     )
     
 @router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
-async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
     """
     Endpoint para obtener un usuario por su ID.
     """
@@ -216,7 +216,7 @@ async def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_use
     )
     
 @router.put("/me/update", response_model=UserResponse)
-async def update_user_info(
+def update_user_info(
     user_update: UserUpdate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -254,7 +254,7 @@ async def update_user_info(
         )
     
 @router.put("/{user_id}/update", response_model=UserResponse)
-async def admin_update_user(
+def admin_update_user(
     user_id: int,
     user_update: AdminUserUpdate,
     db: Session = Depends(getDb),
@@ -311,7 +311,7 @@ async def admin_update_user(
         )
     
 @router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
-async def deactivate_user(
+def deactivate_user(
     user_id: int, 
     db: Session = Depends(getDb), 
     current_user: UserInDB = Depends(get_current_user)
@@ -338,7 +338,7 @@ async def deactivate_user(
         )
     
 @router.post("/password-recovery", status_code=status.HTTP_200_OK)
-async def initiate_password_recovery(
+def initiate_password_recovery(
     recovery_request: PasswordRecoveryRequest,
     db: Session = Depends(getDb)
 ):
@@ -353,7 +353,7 @@ async def initiate_password_recovery(
         )
         
 @router.post("/resend-recovery-pin", status_code=status.HTTP_200_OK)
-async def resend_recovery_pin(
+def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
     db: Session = Depends(getDb)
 ):
@@ -368,7 +368,7 @@ async def resend_recovery_pin(
         )
         
 @router.post("/confirm-recovery-pin", status_code=status.HTTP_200_OK)
-async def confirm_recovery_pin(
+def confirm_recovery_pin(
     pin_confirmation: PinConfirmationRequest,
     db: Session = Depends(getDb)
 ):
@@ -394,7 +394,7 @@ async def confirm_recovery_pin(
         )
         
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
-async def reset_password(
+def reset_password(
     reset_request: PasswordResetRequest,
     db: Session = Depends(getDb)
 ):
@@ -409,7 +409,7 @@ async def reset_password(
         )
         
 @router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout(
+def logout(
     current_user: UserInDB = Depends(get_current_user),
     db: Session = Depends(getDb),
     credentials: HTTPAuthorizationCredentials = Security(security_scheme)

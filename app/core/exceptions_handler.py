@@ -32,7 +32,7 @@ def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[
         new_errors.append(error)
     return new_errors
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+def validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
     # Reemplaza los mensajes de error con los personalizados
     errors = convert_errors(errors, CUSTOM_MESSAGES)
@@ -57,7 +57,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         },
     )
 
-async def custom_exception_handler(request: Request, exc: Exception):
+def custom_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={
@@ -76,7 +76,7 @@ async def custom_exception_handler(request: Request, exc: Exception):
         },
     )
 
-async def custom_http_exception_handler(request: Request, exc: HTTPException):
+def custom_http_exception_handler(request: Request, exc: HTTPException):
     # Obtener el mensaje personalizado basado en el status_code
     message = HTTP_CUSTOM_MESSAGES.get(exc.status_code, exc.detail)
     
@@ -92,7 +92,7 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
         },
     )
     
-async def domain_exception_handler(request: Request, exc: DomainException):
+def domain_exception_handler(request: Request, exc: DomainException):
     return JSONResponse(
         status_code=exc.status_code,
         content={
