@@ -9,6 +9,7 @@ from app.user.application.resend_confirmation_use_case import ResendConfirmation
 from app.user.application.confirmation_use_case import ConfirmationUseCase
 from app.user.application.resend_2fa_use_case import Resend2faUseCase
 from app.user.application.verify_use_case import VerifyUseCase
+from app.user.application.list_users_use_case import ListUsersUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
@@ -37,11 +38,11 @@ async def create_user(
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
-    except Exception:
+    except Exception as e:
         # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno en el registro de usuario"
+            detail=f"Error interno en el registro de usuario: {str(e)}"
         )
         
 @router.post("/resend-confirm-pin", response_model=ResendConfirmationResponse, status_code=status.HTTP_200_OK)
@@ -56,11 +57,11 @@ async def resend_confirmation_pin_endpoint(
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
-    except Exception:
+    except Exception as e:
         # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno al reenviar el PIN de confirmación."
+            detail=f"Error interno al reenviar el PIN de confirmación: {str(e)}"
         )
         
 @router.post("/confirm", response_model=ConfirmUsuarioResponse, status_code=status.HTTP_200_OK)
@@ -75,11 +76,11 @@ async def confirm_user_registration(
     except DomainException as e:
         # Las excepciones serán manejadas por los manejadores globales de FastAPI
         raise e
-    except Exception:
+    except Exception as e:
         # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno al confirmar el registro de usuario"
+            detail=f"Error interno al confirmar el registro de usuario: {str(e)}"
         )
     
 @router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
@@ -91,11 +92,11 @@ async def login_for_access_token(login_request: LoginRequest, db: Session = Depe
     except DomainException as e:
         # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
-    except Exception:
+    except Exception as e:
         # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno al procesar el inicio de sesión."
+            detail=f"Error interno al procesar el inicio de sesión: {str(e)}"
         )
     
 @router.post("/resend-2fa-pin", response_model=Resend2FAResponse, status_code=status.HTTP_200_OK)
@@ -110,10 +111,10 @@ async def resend_2fa_pin_endpoint(
     except DomainException as e:
         # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
-    except Exception:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno al reenviar el PIN de doble factor de autenticación"
+            detail=f"Error interno al reenviar el PIN de doble factor de autenticación: {str(e)}"
         )
         
 @router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
@@ -127,11 +128,11 @@ async def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends
     except DomainException as e:
         # Las excepciones serán manejadas por los manejadores globales de FastAPI
         raise e
-    except Exception:
+    except Exception as e:
         # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno al verificar el inicio de sesión."
+            detail=f"Error interno al verificar el inicio de sesión: {str(e)}"
         )
 
 @router.post(
@@ -149,34 +150,27 @@ async def create_user_by_admin(
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
-    except Exception:
+    except Exception as e:
         # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno en el registro de usuario por el administrador"
+            detail=f"Error interno en el registro de usuario por el administrador: {str(e)}"
         )
 
 # Endpoint para listar todos los usuarios
 @router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
 async def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
-    """
-    Endpoint para listar todos los usuarios.
-    """
-    user_repository = UserRepository(db)
-    users = user_repository.get_all_users()
-    
-    if not users:
-        raise HTTPException(status_code=404, detail="No se encontraron usuarios.")
-    
-    # Mapeamos los usuarios a UserResponse para devolver la información formateada
-    return [UserResponse(
-        id=user.id,
-        nombre=user.nombre,
-        apellido=user.apellido,
-        email=user.email,
-        estado=user.estado.nombre,  # Nombre del estado
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"  # Nombre del primer rol o "Sin rol"
-    ) for user in users]
+    list_users_use_case = ListUsersUseCase(db)
+    try:
+        return list_users_use_case.execute(current_user)
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar los usuarios: {str(e)}"
+        )
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
