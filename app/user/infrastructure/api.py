@@ -10,6 +10,7 @@ from app.user.application.confirmation_use_case import ConfirmationUseCase
 from app.user.application.resend_2fa_use_case import Resend2faUseCase
 from app.user.application.verify_use_case import VerifyUseCase
 from app.user.application.list_users_use_case import ListUsersUseCase
+from app.user.application.resend_recovery_use_case import ResendRecoveryUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
@@ -357,14 +358,18 @@ def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
     db: Session = Depends(getDb)
 ):
-    password_recovery_use_case = PasswordRecoveryUseCase(db)
-    success = password_recovery_use_case.resend_recovery_pin(recovery_request.email)
-    if success:
-        return {"message": "Se ha reenviado el código de recuperación a tu correo electrónico."}
-    else:
+    password_recovery_use_case = ResendRecoveryUseCase(db)
+    try:
+        message = password_recovery_use_case.resend_recovery_pin(recovery_request.email)
+        return message
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception as e:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No se pudo reenviar el código de recuperación. Verifica el correo electrónico e intenta nuevamente."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno en el reenvio del codigo de recuperación de contraseña: {str(e)}"
         )
         
 @router.post("/confirm-recovery-pin", status_code=status.HTTP_200_OK)

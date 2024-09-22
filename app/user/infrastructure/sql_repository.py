@@ -252,6 +252,15 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al agregar la recuperación de contraseña: {e}")
             return False
+        
+    def update_password_recovery(self, recovery: RecuperacionContrasena) -> bool:
+        try:
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar la recuperación de contraseña: {e}")
+            return False
 
     def get_password_recovery(self, user_id: int) -> Optional[RecuperacionContrasena]:
         return self.db.query(RecuperacionContrasena).filter(

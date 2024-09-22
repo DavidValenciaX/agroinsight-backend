@@ -44,33 +44,6 @@ class PasswordRecoveryUseCase:
         
         return send_email(email, subject, text_content, html_content)
 
-    def resend_recovery_pin(self, email: str) -> bool:
-        user = self.user_repository.get_user_by_email(email)
-        if not user:
-            return False
-
-        try:
-            recovery = self.user_repository.get_password_recovery(user.id)
-
-            if not recovery:
-                # Si no hay un registro de recuperación válido, iniciar uno nuevo
-                return self.initiate_password_recovery(email)
-
-            # Generar un nuevo PIN y su hash
-            pin, pin_hash = generate_pin()
-
-            if self.send_password_recovery_email(email, pin):
-                recovery.pin = pin_hash
-                recovery.expiracion = datetime.now(timezone.utc) + timedelta(minutes=15)
-                recovery.intentos = 0
-                self.user_repository.add_password_recovery(recovery)
-                return True
-            else:
-                return False
-        except Exception as e:
-            print(f"Error al reenviar el PIN de recuperación: {str(e)}")
-            return False
-
     def confirm_recovery_pin(self, email: str, pin: str) -> bool:
         """Confirma el PIN de recuperación de contraseña."""
         user = self.user_repository.get_user_by_email(email)
