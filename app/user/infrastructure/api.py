@@ -14,7 +14,7 @@ from app.user.application.resend_recovery_use_case import ResendRecoveryUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserCreateByAdmin, UserResponse, UserCreate, UserCreationResponse, LoginRequest, LoginResponse, TokenResponse, ConfirmationRequest, ResendConfirmationResponse, ConfirmUsuarioResponse, UserInDB, UserResponse, TwoFactorAuthRequest, ResendPinConfirmRequest, Resend2FARequest, Resend2FAResponse, PasswordRecoveryRequest, PasswordResetRequest, PinConfirmationRequest, UserUpdate, AdminUserUpdate
+from app.user.domain.schemas import *
 from app.user.domain.exceptions import TooManyRecoveryAttempts, DomainException
 
 from typing import List
@@ -88,8 +88,7 @@ def confirm_user_registration(
 def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
     login_use_case = LoginUseCase(db)
     try:
-        message = login_use_case.execute(login_request.email, login_request.password)
-        return LoginResponse(message=message)
+        return login_use_case.execute(login_request.email, login_request.password)
     except DomainException as e:
         # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
@@ -338,30 +337,32 @@ def deactivate_user(
             detail="No se pudo desactivar el usuario. Intenta nuevamente."
         )
     
-@router.post("/password-recovery", status_code=status.HTTP_200_OK)
+@router.post("/password-recovery", response_model=PasswordRecoveryResponse, status_code=status.HTTP_200_OK)
 def initiate_password_recovery(
     recovery_request: PasswordRecoveryRequest,
     db: Session = Depends(getDb)
 ):
     password_recovery_use_case = PasswordRecoveryUseCase(db)
-    success = password_recovery_use_case.initiate_password_recovery(recovery_request.email)
-    if success:
-        return {"message": "Se ha enviado un código de recuperación a tu correo electrónico."}
-    else:
+    try:
+        return password_recovery_use_case.execute(recovery_request.email)
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception as e:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No se pudo iniciar el proceso de recuperación de contraseña. Verifica el correo electrónico e intenta nuevamente."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al iniciar el proceso de recuperación de contraseña: {str(e)}"
         )
         
-@router.post("/resend-recovery-pin", status_code=status.HTTP_200_OK)
+@router.post("/resend-recovery-pin", response_model=ResendRecoveryResponse, status_code=status.HTTP_200_OK)
 def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
     db: Session = Depends(getDb)
 ):
     password_recovery_use_case = ResendRecoveryUseCase(db)
     try:
-        message = password_recovery_use_case.resend_recovery_pin(recovery_request.email)
-        return message
+        return password_recovery_use_case.execute(recovery_request.email)
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e

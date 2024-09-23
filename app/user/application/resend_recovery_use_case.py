@@ -12,7 +12,7 @@ class ResendRecoveryUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
 
-    def resend_recovery_pin(self, email: str) -> bool:
+    def execute(self, email: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(

@@ -19,7 +19,7 @@ class LoginUseCase:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
-                message="Usuario no encontrado.",
+                message="Este correo no está registrado, regístrese en la aplicación por favor.",
                 status_code=status.HTTP_404_NOT_FOUND,
             )
         
@@ -58,7 +58,7 @@ class LoginUseCase:
         self.user_repository.update_user(user)
         
         if self.initiate_two_factor_auth(user):
-            return "Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."
+            return {"message":"Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
         else:
             raise DomainException(
                 message="Error al iniciar la verificación en dos pasos.",

@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import status
 from datetime import datetime, timedelta, timezone
 from app.core.services.pin_service import generate_pin, hash_pin
 from app.user.infrastructure.orm_models import RecuperacionContrasena
@@ -12,10 +13,13 @@ class PasswordRecoveryUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
 
-    def initiate_password_recovery(self, email: str) -> bool:
+    def execute(self, email: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
         if not user:
-            return False
+            raise DomainException(
+                message="Este correo no está registrado, regístrese en la aplicación por favor.",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
 
         try:
             self.user_repository.delete_password_recovery(user.id)
@@ -30,12 +34,17 @@ class PasswordRecoveryUseCase:
             
             if self.send_password_recovery_email(email, pin):
                 self.user_repository.add_password_recovery(recovery)
-                return True
+                return {"message": "Se ha enviado un código de recuperación a tu correo electrónico."}
             else:
-                return False
+                raise DomainException(
+                    message="No se pudo reenviar el código de recuperación a tu correo electrónico.",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
         except Exception as e:
-            print(f"Error al iniciar la recuperación de contraseña: {str(e)}")
-            return False
+            raise DomainException(
+                message=f"Error en el proceso la recuperación de contraseña: {str(e)}",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def send_password_recovery_email(self, email: str, pin: str) -> bool:
         subject = "Recuperación de contraseña - AgroInSight"

@@ -225,6 +225,12 @@ class PasswordRecoveryRequest(BaseModel):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
 
+class PasswordRecoveryResponse(BaseModel):
+    message: str
+    
+class ResendRecoveryResponse(BaseModel):
+    message: str
+
 class PinConfirmationRequest(BaseModel):
     email: str
     pin: str
