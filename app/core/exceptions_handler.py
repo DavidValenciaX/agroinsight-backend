@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 CUSTOM_MESSAGES = {
     'missing': 'El campo es requerido',
     'value_error.missing': 'El campo es requerido',
-    'int_parsing': 'La entrada debe ser un número entero válido'
+    'int_parsing': 'La entrada debe ser un número entero válido',
+    'json_invalid': 'Error de decodificación de json'
     # Agregar otros tipos de error y mensajes personalizados si es necesario
 }
 

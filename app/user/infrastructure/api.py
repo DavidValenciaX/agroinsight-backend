@@ -11,11 +11,12 @@ from app.user.application.resend_2fa_use_case import Resend2faUseCase
 from app.user.application.verify_use_case import VerifyUseCase
 from app.user.application.list_users_use_case import ListUsersUseCase
 from app.user.application.resend_recovery_use_case import ResendRecoveryUseCase
+from app.user.application.confirm_recovery_pin_use_case import ConfirmRecoveryPinUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import *
-from app.user.domain.exceptions import TooManyRecoveryAttempts, DomainException
+from app.user.domain.exceptions import DomainException
 
 from typing import List
 
@@ -373,26 +374,17 @@ def resend_recovery_pin(
             detail=f"Error interno en el reenvio del codigo de recuperación de contraseña: {str(e)}"
         )
         
-@router.post("/confirm-recovery-pin", status_code=status.HTTP_200_OK)
+@router.post("/confirm-recovery-pin", response_model=ConfirmRecoveryResponse, status_code=status.HTTP_200_OK)
 def confirm_recovery_pin(
     pin_confirmation: PinConfirmationRequest,
     db: Session = Depends(getDb)
 ):
-    password_recovery_use_case = PasswordRecoveryUseCase(db)
+    password_recovery_use_case = ConfirmRecoveryPinUseCase(db)
     try:
-        success = password_recovery_use_case.confirm_recovery_pin(pin_confirmation.email, pin_confirmation.pin)
-        if success:
-            return {"message": "Código de recuperación confirmado correctamente."}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Código de recuperación inválido o expirado."
-            )
-    except TooManyRecoveryAttempts as e:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=e.message
-        )
+        return password_recovery_use_case.confirm_recovery_pin(pin_confirmation.email, pin_confirmation.pin)
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
