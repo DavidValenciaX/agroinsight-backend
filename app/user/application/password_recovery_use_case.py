@@ -3,7 +3,6 @@ from fastapi import status
 from datetime import datetime, timedelta, timezone
 from app.core.services.pin_service import generate_pin
 from app.user.infrastructure.orm_models import RecuperacionContrasena
-from app.core.security.security_utils import hash_password, verify_password
 from app.core.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.exceptions import DomainException
@@ -52,21 +51,3 @@ class PasswordRecoveryUseCase:
         html_content = f"<html><body><p><strong>Tu código de recuperación de contraseña es: {pin}</strong></p><p>Este código expirará en 10 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)
-
-    def reset_password(self, email: str, new_password: str) -> bool:
-        user = self.user_repository.get_user_by_email(email)
-        if not user:
-            return False
-
-        recovery = self.user_repository.get_password_recovery(user.id)
-
-        if not recovery:
-            return False
-
-        if verify_password(new_password, user.password):
-            return False
-
-        user.password = hash_password(new_password)
-        self.user_repository.delete_recovery(recovery)
-
-        return True

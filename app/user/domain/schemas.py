@@ -276,3 +276,6 @@ class PasswordResetRequest(BaseModel):
             # Levantar un error personalizado sin prefijo
             raise PydanticCustomError('password_validation', message)
         return v
+    
+class ResetPasswordResponse(BaseModel):
+    message: str

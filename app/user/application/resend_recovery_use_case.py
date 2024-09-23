@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import datetime, timedelta, timezone
 from app.core.services.pin_service import generate_pin
-from app.user.infrastructure.orm_models import RecuperacionContrasena
 from app.core.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.exceptions import DomainException
@@ -18,6 +17,35 @@ class ResendRecoveryUseCase:
             raise DomainException(
                 message="Email no registrado.",
                 status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Verificar si la cuenta del usuario está pendiente de confirmación
+        pending_state_id = self.user_repository.get_pending_user_state_id()
+        if user.state_id == pending_state_id:
+            raise DomainException(
+                message="La cuenta del usuario está pendiente de confirmación.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+                
+        # Verificar si el usuario ha sido eliminado
+        inactive_state_id = self.user_repository.get_inactive_user_state_id()
+        if user.state_id == inactive_state_id:
+            raise DomainException(
+                message="El usuario fue eliminado del sistema.",
+                status_code=status.HTTP_410_GONE
+            )
+        
+        # Verificar si la cuenta del usuario está bloqueada
+        if user.locked_until:
+            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
+
+        locked_state_id = self.user_repository.get_locked_user_state_id()
+        if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
+            time_left = user.locked_until - datetime.now(timezone.utc)
+            minutos_restantes = time_left.seconds // 60
+            raise DomainException(
+                message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
+                status_code=status.HTTP_403_FORBIDDEN
             )
 
         try:

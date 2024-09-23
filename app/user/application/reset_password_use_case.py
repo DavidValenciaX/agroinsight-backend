@@ -1,25 +1,20 @@
-
 from sqlalchemy.orm import Session
 from fastapi import status
-from datetime import datetime, timedelta, timezone
-from app.core.services.pin_service import generate_pin, hash_pin
-from app.user.infrastructure.orm_models import RecuperacionContrasena
+from datetime import datetime, timezone
 from app.core.security.security_utils import hash_password, verify_password
-from app.core.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.exceptions import DomainException
 
-class ConfirmRecoveryPinUseCase:
+class ResetPasswordUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
 
-    def execute(self, email: str, pin: str) -> dict:
-        """Confirma el PIN de recuperación de contraseña."""
+    def execute(self, email: str, new_password: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
-                message="Usuario no encontrado.",
+                message="Email no registrado.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
@@ -53,36 +48,33 @@ class ConfirmRecoveryPinUseCase:
             )
 
         recovery = self.user_repository.get_password_recovery(user.id)
+
         if not recovery:
             raise DomainException(
                 message="No hay un registro de recuperación de contraseña pendiente.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
 
-        # Verificar si el PIN proporcionado coincide
-        pin_hash = hash_pin(pin)
-        if pin_hash == recovery.pin:
-            # PIN correcto, eliminar el registro de recuperación
-            self.user_repository.delete_password_recovery(user.id)
-            return {"message": "Código de recuperación confirmado correctamente."}
-        else:
-            # PIN incorrecto, incrementar los intentos
-            recovery.intentos += 1
-            if recovery.intentos >= 3:
-                self.user_repository.delete_password_recovery(user.id)
-                locked = self.user_repository.block_user(user.id, timedelta(minutes=10))
-                if locked:
-                    raise DomainException(
-                        message="Su cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en 10 minutos.",
-                        status_code=status.HTTP_403_FORBIDDEN
-                    )
-                else:
-                    raise DomainException(
-                        message="No se pudo bloquear al usuario debido a un error interno.",
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                self.user_repository.update_password_recovery(recovery)
+        if verify_password(new_password, user.password):
             raise DomainException(
-                message="PIN de verificación inválido o expirado.",
+                message="Asegúrate de que la nueva contraseña sea diferente de la anterior",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
+
+        user.password = hash_password(new_password)
+        # Actualizar usuario en la base de datos
+        updated_user = self.user_repository.update_user(user)
+        if not updated_user:
+            raise DomainException(
+                message="No se pudo actualizar la contraseña del usuario.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        # Eliminar la solicitud de recuperación de contraseña
+        if not self.user_repository.delete_recovery(recovery):
+            raise DomainException(
+                detail="No se pudo eliminar el registro de recuperación de contraseña.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return {"message": "Contraseña restablecida correctamente."}

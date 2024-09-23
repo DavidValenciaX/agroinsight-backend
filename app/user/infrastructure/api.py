@@ -12,6 +12,7 @@ from app.user.application.verify_use_case import VerifyUseCase
 from app.user.application.list_users_use_case import ListUsersUseCase
 from app.user.application.resend_recovery_use_case import ResendRecoveryUseCase
 from app.user.application.confirm_recovery_pin_use_case import ConfirmRecoveryPinUseCase
+from app.user.application.reset_password_use_case import ResetPasswordUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
@@ -381,7 +382,7 @@ def confirm_recovery_pin(
 ):
     password_recovery_use_case = ConfirmRecoveryPinUseCase(db)
     try:
-        return password_recovery_use_case.confirm_recovery_pin(pin_confirmation.email, pin_confirmation.pin)
+        return password_recovery_use_case.execute(pin_confirmation.email, pin_confirmation.pin)
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
@@ -391,19 +392,21 @@ def confirm_recovery_pin(
             detail=f"Error al confirmar el código de recuperación: {str(e)}"
         )
         
-@router.post("/reset-password", status_code=status.HTTP_200_OK)
+@router.post("/reset-password", response_model=ResetPasswordResponse, status_code=status.HTTP_200_OK)
 def reset_password(
     reset_request: PasswordResetRequest,
     db: Session = Depends(getDb)
 ):
-    password_recovery_use_case = PasswordRecoveryUseCase(db)
-    success = password_recovery_use_case.reset_password(reset_request.email, reset_request.new_password)
-    if success:
-        return {"message": "Contraseña restablecida correctamente."}
-    else:
+    password_recovery_use_case = ResetPasswordUseCase(db)
+    try:
+        return password_recovery_use_case.execute(reset_request.email, reset_request.new_password)
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No se pudo restablecer la contraseña. Asegúrate de que la nueva contraseña sea diferente de la anterior y que hayas confirmado el código de recuperación."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al reestablecer la contraseña: {str(e)}"
         )
         
 @router.post("/logout", status_code=status.HTTP_200_OK)
