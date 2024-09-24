@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from app.user.application.deactivate_user_use_case import DeactivateUserUseCase
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
 from app.user.application.admin_update_user_use_case import AdminUpdateUserUseCase
 from app.user.application.user_creation_process.user_creation_use_case import UserCreationUseCase
@@ -144,7 +145,6 @@ def create_user_by_admin(
             detail=f"Error interno en el registro de usuario por el administrador: {str(e)}"
         )
 
-# Endpoint para listar todos los usuarios
 @router.get("/list", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
 def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_user)):
     list_users_use_case = ListUsersUseCase(db)
@@ -190,15 +190,12 @@ def update_user_info(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
-    update_use_case = UpdateUserInfoUseCase(db)  # Instancia del caso de uso
+    update_use_case = UpdateUserInfoUseCase(db)
     try:
-        # Ejecuta el caso de uso y retorna la respuesta
         return update_use_case.execute(current_user, user_update)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"No se pudo actualizar la información del usuario: {str(e)}"
@@ -222,31 +219,21 @@ def admin_update_user(
             detail=f"No se pudo actualizar la información del usuario: {str(e)}"
         )
     
-@router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
+@router.delete("/{user_id}/deactivate", response_model=dict, status_code=status.HTTP_200_OK)
 def deactivate_user(
     user_id: int, 
     db: Session = Depends(getDb), 
     current_user: UserInDB = Depends(get_current_user)
 ):
-    """
-    Endpoint para eliminar (inactivar) un usuario en lugar de eliminarlo.
-    """
-    user_repository = UserRepository(db)
-
-    # Verificar si el usuario existe
-    user = user_repository.get_user_by_id(user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
-    
-    # Desactivar el usuario
-    success = user_repository.deactivate_user(user_id)
-    
-    if success:
-        return {"message": "Usuario desactivado exitosamente."}
-    else:
+    deactivate_use_case = DeactivateUserUseCase(db)
+    try:
+        return deactivate_use_case.execute(user_id, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo desactivar el usuario. Intenta nuevamente."
+            detail=f"No se pudo desactivar el usuario: {str(e)}"
         )
     
 @router.post("/password-recovery", response_model=PasswordRecoveryResponse, status_code=status.HTTP_200_OK)
@@ -258,10 +245,8 @@ def initiate_password_recovery(
     try:
         return password_recovery_use_case.execute(recovery_request.email)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al iniciar el proceso de recuperación de contraseña: {str(e)}"
@@ -276,10 +261,8 @@ def resend_recovery_pin(
     try:
         return password_recovery_use_case.execute(recovery_request.email)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno en el reenvio del PIN de recuperación de contraseña: {str(e)}"
@@ -294,7 +277,6 @@ def confirm_recovery_pin(
     try:
         return password_recovery_use_case.execute(pin_confirmation.email, pin_confirmation.pin)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
         raise HTTPException(
@@ -311,7 +293,6 @@ def reset_password(
     try:
         return password_recovery_use_case.execute(reset_request.email, reset_request.new_password)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
         raise HTTPException(
