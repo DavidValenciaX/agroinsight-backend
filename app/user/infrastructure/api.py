@@ -14,6 +14,7 @@ from app.user.application.password_recovery_process.resend_recovery_use_case imp
 from app.user.application.password_recovery_process.confirm_recovery_pin_use_case import ConfirmRecoveryPinUseCase
 from app.user.application.password_recovery_process.reset_password_use_case import ResetPasswordUseCase
 from app.user.application.get_current_user_use_case import GetCurrentUserUseCase
+from app.user.application.get_user_by_id_use_case import GetUserByIdUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
@@ -111,7 +112,6 @@ def resend_2fa_pin_endpoint(
 @router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
     verify_use_case = VerifyUseCase(db)
-    
     try:
         # Ejecuta el caso de uso y obtiene los datos del token
         return verify_use_case.execute(auth_request.email, auth_request.pin)
@@ -171,24 +171,16 @@ def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db
     
 @router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
-    """
-    Endpoint para obtener un usuario por su ID.
-    """
-    user_repository = UserRepository(db)
-    user = user_repository.get_user_by_id(user_id)
-    
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
-    
-    # Mapeamos el usuario a UserResponse para devolver la información formateada
-    return UserResponse(
-        id=user.id,
-        nombre=user.nombre,
-        apellido=user.apellido,
-        email=user.email,
-        estado=user.estado.nombre,  # Nombre del estado
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
-    )
+    get_user_by_id_use_case = GetUserByIdUseCase(db)
+    try:
+        return get_user_by_id_use_case.execute(user_id, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener el usuario: {str(e)}"
+        )
     
 @router.put("/me/update", response_model=UserResponse)
 def update_user_info(
