@@ -13,12 +13,12 @@ from app.user.application.list_users_use_case import ListUsersUseCase
 from app.user.application.password_recovery_process.resend_recovery_use_case import ResendRecoveryUseCase
 from app.user.application.password_recovery_process.confirm_recovery_pin_use_case import ConfirmRecoveryPinUseCase
 from app.user.application.password_recovery_process.reset_password_use_case import ResetPasswordUseCase
+from app.user.application.get_current_user_use_case import GetCurrentUserUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import *
 from app.user.domain.exceptions import DomainException
-
 from typing import List
 
 # Crear una instancia de HTTPBearer
@@ -56,10 +56,8 @@ def resend_confirmation_pin_endpoint(
     try:
         return resend_confirmation_use_case.execute(resend_request.email)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al reenviar el PIN de confirmación: {str(e)}"
@@ -74,10 +72,8 @@ def confirm_user_registration(
     try:
         return confirmation_use_case.execute(confirmation.email, confirmation.pin)
     except DomainException as e:
-        # Las excepciones serán manejadas por los manejadores globales de FastAPI
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al confirmar el registro de usuario: {str(e)}"
@@ -89,10 +85,8 @@ def login_for_access_token(login_request: LoginRequest, db: Session = Depends(ge
     try:
         return login_use_case.execute(login_request.email, login_request.password)
     except DomainException as e:
-        # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al procesar el inicio de sesión: {str(e)}"
@@ -107,7 +101,6 @@ def resend_2fa_pin_endpoint(
     try:
         return resend_2fa_use_case.execute(resend_request.email)
     except DomainException as e:
-        # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
     except Exception as e:
         raise HTTPException(
@@ -123,10 +116,8 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
         # Ejecuta el caso de uso y obtiene los datos del token
         return verify_use_case.execute(auth_request.email, auth_request.pin)
     except DomainException as e:
-        # Las excepciones serán manejadas por los manejadores globales de FastAPI
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al verificar el inicio de sesión: {str(e)}"
@@ -144,10 +135,8 @@ def create_user_by_admin(
     try:
         return user_creation_by_admin_use_case.execute(user, current_user)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
-        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno en el registro de usuario por el administrador: {str(e)}"
@@ -160,7 +149,6 @@ def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_us
     try:
         return list_users_use_case.execute(current_user)
     except DomainException as e:
-        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
         raise HTTPException(
@@ -170,25 +158,16 @@ def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_us
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
-    
-    # Obtener el repositorio de usuarios
-    user_repository = UserRepository(db)
-    
-    # Obtener el estado del usuario
-    estado = user_repository.get_state_by_id(current_user.state_id)
-    estado_nombre = estado.nombre if estado else "Desconocido"
-    
-    # Obtener el rol del usuario
-    user_role = ", ".join([role.nombre for role in current_user.roles]) if current_user.roles else "Sin rol asignado"
-    
-    return UserResponse(
-        id=current_user.id,
-        nombre=current_user.nombre,
-        apellido=current_user.apellido,
-        email=current_user.email,
-        estado=estado_nombre,
-        rol=user_role
-    )
+    me_use_case = GetCurrentUserUseCase(db)
+    try:
+        return me_use_case.execute(current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener la información del usuario: {str(e)}"
+        )
     
 @router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
