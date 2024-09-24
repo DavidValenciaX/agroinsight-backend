@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
+from app.user.application.admin_update_user_use_case import AdminUpdateUserUseCase
 from app.user.application.user_creation_process.user_creation_use_case import UserCreationUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
 from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
@@ -203,61 +204,22 @@ def update_user_info(
             detail=f"No se pudo actualizar la información del usuario: {str(e)}"
         )
     
-@router.put("/{user_id}/update", response_model=UserResponse)
+@router.put("/{user_id}/update", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def admin_update_user(
     user_id: int,
     user_update: AdminUserUpdate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
-    """
-    Endpoint para que un administrador actualice la información de un usuario.
-    """
-    user_repository = UserRepository(db)
-
-    # Obtener los roles que tienen permisos administrativos
-    admin_roles = user_repository.get_admin_roles()
-
-    # Verificar si el usuario actual tiene uno de los roles administrativos
-    if not any(role.id in [admin_role.id for admin_role in admin_roles] for role in current_user.roles):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permisos para realizar esta acción."
-        )
-
-    # Verificar si el usuario a actualizar existe
-    user_to_update = user_repository.get_user_by_id(user_id)
-    if not user_to_update:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado."
-        )
-
-    # Verificar si el nuevo email está en uso por otro usuario
-    if user_update.email and user_update.email != user_to_update.email:
-        existing_user = user_repository.get_user_by_email(user_update.email)
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El email ya está en uso por otro usuario."
-            )
-
-    # Actualizar la información del usuario
-    updated_user = user_repository.update_user_info_by_admin(user_to_update, user_update.model_dump(exclude_unset=True))
-
-    if updated_user:
-        return UserResponse(
-            id=updated_user.id,
-            nombre=updated_user.nombre,
-            apellido=updated_user.apellido,
-            email=updated_user.email,
-            estado=updated_user.estado.nombre,
-            rol=", ".join([role.nombre for role in updated_user.roles]) if updated_user.roles else "Rol no asignado"
-        )
-    else:
+    update_user_use_case = AdminUpdateUserUseCase(db)
+    try:
+        return update_user_use_case.execute(user_id, user_update, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo actualizar la información del usuario."
+            detail=f"No se pudo actualizar la información del usuario: {str(e)}"
         )
     
 @router.delete("/{user_id}/deactivate", status_code=status.HTTP_200_OK)
