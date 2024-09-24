@@ -18,7 +18,7 @@ from app.user.application.password_recovery_process.confirm_recovery_pin_use_cas
 from app.user.application.password_recovery_process.reset_password_use_case import ResetPasswordUseCase
 from app.user.application.get_current_user_use_case import GetCurrentUserUseCase
 from app.user.application.get_user_by_id_use_case import GetUserByIdUseCase
-from app.user.infrastructure.sql_repository import UserRepository
+from app.user.application.logout_use_case import LogoutUseCase
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import *
@@ -300,25 +300,20 @@ def reset_password(
             detail=f"Error interno al reestablecer la contraseña: {str(e)}"
         )
         
-@router.post("/logout", status_code=status.HTTP_200_OK)
+@router.post("/logout", response_model=dict, status_code=status.HTTP_200_OK)
 def logout(
     current_user: UserInDB = Depends(get_current_user),
     db: Session = Depends(getDb),
     credentials: HTTPAuthorizationCredentials = Security(security_scheme)
 ):
-    """
-    Cierra la sesión del usuario actual invalidando su token.
-    """
     token = credentials.credentials
-    user_repository = UserRepository(db)
-    
-    # Ahora pasas el usuario_id del current_user
-    success = user_repository.blacklist_token(token, current_user.id)
-    
-    if success:
-        return {"message": "Sesión cerrada exitosamente."}
-    else:
+    logout_use_case = LogoutUseCase(db)
+    try:
+        return logout_use_case.execute(token, current_user.id)
+    except DomainException as e:
+        raise e
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo cerrar la sesión. Intenta nuevamente."
+            detail=f"No se pudo cerrar la sesión: {str(e)}"
         )

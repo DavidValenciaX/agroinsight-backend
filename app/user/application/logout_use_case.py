@@ -1,0 +1,18 @@
+from sqlalchemy.orm import Session
+from app.user.infrastructure.sql_repository import UserRepository
+from app.user.domain.exceptions import DomainException
+from fastapi import status
+
+class LogoutUseCase:
+    def __init__(self, db: Session):
+        self.user_repository = UserRepository(db)
+    
+    def execute(self, token: str, user_id: int) -> dict:
+        success = self.user_repository.blacklist_token(token, user_id)
+        if success:
+            return {"message": "Sesión cerrada exitosamente."}
+        else:
+            raise DomainException(
+                message="No se pudo cerrar la sesión. Intenta nuevamente.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
