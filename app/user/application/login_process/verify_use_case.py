@@ -4,7 +4,7 @@ from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.core.services.pin_service import hash_pin
 from app.core.security.security_utils import create_access_token
-from app.user.domain.exceptions import DomainException
+from app.core.common_exceptions import DomainException
 
 
 class VerifyUseCase:

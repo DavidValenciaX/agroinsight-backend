@@ -1,4 +1,3 @@
-# app/core/security/jwt_middleware.py
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials 
 from jose import jwt, JWTError

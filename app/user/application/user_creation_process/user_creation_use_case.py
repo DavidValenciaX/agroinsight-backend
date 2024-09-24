@@ -4,7 +4,7 @@ from app.user.infrastructure.orm_models import User, ConfirmacionUsuario
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserCreate
 from app.core.security.security_utils import hash_password
-from app.user.domain.exceptions import DomainException
+from app.core.common_exceptions import DomainException
 from app.core.services.pin_service import generate_pin
 from app.core.services.email_service import send_email
 from datetime import datetime, timezone, timedelta

@@ -8,8 +8,7 @@ from app.core.exceptions_handler import (
     custom_exception_handler,
     domain_exception_handler
 )
-from app.user.domain.exceptions import DomainException as UserDomainException
-from app.farm.domain.exceptions import DomainException as FarmDomainException
+from app.core.common_exceptions import DomainException
 
 app = FastAPI()
 
@@ -22,7 +21,6 @@ def root():
 
 # Manejadores de excepciones (registrar los más específicos primero)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
-app.add_exception_handler(UserDomainException, domain_exception_handler)
-app.add_exception_handler(FarmDomainException, domain_exception_handler)
+app.add_exception_handler(DomainException, domain_exception_handler)
 app.add_exception_handler(HTTPException, custom_http_exception_handler)
 app.add_exception_handler(Exception, custom_exception_handler)

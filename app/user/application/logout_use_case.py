@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.exceptions import DomainException
+from app.core.common_exceptions import DomainException
 from fastapi import status
 
 class LogoutUseCase:

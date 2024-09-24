@@ -13,8 +13,6 @@ class Finca(Base):
     unidad_area_id = Column(Integer, ForeignKey('unidad_medida.id'), nullable=False)
     latitud = Column(DECIMAL(10, 8), nullable=False)
     longitud = Column(DECIMAL(11, 8), nullable=False)
-    fecha_creacion = Column(TIMESTAMP, server_default=func.now())
-    fecha_modificacion = Column(TIMESTAMP, onupdate=func.now())
 
     unidad_area = relationship("UnidadMedida")
     usuarios = relationship("User", secondary="usuario_finca")
@@ -25,8 +23,6 @@ class UsuarioFinca(Base):
 
     usuario_id = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
     finca_id = Column(Integer, ForeignKey('finca.id'), primary_key=True)
-    fecha_asignacion = Column(TIMESTAMP, server_default=func.now())
-    fecha_modificacion = Column(TIMESTAMP, onupdate=func.now())
 
 class Lote(Base):
     __tablename__ = "lote"
@@ -38,8 +34,6 @@ class Lote(Base):
     latitud = Column(DECIMAL(10, 8), nullable=False)
     longitud = Column(DECIMAL(11, 8), nullable=False)
     finca_id = Column(Integer, ForeignKey('finca.id'), nullable=False)
-    fecha_creacion = Column(TIMESTAMP, server_default=func.now())
-    fecha_modificacion = Column(TIMESTAMP, onupdate=func.now())
 
     finca = relationship("Finca", back_populates="lotes")
     unidad_area = relationship("UnidadMedida")
@@ -50,8 +44,6 @@ class CategoriaUnidadMedida(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(50), unique=True, nullable=False)
     descripcion = Column(Text)
-    fecha_creacion = Column(TIMESTAMP, server_default=func.now())
-    fecha_modificacion = Column(TIMESTAMP, onupdate=func.now())
 
     unidades = relationship("UnidadMedida", back_populates="categoria")
 
@@ -62,7 +54,5 @@ class UnidadMedida(Base):
     nombre = Column(String(50), unique=True, nullable=False)
     abreviatura = Column(String(10), unique=True, nullable=False)
     categoria_id = Column(Integer, ForeignKey('categoria_unidad_medida.id'), nullable=False)
-    fecha_creacion = Column(TIMESTAMP, server_default=func.now())
-    fecha_modificacion = Column(TIMESTAMP, onupdate=func.now())
 
     categoria = relationship("CategoriaUnidadMedida", back_populates="unidades")

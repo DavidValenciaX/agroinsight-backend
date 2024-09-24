@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from decimal import Decimal
 from typing import Optional
-from datetime import datetime
 
 class FincaCreate(BaseModel):
     nombre: str = Field(..., min_length=1, max_length=100)
@@ -32,8 +31,6 @@ class CategoriaUnidadMedidaCreate(CategoriaUnidadMedidaBase):
 
 class CategoriaUnidadMedida(CategoriaUnidadMedidaBase):
     id: int
-    fecha_creacion: datetime
-    fecha_modificacion: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -48,8 +45,6 @@ class UnidadMedidaCreate(UnidadMedidaBase):
 
 class UnidadMedida(UnidadMedidaBase):
     id: int
-    fecha_creacion: datetime
-    fecha_modificacion: Optional[datetime] = None
 
     class Config:
         from_attributes = True

@@ -35,5 +35,3 @@ class FincaRepository:
 
     def get_unidad_medida_by_id(self, unidad_id: int) -> Optional[UnidadMedida]:
         return self.db.query(UnidadMedida).filter(UnidadMedida.id == unidad_id).first()
-
-    # Agregar más métodos según sea necesario

@@ -3,7 +3,7 @@ from fastapi import status
 from datetime import datetime, timezone
 from app.core.security.security_utils import hash_password, verify_password
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.exceptions import DomainException
+from app.core.common_exceptions import DomainException
 
 class ResetPasswordUseCase:
     def __init__(self, db: Session):

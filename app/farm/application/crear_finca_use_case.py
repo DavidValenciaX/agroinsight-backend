@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FincaRepository
 from app.farm.domain.schemas import FincaCreate, FincaResponse
 from app.user.domain.schemas import UserInDB
-from app.farm.domain.exceptions import DomainException
+from app.core.common_exceptions import DomainException
 from fastapi import status
 
 class CrearFincaUseCase:

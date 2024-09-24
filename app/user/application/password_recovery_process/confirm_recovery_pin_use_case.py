@@ -4,7 +4,7 @@ from fastapi import status
 from datetime import datetime, timedelta, timezone
 from app.core.services.pin_service import hash_pin
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.exceptions import DomainException
+from app.core.common_exceptions import DomainException
 
 class ConfirmRecoveryPinUseCase:
     def __init__(self, db: Session):

@@ -22,7 +22,7 @@ from app.user.application.logout_use_case import LogoutUseCase
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import *
-from app.user.domain.exceptions import DomainException
+from app.core.common_exceptions import DomainException
 from typing import List
 
 # Crear una instancia de HTTPBearer
