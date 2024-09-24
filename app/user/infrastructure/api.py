@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from app.user.application.user_creation_use_case import UserCreationUseCase
-from app.user.application.login_use_case import LoginUseCase
+from app.user.application.user_creation_process.user_creation_use_case import UserCreationUseCase
+from app.user.application.login_process.login_use_case import LoginUseCase
 from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
-from app.user.application.password_recovery_use_case import PasswordRecoveryUseCase
-from app.user.application.resend_confirmation_use_case import ResendConfirmationUseCase
-from app.user.application.confirmation_use_case import ConfirmationUseCase
-from app.user.application.resend_2fa_use_case import Resend2faUseCase
-from app.user.application.verify_use_case import VerifyUseCase
+from app.user.application.password_recovery_process.password_recovery_use_case import PasswordRecoveryUseCase
+from app.user.application.user_creation_process.resend_confirmation_use_case import ResendConfirmationUseCase
+from app.user.application.user_creation_process.confirmation_use_case import ConfirmationUseCase
+from app.user.application.login_process.resend_2fa_use_case import Resend2faUseCase
+from app.user.application.login_process.verify_use_case import VerifyUseCase
 from app.user.application.list_users_use_case import ListUsersUseCase
-from app.user.application.resend_recovery_use_case import ResendRecoveryUseCase
-from app.user.application.confirm_recovery_pin_use_case import ConfirmRecoveryPinUseCase
-from app.user.application.reset_password_use_case import ResetPasswordUseCase
+from app.user.application.password_recovery_process.resend_recovery_use_case import ResendRecoveryUseCase
+from app.user.application.password_recovery_process.confirm_recovery_pin_use_case import ConfirmRecoveryPinUseCase
+from app.user.application.password_recovery_process.reset_password_use_case import ResetPasswordUseCase
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from app.core.security.jwt_middleware import get_current_user
@@ -36,8 +36,7 @@ def create_user(
     creation_use_case = UserCreationUseCase(db)
     # Llamamos al caso de uso sin manejar excepciones aquí
     try:
-        message = creation_use_case.execute(user)
-        return UserCreationResponse(message=message)
+        return creation_use_case.execute(user)
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
@@ -55,8 +54,7 @@ def resend_confirmation_pin_endpoint(
 ):
     resend_confirmation_use_case = ResendConfirmationUseCase(db)
     try:
-        message = resend_confirmation_use_case.execute(resend_request.email)
-        return ResendConfirmationResponse(message=message)
+        return resend_confirmation_use_case.execute(resend_request.email)
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
@@ -74,8 +72,7 @@ def confirm_user_registration(
 ):
     confirmation_use_case = ConfirmationUseCase(db)
     try:
-        message = confirmation_use_case.execute(confirmation.email, confirmation.pin)
-        return ConfirmUsuarioResponse(message=message)
+        return confirmation_use_case.execute(confirmation.email, confirmation.pin)
     except DomainException as e:
         # Las excepciones serán manejadas por los manejadores globales de FastAPI
         raise e
@@ -108,8 +105,7 @@ def resend_2fa_pin_endpoint(
 ):
     resend_2fa_use_case = Resend2faUseCase(db)
     try:
-        message = resend_2fa_use_case.execute(resend_request.email)
-        return Resend2FAResponse(message=message)
+        return resend_2fa_use_case.execute(resend_request.email)
     except DomainException as e:
         # Las excepciones personalizadas serán manejadas por los manejadores globales
         raise e
@@ -125,8 +121,7 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
     
     try:
         # Ejecuta el caso de uso y obtiene los datos del token
-        token_data = verify_use_case.execute(auth_request.email, auth_request.pin)
-        return token_data
+        return verify_use_case.execute(auth_request.email, auth_request.pin)
     except DomainException as e:
         # Las excepciones serán manejadas por los manejadores globales de FastAPI
         raise e
@@ -147,8 +142,7 @@ def create_user_by_admin(
 ):
     user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
     try:
-        message = user_creation_by_admin_use_case.execute(user, current_user)
-        return UserCreationResponse(message = message)
+        return user_creation_by_admin_use_case.execute(user, current_user)
     except DomainException as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e

@@ -1,25 +1,25 @@
-from datetime import datetime, timezone, timedelta
+from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from fastapi import status
+from app.user.infrastructure.orm_models import VerificacionDospasos
 from app.user.infrastructure.sql_repository import UserRepository
-from app.core.services.pin_service import hash_pin
-from app.core.security.security_utils import create_access_token
+from app.core.services.pin_service import generate_pin
+from app.core.services.email_service import send_email
 from app.user.domain.exceptions import DomainException
 
-
-class VerifyUseCase:
+class Resend2faUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, email: str, pin: str):
+    def execute(self, email: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
                 message="Usuario no encontrado.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
-                
+            
         # Verificar si la cuenta del usuario está pendiente de confirmación
         pending_state_id = self.user_repository.get_pending_user_state_id()
         if user.state_id == pending_state_id:
@@ -27,7 +27,7 @@ class VerifyUseCase:
                 message="La cuenta del usuario está pendiente de confirmación.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
-                
+        
         # Verificar si el usuario ha sido eliminado
         inactive_state_id = self.user_repository.get_inactive_user_state_id()
         if user.state_id == inactive_state_id:
@@ -48,7 +48,7 @@ class VerifyUseCase:
                 message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
-                
+        
         # Verificar si hay una confirmación pendiente
         pending_verification = self.user_repository.get_user_pending_2fa_verification(user.id)
         if not pending_verification:
@@ -57,29 +57,46 @@ class VerifyUseCase:
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         
-        # Verificar si el PIN es correcto y no ha expirado
-        pin_hash = hash_pin(pin)
-        verify_pin = self.user_repository.get_two_factor_verification(user.id, pin_hash)
-        
-        if not verify_pin:
-            attempts = self.user_repository.increment_two_factor_attempts(user.id)
-            if attempts >= 3:
-                access_token_expire_minutes = 10
-                # Bloquear usuario por 10 minutos
-                self.user_repository.block_user(user.id, timedelta(minutes=access_token_expire_minutes))
-                # Eliminar la verificación
-                self.user_repository.delete_two_factor_verification(user.id)
-                raise DomainException(
-                    message="Su cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en 10 minutos.",
-                    status_code=status.HTTP_403_FORBIDDEN
-                )
-            raise DomainException(
-                message="PIN de verificación inválido o expirado.",
-                status_code=status.HTTP_400_BAD_REQUEST
+        try:
+            # Eliminar cualquier verificación de dos factores existente
+            self.user_repository.delete_two_factor_verification(user.id)
+            
+            # Generar un nuevo PIN y su hash
+            pin, pin_hash = generate_pin()
+            
+            # Crear un nuevo registro de verificación de dos pasos
+            verification = VerificacionDospasos(
+                usuario_id=user.id,
+                pin=pin_hash,
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
             )
-
-        # Eliminar el registro de verificación si el PIN es correcto
-        self.user_repository.delete_two_factor_verification(user.id)
-
-        access_token = create_access_token(data={"sub": user.email})
-        return {"access_token": access_token, "token_type": "bearer"}
+            
+            self.user_repository.add_two_factor_verification(verification)
+            
+            # Enviar el PIN al correo electrónico del usuario
+            if self.send_two_factor_pin(user.email, pin):
+                return {"message":"PIN de verificación en dos pasos reenviado con éxito."}
+            else:
+                raise DomainException(
+                    message="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde.",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        except Exception as e:
+            raise DomainException(
+                message=f"Error al reenviar el PIN de doble verificación: {str(e)}",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+    def send_two_factor_pin(self, email: str, pin: str) -> bool:
+        subject = "Reenvío de código de verificación en dos pasos - AgroInSight"
+        text_content = f"Reenvío: Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 10 minutos."
+        html_content = f"""
+        <html>
+            <body>
+                <p><strong>Reenvío: Tu código de verificación en dos pasos es: {pin}</strong></p>
+                <p>Este código expirará en 10 minutos.</p>
+            </body>
+        </html>
+        """
+        
+        return send_email(email, subject, text_content, html_content)

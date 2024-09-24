@@ -10,7 +10,7 @@ class ConfirmationUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, email: str, pin: str) -> str:
+    def execute(self, email: str, pin: str) -> dict:
         # Obtener el usuario por correo electrónico
         user = self.user_repository.get_user_by_email(email)
         if not user:
@@ -99,4 +99,4 @@ class ConfirmationUseCase:
         # Eliminar el registro de confirmación
         self.user_repository.delete_user_confirmations(user.id)
         
-        return "Usuario confirmado exitosamente"
+        return {"message":"Usuario confirmado exitosamente"}

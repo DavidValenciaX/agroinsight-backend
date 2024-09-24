@@ -2,10 +2,7 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import datetime, timedelta, timezone
-from app.core.services.pin_service import generate_pin, hash_pin
-from app.user.infrastructure.orm_models import RecuperacionContrasena
-from app.core.security.security_utils import hash_password, verify_password
-from app.core.services.email_service import send_email
+from app.core.services.pin_service import hash_pin
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.exceptions import DomainException
 
@@ -62,8 +59,7 @@ class ConfirmRecoveryPinUseCase:
         # Verificar si el PIN proporcionado coincide
         pin_hash = hash_pin(pin)
         if pin_hash == recovery.pin:
-            # PIN correcto, eliminar el registro de recuperación
-            self.user_repository.delete_password_recovery(user.id)
+            #no se debe eliminar el registro de confirmación sino guardar un campo que diga si es confirmed
             return {"message": "Código de recuperación confirmado correctamente."}
         else:
             # PIN incorrecto, incrementar los intentos

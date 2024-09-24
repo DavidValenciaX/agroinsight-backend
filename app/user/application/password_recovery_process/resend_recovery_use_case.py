@@ -74,7 +74,7 @@ class ResendRecoveryUseCase:
                 )
         except Exception as e:
             raise DomainException(
-                message=f"Error al reenviar el codigop de recuperación de contraseña: {str(e)}",
+                message=f"Error al reenviar el codigo de recuperación de contraseña: {str(e)}",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

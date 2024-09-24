@@ -15,7 +15,7 @@ class LoginUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, email: str, password: str) -> str:
+    def execute(self, email: str, password: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
