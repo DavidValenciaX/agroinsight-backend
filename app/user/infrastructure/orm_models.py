@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
 from datetime import datetime, timezone
@@ -78,6 +78,7 @@ class RecuperacionContrasena(Base):
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
+    pin_confirmado = Column(Boolean, default=False, nullable=False)
 
     usuario = relationship("User", back_populates="recuperacion_contrasena")
     

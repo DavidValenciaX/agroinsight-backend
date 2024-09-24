@@ -54,6 +54,12 @@ class ResetPasswordUseCase:
                 message="No hay un registro de recuperación de contraseña pendiente.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
+            
+        if not recovery.pin_confirmado:
+            raise DomainException(
+                message="El PIN de recuperación no ha sido confirmado.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
 
         if verify_password(new_password, user.password):
             raise DomainException(

@@ -79,3 +79,4 @@ share/python-wheels/
 # Misc
 *.swp
 *.bak
+generate_responses.py

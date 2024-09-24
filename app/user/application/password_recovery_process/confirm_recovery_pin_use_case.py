@@ -59,7 +59,9 @@ class ConfirmRecoveryPinUseCase:
         # Verificar si el PIN proporcionado coincide
         pin_hash = hash_pin(pin)
         if pin_hash == recovery.pin:
-            #no se debe eliminar el registro de confirmación sino guardar un campo que diga si es confirmed
+            # Marcar el PIN como confirmado
+            recovery.pin_confirmado = True
+            self.user_repository.update_password_recovery(recovery)
             return {"message": "PIN de recuperación confirmado correctamente."}
         else:
             # PIN incorrecto, incrementar los intentos
