@@ -43,7 +43,7 @@ class ConfirmationUseCase:
         if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
             time_left = user.locked_until - datetime.now(timezone.utc)
             raise DomainException(
-                message=f"Su cuenta está bloqueada. Intente nuevamente en {time_left.seconds // 60} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {time_left.seconds // 60} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
             
@@ -62,7 +62,7 @@ class ConfirmationUseCase:
                 # Eliminar usuario
                 self.user_repository.delete_user(user)
                 raise DomainException(
-                    message="Demasiados intentos fallidos. Cree su cuenta nuevamente desde el inicio.",
+                    message="Demasiados intentos. Por favor, inténtalo de nuevo más tarde.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
             raise DomainException(

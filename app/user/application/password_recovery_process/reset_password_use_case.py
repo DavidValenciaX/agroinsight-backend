@@ -14,7 +14,7 @@ class ResetPasswordUseCase:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
-                message="Email no registrado.",
+                message="Usuario no encontrado.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
@@ -43,7 +43,7 @@ class ResetPasswordUseCase:
             time_left = user.locked_until - datetime.now(timezone.utc)
             minutos_restantes = time_left.seconds // 60
             raise DomainException(
-                message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
@@ -73,7 +73,7 @@ class ResetPasswordUseCase:
         # Eliminar la solicitud de recuperación de contraseña
         if not self.user_repository.delete_recovery(recovery):
             raise DomainException(
-                detail="No se pudo eliminar el registro de recuperación de contraseña.",
+                message="No se pudo eliminar el registro de recuperación de contraseña.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

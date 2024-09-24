@@ -15,7 +15,7 @@ class UserCreationByAdminUseCase:
         # Verificar que el usuario actual está autenticado
         if not current_user:
             raise DomainException(
-                message="No autenticado",
+                message="No estás autenticado. Por favor, proporciona un token válido.",
                 status_code=status.HTTP_401_UNAUTHORIZED
             )
 

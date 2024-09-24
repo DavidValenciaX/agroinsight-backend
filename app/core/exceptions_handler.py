@@ -18,7 +18,7 @@ CUSTOM_MESSAGES = {
 }
 
 HTTP_CUSTOM_MESSAGES = {
-    401: "No estás autenticado. Por favor, proporciona credenciales válidas.",
+    401: "No estás autenticado. Por favor, proporciona un token válido.",
     403: "No tienes permisos para realizar esta acción.",
     404: "Recurso no encontrado.",
     405: "Método no permitido.",

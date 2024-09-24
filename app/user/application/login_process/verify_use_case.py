@@ -45,7 +45,7 @@ class VerifyUseCase:
             time_left = user.locked_until - datetime.now(timezone.utc)
             minutos_restantes = time_left.seconds // 60
             raise DomainException(
-                message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
                 
@@ -54,7 +54,7 @@ class VerifyUseCase:
         if not pending_verification:
             raise DomainException(
                 message="No hay una verificación de doble factor de autenticación pendiente para reenviar el PIN.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_404_NOT_FOUND
             )
         
         # Verificar si el PIN es correcto y no ha expirado
@@ -64,14 +64,14 @@ class VerifyUseCase:
         if not verify_pin:
             attempts = self.user_repository.increment_two_factor_attempts(user.id)
             if attempts >= 3:
-                access_token_expire_minutes = 10
+                block_time = 10
                 # Bloquear usuario por 10 minutos
-                self.user_repository.block_user(user.id, timedelta(minutes=access_token_expire_minutes))
+                self.user_repository.block_user(user.id, timedelta(minutes=block_time))
                 # Eliminar la verificación
                 self.user_repository.delete_two_factor_verification(user.id)
                 raise DomainException(
-                    message="Su cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en 10 minutos.",
-                    status_code=status.HTTP_403_FORBIDDEN
+                    message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {block_time} minutos.",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
             raise DomainException(
                 message="PIN de verificación inválido o expirado.",

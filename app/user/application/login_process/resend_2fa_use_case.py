@@ -45,7 +45,7 @@ class Resend2faUseCase:
             time_left = user.locked_until - datetime.now(timezone.utc)
             minutos_restantes = time_left.seconds // 60
             raise DomainException(
-                message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
         
@@ -78,7 +78,7 @@ class Resend2faUseCase:
                 return {"message":"PIN de verificación en dos pasos reenviado con éxito."}
             else:
                 raise DomainException(
-                    message="No se pudo reenviar el PIN. Verifique el correo electrónico o intente más tarde.",
+                    message="No se pudo reenviar el PIN. Verifique el correo electrónico o intenta más tarde.",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         except Exception as e:

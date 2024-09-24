@@ -44,7 +44,7 @@ class UserCreationUseCase:
                 time_left = existing_user.locked_until - datetime.now(timezone.utc)
                 minutos_restantes = time_left.seconds // 60
                 raise DomainException(
-                    message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
+                    message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                     status_code=status.HTTP_403_FORBIDDEN
                 )
             
@@ -83,7 +83,7 @@ class UserCreationUseCase:
                 self.user_repository.delete_user(created_user)  # Eliminar el usuario si falla la asignación del rol
                 raise DomainException(
                     message="No se pudo asignar el rol de Usuario No Confirmado.",
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    status_code=status.HTTP_400_BAD_REQUEST,
                 )
         else:
             self.user_repository.delete_user(created_user)  # Eliminar el usuario si no se encuentra el rol

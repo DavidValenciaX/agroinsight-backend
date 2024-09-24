@@ -45,7 +45,7 @@ class PasswordRecoveryUseCase:
             time_left = user.locked_until - datetime.now(timezone.utc)
             minutos_restantes = time_left.seconds // 60
             raise DomainException(
-                message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
 

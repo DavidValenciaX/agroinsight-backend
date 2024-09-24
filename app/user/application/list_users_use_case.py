@@ -13,7 +13,7 @@ class ListUsersUseCase:
         # Verificar que el usuario actual está autenticado
         if not current_user:
             raise DomainException(
-                message="No autenticado",
+                message="No estás autenticado. Por favor, proporciona un token válido.",
                 status_code=status.HTTP_401_UNAUTHORIZED
             )
             
@@ -30,10 +30,7 @@ class ListUsersUseCase:
         
         users = self.user_repository.get_all_users()
         if not users:
-            raise DomainException(
-                message="No se encontraron usuarios.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
+            return []  # Retornar lista vacía
         
         # Mapeamos los usuarios a UserResponse para devolver la información formateada
         return [

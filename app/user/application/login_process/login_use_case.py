@@ -45,7 +45,7 @@ class LoginUseCase:
         if user.locked_until and user.locked_until > datetime.now(timezone.utc):
             time_left = user.locked_until - datetime.now(timezone.utc)
             raise DomainException(
-                message=f"La cuenta está bloqueada temporalmente. Intenta nuevamente en {time_left.seconds // 60} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {time_left.seconds // 60} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN,
             )
 
@@ -76,8 +76,8 @@ class LoginUseCase:
             user.state_id = self.user_repository.get_locked_user_state_id()
             self.user_repository.update_user(user)
             raise DomainException(
-                message=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente después de {blocking_time} minutos.",
-                status_code=status.HTTP_403_FORBIDDEN
+                message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {blocking_time} minutos.",
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS
             )
         
         self.user_repository.update_user(user)

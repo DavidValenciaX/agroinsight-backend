@@ -45,7 +45,7 @@ class ConfirmRecoveryPinUseCase:
             time_left = user.locked_until - datetime.now(timezone.utc)
             minutos_restantes = time_left.seconds // 60
             raise DomainException(
-                message=f"Su cuenta está bloqueada. Intente nuevamente en {minutos_restantes} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
@@ -53,7 +53,7 @@ class ConfirmRecoveryPinUseCase:
         if not recovery:
             raise DomainException(
                 message="No hay un registro de recuperación de contraseña pendiente.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_404_NOT_FOUND
             )
 
         # Verificar si el PIN proporcionado coincide
@@ -65,17 +65,18 @@ class ConfirmRecoveryPinUseCase:
             # PIN incorrecto, incrementar los intentos
             recovery.intentos += 1
             if recovery.intentos >= 3:
+                block_time = 10
                 self.user_repository.delete_password_recovery(user.id)
-                locked = self.user_repository.block_user(user.id, timedelta(minutes=10))
+                locked = self.user_repository.block_user(user.id, timedelta(minutes=block_time))
                 if locked:
                     raise DomainException(
-                        message="Su cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en 10 minutos.",
-                        status_code=status.HTTP_403_FORBIDDEN
+                        message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {block_time} minutos.",
+                        status_code=status.HTTP_429_TOO_MANY_REQUESTS
                     )
                 else:
                     raise DomainException(
-                        message="No se pudo bloquear al usuario debido a un error interno.",
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        message="Error al bloquear al usuario.",
+                        status_code=status.HTTP_403_FORBIDDEN)
             else:
                 self.user_repository.update_password_recovery(recovery)
             raise DomainException(
