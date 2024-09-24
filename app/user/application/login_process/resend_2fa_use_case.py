@@ -88,13 +88,13 @@ class Resend2faUseCase:
             )
         
     def send_two_factor_pin(self, email: str, pin: str) -> bool:
-        subject = "Reenvío de código de verificación en dos pasos - AgroInSight"
-        text_content = f"Reenvío: Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 10 minutos."
+        subject = "Reenvío de PIN de verificación en dos pasos - AgroInSight"
+        text_content = f"Reenvío: Tu PIN de verificación en dos pasos es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""
         <html>
             <body>
-                <p><strong>Reenvío: Tu código de verificación en dos pasos es: {pin}</strong></p>
-                <p>Este código expirará en 10 minutos.</p>
+                <p><strong>Reenvío: Tu PIN de verificación en dos pasos es: {pin}</strong></p>
+                <p>Este PIN expirará en 10 minutos.</p>
             </body>
         </html>
         """

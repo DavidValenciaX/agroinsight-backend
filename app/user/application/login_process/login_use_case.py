@@ -58,7 +58,7 @@ class LoginUseCase:
         self.user_repository.update_user(user)
         
         if self.initiate_two_factor_auth(user):
-            return {"message":"Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el código."}
+            return {"message":"Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el PIN."}
         else:
             raise DomainException(
                 message="Error al iniciar la verificación en dos pasos.",
@@ -124,8 +124,8 @@ class LoginUseCase:
             return False
 
     def send_two_factor_pin(self, email: str, pin: str) -> bool:
-        subject = "Código de verificación en dos pasos - AgroInSight"
-        text_content = f"Tu código de verificación en dos pasos es: {pin}\nEste código expirará en 10 minutos."
-        html_content = f"<html><body><p><strong>Tu código de verificación en dos pasos es: {pin}</strong></p><p>Este código expirará en 10 minutos.</p></body></html>"
+        subject = "PIN de verificación en dos pasos - AgroInSight"
+        text_content = f"Tu PIN de verificación en dos pasos es: {pin}\nEste PIN expirará en 10 minutos."
+        html_content = f"<html><body><p><strong>Tu PIN de verificación en dos pasos es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)

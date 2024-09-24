@@ -60,7 +60,7 @@ class ConfirmRecoveryPinUseCase:
         pin_hash = hash_pin(pin)
         if pin_hash == recovery.pin:
             #no se debe eliminar el registro de confirmación sino guardar un campo que diga si es confirmed
-            return {"message": "Código de recuperación confirmado correctamente."}
+            return {"message": "PIN de recuperación confirmado correctamente."}
         else:
             # PIN incorrecto, incrementar los intentos
             recovery.intentos += 1

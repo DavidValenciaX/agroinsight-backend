@@ -61,16 +61,16 @@ class PasswordRecoveryUseCase:
         
         if self.send_password_recovery_email(email, pin):
             self.user_repository.add_password_recovery(recovery)
-            return {"message": "Se ha enviado un código de recuperación a tu correo electrónico."}
+            return {"message": "Se ha enviado un PIN de recuperación a tu correo electrónico."}
         else:
             raise DomainException(
-                message="No se pudo reenviar el código de recuperación a tu correo electrónico.",
+                message="No se pudo reenviar el PIN de recuperación a tu correo electrónico.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
     def send_password_recovery_email(self, email: str, pin: str) -> bool:
         subject = "Recuperación de contraseña - AgroInSight"
-        text_content = f"Tu código de recuperación de contraseña es: {pin}\nEste código expirará en 10 minutos."
-        html_content = f"<html><body><p><strong>Tu código de recuperación de contraseña es: {pin}</strong></p><p>Este código expirará en 10 minutos.</p></body></html>"
+        text_content = f"Tu PIN de recuperación de contraseña es: {pin}\nEste PIN expirará en 10 minutos."
+        html_content = f"<html><body><p><strong>Tu PIN de recuperación de contraseña es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)

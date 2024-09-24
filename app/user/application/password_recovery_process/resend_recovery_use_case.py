@@ -66,26 +66,26 @@ class ResendRecoveryUseCase:
                 recovery.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
                 recovery.intentos = 0
                 self.user_repository.update_password_recovery(recovery)
-                return {"message": "Se ha reenviado el código de recuperación a tu correo electrónico."}
+                return {"message": "Se ha reenviado el PIN de recuperación a tu correo electrónico."}
             else:
                 raise DomainException(
-                    message="No se pudo reenviar el código de recuperación a tu correo electrónico.",
+                    message="No se pudo reenviar el PIN de recuperación a tu correo electrónico.",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         except Exception as e:
             raise DomainException(
-                message=f"Error al reenviar el codigo de recuperación de contraseña: {str(e)}",
+                message=f"Error al reenviar el PIN de recuperación de contraseña: {str(e)}",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     def send_password_recovery_email(self, email: str, pin: str) -> bool:
         subject = "Reenvío: Recuperación de contraseña - AgroInSight"
-        text_content = f"Reenvío: Tu código de recuperación de contraseña es: {pin}\nEste código expirará en 10 minutos."
+        text_content = f"Reenvío: Tu PIN de recuperación de contraseña es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""
         <html>
             <body>
-                <p><strong>Reenvío: Tu código de recuperación de contraseña es: {pin}</strong></p>
-                <p>Este código expirará en 10 minutos.</p>
+                <p><strong>Reenvío: Tu PIN de recuperación de contraseña es: {pin}</strong></p>
+                <p>Este PIN expirará en 10 minutos.</p>
             </body>
         </html>
         """

@@ -366,7 +366,7 @@ def resend_recovery_pin(
         # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno en el reenvio del codigo de recuperación de contraseña: {str(e)}"
+            detail=f"Error interno en el reenvio del PIN de recuperación de contraseña: {str(e)}"
         )
         
 @router.post("/confirm-recovery-pin", response_model=ConfirmRecoveryResponse, status_code=status.HTTP_200_OK)
@@ -383,7 +383,7 @@ def confirm_recovery_pin(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al confirmar el código de recuperación: {str(e)}"
+            detail=f"Error al confirmar el PIN de recuperación: {str(e)}"
         )
         
 @router.post("/reset-password", response_model=ResetPasswordResponse, status_code=status.HTTP_200_OK)
