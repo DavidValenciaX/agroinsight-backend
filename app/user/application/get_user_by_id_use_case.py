@@ -41,5 +41,5 @@ class GetUserByIdUseCase:
             apellido=user.apellido,
             email=user.email,
             estado=user.estado.nombre,
-            rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"
+            rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Rol no asignado"
         )

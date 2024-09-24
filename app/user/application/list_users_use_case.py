@@ -40,6 +40,6 @@ class ListUsersUseCase:
                 apellido=user.apellido,
                 email=user.email,
                 estado=user.estado.nombre,  # Nombre del estado
-                rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Sin rol asignado"  # Nombre de los roles o "Sin rol asignado"
+                rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Rol no asignado"
             ) for user in users
         ]

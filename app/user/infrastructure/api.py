@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
 from app.user.application.user_creation_process.user_creation_use_case import UserCreationUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
 from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
@@ -182,42 +183,24 @@ def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depe
             detail=f"Error interno al obtener el usuario: {str(e)}"
         )
     
-@router.put("/me/update", response_model=UserResponse)
+@router.put("/me/update", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def update_user_info(
     user_update: UserUpdate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
-    """
-    Endpoint para que el usuario actualice su información.
-    """
-    user_repository = UserRepository(db)
-    
-    # Verificar si el email ya está en uso por otro usuario
-    if user_update.email and user_update.email != current_user.email:
-        existing_user = user_repository.get_user_by_email(user_update.email)
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El email ya está en uso por otro usuario."
-            )
-    
-    # Actualizar la información del usuario
-    updated_user = user_repository.update_user_info(current_user, user_update.model_dump(exclude_unset=True))
-    
-    if updated_user:
-        return UserResponse(
-            id=updated_user.id,
-            nombre=updated_user.nombre,
-            apellido=updated_user.apellido,
-            email=updated_user.email,
-            estado=updated_user.estado.nombre,
-            rol=", ".join([role.nombre for role in updated_user.roles]) if updated_user.roles else "Sin rol asignado"
-        )
-    else:
+    update_use_case = UpdateUserInfoUseCase(db)  # Instancia del caso de uso
+    try:
+        # Ejecuta el caso de uso y retorna la respuesta
+        return update_use_case.execute(current_user, user_update)
+    except DomainException as e:
+        # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
+        raise e
+    except Exception as e:
+        # Para cualquier otra excepción no esperada, lanza un error HTTP 500 genérico
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo actualizar la información del usuario."
+            detail=f"No se pudo actualizar la información del usuario: {str(e)}"
         )
     
 @router.put("/{user_id}/update", response_model=UserResponse)
@@ -269,7 +252,7 @@ def admin_update_user(
             apellido=updated_user.apellido,
             email=updated_user.email,
             estado=updated_user.estado.nombre,
-            rol=", ".join([role.nombre for role in updated_user.roles]) if updated_user.roles else "Sin rol asignado"
+            rol=", ".join([role.nombre for role in updated_user.roles]) if updated_user.roles else "Rol no asignado"
         )
     else:
         raise HTTPException(
