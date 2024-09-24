@@ -9,6 +9,7 @@ from app.core.services.email_service import send_email
 from app.core.security.security_utils import verify_password
 from app.user.domain.exceptions import DomainException
 from app.user.infrastructure.orm_models import User
+from app.user.domain.schemas import LoginResponse
 
 class LoginUseCase:
     def __init__(self, db: Session):
@@ -21,6 +22,14 @@ class LoginUseCase:
             raise DomainException(
                 message="Este correo no está registrado, regístrese en la aplicación por favor.",
                 status_code=status.HTTP_404_NOT_FOUND,
+            )
+            
+        # Verificar si el usuario está en estado 'pending'
+        pending_state_id = self.user_repository.get_pending_user_state_id()
+        if user.state_id == pending_state_id:
+            return LoginResponse(
+                message="Tu cuenta está pendiente de confirmación. Por favor, confirma tu registro.",
+                user_state="pending"
             )
         
         # Intentar desbloquear si está bloqueado y el tiempo de bloqueo ha pasado
@@ -58,7 +67,10 @@ class LoginUseCase:
         self.user_repository.update_user(user)
         
         if self.initiate_two_factor_auth(user):
-            return {"message":"Verificación en dos pasos iniciada. Por favor, revise su correo electrónico para obtener el PIN."}
+            return LoginResponse(
+                message="Verificación en dos pasos iniciada. Por favor, revisa tu correo electrónico para obtener el PIN.",
+                user_state="active"
+            )        
         else:
             raise DomainException(
                 message="Error al iniciar la verificación en dos pasos.",

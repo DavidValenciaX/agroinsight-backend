@@ -8,6 +8,7 @@ from app.user.domain.exceptions import DomainException
 from app.core.services.pin_service import generate_pin
 from app.core.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
+from app.user.domain.schemas import UserCreationResponse
 
 class UserCreationUseCase:
     def __init__(self, db: Session):
@@ -51,9 +52,10 @@ class UserCreationUseCase:
             # Verificar si el usuario tiene una confirmación pendiente
             pending_confirmation = self.user_repository.get_user_pending_confirmation(existing_user.id)
             if pending_confirmation:
-                # Eliminar usuario y confirmación pendiente para crearlos de nuevo
-                self.user_repository.delete_user_confirmations(existing_user.id)
-                self.user_repository.delete_user(existing_user)
+                return UserCreationResponse(
+                    message="Tu cuenta está pendiente de confirmación. Por favor, confirma tu registro.",
+                    user_state="pending"
+                )
 
         # Hash del password
         hashed_password = hash_password(user_data.password)
@@ -100,8 +102,11 @@ class UserCreationUseCase:
                 message="Error al crear la confirmación de usuario.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-        return {"message":"Usuario creado. Por favor, revisa tu email para confirmar el registro."}
+            
+        return UserCreationResponse(
+                message="Usuario creado. Por favor, revisa tu email para confirmar el registro.",
+                user_state="pending"
+            )
 
     def create_and_send_confirmation(self, user: User) -> bool:
         try:

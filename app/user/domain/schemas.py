@@ -52,6 +52,7 @@ class UserCreate(BaseModel):
 
 class UserCreationResponse(BaseModel):
     message: str
+    user_state: str
 
 class ResendPinConfirmRequest(BaseModel):
     email: str
@@ -143,6 +144,7 @@ class LoginRequest(BaseModel):
     
 class LoginResponse(BaseModel):
     message: str
+    user_state: str
     
 class TwoFactorAuthRequest(BaseModel):
     email: str
