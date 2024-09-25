@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from decimal import Decimal
+from typing import List
 
 class PlotCreate(BaseModel):
     nombre: str = Field(..., min_length=1, max_length=100)
@@ -20,3 +21,6 @@ class PlotResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class PlotListResponse(BaseModel):
+    plots: List[PlotResponse]

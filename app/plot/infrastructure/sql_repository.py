@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from app.plot.infrastructure.orm_models import Plot
 from app.plot.domain.schemas import PlotCreate
 from typing import Optional
+from app.farm.infrastructure.orm_models import UsuarioFinca, Finca
+from typing import List
 
 class PlotRepository:
     def __init__(self, db: Session):
@@ -25,3 +27,19 @@ class PlotRepository:
             self.db.rollback()
             print(f"Error al crear el lote: {e}")
             return None
+        
+    def list_plots(self, user_id: int) -> List[Plot]:
+            return self.db.query(Plot).join(UsuarioFinca, Plot.finca_id == UsuarioFinca.finca_id).filter(UsuarioFinca.usuario_id == user_id).all()
+        
+    def list_plots_by_farm(self, finca_id: int) -> List[Plot]:
+        return self.db.query(Plot).filter(Plot.finca_id == finca_id).all()
+    
+    def get_farm_by_id(self, finca_id: int) -> Optional[Finca]:
+        return self.db.query(Finca).filter(Finca.id == finca_id).first()
+
+    def check_user_farm_access(self, user_id: int, finca_id: int) -> bool:
+        access = self.db.query(UsuarioFinca).filter(
+            UsuarioFinca.usuario_id == user_id,
+            UsuarioFinca.finca_id == finca_id
+        ).first()
+        return access is not None
