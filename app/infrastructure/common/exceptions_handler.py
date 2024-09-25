@@ -12,7 +12,9 @@ CUSTOM_MESSAGES = {
     'missing': 'El campo es requerido',
     'value_error.missing': 'El campo es requerido',
     'int_parsing': 'La entrada debe ser un número entero válido',
-    'json_invalid': 'Error de decodificación de json'
+    'json_invalid': 'Error de decodificación de json',
+    'less_than_equal': 'La entrada debe ser menor o igual a {le}',
+    'greater_than_equal': 'La entrada debe ser mayor o igual a {ge}',
     # Agregar otros tipos de error y mensajes personalizados si es necesario
 }
 
