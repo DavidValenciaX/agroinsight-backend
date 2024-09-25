@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
 from sqlalchemy.sql import func
+from app.plot.infrastructure.orm_models import Plot
 
 class Finca(Base):
     __tablename__ = "finca"
@@ -16,27 +17,13 @@ class Finca(Base):
 
     unidad_area = relationship("UnidadMedida")
     usuarios = relationship("User", secondary="usuario_finca")
-    lotes = relationship("Lote", back_populates="finca")
+    lotes = relationship("Plot", back_populates="finca")
 
 class UsuarioFinca(Base):
     __tablename__ = "usuario_finca"
 
     usuario_id = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
     finca_id = Column(Integer, ForeignKey('finca.id'), primary_key=True)
-
-class Lote(Base):
-    __tablename__ = "lote"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(100), nullable=False)
-    area = Column(DECIMAL(10, 2), nullable=False)
-    unidad_area_id = Column(Integer, ForeignKey('unidad_medida.id'), nullable=False)
-    latitud = Column(DECIMAL(10, 8), nullable=False)
-    longitud = Column(DECIMAL(11, 8), nullable=False)
-    finca_id = Column(Integer, ForeignKey('finca.id'), nullable=False)
-
-    finca = relationship("Finca", back_populates="lotes")
-    unidad_area = relationship("UnidadMedida")
     
 class CategoriaUnidadMedida(Base):
     __tablename__ = "categoria_unidad_medida"
