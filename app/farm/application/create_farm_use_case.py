@@ -1,54 +1,54 @@
 from sqlalchemy.orm import Session
-from app.farm.infrastructure.sql_repository import FincaRepository
-from app.farm.domain.schemas import FincaCreate, FincaResponse
+from app.farm.infrastructure.sql_repository import FarmRepository
+from app.farm.domain.schemas import FarmCreate, FarmResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
-class CrearFincaUseCase:
+class CreateFarmUseCase:
     def __init__(self, db: Session):
         self.db = db
-        self.finca_repository = FincaRepository(db)
+        self.farm_repository = FarmRepository(db)
 
-    def execute(self, finca_data: FincaCreate, current_user: UserInDB) -> FincaResponse:
+    def execute(self, farm_data: FarmCreate, current_user: UserInDB) -> FarmResponse:
         # Verificar si el usuario tiene permisos para crear fincas
-        if not self.user_can_create_finca(current_user):
+        if not self.user_can_create_farm(current_user):
             raise DomainException(
                 message="No tienes permisos para crear fincas.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
         # Validar los datos de entrada
-        self.validate_finca_data(finca_data)
+        self.validate_farm_data(farm_data)
 
         # Crear la finca
-        finca = self.finca_repository.create_finca(finca_data, current_user.id)
-        if not finca:
+        farm = self.farm_repository.create_farm(farm_data, current_user.id)
+        if not farm:
             raise DomainException(
                 message="No se pudo crear la finca.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
         # Construir y retornar la respuesta
-        return FincaResponse(
-            id=finca.id,
-            nombre=finca.nombre,
-            ubicacion=finca.ubicacion,
-            area_total=finca.area_total,
-            unidad_area=finca.unidad_area.abreviatura,
-            latitud=finca.latitud,
-            longitud=finca.longitud
+        return FarmResponse(
+            id=farm.id,
+            nombre=farm.nombre,
+            ubicacion=farm.ubicacion,
+            area_total=farm.area_total,
+            unidad_area=farm.unidad_area.abreviatura,
+            latitud=farm.latitud,
+            longitud=farm.longitud
         )
 
-    def user_can_create_finca(self, user: UserInDB) -> bool:
+    def user_can_create_farm(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear fincas
         # Por ejemplo, verificar si tiene un rol específico
         allowed_roles = ["Superusuario", "Administrador de finca"]
         return any(role.nombre in allowed_roles for role in user.roles)
 
-    def validate_finca_data(self, finca_data: FincaCreate):
+    def validate_farm_data(self, farm_data: FarmCreate):
         # Implementar validaciones adicionales si es necesario
-        if finca_data.area_total <= 0:
+        if farm_data.area_total <= 0:
             raise DomainException(
                 message="El área total debe ser mayor que cero.",
                 status_code=status.HTTP_400_BAD_REQUEST

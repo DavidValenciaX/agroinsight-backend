@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 
-class FincaCreate(BaseModel):
+class FarmCreate(BaseModel):
     nombre: str = Field(..., min_length=1, max_length=100)
     ubicacion: str = Field(..., min_length=1, max_length=255)
     area_total: Decimal = Field(..., gt=0)
@@ -10,7 +10,7 @@ class FincaCreate(BaseModel):
     latitud: Decimal = Field(..., ge=-90, le=90)
     longitud: Decimal = Field(..., ge=-180, le=180)
 
-class FincaResponse(BaseModel):
+class FarmResponse(BaseModel):
     id: int
     nombre: str
     ubicacion: str
@@ -21,6 +21,9 @@ class FincaResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class FarmListResponse(BaseModel):
+    farms: List[FarmResponse]
         
 class CategoriaUnidadMedidaBase(BaseModel):
     nombre: str
