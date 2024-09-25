@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.orm_models import Finca, UnidadMedida, UsuarioFinca
 from app.farm.domain.schemas import FarmCreate
-from typing import Optional, List
+from typing import Optional, List, Tuple
+from sqlalchemy import func
 
 class FarmRepository:
     def __init__(self, db: Session):
@@ -47,3 +48,11 @@ class FarmRepository:
             UsuarioFinca.usuario_id == user_id,
             Finca.nombre == farm_name
         ).first() is not None
+        
+    def list_farms_paginated(self, user_id: int, page: int, per_page: int) -> Tuple[int, List[Finca]]:
+        query = self.db.query(Finca).join(UsuarioFinca).filter(UsuarioFinca.usuario_id == user_id)
+        
+        total = query.count()
+        farms = query.offset((page - 1) * per_page).limit(per_page).all()
+        
+        return total, farms

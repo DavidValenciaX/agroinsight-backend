@@ -24,6 +24,13 @@ class FarmResponse(BaseModel):
         
 class FarmListResponse(BaseModel):
     farms: List[FarmResponse]
+    
+class PaginatedFarmListResponse(BaseModel):
+    farms: List[FarmResponse]
+    total_farms: int
+    page: int
+    per_page: int
+    total_pages: int
         
 class CategoriaUnidadMedidaBase(BaseModel):
     nombre: str
