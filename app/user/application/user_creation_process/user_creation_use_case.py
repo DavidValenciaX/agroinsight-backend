@@ -17,41 +17,41 @@ class UserCreationUseCase:
 
     def execute(self, user_data: UserCreate) -> dict:
         # Verificar si el usuario ya existe
-        existing_user = self.user_repository.get_user_by_email(user_data.email)
+        user = self.user_repository.get_user_by_email(user_data.email)
         
-        if existing_user:
-            # Verificar el estado del usuario
+        if user:
+            # Verificar si el usuario ya está registrado y activo
             active_state_id = self.user_repository.get_active_user_state_id()
-            if existing_user.state_id == active_state_id:
+            if user.state_id == active_state_id:
                 raise DomainException(
                     message="La cuenta ya está confirmada y activa.",
                     status_code=status.HTTP_400_BAD_REQUEST
                 )
-                
+                    
             # Verificar si el usuario ha sido eliminado
             inactive_state_id = self.user_repository.get_inactive_user_state_id()
-            if existing_user.state_id == inactive_state_id:
+            if user.state_id == inactive_state_id:
                 raise DomainException(
                     message="El usuario fue eliminado del sistema.",
                     status_code=status.HTTP_410_GONE
                 )
 
             # Verificar si la cuenta del usuario está bloqueada        
-            if existing_user.locked_until:
-                existing_user.locked_until = existing_user.locked_until.replace(tzinfo=timezone.utc)
+            if user.locked_until:
+                user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
 
             locked_state_id = self.user_repository.get_locked_user_state_id()
-            if existing_user.state_id == locked_state_id and existing_user.locked_until > datetime.now(timezone.utc):
-                time_left = existing_user.locked_until - datetime.now(timezone.utc)
+            if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
+                time_left = user.locked_until - datetime.now(timezone.utc)
                 minutos_restantes = time_left.seconds // 60
                 raise DomainException(
                     message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                     status_code=status.HTTP_403_FORBIDDEN
                 )
-            
+                
             # Verificar si el usuario tiene una confirmación pendiente
-            pending_confirmation = self.user_repository.get_user_pending_confirmation(existing_user.id)
-            if pending_confirmation:
+            pending_state_id = self.user_repository.get_pending_user_state_id()
+            if user.state_id == pending_state_id:
                 return UserCreationResponse(
                     message="Tu cuenta está pendiente de confirmación. Por favor, confirma tu registro.",
                     user_state="pending"
@@ -68,6 +68,7 @@ class UserCreationUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+        # Obtener rol "no confirmado"
         unconfirmed_role = self.user_repository.get_unconfirmed_user_role()
         if not unconfirmed_role:
             raise DomainException(
