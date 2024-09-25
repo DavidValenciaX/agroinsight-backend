@@ -68,6 +68,13 @@ class UserCreationUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+        unconfirmed_role = self.user_repository.get_unconfirmed_user_role()
+        if not unconfirmed_role:
+            raise DomainException(
+                message="No se pudo encontrar el rol de Usuario No Confirmado.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         # Crear nuevo usuario
         new_user = User(
             nombre=user_data.nombre,
@@ -77,21 +84,12 @@ class UserCreationUseCase:
             state_id=pending_state_id
         )
         created_user = self.user_repository.create_user(new_user)
-
-        # Asignar rol de "Usuario No Confirmado"
-        unconfirmed_role = self.user_repository.get_unconfirmed_user_role()
-        if unconfirmed_role:
-            if not self.user_repository.assign_role_to_user(created_user.id, unconfirmed_role.id):
-                self.user_repository.delete_user(created_user)  # Eliminar el usuario si falla la asignación del rol
-                raise DomainException(
-                    message="No se pudo asignar el rol de Usuario No Confirmado.",
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                )
-        else:
-            self.user_repository.delete_user(created_user)  # Eliminar el usuario si no se encuentra el rol
+            
+        if not self.user_repository.assign_role_to_user(created_user.id, unconfirmed_role.id):
+            self.user_repository.delete_user(created_user)  # Eliminar el usuario si falla la asignación del rol
             raise DomainException(
-                message="No se pudo encontrar el rol de Usuario No Confirmado.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                message="No se pudo asignar el rol de Usuario No Confirmado.",
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         # Intentar crear la confirmación y enviar el correo
@@ -119,11 +117,10 @@ class UserCreationUseCase:
                 expiracion=datetime.now(timezone.utc) + timedelta(minutes=expiration_time)
             )
 
-            # Enviar correo de confirmación
-            if self.send_confirmation_email(user.email, pin):
-                return self.user_repository.add_user_confirmation(confirmation)
-            else:
+            # Enviar correo de confirmación y agregar la confirmación al repositorio
+            if not self.send_confirmation_email(user.email, pin):
                 return False
+            return self.user_repository.add_user_confirmation(confirmation)
         except Exception as e:
             print(f"Error al crear la confirmación del usuario: {str(e)}")
             return False
