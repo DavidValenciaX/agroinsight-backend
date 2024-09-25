@@ -3,7 +3,8 @@ from app.plot.infrastructure.orm_models import Plot
 from app.plot.domain.schemas import PlotCreate
 from typing import Optional
 from app.farm.infrastructure.orm_models import UsuarioFinca, Finca
-from typing import List
+from typing import List, Tuple
+from sqlalchemy import func
 
 class PlotRepository:
     def __init__(self, db: Session):
@@ -33,6 +34,14 @@ class PlotRepository:
         
     def list_plots_by_farm(self, finca_id: int) -> List[Plot]:
         return self.db.query(Plot).filter(Plot.finca_id == finca_id).all()
+    
+    def list_plots_by_farm_paginated(self, finca_id: int, page: int, per_page: int) -> Tuple[int, List[Plot]]:
+        query = self.db.query(Plot).filter(Plot.finca_id == finca_id)
+        
+        total = query.count()
+        plots = query.offset((page - 1) * per_page).limit(per_page).all()
+        
+        return total, plots
     
     def get_farm_by_id(self, finca_id: int) -> Optional[Finca]:
         return self.db.query(Finca).filter(Finca.id == finca_id).first()

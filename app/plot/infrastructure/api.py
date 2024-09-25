@@ -6,8 +6,9 @@ from app.plot.domain.schemas import PlotCreate, PlotResponse
 from app.plot.application.create_plot_use_case import CreatePlotUseCase
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
-from app.plot.domain.schemas import PlotListResponse
+from app.plot.domain.schemas import PaginatedPlotListResponse
 from app.plot.application.list_plots_use_case import ListPlotsUseCase
+from fastapi import Query
 
 router = APIRouter(prefix="/plot", tags=["plot"])
 
@@ -28,15 +29,17 @@ def create_plot(
             detail=f"Error interno al crear el lote: {str(e)}"
         )
         
-@router.get("/list/{finca_id}", response_model=PlotListResponse, status_code=status.HTTP_200_OK)
+@router.get("/list/{finca_id}", response_model=PaginatedPlotListResponse, status_code=status.HTTP_200_OK)
 def list_plots(
     finca_id: int,
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
     list_plots_use_case = ListPlotsUseCase(db)
     try:
-        return list_plots_use_case.execute(current_user, finca_id)
+        return list_plots_use_case.execute(current_user, finca_id, page, per_page)
     except DomainException as e:
         raise e
     except Exception as e:

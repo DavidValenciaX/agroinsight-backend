@@ -17,6 +17,12 @@ class CreatePlotUseCase:
                 message="No tienes permisos para crear lotes.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
+            
+        if not self.user_has_access_to_farm(current_user.id, plot_data.finca_id):
+            raise DomainException(
+                message="No tienes acceso a esta finca.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
 
         # Validar los datos de entrada
         self.validate_plot_data(plot_data)
@@ -53,3 +59,6 @@ class CreatePlotUseCase:
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         # Agregar más validaciones según sea necesario
+        
+    def user_has_access_to_farm(self, user_id: int, finca_id: int) -> bool:
+        return self.plot_repository.check_user_farm_access(user_id, finca_id)

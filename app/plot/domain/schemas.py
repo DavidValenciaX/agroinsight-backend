@@ -24,3 +24,10 @@ class PlotResponse(BaseModel):
 
 class PlotListResponse(BaseModel):
     plots: List[PlotResponse]
+    
+class PaginatedPlotListResponse(BaseModel):
+    plots: List[PlotResponse]
+    total_plots: int
+    page: int
+    per_page: int
+    total_pages: int
