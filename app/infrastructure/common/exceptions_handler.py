@@ -1,9 +1,8 @@
-# app/core/exceptions_handler.py
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import traceback
-from app.core.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 from typing import Dict, List
 import logging
 

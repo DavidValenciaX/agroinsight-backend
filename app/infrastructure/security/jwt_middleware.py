@@ -4,7 +4,7 @@ from jose import jwt, JWTError
 from fastapi import status
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
-from app.core.config.settings import SECRET_KEY, ALGORITHM
+from app.infrastructure.config.settings import SECRET_KEY, ALGORITHM
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from typing import Optional

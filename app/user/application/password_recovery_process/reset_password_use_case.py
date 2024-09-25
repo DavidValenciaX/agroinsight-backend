@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import datetime, timezone
-from app.core.security.security_utils import hash_password, verify_password
+from app.infrastructure.security.security_utils import hash_password, verify_password
 from app.user.infrastructure.sql_repository import UserRepository
-from app.core.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 
 class ResetPasswordUseCase:
     def __init__(self, db: Session):

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import status
-from app.core.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 from app.user.domain.schemas import UserResponse
 from app.user.infrastructure.sql_repository import UserRepository
 

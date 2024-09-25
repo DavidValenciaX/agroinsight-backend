@@ -2,13 +2,13 @@ from fastapi import FastAPI, HTTPException
 from app.user.infrastructure.api import router as user_router
 from app.farm.infrastructure.api import router as farm_router
 from fastapi.exceptions import RequestValidationError
-from app.core.exceptions_handler import (
+from app.infrastructure.common.exceptions_handler import (
     validation_exception_handler, 
     custom_http_exception_handler,
     custom_exception_handler,
     domain_exception_handler
 )
-from app.core.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 
 app = FastAPI()
 

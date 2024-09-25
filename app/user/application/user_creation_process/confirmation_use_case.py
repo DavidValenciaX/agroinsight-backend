@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
-from app.core.common_exceptions import DomainException
-from app.core.services.pin_service import hash_pin
+from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.services.pin_service import hash_pin
 
 class ConfirmationUseCase:
     def __init__(self, db: Session):

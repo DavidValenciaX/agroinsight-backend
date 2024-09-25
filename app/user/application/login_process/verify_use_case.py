@@ -2,9 +2,9 @@ from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
-from app.core.services.pin_service import hash_pin
-from app.core.security.security_utils import create_access_token
-from app.core.common_exceptions import DomainException
+from app.infrastructure.services.pin_service import hash_pin
+from app.infrastructure.security.security_utils import create_access_token
+from app.infrastructure.common.common_exceptions import DomainException
 
 
 class VerifyUseCase:

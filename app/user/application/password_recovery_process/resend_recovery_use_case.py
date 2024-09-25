@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import datetime, timedelta, timezone
-from app.core.services.pin_service import generate_pin
-from app.core.services.email_service import send_email
+from app.infrastructure.services.pin_service import generate_pin
+from app.infrastructure.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
-from app.core.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 
 class ResendRecoveryUseCase:
     def __init__(self, db: Session):

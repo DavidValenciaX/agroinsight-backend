@@ -2,9 +2,9 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import datetime, timedelta, timezone
-from app.core.services.pin_service import hash_pin
+from app.infrastructure.services.pin_service import hash_pin
 from app.user.infrastructure.sql_repository import UserRepository
-from app.core.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 
 class ConfirmRecoveryPinUseCase:
     def __init__(self, db: Session):

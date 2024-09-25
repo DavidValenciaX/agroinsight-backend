@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
-from app.core.security.jwt_middleware import get_current_user
+from app.infrastructure.security.jwt_middleware import get_current_user
 from app.farm.domain.schemas import FincaCreate, FincaResponse
 from app.farm.application.crear_finca_use_case import CrearFincaUseCase
 from app.user.domain.schemas import UserInDB
-from app.core.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
