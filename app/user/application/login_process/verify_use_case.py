@@ -24,7 +24,7 @@ class VerifyUseCase:
         pending_state_id = self.user_repository.get_pending_user_state_id()
         if user.state_id == pending_state_id:
             raise DomainException(
-                message="La cuenta del usuario está pendiente de confirmación.",
+                message="Tu cuenta está pendiente de confirmación. Por favor, confirma tu registro.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
                 

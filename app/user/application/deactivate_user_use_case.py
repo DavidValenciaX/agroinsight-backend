@@ -31,7 +31,7 @@ class DeactivateUserUseCase:
         inactive_state_id = self.user_repository.get_inactive_user_state_id()
         if user_to_deactivate.state_id == inactive_state_id:
             raise DomainException(
-                message="El usuario ya está desactivado.",
+                message="El usuario fue eliminado del sistema.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         

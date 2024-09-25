@@ -20,7 +20,7 @@ class LoginUseCase:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
-                message="Este correo no está registrado, regístrese en la aplicación por favor.",
+                message="Este correo no está registrado, regístrate en la aplicación por favor.",
                 status_code=status.HTTP_404_NOT_FOUND,
             )
             

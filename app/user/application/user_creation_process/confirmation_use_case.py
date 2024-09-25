@@ -42,8 +42,9 @@ class ConfirmationUseCase:
         locked_state_id = self.user_repository.get_locked_user_state_id()
         if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
             time_left = user.locked_until - datetime.now(timezone.utc)
+            minutos_restantes = time_left.seconds // 60
             raise DomainException(
-                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {time_left.seconds // 60} minutos.",
+                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
             
