@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
-from app.farm.domain.schemas import FarmListResponse, FarmResponse, PaginatedFarmListResponse
+from app.farm.domain.schemas import FarmResponse, PaginatedFarmListResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
@@ -43,5 +43,5 @@ class ListFarmsUseCase:
         )
 
     def user_can_list_farms(self, user: UserInDB) -> bool:
-        allowed_roles = ["Superusuario", "Administrador de finca", "Usuario"]
+        allowed_roles = ["Superusuario", "Administrador de Finca"]
         return any(role.nombre in allowed_roles for role in user.roles)

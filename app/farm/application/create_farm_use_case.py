@@ -50,7 +50,7 @@ class CreateFarmUseCase:
     def user_can_create_farm(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear fincas
         # Por ejemplo, verificar si tiene un rol específico
-        allowed_roles = ["Superusuario", "Administrador de finca"]
+        allowed_roles = ["Superusuario", "Administrador de Finca"]
         return any(role.nombre in allowed_roles for role in user.roles)
 
     def validate_farm_data(self, farm_data: FarmCreate):

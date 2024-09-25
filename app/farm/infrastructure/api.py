@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, FarmResponse, FarmListResponse, PaginatedFarmListResponse
+from app.farm.domain.schemas import FarmCreate, FarmResponse, PaginatedFarmListResponse
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.user.domain.schemas import UserInDB

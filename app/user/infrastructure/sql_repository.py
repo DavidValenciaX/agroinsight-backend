@@ -317,7 +317,7 @@ class UserRepository:
         return inactive_state.id if inactive_state else None
 
     def get_admin_roles(self) -> List[Role]:
-        admin_roles = self.db.query(Role).filter(Role.nombre.in_(["Superusuario", "Administrador de finca"])).all()
+        admin_roles = self.db.query(Role).filter(Role.nombre.in_(["Superusuario", "Administrador de Finca"])).all()
         return admin_roles
 
     def deactivate_user(self, user_id: int) -> bool:
