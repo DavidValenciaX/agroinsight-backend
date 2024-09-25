@@ -38,3 +38,12 @@ class FarmRepository:
     
     def list_farms(self, user_id: int) -> List[Finca]:
             return self.db.query(Finca).join(UsuarioFinca).filter(UsuarioFinca.usuario_id == user_id).all()
+        
+    def farm_exists_for_user(self, user_id: int, farm_name: str) -> bool:
+        """
+        Verifica si ya existe una finca con el mismo nombre para el usuario dado.
+        """
+        return self.db.query(Finca).join(UsuarioFinca).filter(
+            UsuarioFinca.usuario_id == user_id,
+            Finca.nombre == farm_name
+        ).first() is not None

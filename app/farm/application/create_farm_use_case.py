@@ -20,6 +20,13 @@ class CreateFarmUseCase:
 
         # Validar los datos de entrada
         self.validate_farm_data(farm_data)
+        
+        # Verificar si ya existe una finca con el mismo nombre para este usuario
+        if self.farm_repository.farm_exists_for_user(current_user.id, farm_data.nombre):
+            raise DomainException(
+                message="El usuario ya tiene una finca registrada con ese nombre. Por favor, escoja un nombre diferente.",
+                status_code=status.HTTP_409_CONFLICT
+            )
 
         # Crear la finca
         farm = self.farm_repository.create_farm(farm_data, current_user.id)
