@@ -1,14 +1,17 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from fastapi import status
+from app.user.domain.schemas import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.services.pin_service import hash_pin
+from app.user.domain.user_state_validator import UserState, UserStateValidator
 
 class ConfirmationUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
+        self.state_validator = UserStateValidator(self.user_repository)
         
     def execute(self, email: str, pin: str) -> dict:
         # Obtener el usuario por correo electrónico
@@ -19,34 +22,14 @@ class ConfirmationUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        # Verificar si la cuenta del usuario ya está activa
-        active_state_id = self.user_repository.get_active_user_state_id()
-        if user.state_id == active_state_id:
-            raise DomainException(
-                message="La cuenta ya está confirmada y activa.",
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Verificar si el usuario ha sido eliminado
-        inactive_state_id = self.user_repository.get_inactive_user_state_id()
-        if user.state_id == inactive_state_id:
-            raise DomainException(
-                message="El usuario fue eliminado del sistema.",
-                status_code=status.HTTP_410_GONE
-            )
-        
-        if user.locked_until:
-            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
-
-        # Verificar si la cuenta del usuario está bloqueada
-        locked_state_id = self.user_repository.get_locked_user_state_id()
-        if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
-            time_left = user.locked_until - datetime.now(timezone.utc)
-            minutos_restantes = time_left.seconds // 60
-            raise DomainException(
-                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+        # Validar el estado del usuario
+        state_validation_result = self.state_validator.validate_user_state(
+            user,
+            allowed_states=[UserState.PENDING],
+            disallowed_states=[UserState.ACTIVE, UserState.LOCKED, UserState.INACTIVE]
+        )
+        if state_validation_result:
+            return state_validation_result
             
         # Hashear el PIN proporcionado
         pin_hash = hash_pin(pin)
@@ -99,5 +82,6 @@ class ConfirmationUseCase:
         
         # Eliminar el registro de confirmación
         self.user_repository.delete_user_confirmations(user.id)
-        
-        return {"message":"Usuario confirmado exitosamente"}
+        return SuccessResponse(
+                    message="Usuario confirmado exitosamente."
+                )

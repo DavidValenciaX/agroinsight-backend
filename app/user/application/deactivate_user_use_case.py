@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from app.user.domain.schemas import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
@@ -43,4 +44,6 @@ class DeactivateUserUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-        return {"message": "Usuario desactivado exitosamente."}
+        return SuccessResponse(
+            message= "Usuario eliminado exitosamente."
+        )

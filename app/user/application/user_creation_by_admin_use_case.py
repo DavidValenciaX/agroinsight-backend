@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.schemas import UserCreateByAdmin
+from app.user.domain.schemas import SuccessResponse, UserCreateByAdmin
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User
@@ -71,4 +71,6 @@ class UserCreationByAdminUseCase:
         # Asignar el rol especificado
         self.user_repository.assign_role_to_user(created_user.id, user_data.role_id)
 
-        return {"message":"Usuario creado y activado exitosamente."}
+        return SuccessResponse(
+            message="Usuario creado y activado exitosamente."
+        )

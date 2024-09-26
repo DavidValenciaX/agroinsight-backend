@@ -1,61 +1,33 @@
 from sqlalchemy.orm import Session
 from fastapi import status
+from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.orm_models import User, ConfirmacionUsuario
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.schemas import UserCreate
+from app.user.domain.schemas import SuccessResponse, UserCreate
 from app.infrastructure.security.security_utils import hash_password
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
-from app.user.domain.schemas import UserCreationResponse
 
 class UserCreationUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
+        self.state_validator = UserStateValidator(self.user_repository)
 
     def execute(self, user_data: UserCreate) -> dict:
         # Verificar si el usuario ya existe
         user = self.user_repository.get_user_by_email(user_data.email)
         
         if user:
-            # Verificar si el usuario ya está registrado y activo
-            active_state_id = self.user_repository.get_active_user_state_id()
-            if user.state_id == active_state_id:
-                raise DomainException(
-                    message="La cuenta ya está confirmada y activa.",
-                    status_code=status.HTTP_400_BAD_REQUEST
-                )
-                    
-            # Verificar si el usuario ha sido eliminado
-            inactive_state_id = self.user_repository.get_inactive_user_state_id()
-            if user.state_id == inactive_state_id:
-                raise DomainException(
-                    message="El usuario fue eliminado del sistema.",
-                    status_code=status.HTTP_410_GONE
-                )
 
-            # Verificar si la cuenta del usuario está bloqueada        
-            if user.locked_until:
-                user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
-
-            locked_state_id = self.user_repository.get_locked_user_state_id()
-            if user.state_id == locked_state_id and user.locked_until > datetime.now(timezone.utc):
-                time_left = user.locked_until - datetime.now(timezone.utc)
-                minutos_restantes = time_left.seconds // 60
-                raise DomainException(
-                    message=f"Tu cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
-                    status_code=status.HTTP_403_FORBIDDEN
-                )
-                
-            # Verificar si el usuario tiene una confirmación pendiente
-            pending_state_id = self.user_repository.get_pending_user_state_id()
-            if user.state_id == pending_state_id:
-                return UserCreationResponse(
-                    message="Tu cuenta está pendiente de confirmación. Por favor, confirma tu registro.",
-                    user_state="pending"
-                )
+            state_validation_result = self.state_validator.validate_user_state(
+                user,
+                disallowed_states=[UserState.ACTIVE, UserState.PENDING, UserState.INACTIVE, UserState.LOCKED]
+            )
+            if state_validation_result:
+                return state_validation_result
 
         # Hash del password
         hashed_password = hash_password(user_data.password)
@@ -102,9 +74,8 @@ class UserCreationUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
             
-        return UserCreationResponse(
-                message="Usuario creado. Por favor, revisa tu email para confirmar el registro.",
-                user_state="pending"
+        return SuccessResponse(
+                message="Usuario creado. Por favor, revisa tu email para confirmar el registro."
             )
 
     def create_and_send_confirmation(self, user: User) -> bool:

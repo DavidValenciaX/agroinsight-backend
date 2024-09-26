@@ -32,7 +32,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 
 # endpoints de usuarios
 
-@router.post("/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_user(
     user: UserCreate,
     db: Session = Depends(getDb),
@@ -51,7 +51,7 @@ def create_user(
             detail=f"Error interno en el registro de usuario: {str(e)}"
         )
         
-@router.post("/resend-confirm-pin", response_model=ResendConfirmationResponse, status_code=status.HTTP_200_OK)
+@router.post("/resend-confirm-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
     db: Session = Depends(getDb)
@@ -67,7 +67,7 @@ def resend_confirmation_pin_endpoint(
             detail=f"Error interno al reenviar el PIN de confirmación: {str(e)}"
         )
         
-@router.post("/confirm", response_model=ConfirmUsuarioResponse, status_code=status.HTTP_200_OK)
+@router.post("/confirm", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def confirm_user_registration(
     confirmation: ConfirmationRequest,
     db: Session = Depends(getDb)
@@ -83,7 +83,7 @@ def confirm_user_registration(
             detail=f"Error interno al confirmar el registro de usuario: {str(e)}"
         )
     
-@router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
+@router.post("/login", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
     login_use_case = LoginUseCase(db)
     try:
@@ -96,7 +96,7 @@ def login_for_access_token(login_request: LoginRequest, db: Session = Depends(ge
             detail=f"Error interno al procesar el inicio de sesión: {str(e)}"
         )
     
-@router.post("/resend-2fa-pin", response_model=Resend2FAResponse, status_code=status.HTTP_200_OK)
+@router.post("/resend-2fa-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
     db: Session = Depends(getDb)
@@ -127,7 +127,7 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
         )
 
 @router.post(
-    "/admin/create", response_model=UserCreationResponse, status_code=status.HTTP_201_CREATED
+    "/admin/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED
 )
 def create_user_by_admin(
     user: UserCreateByAdmin,
@@ -219,7 +219,7 @@ def admin_update_user(
             detail=f"No se pudo actualizar la información del usuario: {str(e)}"
         )
     
-@router.delete("/{user_id}/deactivate", response_model=dict, status_code=status.HTTP_200_OK)
+@router.delete("/{user_id}/deactivate", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def deactivate_user(
     user_id: int, 
     db: Session = Depends(getDb), 
@@ -236,7 +236,7 @@ def deactivate_user(
             detail=f"No se pudo desactivar el usuario: {str(e)}"
         )
     
-@router.post("/password-recovery", response_model=PasswordRecoveryResponse, status_code=status.HTTP_200_OK)
+@router.post("/password-recovery", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def initiate_password_recovery(
     recovery_request: PasswordRecoveryRequest,
     db: Session = Depends(getDb)
@@ -252,7 +252,7 @@ def initiate_password_recovery(
             detail=f"Error interno al iniciar el proceso de recuperación de contraseña: {str(e)}"
         )
         
-@router.post("/resend-recovery-pin", response_model=ResendRecoveryResponse, status_code=status.HTTP_200_OK)
+@router.post("/resend-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
     db: Session = Depends(getDb)
@@ -268,7 +268,7 @@ def resend_recovery_pin(
             detail=f"Error interno en el reenvio del PIN de recuperación de contraseña: {str(e)}"
         )
         
-@router.post("/confirm-recovery-pin", response_model=ConfirmRecoveryResponse, status_code=status.HTTP_200_OK)
+@router.post("/confirm-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def confirm_recovery_pin(
     pin_confirmation: PinConfirmationRequest,
     db: Session = Depends(getDb)
@@ -284,7 +284,7 @@ def confirm_recovery_pin(
             detail=f"Error al confirmar el PIN de recuperación: {str(e)}"
         )
         
-@router.post("/reset-password", response_model=ResetPasswordResponse, status_code=status.HTTP_200_OK)
+@router.post("/reset-password", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def reset_password(
     reset_request: PasswordResetRequest,
     db: Session = Depends(getDb)
@@ -300,7 +300,7 @@ def reset_password(
             detail=f"Error interno al reestablecer la contraseña: {str(e)}"
         )
         
-@router.post("/logout", response_model=dict, status_code=status.HTTP_200_OK)
+@router.post("/logout", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def logout(
     current_user: UserInDB = Depends(get_current_user),
     db: Session = Depends(getDb),

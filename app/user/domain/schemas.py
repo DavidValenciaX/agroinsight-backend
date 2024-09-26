@@ -49,10 +49,8 @@ class UserCreate(BaseModel):
             raise PydanticCustomError('password_validation', message)
         return v
 
-
-class UserCreationResponse(BaseModel):
+class SuccessResponse(BaseModel):
     message: str
-    user_state: str
 
 class ResendPinConfirmRequest(BaseModel):
     email: str
@@ -64,9 +62,6 @@ class ResendPinConfirmRequest(BaseModel):
         if not re.match(email_regex, v):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
-    
-class ResendConfirmationResponse(BaseModel):
-    message: str
 
 class ConfirmationRequest(BaseModel):
     email: str
@@ -79,12 +74,10 @@ class ConfirmationRequest(BaseModel):
         if not re.match(email_regex, v):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
-    
-class ConfirmUsuarioResponse(BaseModel):
-    message: str
 
 class UserCreateByAdmin(UserCreate):
     role_id: int
+
 class RoleInfo(BaseModel):
     id: int
     nombre: str
@@ -142,10 +135,6 @@ class LoginRequest(BaseModel):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
     
-class LoginResponse(BaseModel):
-    message: str
-    user_state: str
-    
 class TwoFactorAuthRequest(BaseModel):
     email: str
     pin: str
@@ -168,9 +157,6 @@ class Resend2FARequest(BaseModel):
         if not re.match(email_regex, v):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
-    
-class Resend2FAResponse(BaseModel):
-    message: str
     
 class TokenResponse(BaseModel):
     access_token: str
@@ -221,12 +207,6 @@ class PasswordRecoveryRequest(BaseModel):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
 
-class PasswordRecoveryResponse(BaseModel):
-    message: str
-    
-class ResendRecoveryResponse(BaseModel):
-    message: str
-
 class PinConfirmationRequest(BaseModel):
     email: str
     pin: str
@@ -238,9 +218,6 @@ class PinConfirmationRequest(BaseModel):
         if not re.match(email_regex, v):
             raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
         return v
-    
-class ConfirmRecoveryResponse(BaseModel):
-    message: str
 
 class PasswordResetRequest(BaseModel):
     email: str
@@ -272,6 +249,3 @@ class PasswordResetRequest(BaseModel):
             # Levantar un error personalizado sin prefijo
             raise PydanticCustomError('password_validation', message)
         return v
-    
-class ResetPasswordResponse(BaseModel):
-    message: str

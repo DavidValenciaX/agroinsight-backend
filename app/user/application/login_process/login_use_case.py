@@ -2,19 +2,19 @@ from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.orm_models import VerificacionDospasos
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.security.security_utils import verify_password
 from app.infrastructure.common.common_exceptions import DomainException
-from app.user.infrastructure.orm_models import User
-from app.user.domain.schemas import LoginResponse
+from app.user.domain.user_state_validator import UserState, UserStateValidator
 
 class LoginUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
+        self.state_validator = UserStateValidator(self.user_repository)
         
     def execute(self, email: str, password: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
@@ -24,39 +24,14 @@ class LoginUseCase:
                 status_code=status.HTTP_404_NOT_FOUND,
             )
             
-        # Verificar si el usuario está en estado 'pending'
-        pending_state_id = self.user_repository.get_pending_user_state_id()
-        if user.state_id == pending_state_id:
-            return LoginResponse(
-                message="Tu cuenta está pendiente de confirmación. Por favor, confirma tu registro.",
-                user_state="pending"
-            )
-        
-        # Intentar desbloquear si está bloqueado y el tiempo de bloqueo ha pasado
-        locked_state_id = self.user_repository.get_locked_user_state_id()
-        if user.state_id == locked_state_id:
-            self.unlock_user(user)
-            # Recargar el usuario después del desbloqueo
-            user = self.user_repository.get_user_by_email(email)
-        
-        # Verificar si el usuario ha sido eliminado
-        inactive_state_id = self.user_repository.get_inactive_user_state_id()
-        if user.state_id == inactive_state_id:
-            raise DomainException(
-                message="El usuario fue eliminado del sistema.",
-                status_code=status.HTTP_410_GONE
-            )
-        
-        # Verificar si la cuenta del usuario está bloqueada
-        if user.locked_until:
-            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
-        
-        if user.locked_until and user.locked_until > datetime.now(timezone.utc):
-            time_left = user.locked_until - datetime.now(timezone.utc)
-            raise DomainException(
-                message=f"Tu cuenta está bloqueada. Intenta nuevamente en {time_left.seconds // 60} minutos.",
-                status_code=status.HTTP_403_FORBIDDEN,
-            )
+        # Validar el estado del usuario
+        state_validation_result = self.state_validator.validate_user_state(
+            user,
+            allowed_states=[UserState.ACTIVE],
+            disallowed_states=[UserState.INACTIVE, UserState.PENDING, UserState.LOCKED]
+        )
+        if state_validation_result:
+            return state_validation_result
 
         if not verify_password(password, user.password):
             self.handle_failed_login_attempt(user)
@@ -67,10 +42,9 @@ class LoginUseCase:
         self.user_repository.update_user(user)
         
         if self.initiate_two_factor_auth(user):
-            return LoginResponse(
-                message="Verificación en dos pasos iniciada. Por favor, revisa tu correo electrónico para obtener el PIN.",
-                user_state="active"
-            )        
+            return SuccessResponse(
+                    message="Verificación en dos pasos iniciada. Por favor, revisa tu correo electrónico para obtener el PIN."
+                )
         else:
             raise DomainException(
                 message="Error al iniciar la verificación en dos pasos.",
@@ -97,18 +71,6 @@ class LoginUseCase:
             message="Contraseña incorrecta.",
             status_code=status.HTTP_401_UNAUTHORIZED
         )
-
-    def unlock_user(self, user: User):
-        current_time = datetime.now(timezone.utc)
-        
-        if user.locked_until:
-            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
-        
-        if user.locked_until and current_time > user.locked_until:
-            user.failed_attempts = 0
-            user.locked_until = None
-            user.state_id = self.user_repository.get_active_user_state_id()
-            self.user_repository.update_user(user)
 
     def initiate_two_factor_auth(self, user: UserInDB) -> bool:
         try:

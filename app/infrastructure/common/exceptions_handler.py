@@ -104,14 +104,17 @@ def custom_http_exception_handler(request: Request, exc: HTTPException):
     
 def domain_exception_handler(request: Request, exc: DomainException):
     logger.warning(f"DomainException en {request.url}: {exc.message}")
+    response_content = {
+        "error": {
+            "route": str(request.url),
+            "status_code": exc.status_code,
+            "message": exc.message,
+            "details": []
+        }
+    }
+    if exc.user_state:
+        response_content["error"]["user_state"] = exc.user_state
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": {
-                "route": str(request.url),
-                "status_code": exc.status_code,
-                "message": exc.message,
-                "details": []
-            }
-        }
+        content=response_content
     )
