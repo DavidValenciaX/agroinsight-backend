@@ -52,3 +52,9 @@ class PlotRepository:
             UsuarioFinca.finca_id == finca_id
         ).first()
         return access is not None
+    
+    def get_plot_by_name_and_farm(self, nombre: str, finca_id: int) -> Optional[Plot]:
+        return self.db.query(Plot).filter(
+            Plot.nombre == nombre,
+            Plot.finca_id == finca_id
+        ).first()

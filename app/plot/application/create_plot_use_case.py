@@ -26,6 +26,14 @@ class CreatePlotUseCase:
 
         # Validar los datos de entrada
         self.validate_plot_data(plot_data)
+        
+        # Verificar si ya existe un lote con el mismo nombre en la misma finca
+        existing_plot = self.plot_repository.get_plot_by_name_and_farm(plot_data.nombre, plot_data.finca_id)
+        if existing_plot:
+            raise DomainException(
+                message="Ya existe un lote con este nombre en la finca.",
+                status_code=status.HTTP_409_CONFLICT
+            )
 
         # Crear el lote
         plot = self.plot_repository.create_plot(plot_data, current_user.id)
