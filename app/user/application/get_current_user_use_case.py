@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserResponse
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from fastapi import status
 
 class GetCurrentUserUseCase:
@@ -19,10 +19,12 @@ class GetCurrentUserUseCase:
         # Obtener el estado del usuario
         estado = self.user_repository.get_state_by_id(current_user.state_id)
         if not estado:
-            raise DomainException(
-                message="Estado del usuario no encontrado.",
-                status_code=500
+            raise UserStateException(
+                message="Estado de usuario no reconocido.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
             )
+            
             
         estado_nombre = estado.nombre
         

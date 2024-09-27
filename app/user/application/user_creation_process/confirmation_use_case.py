@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from fastapi import status
 from app.user.domain.schemas import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.infrastructure.services.pin_service import hash_pin
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 
@@ -57,10 +57,13 @@ class ConfirmationUseCase:
         # Actualizar el estado del usuario a activo
         active_state_id = self.user_repository.get_active_user_state_id()
         if not active_state_id:
-            raise DomainException(
-                message="No se pudo encontrar el estado de usuario 'active'.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            raise UserStateException(
+                message="No se pudo encontrar el estado de usuario activo.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
             )
+            
+            
         self.user_repository.update_user_state(user.id, active_state_id)
         
         # Actualizar el rol de usuario no confirmado a usuario

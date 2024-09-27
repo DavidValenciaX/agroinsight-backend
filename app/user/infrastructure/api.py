@@ -231,7 +231,7 @@ def deactivate_user(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"No se pudo desactivar el usuario: {str(e)}"
+            detail=f"No se pudo eliminar el usuario: {str(e)}"
         )
     
 @router.post("/password-recovery", response_model=SuccessResponse, status_code=status.HTTP_200_OK)

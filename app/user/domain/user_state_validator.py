@@ -41,6 +41,12 @@ class UserStateValidator:
             return UserState.LOCKED
         elif user.state_id == self.user_repository.get_pending_user_state_id():
             return UserState.PENDING
+        else:
+            raise UserStateException(
+                message="Estado de usuario no reconocido.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
+            )
 
     def _handle_disallowed_state(self, state, user):
         if state == UserState.ACTIVE:

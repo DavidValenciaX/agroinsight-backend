@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import SuccessResponse, UserCreateByAdmin
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.infrastructure.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User
 
@@ -48,9 +48,10 @@ class UserCreationByAdminUseCase:
         hashed_password = hash_password(user_data.password)
         active_state_id = self.user_repository.get_active_user_state_id()
         if not active_state_id:
-            raise DomainException(
+            raise UserStateException(
                 message="No se pudo encontrar el estado de usuario activo.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
             )
 
         new_user = User(

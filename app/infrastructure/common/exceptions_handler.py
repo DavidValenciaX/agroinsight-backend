@@ -1,4 +1,4 @@
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import traceback
@@ -53,11 +53,11 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
         })
 
     return JSONResponse(
-        status_code=422,
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "error": {
                 "route": str(request.url),
-                "status_code": 422,
+                "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY,
                 "message": "Error en la validación de los datos de entrada",
                 "details": formatted_errors
             }
@@ -67,7 +67,7 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
 def custom_exception_handler(request: Request, exc: Exception):
     logger.error(f"Error en la ruta {request.url}: {str(exc)}")
     return JSONResponse(
-        status_code=500,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": {
                 "route": str(request.url),

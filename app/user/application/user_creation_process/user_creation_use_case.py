@@ -5,7 +5,7 @@ from app.user.infrastructure.orm_models import User, ConfirmacionUsuario
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import SuccessResponse, UserCreate
 from app.infrastructure.security.security_utils import hash_password
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
@@ -35,9 +35,10 @@ class UserCreationUseCase:
         # Obtener estado "pendiente" del usuario
         pending_state_id = self.user_repository.get_pending_user_state_id()
         if not pending_state_id:
-            raise DomainException(
+            raise UserStateException(
                 message="No se pudo encontrar el estado de usuario pendiente.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
             )
 
         # Obtener rol "no confirmado"
