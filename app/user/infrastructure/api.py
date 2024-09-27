@@ -22,15 +22,13 @@ from app.user.application.logout_use_case import LogoutUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import *
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from typing import List
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/user", tags=["user"])
-
-# endpoints de usuarios
 
 @router.post("/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_user(
@@ -41,7 +39,7 @@ def create_user(
     # Llamamos al caso de uso sin manejar excepciones aquí
     try:
         return creation_use_case.execute(user)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
     except Exception as e:
@@ -59,7 +57,7 @@ def resend_confirmation_pin_endpoint(
     resend_confirmation_use_case = ResendConfirmationUseCase(db)
     try:
         return resend_confirmation_use_case.execute(resend_request.email)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -75,7 +73,7 @@ def confirm_user_registration(
     confirmation_use_case = ConfirmationUseCase(db)
     try:
         return confirmation_use_case.execute(confirmation.email, confirmation.pin)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -88,7 +86,7 @@ def login_for_access_token(login_request: LoginRequest, db: Session = Depends(ge
     login_use_case = LoginUseCase(db)
     try:
         return login_use_case.execute(login_request.email, login_request.password)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -104,7 +102,7 @@ def resend_2fa_pin_endpoint(
     resend_2fa_use_case = Resend2faUseCase(db)
     try:
         return resend_2fa_use_case.execute(resend_request.email)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -118,7 +116,7 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
     try:
         # Ejecuta el caso de uso y obtiene los datos del token
         return verify_use_case.execute(auth_request.email, auth_request.pin)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -137,7 +135,7 @@ def create_user_by_admin(
     user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
     try:
         return user_creation_by_admin_use_case.execute(user, current_user)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -152,7 +150,7 @@ def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_us
         return list_users_use_case.execute(current_user)
     except DomainException as e:
         raise e
-    except Exception as e:
+    except (DomainException, UserStateException) as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar los usuarios: {str(e)}"
@@ -163,7 +161,7 @@ def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db
     me_use_case = GetCurrentUserUseCase(db)
     try:
         return me_use_case.execute(current_user)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -176,7 +174,7 @@ def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depe
     get_user_by_id_use_case = GetUserByIdUseCase(db)
     try:
         return get_user_by_id_use_case.execute(user_id, current_user)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -193,7 +191,7 @@ def update_user_info(
     update_use_case = UpdateUserInfoUseCase(db)
     try:
         return update_use_case.execute(current_user, user_update)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -211,7 +209,7 @@ def admin_update_user(
     update_user_use_case = AdminUpdateUserUseCase(db)
     try:
         return update_user_use_case.execute(user_id, user_update, current_user)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -228,7 +226,7 @@ def deactivate_user(
     deactivate_use_case = DeactivateUserUseCase(db)
     try:
         return deactivate_use_case.execute(user_id, current_user)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -244,7 +242,7 @@ def initiate_password_recovery(
     password_recovery_use_case = PasswordRecoveryUseCase(db)
     try:
         return password_recovery_use_case.execute(recovery_request.email)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -260,7 +258,7 @@ def resend_recovery_pin(
     password_recovery_use_case = ResendRecoveryUseCase(db)
     try:
         return password_recovery_use_case.execute(recovery_request.email)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -276,7 +274,7 @@ def confirm_recovery_pin(
     password_recovery_use_case = ConfirmRecoveryPinUseCase(db)
     try:
         return password_recovery_use_case.execute(pin_confirmation.email, pin_confirmation.pin)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -292,7 +290,7 @@ def reset_password(
     password_recovery_use_case = ResetPasswordUseCase(db)
     try:
         return password_recovery_use_case.execute(reset_request.email, reset_request.new_password)
-    except DomainException as e:
+    except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
         raise HTTPException(
@@ -310,8 +308,6 @@ def logout(
     logout_use_case = LogoutUseCase(db)
     try:
         return logout_use_case.execute(token, current_user.id)
-    except DomainException as e:
-        raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

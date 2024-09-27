@@ -27,6 +27,14 @@ class UserCreationByAdminUseCase:
                 message="No tienes permisos para realizar esta acción.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
+            
+        # Verificar si el correo electrónico ya existe
+        existing_user = self.user_repository.get_user_by_email(user_data.email)
+        if existing_user:
+            raise DomainException(
+                message="El correo electrónico proporcionado ya está en uso.",
+                status_code=status.HTTP_409_CONFLICT
+            )
 
         # Verificar si el rol proporcionado es válido
         role = self.user_repository.get_role_by_id(user_data.role_id)
@@ -34,14 +42,6 @@ class UserCreationByAdminUseCase:
             raise DomainException(
                 message="Rol proporcionado no válido.",
                 status_code=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Verificar si el correo electrónico ya existe
-        existing_user = self.user_repository.get_user_by_email(user_data.email)
-        if existing_user:
-            raise DomainException(
-                message="El correo electrónico proporcionado ya está en uso.",
-                status_code=status.HTTP_409_CONFLICT
             )
 
         # Crear el usuario con estado "active"

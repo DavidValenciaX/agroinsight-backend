@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from fastapi import status
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import UserStateException
 from enum import Enum, auto
 
 class UserState(Enum):
@@ -44,23 +44,23 @@ class UserStateValidator:
 
     def _handle_disallowed_state(self, state, user):
         if state == UserState.ACTIVE:
-            raise DomainException(
+            raise UserStateException(
                 message="La cuenta ya está registrada y activa.",
                 status_code=status.HTTP_400_BAD_REQUEST,
                 user_state="active"
             )
         elif state == UserState.INACTIVE:
-            raise DomainException(
+            raise UserStateException(
                 message="La cuenta fue eliminada del sistema.",
                 status_code=status.HTTP_410_GONE,
                 user_state="inactive"
             )
         elif state == UserState.PENDING:
-            raise DomainException(
-            message="La cuenta está pendiente de confirmación. Por favor, confirma el registro.",
-            status_code=status.HTTP_400_BAD_REQUEST,
-            user_state="pending"
-        )
+            raise UserStateException(
+                message="La cuenta está pendiente de confirmación. Por favor, confirma el registro.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                user_state="pending"
+            )
         elif state == UserState.LOCKED:
             return self._handle_locked_state(user)
 
@@ -72,7 +72,7 @@ class UserStateValidator:
             # Si el usuario sigue bloqueado, calculamos el tiempo restante y lanzamos una excepción
             time_left = user.locked_until - datetime.now(timezone.utc)
             minutos_restantes = max(time_left.seconds // 60, 1)  # Aseguramos que sea al menos 1 minuto
-            raise DomainException(
+            raise UserStateException(
                 message=f"La cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
                 status_code=status.HTTP_403_FORBIDDEN,
                 user_state="locked"

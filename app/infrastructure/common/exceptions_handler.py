@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import traceback
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from typing import Dict, List
 import logging
 
@@ -104,17 +104,29 @@ def custom_http_exception_handler(request: Request, exc: HTTPException):
     
 def domain_exception_handler(request: Request, exc: DomainException):
     logger.warning(f"DomainException en {request.url}: {exc.message}")
-    response_content = {
-        "error": {
-            "route": str(request.url),
-            "status_code": exc.status_code,
-            "message": exc.message,
-            "details": []
-        }
-    }
-    if exc.user_state:
-        response_content["error"]["user_state"] = exc.user_state
     return JSONResponse(
         status_code=exc.status_code,
-        content=response_content
+        content={
+            "error": {
+                "route": str(request.url),
+                "status_code": exc.status_code,
+                "message": exc.message,
+                "details": []
+            }
+        }
+    )
+    
+def user_state_exception_handler(request: Request, exc: UserStateException):
+    logger.warning(f"UserStateException en {request.url}: {exc.message}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": {
+                "route": str(request.url),
+                "status_code": exc.status_code,
+                "message": exc.message,
+                "user_state": exc.user_state,
+                "details": []
+            }
+        }
     )

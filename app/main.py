@@ -7,9 +7,10 @@ from app.infrastructure.common.exceptions_handler import (
     validation_exception_handler, 
     custom_http_exception_handler,
     custom_exception_handler,
-    domain_exception_handler
+    domain_exception_handler,
+    user_state_exception_handler
 )
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 
 app = FastAPI()
 
@@ -23,6 +24,7 @@ def root():
 
 # Manejadores de excepciones (registrar los más específicos primero)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(UserStateException, user_state_exception_handler)
 app.add_exception_handler(DomainException, domain_exception_handler)
 app.add_exception_handler(HTTPException, custom_http_exception_handler)
 app.add_exception_handler(Exception, custom_exception_handler)
