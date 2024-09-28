@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserResponse
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserNotRegisteredException
-from fastapi import status
+from app.infrastructure.common.common_exceptions import InsufficientPermissionsException, MissingTokenException, UserNotRegisteredException
 
 class GetUserByIdUseCase:
     def __init__(self, db: Session):
@@ -10,12 +9,8 @@ class GetUserByIdUseCase:
         self.user_repository = UserRepository(db)
         
     def execute(self, user_id: int, current_user):
-        # Verificar que el usuario actual está autenticado
         if not current_user:
-            raise DomainException(
-                message="No estás autenticado. Por favor, proporciona un token válido.",
-                status_code=status.HTTP_401_UNAUTHORIZED
-            )
+            raise MissingTokenException()
             
         # Verificar que el usuario actual tiene roles de administrador
         admin_roles = self.user_repository.get_admin_roles()

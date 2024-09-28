@@ -1,6 +1,7 @@
-from datetime import datetime, timezone, timedelta
+from datetime import timedelta
 from sqlalchemy.orm import Session
 from fastapi import status
+from app.user.domain.schemas import TokenResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.security.security_utils import create_access_token
@@ -57,8 +58,7 @@ class VerifyUseCase:
         self.user_repository.delete_two_factor_verification(user.id)
 
         access_token = create_access_token(data={"sub": user.email})
-        return {"access_token": access_token, "token_type": "bearer"}
-        TokenResponse(
+        return TokenResponse(
             access_token=access_token,
             token_type="bearer"
         )

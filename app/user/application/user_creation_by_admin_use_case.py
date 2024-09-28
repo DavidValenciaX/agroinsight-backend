@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import SuccessResponse, UserCreateByAdmin
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserAlreadyRegisteredException, UserStateException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, MissingTokenException, UserAlreadyRegisteredException, UserStateException
 from app.infrastructure.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User
 
@@ -12,12 +12,8 @@ class UserCreationByAdminUseCase:
         self.user_repository = UserRepository(db)
 
     def execute(self, user_data: UserCreateByAdmin, current_user) -> dict:
-        # Verificar que el usuario actual está autenticado
         if not current_user:
-            raise DomainException(
-                message="No estás autenticado. Por favor, proporciona un token válido.",
-                status_code=status.HTTP_401_UNAUTHORIZED
-            )
+            raise MissingTokenException()
 
         # Verificar que el usuario actual tiene roles de administrador
         admin_roles = self.user_repository.get_admin_roles()

@@ -17,7 +17,7 @@ def get_current_user(
     db: Session = Depends(getDb)
 ):
     if credentials is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No estás autenticado. Por favor, proporciona un token válido")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Se requiere un token de autenticación")
     
     token = credentials.credentials
     user_repository = UserRepository(db)
@@ -41,5 +41,5 @@ def get_current_user(
     
     user = user_repository.get_user_by_email(email)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario no encontrado.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="La cuenta con este email no está registrada")
     return user

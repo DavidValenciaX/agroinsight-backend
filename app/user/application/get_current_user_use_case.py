@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserResponse
-from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+from app.infrastructure.common.common_exceptions import MissingTokenException, UserStateException
 from fastapi import status
 
 class GetCurrentUserUseCase:
@@ -11,10 +11,7 @@ class GetCurrentUserUseCase:
         
     def execute(self, current_user):
         if not current_user:
-            raise DomainException(
-                message="No estás autenticado. Por favor, proporciona un token válido.",
-                status_code=status.HTTP_401_UNAUTHORIZED
-            )
+            raise MissingTokenException()
             
         # Obtener el estado del usuario
         estado = self.user_repository.get_state_by_id(current_user.state_id)
