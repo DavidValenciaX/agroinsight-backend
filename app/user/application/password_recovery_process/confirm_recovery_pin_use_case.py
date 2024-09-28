@@ -41,32 +41,34 @@ class ConfirmRecoveryPinUseCase:
 
         # Verificar si el PIN proporcionado coincide
         pin_hash = hash_pin(pin)
-        if pin_hash == recovery.pin:
-            # Marcar el PIN como confirmado
-            recovery.pin_confirmado = True
-            self.user_repository.update_password_recovery(recovery)
-            return SuccessResponse(
-                    message="PIN de recuperación confirmado correctamente."
-                ) 
-        else:
+        if pin_hash != recovery.pin:
             # PIN incorrecto, incrementar los intentos
             recovery.intentos += 1
             if recovery.intentos >= 3:
                 block_time = 10
                 self.user_repository.delete_password_recovery(user.id)
                 locked = self.user_repository.block_user(user.id, timedelta(minutes=block_time))
-                if locked:
-                    raise DomainException(
-                        message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {block_time} minutos.",
-                        status_code=status.HTTP_429_TOO_MANY_REQUESTS
-                    )
-                else:
+                if not locked:
                     raise DomainException(
                         message="Error al bloquear al usuario.",
-                        status_code=status.HTTP_403_FORBIDDEN)
+                        status_code=status.HTTP_403_FORBIDDEN
+                    )
+
+                raise DomainException(
+                    message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {block_time} minutos.",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
+                )
+
             else:
                 self.user_repository.update_password_recovery(recovery)
+                
             raise DomainException(
                 message="PIN de verificación inválido o expirado.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
+        # Marcar el PIN como confirmado
+        recovery.pin_confirmado = True
+        self.user_repository.update_password_recovery(recovery)
+        return SuccessResponse(
+                message="PIN de recuperación confirmado correctamente."
+            ) 

@@ -16,7 +16,7 @@ class ResendConfirmationUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
 
-    def execute(self, email: str) -> dict:
+    def execute(self, email: str) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise DomainException(
@@ -54,16 +54,17 @@ class ResendConfirmationUseCase:
             )
 
             # Enviar el correo electrónico con el nuevo PIN
-            if self.resend_confirmation_email(email, pin):
-                self.user_repository.add_user_confirmation(confirmation)
-                return SuccessResponse(
-                    message="PIN de confirmación reenviado con éxito."
-                )
-            else:
+            if not self.resend_confirmation_email(email, pin):
                 raise DomainException(
                     message="No se pudo enviar el correo electrónico.",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
+            
+            self.user_repository.add_user_confirmation(confirmation)
+            return SuccessResponse(
+                message="PIN de confirmación reenviado con éxito."
+            )
+
         except Exception as e:
             # Manejar excepciones específicas si es necesario
             raise DomainException(

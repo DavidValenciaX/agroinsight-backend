@@ -71,21 +71,21 @@ class UserRepository:
         # Cambiar el estado del usuario basado en el estado_id
         if 'estado_id' in user_data and user_data['estado_id']:
             estado = self.get_state_by_id(user_data['estado_id'])
-            if estado:
-                user.state_id = estado.id
-            else:
+            if not estado:
                 raise ValueError("Estado no válido")
+            
+            user.state_id = estado.id
 
         # Cambiar el rol del usuario basado en el rol_id
         if 'rol_id' in user_data and user_data['rol_id']:
             nuevo_rol = self.get_role_by_id(user_data['rol_id'])
-            if nuevo_rol:
-                # Eliminar el rol actual y asignar el nuevo rol
-                self.db.query(UserRole).filter(UserRole.usuario_id == user.id).delete()
-                user_role = UserRole(usuario_id=user.id, rol_id=nuevo_rol.id)
-                self.db.add(user_role)
-            else:
+            if not nuevo_rol:
                 raise ValueError("Rol no válido")
+            
+            # Eliminar el rol actual y asignar el nuevo rol
+            self.db.query(UserRole).filter(UserRole.usuario_id == user.id).delete()
+            user_role = UserRole(usuario_id=user.id, rol_id=nuevo_rol.id)
+            self.db.add(user_role)
 
         try:
             self.db.commit()

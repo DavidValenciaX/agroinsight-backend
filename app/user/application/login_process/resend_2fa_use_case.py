@@ -57,15 +57,16 @@ class Resend2faUseCase:
             self.user_repository.add_two_factor_verification(verification)
             
             # Enviar el PIN al correo electrónico del usuario
-            if self.send_two_factor_pin(user.email, pin):
-                return SuccessResponse(
-                    message="PIN de verificación en dos pasos reenviado con éxito."
-                )
-            else:
+            if not self.send_two_factor_pin(user.email, pin):
                 raise DomainException(
                     message="No se pudo reenviar el PIN. Verifique el correo electrónico o intenta más tarde.",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
+
+            return SuccessResponse(
+                message="PIN de verificación en dos pasos reenviado con éxito."
+            )
+
         except Exception as e:
             raise DomainException(
                 message=f"Error al reenviar el PIN de doble verificación: {str(e)}",

@@ -41,28 +41,29 @@ class LoginUseCase:
         user.locked_until = None
         self.user_repository.update_user(user)
         
-        if self.initiate_two_factor_auth(user):
-            return SuccessResponse(
-                    message="Verificación en dos pasos iniciada. Por favor, revisa tu correo electrónico para obtener el PIN."
-                )
-        else:
+        if not self.initiate_two_factor_auth(user):
             raise DomainException(
                 message="Error al iniciar la verificación en dos pasos.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+            
+        return SuccessResponse(
+                message="Verificación en dos pasos iniciada. Por favor, revisa tu correo electrónico para obtener el PIN."
+        )
+
 
     def handle_failed_login_attempt(self, user: UserInDB) -> None:        
         maxFailedAttempts = 3
-        blocking_time = 10  # minutos
+        block_time = 10  # minutos
         
         user.failed_attempts += 1
         
         if user.failed_attempts >= maxFailedAttempts:
-            user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=blocking_time)
+            user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=block_time)
             user.state_id = self.user_repository.get_locked_user_state_id()
             self.user_repository.update_user(user)
             raise DomainException(
-                message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {blocking_time} minutos.",
+                message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {block_time} minutos.",
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS
             )
         
@@ -88,11 +89,13 @@ class LoginUseCase:
             )
             
             # Enviar el PIN al correo electrónico del usuario
-            if self.send_two_factor_pin(user.email, pin):
-                self.user_repository.add_two_factor_verification(verification)
-                return True
-            else:
+            if not self.send_two_factor_pin(user.email, pin):
                 return False
+
+            self.user_repository.add_two_factor_verification(verification)
+            return True
+
+            
         except Exception as e:
             print(f"Error al iniciar la verificación en dos pasos: {str(e)}")
             return False

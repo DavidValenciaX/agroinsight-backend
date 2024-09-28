@@ -71,10 +71,7 @@ class UserStateValidator:
             return self._handle_locked_state(user)
 
     def _handle_locked_state(self, user):
-        if self._try_unlock_user(user):
-            # Si el usuario se desbloqueó exitosamente, volver a validar el estado
-            return self._validate_state(user)
-        else:
+        if not self._try_unlock_user(user):
             # Si el usuario sigue bloqueado, calculamos el tiempo restante y lanzamos una excepción
             time_left = user.locked_until - datetime.now(timezone.utc)
             minutos_restantes = max(time_left.seconds // 60, 1)  # Aseguramos que sea al menos 1 minuto
@@ -83,6 +80,10 @@ class UserStateValidator:
                 status_code=status.HTTP_403_FORBIDDEN,
                 user_state="locked"
             )
+            
+        # Si el usuario se desbloqueó exitosamente, volver a validar el estado
+        return self._validate_state(user)
+
 
     def _try_unlock_user(self, user):
         current_time = datetime.now(timezone.utc)

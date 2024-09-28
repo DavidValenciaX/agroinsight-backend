@@ -17,7 +17,7 @@ def get_current_user(
     db: Session = Depends(getDb)
 ):
     if credentials is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No estás autenticado. Proporciona un token válido.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No estás autenticado. Por favor, proporciona un token válido")
     
     token = credentials.credentials
     user_repository = UserRepository(db)
