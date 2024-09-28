@@ -35,7 +35,7 @@ class ResendConfirmationUseCase:
         if not pending_confirmation:
             raise DomainException(
                 message="No hay una confirmación pendiente para reenviar el PIN.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_404_NOT_FOUND
             )
 
         try:

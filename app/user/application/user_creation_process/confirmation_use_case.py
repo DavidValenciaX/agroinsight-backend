@@ -27,6 +27,14 @@ class ConfirmationUseCase:
         )
         if state_validation_result:
             return state_validation_result
+        
+        # Verificar si hay una confirmación pendiente
+        pending_confirmation = self.user_repository.get_user_pending_confirmation(user.id)
+        if not pending_confirmation:
+            raise DomainException(
+                message="No hay una confirmación pendiente para reenviar el PIN.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
             
         # Hashear el PIN proporcionado
         pin_hash = hash_pin(pin)

@@ -32,7 +32,7 @@ class ResetPasswordUseCase:
         if not recovery:
             raise DomainException(
                 message="No hay un registro de recuperación de contraseña pendiente.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_404_NOT_FOUND
             )
             
         if not recovery.pin_confirmado:

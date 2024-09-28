@@ -34,7 +34,7 @@ class Resend2faUseCase:
         if not pending_verification:
             raise DomainException(
                 message="No hay una verificación de doble factor de autenticación pendiente para reenviar el PIN.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_404_NOT_FOUND
             )
         
         try:

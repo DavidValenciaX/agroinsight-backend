@@ -32,7 +32,6 @@ class ResendRecoveryUseCase:
         recovery = self.user_repository.get_password_recovery(user.id)
 
         if not recovery:
-            # Si no hay un registro de recuperación válido, levantar un error
             raise DomainException(
                 message="No hay un registro de recuperación de contraseña pendiente.",
                 status_code=status.HTTP_404_NOT_FOUND
