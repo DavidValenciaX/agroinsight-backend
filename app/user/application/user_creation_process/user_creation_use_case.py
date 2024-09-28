@@ -16,7 +16,7 @@ class UserCreationUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
 
-    def execute(self, user_data: UserCreate) -> dict:
+    def execute(self, user_data: UserCreate) -> SuccessResponse:
         # Verificar si el usuario ya existe
         user = self.user_repository.get_user_by_email(user_data.email)
         

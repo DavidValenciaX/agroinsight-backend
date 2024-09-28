@@ -11,7 +11,7 @@ class UserCreationByAdminUseCase:
     def __init__(self, db: Session):
         self.user_repository = UserRepository(db)
 
-    def execute(self, user_data: UserCreateByAdmin, current_user) -> dict:
+    def execute(self, user_data: UserCreateByAdmin, current_user) -> SuccessResponse:
         if not current_user:
             raise MissingTokenException()
 

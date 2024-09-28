@@ -14,7 +14,7 @@ class ConfirmRecoveryPinUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
 
-    def execute(self, email: str, pin: str) -> dict:
+    def execute(self, email: str, pin: str) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()
