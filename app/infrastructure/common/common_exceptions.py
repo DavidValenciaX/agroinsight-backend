@@ -24,3 +24,7 @@ class InsufficientPermissionsException(DomainException):
 class UserAlreadyRegisteredException(DomainException):
     def __init__(self):
         super().__init__("La cuenta ya está registrada", status.HTTP_409_CONFLICT)
+        
+class UserHasBeenBlockedException(DomainException):
+    def __init__(self, block_time: int):
+        super().__init__(f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en {block_time} minutos.", status.HTTP_429_TOO_MANY_REQUESTS)

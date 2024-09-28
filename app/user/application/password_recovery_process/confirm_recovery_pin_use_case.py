@@ -6,7 +6,7 @@ from app.infrastructure.services.pin_service import hash_pin
 from app.user.domain.schemas import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
+from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 
 class ConfirmRecoveryPinUseCase:
     def __init__(self, db: Session):
@@ -50,10 +50,7 @@ class ConfirmRecoveryPinUseCase:
                         status_code=status.HTTP_403_FORBIDDEN
                     )
 
-                raise DomainException(
-                    message=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en {block_time} minutos.",
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
-                )
+                raise UserHasBeenBlockedException(block_time)
 
             else:
                 self.user_repository.update_password_recovery(recovery)

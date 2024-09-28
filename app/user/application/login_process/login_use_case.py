@@ -7,7 +7,7 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.security.security_utils import verify_password
-from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
+from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 
 class LoginUseCase:
@@ -59,10 +59,7 @@ class LoginUseCase:
             user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=block_time)
             user.state_id = self.user_repository.get_locked_user_state_id()
             self.user_repository.update_user(user)
-            raise DomainException(
-                message=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en {block_time} minutos.",
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS
-            )
+            raise UserHasBeenBlockedException(block_time)
         
         self.user_repository.update_user(user)
         raise DomainException(

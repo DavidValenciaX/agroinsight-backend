@@ -4,7 +4,7 @@ from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.security.security_utils import create_access_token
-from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
+from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 
 class VerifyUseCase:
@@ -47,10 +47,7 @@ class VerifyUseCase:
                 self.user_repository.block_user(user.id, timedelta(minutes=block_time))
                 # Eliminar la verificación
                 self.user_repository.delete_two_factor_verification(user.id)
-                raise DomainException(
-                    message=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en {block_time} minutos.",
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
-                )
+                raise UserHasBeenBlockedException(block_time)
             raise DomainException(
                 message="PIN de verificación inválido o expirado.",
                 status_code=status.HTTP_400_BAD_REQUEST
