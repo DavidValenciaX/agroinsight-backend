@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserUpdate, UserResponse, UserInDB
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserAlreadyRegisteredException
 from fastapi import status
 
 class UpdateUserInfoUseCase:
@@ -14,10 +14,7 @@ class UpdateUserInfoUseCase:
         if user_update.email and user_update.email != current_user.email:
             existing_user = self.user_repository.get_user_by_email(user_update.email)
             if existing_user:
-                raise DomainException(
-                    message="El email ya está en uso por otro usuario.",
-                    status_code=status.HTTP_400_BAD_REQUEST
-                )
+                raise UserAlreadyRegisteredException()
         
         # Actualizar la información del usuario
         updated_user = self.user_repository.update_user_info(current_user, user_update.model_dump(exclude_unset=True))

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import AdminUserUpdate, UserResponse, UserInDB
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserAlreadyRegisteredException, UserNotRegisteredException
 from fastapi import status
 
 class AdminUpdateUserUseCase:
@@ -16,27 +16,18 @@ class AdminUpdateUserUseCase:
         
         # Verificar si el usuario actual tiene uno de los roles administrativos
         if not any(role.id in admin_role_ids for role in current_user.roles):
-            raise DomainException(
-                message="No tienes permisos para realizar esta acción.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise InsufficientPermissionsException()
         
         # Verificar si el usuario a actualizar existe
         user_to_update = self.user_repository.get_user_by_id(user_id)
         if not user_to_update:
-            raise DomainException(
-                message="Usuario no encontrado.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
+            raise UserNotRegisteredException()
         
         # Verificar si el nuevo email está en uso por otro usuario
         if user_update.email and user_update.email != user_to_update.email:
             existing_user = self.user_repository.get_user_by_email(user_update.email)
             if existing_user:
-                raise DomainException(
-                    message="El email ya está en uso por otro usuario.",
-                    status_code=status.HTTP_400_BAD_REQUEST
-                )
+                raise UserAlreadyRegisteredException()
         
         # Actualizar la información del usuario
         updated_user = self.user_repository.update_user_info_by_admin(

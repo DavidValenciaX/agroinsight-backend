@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import status
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from app.user.domain.schemas import UserResponse
 from app.user.infrastructure.sql_repository import UserRepository
 
@@ -23,10 +23,7 @@ class ListUsersUseCase:
             role.id in [admin_role.id for admin_role in admin_roles]
             for role in current_user.roles
         ):
-            raise DomainException(
-                message="No tienes permisos para realizar esta acción.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise InsufficientPermissionsException()
         
         users = self.user_repository.get_all_users()
         if not users:

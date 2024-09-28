@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PlotCreate, PlotResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 
 class CreatePlotUseCase:
@@ -13,10 +13,7 @@ class CreatePlotUseCase:
     def execute(self, plot_data: PlotCreate, current_user: UserInDB) -> PlotResponse:
         # Verificar si el usuario tiene permisos para crear lotes
         if not self.user_can_create_plot(current_user):
-            raise DomainException(
-                message="No tienes permisos para crear lotes.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise InsufficientPermissionsException()
             
         if not self.user_has_access_to_farm(current_user.id, plot_data.finca_id):
             raise DomainException(

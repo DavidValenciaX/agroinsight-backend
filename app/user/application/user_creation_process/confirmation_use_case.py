@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from fastapi import status
 from app.user.domain.schemas import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException, UserStateException
 from app.infrastructure.services.pin_service import hash_pin
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 
@@ -17,10 +17,7 @@ class ConfirmationUseCase:
         # Obtener el usuario por correo electrónico
         user = self.user_repository.get_user_by_email(email)
         if not user:
-            raise DomainException(
-                message="Usuario no encontrado.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
+            raise UserNotRegisteredException()
         
         # Validar el estado del usuario
         state_validation_result = self.state_validator.validate_user_state(

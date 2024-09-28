@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import FarmCreate, FarmResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 
 class CreateFarmUseCase:
@@ -13,10 +13,7 @@ class CreateFarmUseCase:
     def execute(self, farm_data: FarmCreate, current_user: UserInDB) -> FarmResponse:
         # Verificar si el usuario tiene permisos para crear fincas
         if not self.user_can_create_farm(current_user):
-            raise DomainException(
-                message="No tienes permisos para crear fincas.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise InsufficientPermissionsException()
 
         # Validar los datos de entrada
         self.validate_farm_data(farm_data)

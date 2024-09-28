@@ -1,5 +1,7 @@
+from fastapi import status
+
 class DomainException(Exception):
-    def __init__(self, message: str = "Error", status_code: int = 500):
+    def __init__(self, message: str = "Error", status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR):
         self.message = message
         self.status_code = status_code
         super().__init__(self.message)
@@ -10,3 +12,15 @@ class UserStateException(Exception):
         self.status_code = status_code
         self.user_state = user_state
         super().__init__(self.message)
+        
+class UserNotRegisteredException(DomainException):
+    def __init__(self):
+        super().__init__("La cuenta no está registrada", status.HTTP_401_UNAUTHORIZED)
+        
+class InsufficientPermissionsException(DomainException):
+    def __init__(self):
+        super().__init__("No tienes permisos para realizar esta acción.", status.HTTP_403_FORBIDDEN)
+        
+class UserAlreadyRegisteredException(DomainException):
+    def __init__(self):
+        super().__init__("La cuenta ya está registrada", status.HTTP_409_CONFLICT)

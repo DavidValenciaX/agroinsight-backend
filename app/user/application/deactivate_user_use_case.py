@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.user.domain.schemas import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserNotRegisteredException
 from fastapi import status
 
 class DeactivateUserUseCase:
@@ -15,18 +15,12 @@ class DeactivateUserUseCase:
         admin_role_ids = {role.id for role in admin_roles}
         
         if not any(role.id in admin_role_ids for role in current_user.roles):
-            raise DomainException(
-                message="No tienes permisos para desactivar usuarios.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise InsufficientPermissionsException()
         
         # Verificar si el usuario a desactivar existe
         user_to_deactivate = self.user_repository.get_user_by_id(user_id)
         if not user_to_deactivate:
-            raise DomainException(
-                message="Usuario no encontrado.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
+            raise UserNotRegisteredException()
         
         # Verificar si el usuario ya está desactivado
         inactive_state_id = self.user_repository.get_inactive_user_state_id()

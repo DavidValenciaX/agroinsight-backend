@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import FarmResponse, PaginatedFarmListResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 from math import ceil
 
@@ -13,10 +13,7 @@ class ListFarmsUseCase:
 
     def execute(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
         if not self.user_can_list_farms(current_user):
-            raise DomainException(
-                message="No tienes permisos para listar fincas.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise InsufficientPermissionsException()
 
         total_farms, farms = self.farm_repository.list_farms_paginated(current_user.id, page, per_page)
 

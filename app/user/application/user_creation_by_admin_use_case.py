@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import SuccessResponse, UserCreateByAdmin
-from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserAlreadyRegisteredException, UserStateException
 from app.infrastructure.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User
 
@@ -23,18 +23,12 @@ class UserCreationByAdminUseCase:
         admin_roles = self.user_repository.get_admin_roles()
         admin_role_ids = {admin_role.id for admin_role in admin_roles}
         if not any(role.id in admin_role_ids for role in current_user.roles):
-            raise DomainException(
-                message="No tienes permisos para realizar esta acción.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise InsufficientPermissionsException()
             
         # Verificar si el correo electrónico ya existe
         existing_user = self.user_repository.get_user_by_email(user_data.email)
         if existing_user:
-            raise DomainException(
-                message="El correo electrónico proporcionado ya está en uso.",
-                status_code=status.HTTP_409_CONFLICT
-            )
+                raise UserAlreadyRegisteredException()
 
         # Verificar si el rol proporcionado es válido
         role = self.user_repository.get_role_by_id(user_data.role_id)

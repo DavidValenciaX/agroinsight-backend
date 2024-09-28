@@ -6,7 +6,7 @@ from app.infrastructure.services.email_service import send_email
 from app.user.domain.schemas import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 
 class ResendRecoveryUseCase:
     def __init__(self, db: Session):
@@ -17,10 +17,7 @@ class ResendRecoveryUseCase:
     def execute(self, email: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
         if not user:
-            raise DomainException(
-                message="Usuario no encontrado.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
+            raise UserNotRegisteredException()
             
         # Validar el estado del usuario
         state_validation_result = self.state_validator.validate_user_state(

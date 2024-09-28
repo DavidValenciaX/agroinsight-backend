@@ -4,7 +4,7 @@ from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.security.security_utils import create_access_token
-from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 
 class VerifyUseCase:
@@ -16,10 +16,7 @@ class VerifyUseCase:
     def execute(self, email: str, pin: str) -> dict:
         user = self.user_repository.get_user_by_email(email)
         if not user:
-            raise DomainException(
-                message="Usuario no encontrado.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
+            raise UserNotRegisteredException()
                 
         # Validar el estado del usuario
         state_validation_result = self.state_validator.validate_user_state(
@@ -51,7 +48,7 @@ class VerifyUseCase:
                 # Eliminar la verificación
                 self.user_repository.delete_two_factor_verification(user.id)
                 raise DomainException(
-                    message=f"Tu cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intenta nuevamente en {block_time} minutos.",
+                    message=f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en {block_time} minutos.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
             raise DomainException(
