@@ -31,6 +31,7 @@ class User(Base):
     blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
     # Relación con las fincas
     fincas = relationship("Finca", secondary="usuario_finca", back_populates="usuarios")
+    asignaciones = relationship("Asignacion", back_populates="usuario")
     
 class UserRole(Base):
     __tablename__ = "usuario_rol"

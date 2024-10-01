@@ -50,12 +50,12 @@ class LoginUseCase:
 
 
     def handle_failed_login_attempt(self, user: UserInDB) -> None:        
-        maxFailedAttempts = 3
+        max_failed_attempts = 3
         block_time = 10
         
         user.failed_attempts += 1
         
-        if user.failed_attempts >= maxFailedAttempts:
+        if user.failed_attempts >= max_failed_attempts:
             user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=block_time)
             user.state_id = self.user_repository.get_locked_user_state_id()
             self.user_repository.update_user(user)

@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DECIMAL, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
-from app.plot.infrastructure.orm_models import Plot
 from sqlalchemy.orm import relationship
-from datetime import datetime, timezone
 
 class Finca(Base):
     __tablename__ = "finca"

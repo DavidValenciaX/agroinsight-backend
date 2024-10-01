@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
-from sqlalchemy.sql import func
 
 class Plot(Base):
     __tablename__ = "lote"
@@ -16,3 +15,4 @@ class Plot(Base):
 
     unidad_area = relationship("UnidadMedida")
     finca = relationship("Finca", back_populates="lotes")
+    asignaciones = relationship("Asignacion", back_populates="lote")
