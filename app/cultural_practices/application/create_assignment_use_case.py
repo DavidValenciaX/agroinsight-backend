@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
-from app.cultural_practices.domain.schemas import AssignmentCreate, AssignmentResponse
-from app.user.domain.schemas import UserInDB
+from app.cultural_practices.domain.schemas import AssignmentCreate
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 
@@ -10,7 +10,7 @@ class CreateAssignmentUseCase:
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
 
-    def execute(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> AssignmentResponse:
+    def execute(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> SuccessResponse:
         if not self.user_can_create_assignment(current_user):
             raise InsufficientPermissionsException()
 
@@ -35,7 +35,7 @@ class CreateAssignmentUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        return AssignmentResponse.model_validate(assignment)
+        return SuccessResponse(message="Asignación creada exitosamente")
 
     def user_can_create_assignment(self, user: UserInDB) -> bool:
         allowed_roles = ["Superusuario", "Administrador de Finca"]

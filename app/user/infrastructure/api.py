@@ -182,7 +182,7 @@ def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depe
             detail=f"Error interno al obtener el usuario: {str(e)}"
         )
     
-@router.put("/me/update", response_model=UserResponse, status_code=status.HTTP_200_OK)
+@router.put("/me/update", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def update_user_info(
     user_update: UserUpdate,
     db: Session = Depends(getDb),

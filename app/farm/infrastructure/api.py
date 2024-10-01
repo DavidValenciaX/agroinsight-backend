@@ -3,17 +3,17 @@ from sqlalchemy.orm import Session
 from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, FarmResponse, PaginatedFarmListResponse, FarmUserAssignment, FarmUserAssignmentResponse, PaginatedFarmUserListResponse
+from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, FarmUserAssignment, PaginatedFarmUserListResponse
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from app.user.infrastructure.orm_models import User
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
-@router.post("/create", response_model=FarmResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_farm(
     farm: FarmCreate,
     db: Session = Depends(getDb),
@@ -48,15 +48,15 @@ def list_farms(
             detail=f"Error interno al listar las fincas: {str(e)}"
         )
         
-@router.post("/assign-users", response_model=FarmUserAssignmentResponse, status_code=status.HTTP_200_OK)
+@router.post("/assign-users", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def assign_users_to_farm(
     assignment_data: FarmUserAssignment,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
-    use_case = AssignUsersToFarmUseCase(db)
+    assingn_users_use_case = AssignUsersToFarmUseCase(db)
     try:
-        return use_case.execute(assignment_data, current_user)
+        return assingn_users_use_case.execute(assignment_data, current_user)
     except DomainException as e:
         raise e
     except Exception as e:

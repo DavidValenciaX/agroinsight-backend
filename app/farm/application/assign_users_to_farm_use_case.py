@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.infrastructure.sql_repository import UserRepository
 from app.farm.domain.schemas import FarmUserAssignment, FarmUserAssignmentResponse
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 
@@ -12,7 +12,7 @@ class AssignUsersToFarmUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
 
-    def execute(self, assignment_data: FarmUserAssignment, current_user: UserInDB) -> FarmUserAssignmentResponse:
+    def execute(self, assignment_data: FarmUserAssignment, current_user: UserInDB) -> SuccessResponse:
         if not self.user_can_assign_users(current_user):
             raise InsufficientPermissionsException()
 
@@ -31,13 +31,9 @@ class AssignUsersToFarmUseCase:
                     status_code=status.HTTP_404_NOT_FOUND
                 )
 
-        assigned_user_ids = self.farm_repository.assign_users_to_farm(
-            assignment_data.farm_id, assignment_data.user_ids
-        )
+        self.farm_repository.assign_users_to_farm(assignment_data.farm_id, assignment_data.user_ids)
 
-        return FarmUserAssignmentResponse(
-            farm_id=assignment_data.farm_id,
-            assigned_user_ids=assigned_user_ids,
+        return SuccessResponse(
             message="Usuarios asignados exitosamente a la finca."
         )
 

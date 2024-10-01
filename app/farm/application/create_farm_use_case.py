@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import FarmCreate, FarmResponse
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
-from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from fastapi import status
 
 class CreateFarmUseCase:
@@ -11,7 +10,7 @@ class CreateFarmUseCase:
         self.db = db
         self.farm_repository = FarmRepository(db)
 
-    def execute(self, farm_data: FarmCreate, current_user: UserInDB) -> FarmResponse:
+    def execute(self, farm_data: FarmCreate, current_user: UserInDB) -> SuccessResponse:
         # Verificar si el usuario tiene permisos para crear fincas
         if not self.user_can_create_farm(current_user):
             raise InsufficientPermissionsException()
@@ -34,8 +33,7 @@ class CreateFarmUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Usar la función de mapeo para construir la respuesta
-        return map_farm_to_response(farm)
+        return SuccessResponse(message="Finca creada exitosamente")
 
     def user_can_create_farm(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear fincas

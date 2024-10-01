@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PlotCreate, PlotResponse
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from app.infrastructure.mappers.response_mappers import map_plot_to_response
 from fastapi import status
@@ -11,7 +11,7 @@ class CreatePlotUseCase:
         self.db = db
         self.plot_repository = PlotRepository(db)
 
-    def execute(self, plot_data: PlotCreate, current_user: UserInDB) -> PlotResponse:
+    def execute(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
         # Verificar si el usuario tiene permisos para crear lotes
         if not self.user_can_create_plot(current_user):
             raise InsufficientPermissionsException()
@@ -41,8 +41,7 @@ class CreatePlotUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Usar la función de mapeo para construir la respuesta
-        return map_plot_to_response(plot)
+        return SuccessResponse(message="Lote creado exitosamente")
 
     def user_can_create_plot(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear lotes

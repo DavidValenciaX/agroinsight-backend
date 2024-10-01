@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreate, AssignmentResponse, TareaLaborCulturalCreate, TareaLaborCulturalResponse
+from app.cultural_practices.domain.schemas import AssignmentCreate, TareaLaborCulturalCreate
 from app.cultural_practices.application.create_assignment_use_case import CreateAssignmentUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import SuccessResponse, UserInDB
 
 router = APIRouter(prefix="/cultural_practices", tags=["cultural practices"])
 
-@router.post("/create-task", response_model=TareaLaborCulturalResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create-task", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_task(
     task: TareaLaborCulturalCreate,
     db: Session = Depends(getDb),
@@ -27,7 +27,7 @@ def create_task(
             detail=f"Error interno al crear la tarea: {str(e)}"
         )
 
-@router.post("/create-assignment", response_model=AssignmentResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create-assignment", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_assignment(
     assignment: AssignmentCreate,
     db: Session = Depends(getDb),

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
-from app.cultural_practices.domain.schemas import TareaLaborCulturalCreate, TareaLaborCulturalResponse
-from app.user.domain.schemas import UserInDB
+from app.cultural_practices.domain.schemas import TareaLaborCulturalCreate
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 from datetime import datetime
@@ -11,7 +11,7 @@ class CreateTaskUseCase:
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
 
-    def execute(self, tarea_data: TareaLaborCulturalCreate, current_user: UserInDB) -> TareaLaborCulturalResponse:
+    def execute(self, tarea_data: TareaLaborCulturalCreate, current_user: UserInDB) -> SuccessResponse:
         if not self.user_can_create_tarea(current_user):
             raise InsufficientPermissionsException()
 
@@ -55,7 +55,7 @@ class CreateTaskUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        return TareaLaborCulturalResponse.model_validate(tarea)
+        return SuccessResponse(message="Tarea creada exitosamente")
 
     def user_can_create_tarea(self, user: UserInDB) -> bool:
         allowed_roles = ["Superusuario", "Administrador de Finca"]

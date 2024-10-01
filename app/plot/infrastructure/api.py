@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.plot.domain.schemas import PlotCreate, PlotResponse
+from app.plot.domain.schemas import PlotCreate
 from app.plot.application.create_plot_use_case import CreatePlotUseCase
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import SuccessResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from app.plot.domain.schemas import PaginatedPlotListResponse
 from app.plot.application.list_plots_use_case import ListPlotsUseCase
@@ -12,7 +12,7 @@ from fastapi import Query
 
 router = APIRouter(prefix="/plot", tags=["plot"])
 
-@router.post("/create", response_model=PlotResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_plot(
     plot: PlotCreate,
     db: Session = Depends(getDb),
