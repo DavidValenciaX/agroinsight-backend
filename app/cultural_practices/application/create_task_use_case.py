@@ -39,6 +39,13 @@ class CreateTaskUseCase:
                 message="No se puede crear una tarea directamente en estado 'Completada'.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
+            
+        # Verificar si el lote existe
+        if not self.cultural_practice_repository.plot_exists(tarea_data.lote_id):
+            raise DomainException(
+                message="El lote especificado no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
 
         # Crear la tarea
         tarea = self.cultural_practice_repository.create_tarea(tarea_data)

@@ -15,4 +15,6 @@ class Plot(Base):
 
     unidad_area = relationship("UnidadMedida")
     finca = relationship("Finca", back_populates="lotes")
-    asignaciones = relationship("Asignacion", back_populates="lote")
+    
+    # Cambiar de 'asignaciones' a 'tareas' para reflejar la relación correcta
+    tareas = relationship("TareaLaborCultural", back_populates="lote")

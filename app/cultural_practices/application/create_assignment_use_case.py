@@ -26,12 +26,6 @@ class CreateAssignmentUseCase:
                 message="La tarea especificada no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
-        
-        if not self.cultural_practice_repository.plot_exists(assignment_data.lote_id):
-            raise DomainException(
-                message="El lote especificado no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
 
         # Crear la asignación
         assignment = self.cultural_practice_repository.create_assignment(assignment_data)
@@ -41,7 +35,7 @@ class CreateAssignmentUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        return AssignmentResponse.from_orm(assignment)
+        return AssignmentResponse.model_validate(assignment)
 
     def user_can_create_assignment(self, user: UserInDB) -> bool:
         allowed_roles = ["Superusuario", "Administrador de Finca"]
