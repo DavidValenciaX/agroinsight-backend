@@ -3,6 +3,10 @@ from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
 from datetime import datetime, timezone
 
+# Definir constantes para evitar la duplicación de literales
+USUARIO_ID = 'usuario.id'
+CASCADE_DELETE_ORPHAN = "all, delete-orphan"
+
 class User(Base):
     __tablename__ = "usuario"
     
@@ -20,16 +24,18 @@ class User(Base):
     # Relación con la tabla estado_usuario
     estado = relationship("EstadoUsuario")
     # Relaciones para confirmación, verificación y recuperación
-    confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
-    verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
-    recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade="all, delete-orphan")
+    confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
+    verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
+    recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     # Relación con la tabla blacklisted_tokens
     blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
+    # Relación con las fincas
+    fincas = relationship("Finca", secondary="usuario_finca", back_populates="usuarios")
     
 class UserRole(Base):
     __tablename__ = "usuario_rol"
     
-    usuario_id = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
+    usuario_id = Column(Integer, ForeignKey(USUARIO_ID), primary_key=True)
     rol_id = Column(Integer, ForeignKey('rol.id'), primary_key=True)
     
 class Role(Base):
@@ -52,7 +58,7 @@ class ConfirmacionUsuario(Base):
     __tablename__ = "confirmacion_usuario"
     
     id = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(Integer, ForeignKey('usuario.id', ondelete="CASCADE"), nullable=False)
+    usuario_id = Column(Integer, ForeignKey(USUARIO_ID, ondelete="CASCADE"), nullable=False)
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
@@ -63,7 +69,7 @@ class VerificacionDospasos(Base):
     __tablename__ = "verificacion_dos_pasos"
     
     id = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(Integer, ForeignKey('usuario.id', ondelete="CASCADE"), nullable=False)
+    usuario_id = Column(Integer, ForeignKey(USUARIO_ID, ondelete="CASCADE"), nullable=False)
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
@@ -74,7 +80,7 @@ class RecuperacionContrasena(Base):
     __tablename__ = "recuperacion_contrasena"
     
     id = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(Integer, ForeignKey('usuario.id', ondelete="CASCADE"), nullable=False)
+    usuario_id = Column(Integer, ForeignKey(USUARIO_ID, ondelete="CASCADE"), nullable=False)
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
@@ -90,7 +96,7 @@ class BlacklistedToken(Base):
     blacklisted_at = Column(DateTime, default=datetime.now(timezone.utc))
     
     # Agregando la clave foránea para relacionar con la tabla usuario
-    usuario_id = Column(Integer, ForeignKey('usuario.id'), nullable=False)
+    usuario_id = Column(Integer, ForeignKey(USUARIO_ID), nullable=False)
     
     # Relación con el modelo User
     usuario = relationship("User", back_populates="blacklisted_tokens")

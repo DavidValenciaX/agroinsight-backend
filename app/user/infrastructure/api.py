@@ -148,9 +148,9 @@ def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_us
     list_users_use_case = ListUsersUseCase(db)
     try:
         return list_users_use_case.execute(current_user)
-    except DomainException as e:
-        raise e
     except (DomainException, UserStateException) as e:
+        raise e
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar los usuarios: {str(e)}"

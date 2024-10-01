@@ -58,3 +58,12 @@ class UnidadMedida(UnidadMedidaBase):
 
     class Config:
         from_attributes = True
+        
+class FarmUserAssignment(BaseModel):
+    farm_id: int
+    user_ids: List[int]
+
+class FarmUserAssignmentResponse(BaseModel):
+    farm_id: int
+    assigned_user_ids: List[int]
+    message: str

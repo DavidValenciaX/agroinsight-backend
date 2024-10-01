@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from app.farm.infrastructure.orm_models import Finca, UnidadMedida, UsuarioFinca
 from app.farm.domain.schemas import FarmCreate
 from typing import Optional, List, Tuple
-from sqlalchemy import func
+from app.farm.infrastructure.orm_models import Finca, UsuarioFinca
+from typing import List
 
 class FarmRepository:
     def __init__(self, db: Session):
@@ -56,3 +57,15 @@ class FarmRepository:
         farms = query.offset((page - 1) * per_page).limit(per_page).all()
         
         return total, farms
+    
+    def assign_users_to_farm(self, farm_id: int, user_ids: List[int]) -> List[int]:
+        assigned_user_ids = []
+        for user_id in user_ids:
+            user_farm = UsuarioFinca(usuario_id=user_id, finca_id=farm_id)
+            self.db.merge(user_farm)
+            assigned_user_ids.append(user_id)
+        self.db.commit()
+        return assigned_user_ids
+
+    def get_farm_by_id(self, farm_id: int) -> Finca:
+        return self.db.query(Finca).filter(Finca.id == farm_id).first()

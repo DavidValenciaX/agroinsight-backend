@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, FarmResponse, PaginatedFarmListResponse
+from app.farm.domain.schemas import FarmCreate, FarmResponse, PaginatedFarmListResponse, FarmUserAssignment, FarmUserAssignmentResponse
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
+from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
-from fastapi import Query
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
@@ -44,4 +44,21 @@ def list_farms(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar las fincas: {str(e)}"
+        )
+        
+@router.post("/assign-users", response_model=FarmUserAssignmentResponse)
+def assign_users_to_farm(
+    assignment_data: FarmUserAssignment,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    use_case = AssignUsersToFarmUseCase(db)
+    try:
+        return use_case.execute(assignment_data, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno a asignar usuario a una finca {str(e)}"
         )
