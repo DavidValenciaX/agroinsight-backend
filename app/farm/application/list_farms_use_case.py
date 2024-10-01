@@ -1,8 +1,10 @@
+# app/farm/application/list_farms_use_case.py
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
-from app.farm.domain.schemas import FarmResponse, PaginatedFarmListResponse
+from app.farm.domain.schemas import PaginatedFarmListResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
+from app.infrastructure.common.common_exceptions import InsufficientPermissionsException
+from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from fastapi import status
 from math import ceil
 
@@ -17,17 +19,8 @@ class ListFarmsUseCase:
 
         total_farms, farms = self.farm_repository.list_farms_paginated(current_user.id, page, per_page)
 
-        farm_responses = [
-            FarmResponse(
-                id=farm.id,
-                nombre=farm.nombre,
-                ubicacion=farm.ubicacion,
-                area_total=farm.area_total,
-                unidad_area=farm.unidad_area.abreviatura,
-                latitud=farm.latitud,
-                longitud=farm.longitud
-            ) for farm in farms
-        ]
+        # Usar la función de mapeo para construir FarmResponse para cada finca
+        farm_responses = [map_farm_to_response(farm) for farm in farms]
 
         total_pages = ceil(total_farms / per_page)
 

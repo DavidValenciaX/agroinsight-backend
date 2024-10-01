@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from app.infrastructure.mappers.response_mappers import map_user_to_response
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserResponse
 from app.infrastructure.common.common_exceptions import MissingTokenException, UserStateException
@@ -9,7 +10,7 @@ class GetCurrentUserUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, current_user):
+    def execute(self, current_user) -> UserResponse:
         if not current_user:
             raise MissingTokenException()
             
@@ -21,18 +22,6 @@ class GetCurrentUserUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 user_state="unknown"
             )
-            
-            
-        estado_nombre = estado.nombre
         
-        # Obtener el rol del usuario
-        user_role = ", ".join([role.nombre for role in current_user.roles]) if current_user.roles else "Rol no asignado"
-
-        return UserResponse(
-            id=current_user.id,
-            nombre=current_user.nombre,
-            apellido=current_user.apellido,
-            email=current_user.email,
-            estado=estado_nombre,
-            rol=user_role
-        )
+        current_user.estado = estado
+        return map_user_to_response(current_user)

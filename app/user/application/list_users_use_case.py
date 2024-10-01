@@ -1,14 +1,16 @@
+from typing import List
 from sqlalchemy.orm import Session
 from app.infrastructure.common.common_exceptions import InsufficientPermissionsException, MissingTokenException
 from app.user.domain.schemas import UserResponse
 from app.user.infrastructure.sql_repository import UserRepository
+from app.infrastructure.mappers.response_mappers import map_user_to_response
 
 class ListUsersUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, current_user):
+    def execute(self, current_user) -> List[UserResponse]:
         if not current_user:
             raise MissingTokenException()
             
@@ -24,14 +26,5 @@ class ListUsersUseCase:
         if not users:
             return []  # Retornar lista vacía
         
-        # Mapeamos los usuarios a UserResponse para devolver la información formateada
-        return [
-            UserResponse(
-                id=user.id,
-                nombre=user.nombre,
-                apellido=user.apellido,
-                email=user.email,
-                estado=user.estado.nombre,  # Nombre del estado
-                rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Rol no asignado"
-            ) for user in users
-        ]
+        # Usar la función de mapeo para construir UserResponse para cada usuario
+        return [map_user_to_response(user) for user in users]

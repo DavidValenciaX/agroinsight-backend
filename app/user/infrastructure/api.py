@@ -21,7 +21,7 @@ from app.user.application.get_user_by_id_use_case import GetUserByIdUseCase
 from app.user.application.logout_use_case import LogoutUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import *
+from app.user.domain.schemas import UserCreate, SuccessResponse, ResendPinConfirmRequest, ConfirmationRequest, LoginRequest, Resend2FARequest, TwoFactorAuthRequest, TokenResponse, UserCreateByAdmin, UserResponse, UserUpdate, AdminUserUpdate, PasswordRecoveryRequest, PinConfirmationRequest, PasswordResetRequest, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from typing import List
 

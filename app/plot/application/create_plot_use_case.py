@@ -3,6 +3,7 @@ from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PlotCreate, PlotResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
+from app.infrastructure.mappers.response_mappers import map_plot_to_response
 from fastapi import status
 
 class CreatePlotUseCase:
@@ -40,16 +41,8 @@ class CreatePlotUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Construir y retornar la respuesta
-        return PlotResponse(
-            id=plot.id,
-            nombre=plot.nombre,
-            area=plot.area,
-            unidad_area=plot.unidad_area.abreviatura,
-            latitud=plot.latitud,
-            longitud=plot.longitud,
-            finca_id=plot.finca_id
-        )
+        # Usar la función de mapeo para construir la respuesta
+        return map_plot_to_response(plot)
 
     def user_can_create_plot(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear lotes

@@ -1,14 +1,15 @@
 from sqlalchemy.orm import Session
-from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserResponse
+from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import InsufficientPermissionsException, MissingTokenException, UserNotRegisteredException
+from app.infrastructure.mappers.response_mappers import map_user_to_response
 
 class GetUserByIdUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, user_id: int, current_user):
+    def execute(self, user_id: int, current_user) -> UserResponse:
         if not current_user:
             raise MissingTokenException()
             
@@ -24,11 +25,5 @@ class GetUserByIdUseCase:
         if not user:
             raise UserNotRegisteredException()
         
-        return UserResponse(
-            id=user.id,
-            nombre=user.nombre,
-            apellido=user.apellido,
-            email=user.email,
-            estado=user.estado.nombre,
-            rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Rol no asignado"
-        )
+        # Usar la función de mapeo para construir UserResponse
+        return map_user_to_response(user)

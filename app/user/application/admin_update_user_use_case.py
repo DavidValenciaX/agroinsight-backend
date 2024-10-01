@@ -3,6 +3,7 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import AdminUserUpdate, UserResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserAlreadyRegisteredException, UserNotRegisteredException
 from fastapi import status
+from app.infrastructure.mappers.response_mappers import map_user_to_response
 
 class AdminUpdateUserUseCase:
     def __init__(self, db: Session):
@@ -40,12 +41,5 @@ class AdminUpdateUserUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-        # Construir UserResponse
-        return UserResponse(
-            id=updated_user.id,
-            nombre=updated_user.nombre,
-            apellido=updated_user.apellido,
-            email=updated_user.email,
-            estado=updated_user.estado.nombre,
-            rol=", ".join([role.nombre for role in updated_user.roles]) if updated_user.roles else "Rol no asignado"
-        )
+        # Usar la función de mapeo para construir UserResponse
+        return map_user_to_response(updated_user)

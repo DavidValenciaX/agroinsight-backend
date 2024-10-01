@@ -3,6 +3,7 @@ from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import FarmCreate, FarmResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
+from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from fastapi import status
 
 class CreateFarmUseCase:
@@ -33,16 +34,8 @@ class CreateFarmUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Construir y retornar la respuesta
-        return FarmResponse(
-            id=farm.id,
-            nombre=farm.nombre,
-            ubicacion=farm.ubicacion,
-            area_total=farm.area_total,
-            unidad_area=farm.unidad_area.abreviatura,
-            latitud=farm.latitud,
-            longitud=farm.longitud
-        )
+        # Usar la función de mapeo para construir la respuesta
+        return map_farm_to_response(farm)
 
     def user_can_create_farm(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear fincas

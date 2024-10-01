@@ -1,8 +1,10 @@
+# app/plot/application/list_plots_use_case.py
 from sqlalchemy.orm import Session
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PlotResponse, PaginatedPlotListResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.mappers.response_mappers import map_plot_to_response
 from fastapi import status
 from math import ceil
 
@@ -27,17 +29,8 @@ class ListPlotsUseCase:
 
         total_plots, plots = self.plot_repository.list_plots_by_farm_paginated(finca_id, page, per_page)
 
-        plot_responses = [
-            PlotResponse(
-                id=plot.id,
-                nombre=plot.nombre,
-                area=plot.area,
-                unidad_area=plot.unidad_area.abreviatura,
-                latitud=plot.latitud,
-                longitud=plot.longitud,
-                finca_id=plot.finca_id
-            ) for plot in plots
-        ]
+        # Usar la función de mapeo para construir PlotResponse para cada lote
+        plot_responses = [map_plot_to_response(plot) for plot in plots]
 
         total_pages = ceil(total_plots / per_page)
 
