@@ -10,7 +10,7 @@ class PlotRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_plot(self, plot_data: PlotCreate, user_id: int) -> Optional[Plot]:
+    def create_plot(self, plot_data: PlotCreate) -> Optional[Plot]:
         try:
             new_plot = Plot(
                 nombre=plot_data.nombre,

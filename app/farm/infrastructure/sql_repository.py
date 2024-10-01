@@ -5,6 +5,8 @@ from typing import Optional, List, Tuple
 from app.farm.infrastructure.orm_models import Finca, UsuarioFinca
 from typing import List
 
+from app.user.infrastructure.orm_models import User, UserRole
+
 class FarmRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -69,3 +71,22 @@ class FarmRepository:
 
     def get_farm_by_id(self, farm_id: int) -> Finca:
         return self.db.query(Finca).filter(Finca.id == farm_id).first()
+    
+    def list_farm_users_by_role_paginated(self, farm_id: int, role_id: int, page: int, per_page: int):
+        offset = (page - 1) * per_page
+        query = (
+            self.db.query(User)
+            .join(UsuarioFinca, UsuarioFinca.usuario_id == User.id)
+            .join(UserRole, UserRole.usuario_id == User.id)
+            .filter(UsuarioFinca.finca_id == farm_id)
+            .filter(UserRole.rol_id == role_id)
+        )
+        total = query.count()
+        users = query.offset(offset).limit(per_page).all()
+        return total, users
+    
+    def user_has_access_to_farm(self, user_id: int, farm_id: int) -> bool:
+        return self.db.query(UsuarioFinca).filter(
+            UsuarioFinca.usuario_id == user_id,
+            UsuarioFinca.finca_id == farm_id
+        ).first() is not None

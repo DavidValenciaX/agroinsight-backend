@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from decimal import Decimal
 from typing import Optional, List
 
+from app.user.domain.schemas import UserResponse
+
 class FarmCreate(BaseModel):
     nombre: str = Field(..., min_length=1, max_length=100)
     ubicacion: str = Field(..., min_length=1, max_length=255)
@@ -67,3 +69,13 @@ class FarmUserAssignmentResponse(BaseModel):
     farm_id: int
     assigned_user_ids: List[int]
     message: str
+    
+class FarmUserListResponse(BaseModel):
+    users: List[UserResponse]
+
+class PaginatedFarmUserListResponse(BaseModel):
+    users: List[UserResponse]
+    total_users: int
+    page: int
+    per_page: int
+    total_pages: int

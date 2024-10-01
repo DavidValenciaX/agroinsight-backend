@@ -253,7 +253,7 @@ class UserRepository:
             print(f"Error al agregar la recuperación de contraseña: {e}")
             return False
         
-    def update_password_recovery(self, recovery: RecuperacionContrasena) -> bool:
+    def update_password_recovery(self) -> bool:
         try:
             self.db.commit()
             return True
