@@ -1,8 +1,14 @@
+import re
 from typing import List
 from datetime import datetime
 from pydantic import BaseModel, field_validator
 from pydantic_core import PydanticCustomError
-import re
+
+def validate_email(v: str) -> str:
+    email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    if not re.match(email_regex, v):
+        raise PydanticCustomError('email_validation', 'El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
+    return v
 
 class UserCreate(BaseModel):
     email: str
@@ -10,13 +16,7 @@ class UserCreate(BaseModel):
     apellido: str
     password: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
     @field_validator('nombre')
     def validate_nombre(cls, v):
@@ -43,9 +43,7 @@ class UserCreate(BaseModel):
             errors.append('La contraseña debe contener al menos un carácter especial.')
         
         if errors:
-            # Unir los errores en un solo mensaje
             message = '\n'.join(errors)
-            # Levantar un error personalizado sin prefijo
             raise PydanticCustomError('password_validation', message)
         return v
 
@@ -55,25 +53,13 @@ class SuccessResponse(BaseModel):
 class ResendPinConfirmRequest(BaseModel):
     email: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
 class ConfirmationRequest(BaseModel):
     email: str
     pin: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
 class UserCreateByAdmin(UserCreate):
     role_id: int
@@ -96,13 +82,7 @@ class UserInDB(BaseModel):
     class Config:
         from_attributes = True
         
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
 class UserResponse(BaseModel):
     id: int
@@ -115,48 +95,24 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
 class LoginRequest(BaseModel):
     email: str
     password: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
     
 class TwoFactorAuthRequest(BaseModel):
     email: str
     pin: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
     
 class Resend2FARequest(BaseModel):
     email: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
     
 class TokenResponse(BaseModel):
     access_token: str
@@ -170,13 +126,7 @@ class UserUpdate(BaseModel):
     class Config:
         from_attributes = True
         
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
         
 class AdminUserUpdate(BaseModel):
     nombre: str
@@ -188,48 +138,24 @@ class AdminUserUpdate(BaseModel):
     class Config:
         from_attributes = True
         
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
 class PasswordRecoveryRequest(BaseModel):
     email: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
 class PinConfirmationRequest(BaseModel):
     email: str
     pin: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
 
 class PasswordResetRequest(BaseModel):
     email: str
     new_password: str
     
-    @field_validator('email')
-    def validate_email(cls, v):
-        # Expresión regular básica para validar el formato del correo electrónico
-        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(email_regex, v):
-            raise PydanticCustomError('email_validation','El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-        return v
+    _validate_email = field_validator('email')(validate_email)
     
     @field_validator('new_password')
     def validate_password(cls, v):
@@ -244,8 +170,6 @@ class PasswordResetRequest(BaseModel):
             errors.append('La contraseña debe contener al menos un carácter especial.')
         
         if errors:
-            # Unir los errores en un solo mensaje
             message = '\n'.join(errors)
-            # Levantar un error personalizado sin prefijo
             raise PydanticCustomError('password_validation', message)
         return v
