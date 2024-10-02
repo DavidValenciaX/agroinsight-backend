@@ -34,7 +34,7 @@ class CreatePlotUseCase:
             )
 
         # Crear el lote
-        plot = self.plot_repository.create_plot(plot_data, current_user.id)
+        plot = self.plot_repository.create_plot(plot_data)
         if not plot:
             raise DomainException(
                 message="No se pudo crear el lote.",
