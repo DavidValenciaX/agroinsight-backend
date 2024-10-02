@@ -1,9 +1,10 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, FarmUserAssignment, PaginatedFarmUserListResponse
+from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentById, FarmUserAssignmentByEmail
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
@@ -49,21 +50,38 @@ def list_farms(
             detail=f"Error interno al listar las fincas: {str(e)}"
         )
         
-@router.post("/assign-users", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
+@router.post("/assign-users-by-id", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def assign_users_to_farm(
-    assignment_data: FarmUserAssignment,
+    assignment_data: FarmUserAssignmentById,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
-    assingn_users_use_case = AssignUsersToFarmUseCase(db)
+    assign_users_use_case = AssignUsersToFarmUseCase(db)
     try:
-        return assingn_users_use_case.execute(assignment_data, current_user)
+        return assign_users_use_case.execute_by_id(assignment_data, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al asignar usuario a una finca {str(e)}"
+        )
+        
+@router.post("/assign-users-by-email", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
+def assign_users_to_farm_by_email(
+    assignment_data: FarmUserAssignmentByEmail,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    assign_users_use_case = AssignUsersToFarmUseCase(db)
+    try:
+        return assign_users_use_case.execute_by_emails(assignment_data, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al asignar usuario a una finca: {str(e)}"
         )
         
 @router.get("/{farm_id}/users", response_model=PaginatedFarmUserListResponse, status_code=status.HTTP_200_OK)

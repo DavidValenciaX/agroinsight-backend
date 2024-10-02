@@ -61,14 +61,13 @@ class UnidadMedida(UnidadMedidaBase):
     class Config:
         from_attributes = True
         
-class FarmUserAssignment(BaseModel):
+class FarmUserAssignmentById(BaseModel):
     farm_id: int
     user_ids: List[int]
-
-class FarmUserAssignmentResponse(BaseModel):
+    
+class FarmUserAssignmentByEmail(BaseModel):
     farm_id: int
-    assigned_user_ids: List[int]
-    message: str
+    user_emails: List[str]
     
 class FarmUserListResponse(BaseModel):
     users: List[UserResponse]
