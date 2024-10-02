@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.schemas import SuccessResponse, UserUpdate, UserInDB
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserUpdate, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserAlreadyRegisteredException
 from fastapi import status
 

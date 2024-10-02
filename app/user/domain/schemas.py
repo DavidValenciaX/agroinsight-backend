@@ -47,9 +47,6 @@ class UserCreate(BaseModel):
             raise PydanticCustomError('apellido_validation','El apellido debe tener al menos 2 caracteres.')
         return v
 
-class SuccessResponse(BaseModel):
-    message: str
-
 class ResendPinConfirmRequest(BaseModel):
     email: str
     

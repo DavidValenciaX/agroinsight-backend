@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import datetime, timedelta, timezone
 from app.infrastructure.services.pin_service import generate_pin
-from app.user.domain.schemas import SuccessResponse
+from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState
 from app.user.infrastructure.orm_models import RecuperacionContrasena
 from app.infrastructure.services.email_service import send_email

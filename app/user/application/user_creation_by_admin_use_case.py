@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.schemas import SuccessResponse, UserCreateByAdmin
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserCreateByAdmin
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, MissingTokenException, UserAlreadyRegisteredException, UserStateException
 from app.infrastructure.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User

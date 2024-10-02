@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.domain.schemas import AssignmentCreate
-from app.user.domain.schemas import SuccessResponse, UserInDB
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 

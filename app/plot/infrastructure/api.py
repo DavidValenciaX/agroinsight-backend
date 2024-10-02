@@ -4,7 +4,8 @@ from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.plot.domain.schemas import PlotCreate
 from app.plot.application.create_plot_use_case import CreatePlotUseCase
-from app.user.domain.schemas import SuccessResponse, UserInDB
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from app.plot.domain.schemas import PaginatedPlotListResponse
 from app.plot.application.list_plots_use_case import ListPlotsUseCase

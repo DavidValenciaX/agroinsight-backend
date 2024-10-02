@@ -3,7 +3,8 @@ from fastapi import status
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.orm_models import User, ConfirmacionUsuario
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.domain.schemas import SuccessResponse, UserCreate
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserCreate
 from app.infrastructure.security.security_utils import hash_password
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.infrastructure.services.pin_service import generate_pin

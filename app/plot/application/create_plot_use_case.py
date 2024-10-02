@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from app.plot.infrastructure.sql_repository import PlotRepository
-from app.plot.domain.schemas import PlotCreate, PlotResponse
-from app.user.domain.schemas import SuccessResponse, UserInDB
+from app.plot.domain.schemas import PlotCreate
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
-from app.infrastructure.mappers.response_mappers import map_plot_to_response
 from fastapi import status
 
 class CreatePlotUseCase:

@@ -6,7 +6,8 @@ from app.cultural_practices.application.create_task_use_case import CreateTaskUs
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.user.domain.schemas import SuccessResponse, UserInDB
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserInDB
 
 router = APIRouter(prefix="/cultural_practices", tags=["cultural practices"])
 

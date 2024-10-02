@@ -7,7 +7,8 @@ from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, FarmU
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
-from app.user.domain.schemas import SuccessResponse, UserInDB
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from app.user.infrastructure.orm_models import User
 

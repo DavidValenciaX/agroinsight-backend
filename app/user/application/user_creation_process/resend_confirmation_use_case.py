@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from fastapi import status
-from app.user.domain.schemas import SuccessResponse
+from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.user.domain.schemas import SuccessResponse
+from app.infrastructure.common.response_models import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserNotRegisteredException
 from fastapi import status

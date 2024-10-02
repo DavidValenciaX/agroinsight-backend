@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
-from app.farm.domain.schemas import FarmCreate, FarmResponse
-from app.user.domain.schemas import SuccessResponse, UserInDB
+from app.farm.domain.schemas import FarmCreate
+from app.infrastructure.common.response_models import SuccessResponse
+from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
 
