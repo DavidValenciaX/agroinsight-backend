@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from app.cultural_practices.domain.schemas import AssignmentCreate, TareaLaborCulturalCreate
 from app.cultural_practices.infrastructure.orm_models import Asignacion, EstadoTareaLaborCultural, TipoLaborCultural
@@ -45,3 +46,9 @@ class CulturalPracticesRepository:
 
     def get_current_date(self) -> datetime.date:
         return datetime.now(timezone.utc).date()
+    
+    def list_assignments_by_user_paginated(self, user_id: int, page: int, per_page: int) -> tuple[int, List[Asignacion]]:
+        query = self.db.query(Asignacion).filter(Asignacion.usuario_id == user_id)
+        total_assignments = query.count()
+        assignments = query.offset((page - 1) * per_page).limit(per_page).all()
+        return total_assignments, assignments

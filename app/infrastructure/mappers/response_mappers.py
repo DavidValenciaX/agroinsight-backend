@@ -1,5 +1,5 @@
-# app/infrastructure/mappers/response_mappers.py
 
+from app.cultural_practices.domain.schemas import AssignmentResponse
 from app.user.domain.schemas import UserResponse
 from app.farm.domain.schemas import FarmResponse
 from app.plot.domain.schemas import PlotResponse
@@ -34,4 +34,11 @@ def map_plot_to_response(plot) -> PlotResponse:
         latitud=plot.latitud,
         longitud=plot.longitud,
         finca_id=plot.finca_id
+    )
+    
+def map_assignment_to_response(assignment) -> AssignmentResponse:
+    return AssignmentResponse(
+        usuario_id=assignment.usuario_id,
+        tarea_labor_cultural_id=assignment.tarea_labor_cultural_id,
+        notas=assignment.notas
     )

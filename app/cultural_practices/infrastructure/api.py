@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from app.cultural_practices.application.list_assignments_use_case import ListAssignmentsUseCase
 from app.cultural_practices.domain.schemas import AssignmentCreate, TareaLaborCulturalCreate
 from app.cultural_practices.application.create_assignment_use_case import CreateAssignmentUseCase
+from app.cultural_practices.domain.schemas import PaginatedAssignmentListResponse
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
@@ -43,4 +45,23 @@ def create_assignment(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al asignar la tarea: {str(e)}"
+        )
+        
+@router.get("/list-assignments/{user_id}", response_model=PaginatedAssignmentListResponse, status_code=status.HTTP_200_OK)
+def list_assignments(
+    user_id: int,
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    list_assignments_use_case = ListAssignmentsUseCase(db)
+    try:
+        return list_assignments_use_case.execute(user_id, page, per_page, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar las asignaciones: {str(e)}"
         )

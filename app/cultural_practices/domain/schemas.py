@@ -1,7 +1,7 @@
 from decimal import Decimal
 from pydantic import BaseModel, Field
-from datetime import date, datetime
-from typing import Optional
+from datetime import date
+from typing import List, Optional
         
 class TareaLaborCulturalBase(BaseModel):
     tipo_labor_id: int
@@ -34,3 +34,10 @@ class AssignmentResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class PaginatedAssignmentListResponse(BaseModel):
+    assignments: List[AssignmentResponse]
+    total_assignments: int
+    page: int
+    per_page: int
+    total_pages: int
