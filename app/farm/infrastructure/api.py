@@ -1,3 +1,10 @@
+"""
+Este módulo define las rutas de la API para la gestión de fincas.
+
+Incluye endpoints para la creación de fincas, asignación de usuarios,
+listado de fincas y usuarios de una finca específica.
+"""
+
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
@@ -21,6 +28,20 @@ def create_farm(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
+    """
+    Crea una nueva finca en el sistema.
+
+    Parameters:
+        farm (FarmCreate): Datos de la finca a crear.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        SuccessResponse: Un objeto SuccessResponse indicando que la finca fue creada exitosamente.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la creación de la finca.
+    """
     crear_farm_use_case = CreateFarmUseCase(db)
     try:
         return crear_farm_use_case.execute(farm, current_user)
@@ -39,6 +60,21 @@ def list_farms(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
+    """
+    Lista todas las fincas en el sistema.
+
+    Parameters:
+        page (int): Número de página.
+        per_page (int): Elementos por página.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        PaginatedFarmListResponse: Una lista paginada de fincas.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la lista de fincas.
+    """
     list_farms_use_case = ListFarmsUseCase(db)
     try:
         return list_farms_use_case.execute(current_user, page, per_page)
@@ -56,6 +92,20 @@ def assign_users_to_farm(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
+    """
+    Asigna usuarios a una finca utilizando sus IDs.
+
+    Parameters:
+        assignment_data (FarmUserAssignmentById): Datos de asignación de usuarios.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        SuccessResponse: Un objeto SuccessResponse indicando que los usuarios fueron asignados exitosamente.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la asignación de usuarios.
+    """
     assign_users_use_case = AssignUsersToFarmUseCase(db)
     try:
         return assign_users_use_case.execute_by_id(assignment_data, current_user)
@@ -73,6 +123,20 @@ def assign_users_to_farm_by_email(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
+    """
+    Asigna usuarios a una finca utilizando sus correos electrónicos.
+
+    Parameters:
+        assignment_data (FarmUserAssignmentByEmail): Datos de asignación de usuarios.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        SuccessResponse: Un objeto SuccessResponse indicando que los usuarios fueron asignados exitosamente.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la asignación de usuarios.
+    """
     assign_users_use_case = AssignUsersToFarmUseCase(db)
     try:
         return assign_users_use_case.execute_by_emails(assignment_data, current_user)
@@ -94,6 +158,24 @@ def list_farm_users(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(getDb)
 ):
+    """
+    Lista los usuarios de una finca específica.
+
+    Parameters:
+        farm_id (int): ID de la finca.
+        role (str): Nombre del rol a filtrar.
+        role_id (int): ID del rol a filtrar.
+        page (int): Número de página.
+        per_page (int): Elementos por página.
+        current_user (User): Usuario actual autenticado.
+        db (Session): Sesión de base de datos.
+
+    Returns:
+        PaginatedFarmUserListResponse: Una lista paginada de usuarios de la finca.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la lista de usuarios.
+    """
     if role is None and role_id is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

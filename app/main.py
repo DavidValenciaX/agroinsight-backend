@@ -1,3 +1,10 @@
+"""
+Módulo principal de la aplicación AgroInSight.
+
+Este módulo inicializa la aplicación FastAPI, configura los routers
+y los manejadores de excepciones.
+"""
+
 from fastapi import FastAPI, HTTPException
 from app.user.infrastructure.api import router as user_router
 from app.farm.infrastructure.api import router as farm_router
@@ -22,6 +29,12 @@ app.include_router(cultural_practices_router)
 
 @app.get("/")
 def root():
+    """
+    Ruta raíz de la API.
+
+    Returns:
+        dict: Mensaje de bienvenida.
+    """
     return {"message": "Bienvenido a AgroinSight"}
 
 # Manejadores de excepciones (registrar los más específicos primero)
