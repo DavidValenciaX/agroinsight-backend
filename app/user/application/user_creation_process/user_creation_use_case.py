@@ -12,13 +12,53 @@ from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
 
 class UserCreationUseCase:
+    """
+    Caso de uso para la creación de un nuevo usuario en el sistema.
+
+    Esta clase maneja la lógica de negocio para el registro de nuevos usuarios,
+    incluyendo la validación de datos, la creación del usuario en la base de datos,
+    y el envío de correos de confirmación.
+
+    Attributes:
+    ----------
+        - db (Session): La sesión de base de datos para realizar operaciones.
+        - user_repository (UserRepository): Repositorio para operaciones de usuario.
+        - state_validator (UserStateValidator): Validador de estados de usuario.
+    """
     def __init__(self, db: Session):
+        """
+        Inicializa una nueva instancia de UserCreationUseCase.
+
+        Parameters:
+        -------
+            - db (Session): La sesión de base de datos a utilizar.
+        """
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
 
     def execute(self, user_data: UserCreate) -> SuccessResponse:
-        # Verificar si el usuario ya existe
+        """
+        Ejecuta el proceso de creación de un nuevo usuario.
+
+        Este método realiza las siguientes operaciones:
+        
+        1. Verifica si el usuario ya existe.
+        2. Valida el estado del usuario si ya existe.
+        3. Crea un nuevo usuario con estado pendiente.
+        4. Asigna el rol de usuario no confirmado.
+        5. Crea y envía una confirmación por correo electrónico.
+
+        Parameters:
+            user_data (UserCreate): Datos del usuario a crear.
+
+        Returns:
+            SuccessResponse: Respuesta indicando el éxito de la operación.
+
+        Raises:
+            DomainException: Si ocurre un error durante el proceso de creación.
+            UserStateException: Si el estado del usuario no es válido.
+        """
         user = self.user_repository.get_user_by_email(user_data.email)
         
         if user:
@@ -81,6 +121,18 @@ class UserCreationUseCase:
             )
 
     def create_and_send_confirmation(self, user: User) -> bool:
+        """
+        Crea y envía una confirmación de registro al usuario.
+
+        Este método genera un PIN de confirmación, crea un registro de confirmación
+        en la base de datos y envía un correo electrónico con el PIN al usuario.
+
+        Parameters:
+            user (User): El usuario para el cual se crea la confirmación.
+
+        Returns:
+            bool: True si la confirmación se creó y envió correctamente, False en caso contrario.
+        """
         try:
             # Generar PIN y su hash
             expiration_time = 10  # minutos
@@ -100,7 +152,16 @@ class UserCreationUseCase:
             return False
 
     def send_confirmation_email(self, email: str, pin: str) -> bool:
-        """Envía un correo electrónico con el PIN de confirmación."""
+        """
+        Envía un correo electrónico de confirmación al usuario.
+
+        Parameters:
+            email (str): La dirección de correo electrónico del usuario.
+            pin (str): El PIN de confirmación generado.
+
+        Returns:
+            bool: True si el correo se envió correctamente, False en caso contrario.
+        """
         subject = "Confirma tu registro en AgroInSight"
         text_content = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""

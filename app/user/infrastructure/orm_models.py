@@ -8,6 +8,28 @@ USUARIO_ID = 'usuario.id'
 CASCADE_DELETE_ORPHAN = "all, delete-orphan"
 
 class User(Base):
+    """
+    Representa la tabla 'usuario' en la base de datos.
+
+    Atributos:
+    ----------
+    - **id** (int): Identificador único del usuario.
+    - **nombre** (str): Nombre del usuario.
+    - **apellido** (str): Apellido del usuario.
+    - **email** (str): Correo electrónico único del usuario.
+    - **password** (str): Contraseña del usuario.
+    - **failed_attempts** (int): Número de intentos fallidos de inicio de sesión.
+    - **locked_until** (datetime): Fecha y hora hasta la cual el usuario está bloqueado.
+    - **state_id** (int): Identificador del estado del usuario.
+    - **roles** (List[Role]): Lista de roles asociados al usuario.
+    - **estado** (EstadoUsuario): Estado actual del usuario.
+    - **confirmacion** (ConfirmacionUsuario): Información de confirmación del usuario.
+    - **verificacion_dos_pasos** (VerificacionDospasos): Información de verificación de dos pasos.
+    - **recuperacion_contrasena** (RecuperacionContrasena): Información de recuperación de contraseña.
+    - **blacklisted_tokens** (List[BlacklistedToken]): Lista de tokens en lista negra.
+    - **fincas** (List[Finca]): Lista de fincas asociadas al usuario.
+    - **asignaciones** (List[Asignacion]): Lista de asignaciones del usuario.
+    """
     __tablename__ = "usuario"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -19,27 +41,40 @@ class User(Base):
     locked_until = Column(DateTime, nullable=True)
     state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
 
-    # Relación con la tabla roles
     roles = relationship("Role", secondary="usuario_rol", back_populates="users")
-    # Relación con la tabla estado_usuario
     estado = relationship("EstadoUsuario")
-    # Relaciones para confirmación, verificación y recuperación
     confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
-    # Relación con la tabla blacklisted_tokens
     blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
-    # Relación con las fincas
     fincas = relationship("Finca", secondary="usuario_finca", back_populates="usuarios")
     asignaciones = relationship("Asignacion", back_populates="usuario")
     
 class UserRole(Base):
+    """
+    Representa la tabla 'usuario_rol' en la base de datos.
+
+    Atributos:
+    ----------
+    - **usuario_id** (int): Identificador del usuario.
+    - **rol_id** (int): Identificador del rol.
+    """
     __tablename__ = "usuario_rol"
     
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID), primary_key=True)
     rol_id = Column(Integer, ForeignKey('rol.id'), primary_key=True)
     
 class Role(Base):
+    """
+    Representa la tabla 'rol' en la base de datos.
+
+    Atributos:
+    ----------
+    - **id** (int): Identificador único del rol.
+    - **nombre** (str): Nombre único del rol.
+    - **descripcion** (str): Descripción del rol.
+    - **users** (List[User]): Lista de usuarios asociados al rol.
+    """
     __tablename__ = "rol"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -49,6 +84,15 @@ class Role(Base):
     users = relationship("User", secondary="usuario_rol", back_populates="roles")
     
 class EstadoUsuario(Base):
+    """
+    Representa la tabla 'estado_usuario' en la base de datos.
+
+    Atributos:
+    ----------
+    - **id** (int): Identificador único del estado.
+    - **nombre** (str): Nombre único del estado.
+    - **descripcion** (str): Descripción del estado.
+    """
     __tablename__ = "estado_usuario"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -56,6 +100,18 @@ class EstadoUsuario(Base):
     descripcion = Column(String(255))
     
 class ConfirmacionUsuario(Base):
+    """
+    Representa la tabla 'confirmacion_usuario' en la base de datos.
+
+    Atributos:
+    ----------
+    - **id** (int): Identificador único de la confirmación.
+    - **usuario_id** (int): Identificador del usuario asociado.
+    - **pin** (str): PIN único de confirmación.
+    - **expiracion** (datetime): Fecha y hora de expiración del PIN.
+    - **intentos** (int): Número de intentos de confirmación.
+    - **usuario** (User): Usuario asociado a la confirmación.
+    """
     __tablename__ = "confirmacion_usuario"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -67,6 +123,18 @@ class ConfirmacionUsuario(Base):
     usuario = relationship("User", back_populates="confirmacion")
     
 class VerificacionDospasos(Base):
+    """
+    Representa la tabla 'verificacion_dos_pasos' en la base de datos.
+
+    Atributos:
+    ----------
+    - **id** (int): Identificador único de la verificación.
+    - **usuario_id** (int): Identificador del usuario asociado.
+    - **pin** (str): PIN único de verificación.
+    - **expiracion** (datetime): Fecha y hora de expiración del PIN.
+    - **intentos** (int): Número de intentos de verificación.
+    - **usuario** (User): Usuario asociado a la verificación.
+    """
     __tablename__ = "verificacion_dos_pasos"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -78,6 +146,19 @@ class VerificacionDospasos(Base):
     usuario = relationship("User", back_populates="verificacion_dos_pasos")
     
 class RecuperacionContrasena(Base):
+    """
+    Representa la tabla 'recuperacion_contrasena' en la base de datos.
+
+    Atributos:
+    ----------
+    - **id** (int): Identificador único de la recuperación.
+    - **usuario_id** (int): Identificador del usuario asociado.
+    - **pin** (str): PIN único de recuperación.
+    - **expiracion** (datetime): Fecha y hora de expiración del PIN.
+    - **intentos** (int): Número de intentos de recuperación.
+    - **pin_confirmado** (bool): Indica si el PIN ha sido confirmado.
+    - **usuario** (User): Usuario asociado a la recuperación.
+    """
     __tablename__ = "recuperacion_contrasena"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -90,14 +171,22 @@ class RecuperacionContrasena(Base):
     usuario = relationship("User", back_populates="recuperacion_contrasena")
     
 class BlacklistedToken(Base):
+    """
+    Representa la tabla 'blacklisted_tokens' en la base de datos.
+
+    Atributos:
+    ----------
+    - **id** (int): Identificador único del token en lista negra.
+    - **token** (str): Token único en lista negra.
+    - **blacklisted_at** (datetime): Fecha y hora en que el token fue añadido a la lista negra.
+    - **usuario_id** (int): Identificador del usuario asociado.
+    - **usuario** (User): Usuario asociado al token en lista negra.
+    """
     __tablename__ = "blacklisted_tokens"
     
     id = Column(Integer, primary_key=True, index=True)
     token = Column(String(500), unique=True, nullable=False, index=True)
     blacklisted_at = Column(DateTime, default=datetime.now(timezone.utc))
     
-    # Agregando la clave foránea para relacionar con la tabla usuario
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID), nullable=False)
-    
-    # Relación con el modelo User
     usuario = relationship("User", back_populates="blacklisted_tokens")

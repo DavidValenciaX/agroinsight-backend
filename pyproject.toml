@@ -39,6 +39,9 @@ resend = "^2.4.0"
 apscheduler = "^3.10.4"
 sendgrid = "^6.11.0"
 mailersend = "^0.5.8"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.5.39"
+mkdocstrings = {extras = ["python"], version = "^0.26.1"}
 
 [build-system]
 requires = ["poetry-core"]

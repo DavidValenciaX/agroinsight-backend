@@ -18,11 +18,11 @@ RUN poetry config virtualenvs.create false && \
 # Segunda etapa: imagen final
 FROM python:3.12-slim
 
-# Declara los ARGs para las variables de entorno que necesitas
+# Declara los Parameters para las variables de entorno que necesitas
 ARG MYSQL_PUBLIC_URL
 ARG SECRET_KEY
 
-# Establece las variables de entorno usando los ARGs, con valores por defecto
+# Establece las variables de entorno usando los Parameters, con valores por defecto
 ENV MYSQL_PUBLIC_URL=$MYSQL_PUBLIC_URL \
     SECRET_KEY=$SECRET_KEY
 

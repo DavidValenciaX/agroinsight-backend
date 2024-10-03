@@ -1,0 +1,61 @@
+site_name: AgroInsight Backend Documentation
+site_description: Documentación para el desarrollador backend del proyecto AgroInSight
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Documentación complementaria:
+    - Descripción: complement-docs/overview.md
+    - FastAPI Swagger: 'https://agroinsight-backend-production.up.railway.app/docs'
+    - ReDoc: 'https://agroinsight-backend-production.up.railway.app/redoc'
+    - Base de datos: 'https://dbdocs.io/davidvalencia0526/AgroInsight'
+    - Diseño de interfaz UI: 'https://www.figma.com/design/PwBFnVysZISNgO8UIoOHL1/Agroinsight?node-id=0-1&node-type=CANVAS&t=s9L7qvi4CEiMX9ad-0'
+    - Repositorio backend: 'https://github.com/DavidValenciaX/agroinsight-backend'
+    - Repositorio frontend: 'https://github.com/Alejandroo04/AgroInsight_Front'
+    - Jira: 'https://usco-team-y6acsy2v.atlassian.net/jira/software/projects/AGROINSHT/boards/1/backlog'
+    - Sharepoint: 'https://drive.google.com/drive/folders/1Nt50sTun-_FQMulYEXsy5aUcIJ7TXKpZ'
+    - Slack: 'https://join.slack.com/t/agroinsight/shared_invite/zt-2rnhell7b-3~ziopW1zaod0ZD8QP6QFw'
+
+  - Guías:
+    - Instalación: guides/installation.md
+    - Guía de inicio rápido: guides/getting_started.md
+    - Preguntas frecuentes: guides/faq.md
+
+  - Módulo de usuarios:
+      - Descripción: user/overview.md
+      - Endpoints: user/endpoints.md
+      - Modelos de datos: user/models.md
+      - Esquemas: user/schemas.md
+      - Casos de uso: user/use_cases.md
+  - Módulo de Fincas:
+      - Descripción: farm/overview.md
+      - Endpoints: farm/endpoints.md
+      - Modelos de datos: farm/models.md
+      - Casos de uso: farm/use_cases.md
+  - Módulo de lotes:
+      - Descripción: plot/overview.md
+      - Endpoints: plot/endpoints.md
+      - Modelos de datos: plot/models.md
+      - Casos de uso: plot/use_cases.md
+  - Módulo de labores culturales:
+      - Descripción: cultural_practices/overview.md
+      - Endpoints: cultural_practices/endpoints.md
+      - Modelos de datos: cultural_practices/models.md
+      - Casos de uso: cultural_practices/use_cases.md
+
+  - Desarrollo:
+      - Guía para contribuir al proyecto: development/contributing.md
+      - Estándares de codificación: development/coding_standards.md
+      - Guía de pruebas: development/testing.md
+
+  - Acerca de: about.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
