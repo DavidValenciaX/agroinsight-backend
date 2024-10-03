@@ -6,6 +6,8 @@ y los manejadores de excepciones.
 """
 
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+import os
 from app.user.infrastructure.api import router as user_router
 from app.farm.infrastructure.api import router as farm_router
 from app.plot.infrastructure.api import router as plot_router
@@ -21,6 +23,12 @@ from app.infrastructure.common.exceptions_handler import (
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 
 app = FastAPI()
+
+# Ruta absoluta para mayor seguridad
+site_directory = os.path.join(os.getcwd(), "site")
+
+# Montar StaticFiles con html=True
+app.mount("/MkDocs", StaticFiles(directory=site_directory, html=True), name="site")
 
 app.include_router(user_router)
 app.include_router(farm_router)
