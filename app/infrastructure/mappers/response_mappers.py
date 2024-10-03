@@ -11,7 +11,8 @@ def map_user_to_response(user) -> UserResponse:
         apellido=user.apellido,
         email=user.email,
         estado=user.estado.nombre if user.estado else "Desconocido",
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Rol no asignado"
+        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Rol no asignado",
+        fincas=[finca.nombre for finca in user.fincas]
     )
 
 def map_farm_to_response(farm) -> FarmResponse:

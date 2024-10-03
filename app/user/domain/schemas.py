@@ -89,6 +89,7 @@ class UserResponse(BaseModel):
     email: str
     estado: str
     rol: str
+    fincas: List[str]  # Add this line to include farm names
 
     class Config:
         from_attributes = True
