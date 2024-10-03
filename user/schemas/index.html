@@ -1,0 +1,3501 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentación para el desarrollador backend del proyecto AgroInSight">
+      
+      
+      
+      
+        <link rel="prev" href="../models/">
+      
+      
+        <link rel="next" href="../use_cases/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+    
+    
+      
+        <title>Esquemas - AgroInsight Backend Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#modelos-de-usuario" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="AgroInsight Backend Documentation" class="md-header__button md-logo" aria-label="AgroInsight Backend Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AgroInsight Backend Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Esquemas
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AgroInsight Backend Documentation" class="md-nav__button md-logo" aria-label="AgroInsight Backend Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AgroInsight Backend Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Documentación complementaria
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Documentación complementaria
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../complement-docs/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://agroinsight-backend-production.up.railway.app/docs" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FastAPI Swagger
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://agroinsight-backend-production.up.railway.app/redoc" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ReDoc
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://dbdocs.io/davidvalencia0526/AgroInsight" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.figma.com/design/PwBFnVysZISNgO8UIoOHL1/Agroinsight?node-id=0-1&node-type=CANVAS&t=s9L7qvi4CEiMX9ad-0" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Diseño de interfaz UI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/DavidValenciaX/agroinsight-backend" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio backend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Alejandroo04/AgroInsight_Front" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio frontend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://usco-team-y6acsy2v.atlassian.net/jira/software/projects/AGROINSHT/boards/1/backlog" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Jira
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://drive.google.com/drive/folders/1Nt50sTun-_FQMulYEXsy5aUcIJ7TXKpZ" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sharepoint
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://join.slack.com/t/agroinsight/shared_invite/zt-2rnhell7b-3~ziopW1zaod0ZD8QP6QFw" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Slack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Guías
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guías
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Instalación
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía de inicio rápido
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/faq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Preguntas frecuentes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de usuarios
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de usuarios
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Esquemas
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Esquemas
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#esquemas-de-solicitud-y-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Esquemas de Solicitud y Respuesta
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Esquemas de Solicitud y Respuesta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#crear-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Crear Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreate" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserCreate
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserCreate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreate--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reenvio-de-pin-de-confirmacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reenvío de PIN de Confirmación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ResendPinConfirmRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResendPinConfirmRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResendPinConfirmRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ResendPinConfirmRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confirmacion-de-registro" class="md-nav__link">
+    <span class="md-ellipsis">
+      Confirmación de Registro
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ConfirmationRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConfirmationRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ConfirmationRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ConfirmationRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inicio-de-sesion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Inicio de Sesión
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.LoginRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      LoginRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LoginRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.LoginRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reenvio-de-pin-de-autenticacion-de-dos-factores" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reenvío de PIN de Autenticación de Dos Factores
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.Resend2FARequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resend2FARequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resend2FARequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.Resend2FARequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verificacion-de-inicio-de-sesion-con-dos-factores" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verificación de Inicio de Sesión con Dos Factores
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TwoFactorAuthRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      TwoFactorAuthRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TwoFactorAuthRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TwoFactorAuthRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#respuesta-de-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      Respuesta de Token
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TokenResponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      TokenResponse
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TokenResponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TokenResponse--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crear-usuario-por-administrador" class="md-nav__link">
+    <span class="md-ellipsis">
+      Crear Usuario por Administrador
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreateByAdmin" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserCreateByAdmin
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserCreateByAdmin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreateByAdmin--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#respuesta-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Respuesta de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserResponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserResponse
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserResponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserResponse--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-informacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Información de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserUpdate
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserUpdate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserUpdate--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actualizacion-de-usuario-por-administrador" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualización de Usuario por Administrador
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.AdminUserUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      AdminUserUpdate
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AdminUserUpdate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.AdminUserUpdate--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordRecoveryRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      PasswordRecoveryRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PasswordRecoveryRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordRecoveryRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confirmacion-de-pin-de-recuperacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Confirmación de PIN de Recuperación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PinConfirmationRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      PinConfirmationRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PinConfirmationRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PinConfirmationRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restablecer-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restablecer Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordResetRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      PasswordResetRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PasswordResetRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordResetRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usuario-en-la-base-de-datos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usuario en la Base de Datos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserInDB" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserInDB
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserInDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserInDB--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Fincas
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Fincas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de lotes
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de lotes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de labores culturales
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de labores culturales
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Desarrollo
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Desarrollo
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía para contribuir al proyecto
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/coding_standards/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Estándares de codificación
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/testing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía de pruebas
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acerca de
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#esquemas-de-solicitud-y-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Esquemas de Solicitud y Respuesta
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Esquemas de Solicitud y Respuesta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#crear-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Crear Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreate" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserCreate
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserCreate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreate--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reenvio-de-pin-de-confirmacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reenvío de PIN de Confirmación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ResendPinConfirmRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResendPinConfirmRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResendPinConfirmRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ResendPinConfirmRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confirmacion-de-registro" class="md-nav__link">
+    <span class="md-ellipsis">
+      Confirmación de Registro
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ConfirmationRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConfirmationRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ConfirmationRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.ConfirmationRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inicio-de-sesion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Inicio de Sesión
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.LoginRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      LoginRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LoginRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.LoginRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reenvio-de-pin-de-autenticacion-de-dos-factores" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reenvío de PIN de Autenticación de Dos Factores
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.Resend2FARequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resend2FARequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resend2FARequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.Resend2FARequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verificacion-de-inicio-de-sesion-con-dos-factores" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verificación de Inicio de Sesión con Dos Factores
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TwoFactorAuthRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      TwoFactorAuthRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TwoFactorAuthRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TwoFactorAuthRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#respuesta-de-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      Respuesta de Token
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TokenResponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      TokenResponse
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TokenResponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.TokenResponse--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crear-usuario-por-administrador" class="md-nav__link">
+    <span class="md-ellipsis">
+      Crear Usuario por Administrador
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreateByAdmin" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserCreateByAdmin
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserCreateByAdmin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserCreateByAdmin--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#respuesta-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Respuesta de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserResponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserResponse
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserResponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserResponse--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-informacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Información de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserUpdate
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserUpdate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserUpdate--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actualizacion-de-usuario-por-administrador" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualización de Usuario por Administrador
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.AdminUserUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      AdminUserUpdate
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AdminUserUpdate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.AdminUserUpdate--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordRecoveryRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      PasswordRecoveryRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PasswordRecoveryRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordRecoveryRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confirmacion-de-pin-de-recuperacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Confirmación de PIN de Recuperación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PinConfirmationRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      PinConfirmationRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PinConfirmationRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PinConfirmationRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restablecer-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restablecer Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordResetRequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      PasswordResetRequest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PasswordResetRequest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.PasswordResetRequest--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usuario-en-la-base-de-datos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usuario en la Base de Datos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserInDB" class="md-nav__link">
+    <span class="md-ellipsis">
+      UserInDB
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UserInDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.user.domain.schemas.UserInDB--atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Atributos:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="modelos-de-usuario">Modelos de Usuario</h1>
+<p>Este documento describe los modelos Pydantic utilizados para la gestión de usuarios en el sistema AgroInsight.</p>
+<h2 id="esquemas-de-solicitud-y-respuesta">Esquemas de Solicitud y Respuesta</h2>
+<h3 id="crear-usuario">Crear Usuario</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.UserCreate"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para crear un nuevo usuario.</p>
+<h3 id="app.user.domain.schemas.UserCreate--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- nombre (str): Nombre del usuario.
+- apellido (str): Apellido del usuario.
+- email (EmailStr): Correo electrónico único del usuario.
+- password (str): Contraseña del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserCreate</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para crear un nuevo usuario.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - nombre (str): Nombre del usuario.</span>
+<span class="sd">        - apellido (str): Apellido del usuario.</span>
+<span class="sd">        - email (EmailStr): Correo electrónico único del usuario.</span>
+<span class="sd">        - password (str): Contraseña del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">nombre</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">apellido</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+    <span class="n">_validate_password</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)(</span><span class="n">validate_password</span><span class="p">)</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s1">&#39;nombre&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_nombre</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PydanticCustomError</span><span class="p">(</span><span class="s1">&#39;nombre_validation&#39;</span><span class="p">,</span><span class="s1">&#39;El nombre debe tener al menos 2 caracteres.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s1">&#39;apellido&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_apellido</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PydanticCustomError</span><span class="p">(</span><span class="s1">&#39;apellido_validation&#39;</span><span class="p">,</span><span class="s1">&#39;El apellido debe tener al menos 2 caracteres.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="reenvio-de-pin-de-confirmacion">Reenvío de PIN de Confirmación</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.ResendPinConfirmRequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para solicitar el reenvío del PIN de confirmación.</p>
+<h3 id="app.user.domain.schemas.ResendPinConfirmRequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ResendPinConfirmRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para solicitar el reenvío del PIN de confirmación.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="confirmacion-de-registro">Confirmación de Registro</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.ConfirmationRequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para confirmar el registro de un usuario mediante PIN.</p>
+<h3 id="app.user.domain.schemas.ConfirmationRequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+- pin (str): PIN de confirmación enviado al correo.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ConfirmationRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para confirmar el registro de un usuario mediante PIN.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">        - pin (str): PIN de confirmación enviado al correo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">pin</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="inicio-de-sesion">Inicio de Sesión</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.LoginRequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para solicitar un inicio de sesión.</p>
+<h3 id="app.user.domain.schemas.LoginRequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+- password (str): Contraseña del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LoginRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para solicitar un inicio de sesión.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">        - password (str): Contraseña del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+    <span class="n">_validate_password</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)(</span><span class="n">validate_password</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="reenvio-de-pin-de-autenticacion-de-dos-factores">Reenvío de PIN de Autenticación de Dos Factores</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.Resend2FARequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para solicitar el reenvío del PIN de autenticación de dos factores.</p>
+<h3 id="app.user.domain.schemas.Resend2FARequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Resend2FARequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para solicitar el reenvío del PIN de autenticación de dos factores.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="verificacion-de-inicio-de-sesion-con-dos-factores">Verificación de Inicio de Sesión con Dos Factores</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.TwoFactorAuthRequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para verificar el inicio de sesión con autenticación de dos factores.</p>
+<h3 id="app.user.domain.schemas.TwoFactorAuthRequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+- pin (str): PIN de autenticación de dos factores.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TwoFactorAuthRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para verificar el inicio de sesión con autenticación de dos factores.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">        - pin (str): PIN de autenticación de dos factores.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">pin</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="respuesta-de-token">Respuesta de Token</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.TokenResponse"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para la respuesta que contiene el token de acceso.</p>
+<h3 id="app.user.domain.schemas.TokenResponse--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- access_token (str): Token de acceso JWT.
+- token_type (str): Tipo de token, generalmente &quot;bearer&quot;.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TokenResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para la respuesta que contiene el token de acceso.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - access_token (str): Token de acceso JWT.</span>
+<span class="sd">        - token_type (str): Tipo de token, generalmente &quot;bearer&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">access_token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">token_type</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="crear-usuario-por-administrador">Crear Usuario por Administrador</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.UserCreateByAdmin"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="app.user.domain.schemas.UserCreate" href="#app.user.domain.schemas.UserCreate">UserCreate</a></code></p>
+
+
+        <p>Esquema para que un administrador cree un nuevo usuario.</p>
+<h3 id="app.user.domain.schemas.UserCreateByAdmin--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- nombre (str): Nombre del usuario.
+- apellido (str): Apellido del usuario.
+- email (EmailStr): Correo electrónico único del usuario.
+- password (str): Contraseña del usuario.
+- roles (List[int]): Lista de IDs de roles asignados al usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserCreateByAdmin</span><span class="p">(</span><span class="n">UserCreate</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para que un administrador cree un nuevo usuario.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - nombre (str): Nombre del usuario.</span>
+<span class="sd">        - apellido (str): Apellido del usuario.</span>
+<span class="sd">        - email (EmailStr): Correo electrónico único del usuario.</span>
+<span class="sd">        - password (str): Contraseña del usuario.</span>
+<span class="sd">        - roles (List[int]): Lista de IDs de roles asignados al usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">role_id</span><span class="p">:</span> <span class="nb">int</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="respuesta-de-usuario">Respuesta de Usuario</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.UserResponse"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para la respuesta que contiene información del usuario.</p>
+<h3 id="app.user.domain.schemas.UserResponse--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- id (int): Identificador único del usuario.
+- nombre (str): Nombre del usuario.
+- apellido (str): Apellido del usuario.
+- email (EmailStr): Correo electrónico único del usuario.
+- roles (List[str]): Lista de nombres de roles asignados al usuario.
+- estado (str): Estado actual del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para la respuesta que contiene información del usuario.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - id (int): Identificador único del usuario.</span>
+<span class="sd">        - nombre (str): Nombre del usuario.</span>
+<span class="sd">        - apellido (str): Apellido del usuario.</span>
+<span class="sd">        - email (EmailStr): Correo electrónico único del usuario.</span>
+<span class="sd">        - roles (List[str]): Lista de nombres de roles asignados al usuario.</span>
+<span class="sd">        - estado (str): Estado actual del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">nombre</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">apellido</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">estado</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">rol</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">fincas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># Add this line to include farm names</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">from_attributes</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="actualizar-informacion-de-usuario">Actualizar Información de Usuario</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.UserUpdate"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para actualizar la información del usuario actual.</p>
+<h3 id="app.user.domain.schemas.UserUpdate--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- nombre (Optional[str]): Nuevo nombre del usuario.
+- apellido (Optional[str]): Nuevo apellido del usuario.
+- password (Optional[str]): Nueva contraseña del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserUpdate</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para actualizar la información del usuario actual.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - nombre (Optional[str]): Nuevo nombre del usuario.</span>
+<span class="sd">        - apellido (Optional[str]): Nuevo apellido del usuario.</span>
+<span class="sd">        - password (Optional[str]): Nueva contraseña del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nombre</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">apellido</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">from_attributes</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="actualizacion-de-usuario-por-administrador">Actualización de Usuario por Administrador</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.AdminUserUpdate"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para que un administrador actualice la información de un usuario específico.</p>
+<h3 id="app.user.domain.schemas.AdminUserUpdate--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- nombre (Optional[str]): Nuevo nombre del usuario.
+- apellido (Optional[str]): Nuevo apellido del usuario.
+- email (Optional[EmailStr]): Nuevo correo electrónico del usuario.
+- roles (Optional[List[int]]): Nueva lista de IDs de roles asignados al usuario.
+- estado_id (Optional[int]): Nuevo ID de estado del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">AdminUserUpdate</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para que un administrador actualice la información de un usuario específico.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - nombre (Optional[str]): Nuevo nombre del usuario.</span>
+<span class="sd">        - apellido (Optional[str]): Nuevo apellido del usuario.</span>
+<span class="sd">        - email (Optional[EmailStr]): Nuevo correo electrónico del usuario.</span>
+<span class="sd">        - roles (Optional[List[int]]): Nueva lista de IDs de roles asignados al usuario.</span>
+<span class="sd">        - estado_id (Optional[int]): Nuevo ID de estado del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nombre</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">apellido</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">estado_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">rol_id</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">from_attributes</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="recuperacion-de-contrasena">Recuperación de Contraseña</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.PasswordRecoveryRequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para iniciar el proceso de recuperación de contraseña.</p>
+<h3 id="app.user.domain.schemas.PasswordRecoveryRequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PasswordRecoveryRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para iniciar el proceso de recuperación de contraseña.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="confirmacion-de-pin-de-recuperacion">Confirmación de PIN de Recuperación</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.PinConfirmationRequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para confirmar el PIN de recuperación de contraseña.</p>
+<h3 id="app.user.domain.schemas.PinConfirmationRequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+- pin (str): PIN de recuperación enviado al correo.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PinConfirmationRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para confirmar el PIN de recuperación de contraseña.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">        - pin (str): PIN de recuperación enviado al correo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">pin</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="restablecer-contrasena">Restablecer Contraseña</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.PasswordResetRequest"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema para restablecer la contraseña del usuario.</p>
+<h3 id="app.user.domain.schemas.PasswordResetRequest--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- email (EmailStr): Correo electrónico del usuario.
+- new_password (str): Nueva contraseña del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PasswordResetRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema para restablecer la contraseña del usuario.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - email (EmailStr): Correo electrónico del usuario.</span>
+<span class="sd">        - new_password (str): Nueva contraseña del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">new_password</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+    <span class="n">_validate_password</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;new_password&#39;</span><span class="p">)(</span><span class="n">validate_password</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="usuario-en-la-base-de-datos">Usuario en la Base de Datos</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="app.user.domain.schemas.UserInDB"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Esquema que representa al usuario almacenado en la base de datos.</p>
+<h3 id="app.user.domain.schemas.UserInDB--atributos">Atributos:</h3>
+<div class="highlight"><pre><span></span><code>- id (int): Identificador único del usuario.
+- nombre (str): Nombre del usuario.
+- apellido (str): Apellido del usuario.
+- email (EmailStr): Correo electrónico único del usuario.
+- roles (List[str]): Lista de nombres de roles asignados al usuario.
+- estado (str): Estado actual del usuario.
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>app\user\domain\schemas.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserInDB</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esquema que representa al usuario almacenado en la base de datos.</span>
+
+<span class="sd">    Atributos:</span>
+<span class="sd">    ---------</span>
+<span class="sd">        - id (int): Identificador único del usuario.</span>
+<span class="sd">        - nombre (str): Nombre del usuario.</span>
+<span class="sd">        - apellido (str): Apellido del usuario.</span>
+<span class="sd">        - email (EmailStr): Correo electrónico único del usuario.</span>
+<span class="sd">        - roles (List[str]): Lista de nombres de roles asignados al usuario.</span>
+<span class="sd">        - estado (str): Estado actual del usuario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">nombre</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">apellido</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">failed_attempts</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">locked_until</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">state_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">roles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RoleInfo</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">from_attributes</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">_validate_email</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)(</span><span class="n">validate_email</span><span class="p">)</span>
+    <span class="n">_validate_password</span> <span class="o">=</span> <span class="n">field_validator</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)(</span><span class="n">validate_password</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
+      
+    
+  </body>
+</html>
