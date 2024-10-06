@@ -41,53 +41,55 @@ def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[
 
 def validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
-    # Reemplaza los mensajes de error con los personalizados
     errors = convert_errors(errors, CUSTOM_MESSAGES)
-    formatted_errors = []
-
+    error_details = []
     for error in errors:
-        formatted_errors.append({
-            "field": error["loc"][-1],
-            "type": error['type'],
+        error_detail = {
+            "field": error.get("loc", [""])[0],
+            "type": error.get("type", ""),
             "message": error["msg"].split('\n')
-        })
+        }
+        error_details.append(error_detail)
 
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={
+    error_response = {
             "error": {
                 "route": str(request.url),
                 "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY,
                 "message": "Error en la validación de los datos de entrada",
-                "details": formatted_errors
+                "details": error_details
             }
-        },
+    }
+    
+    # Log the detailed error
+    logger.error(f"Validation error: {error_response}")
+
+    return JSONResponse(
+        status_code=422,
+        content=error_response
     )
 
 def custom_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Error en la ruta {request.url}: {str(exc)}")
+    error_details = {
+        "message": str(exc),
+        "type": type(exc).__name__,
+        "traceback": traceback.format_exc()
+    }
+    logger.error(f"Excepción no controlada en {request.url}: {error_details}")
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": {
                 "route": str(request.url),
-                "status_code": 500,
+                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "message": "Error interno del servidor",
-                "details": [
-                    {
-                        "message": str(exc),
-                        "type": "exception",
-                        "traceback": traceback.format_exc()
-                    }
-                ]
+                "details": [error_details]
             }
         },
     )
 
 def custom_http_exception_handler(request: Request, exc: HTTPException):
-    # Obtener el mensaje personalizado basado en el status_code
     message = HTTP_CUSTOM_MESSAGES.get(exc.status_code, exc.detail)
-    logger.info(f"HTTPException en {request.url}: {message}")
+    logger.warning(f"HTTPException en {request.url}: status_code={exc.status_code}, message='{message}'")
     
     return JSONResponse(
         status_code=exc.status_code,
@@ -103,21 +105,18 @@ def custom_http_exception_handler(request: Request, exc: HTTPException):
 
     
 def domain_exception_handler(request: Request, exc: DomainException):
-    logger.warning(f"DomainException en {request.url}: {exc.message}")
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "error": {
-                "route": str(request.url),
-                "status_code": exc.status_code,
-                "message": exc.message,
-                "details": []
-            }
+    error_response = {
+        "error": {
+            "route": str(request.url),
+            "status_code": exc.status_code,
+            "message": exc.message
         }
-    )
+    }
+    logger.error(f"Domain exception en {request.url}: status_code={exc.status_code}, message='{exc.message}'")
+    return JSONResponse(status_code=exc.status_code, content=error_response)
     
 def user_state_exception_handler(request: Request, exc: UserStateException):
-    logger.warning(f"UserStateException en {request.url}: {exc.message}")
+    logger.warning(f"UserStateException in {request.url}: status_code={exc.status_code}, message='{exc.message}', user_state='{exc.user_state}'")
     return JSONResponse(
         status_code=exc.status_code,
         content={

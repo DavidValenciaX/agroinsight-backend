@@ -19,6 +19,10 @@ from app.infrastructure.common.exceptions_handler import (
     user_state_exception_handler
 )
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
