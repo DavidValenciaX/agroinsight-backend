@@ -80,3 +80,6 @@ share/python-wheels/
 *.swp
 *.bak
 generate_responses.py
+
+# Ignorar la carpeta site generada por mkdocs
+site/
