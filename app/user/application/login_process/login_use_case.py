@@ -58,7 +58,7 @@ class LoginUseCase:
         verification = VerificacionDospasos(
             usuario_id=user.id,
             pin=pin_hash,
-            expiracion=datetime.now(timezone.utc) + timedelta(minutes=5),
+            expiracion=datetime.now(timezone.utc) + timedelta(minutes=10),
             resends=0  # Inicializamos resends en 0
         )
         
