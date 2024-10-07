@@ -40,12 +40,36 @@ class LoginUseCase:
         user.locked_until = None
         self.user_repository.update_user(user)
         
-        if not self.initiate_two_factor_auth(user):
+        # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
+        last_verification = self.user_repository.get_last_two_factor_verification(user.id)
+        if last_verification and (datetime.now(timezone.utc) - ensure_utc(last_verification.created_at)).total_seconds() < 180:
             raise DomainException(
-                message="Error al iniciar la verificación en dos pasos.",
+                message="Ya has solicitado un PIN de autenticación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+        
+        # Eliminar cualquier verificación anterior
+        self.user_repository.delete_two_factor_verification(user.id)
+        
+        # Generar el PIN y su hash
+        pin, pin_hash = generate_pin()
+        
+        # Crear un nuevo registro de verificación
+        verification = VerificacionDospasos(
+            usuario_id=user.id,
+            pin=pin_hash,
+            expiracion=datetime.now(timezone.utc) + timedelta(minutes=5),
+            resends=0  # Inicializamos resends en 0
+        )
+        
+        # Enviar el PIN al correo electrónico del usuario
+        if not self.send_two_factor_pin(user.email, pin):
+            return DomainException(
+                message="Error al enviar el PIN de autenticación.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
+
+        self.user_repository.add_two_factor_verification(verification)
         return SuccessResponse(
                 message="Verificación en dos pasos iniciada. Por favor, revisa tu correo electrónico para obtener el PIN."
         )
@@ -68,42 +92,6 @@ class LoginUseCase:
             message="Contraseña incorrecta.",
             status_code=status.HTTP_401_UNAUTHORIZED
         )
-
-    def initiate_two_factor_auth(self, user: UserInDB) -> bool:
-        try:
-            # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
-            last_verification = self.user_repository.get_last_two_factor_verification(user.id)
-            if last_verification and (datetime.now(timezone.utc) - ensure_utc(last_verification.created_at)).total_seconds() < 180:
-                raise DomainException(
-                    message="Ya has solicitado un PIN de autenticación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
-                )
-            
-            # Eliminar cualquier verificación anterior
-            self.user_repository.delete_two_factor_verification(user.id)
-            
-            # Generar el PIN y su hash
-            pin, pin_hash = generate_pin()
-            
-            # Crear un nuevo registro de verificación
-            verification = VerificacionDospasos(
-                usuario_id=user.id,
-                pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=5),
-                resends=0  # Inicializamos resends en 0
-            )
-            
-            # Enviar el PIN al correo electrónico del usuario
-            if not self.send_two_factor_pin(user.email, pin):
-                return False
-
-            self.user_repository.add_two_factor_verification(verification)
-            return True
-
-            
-        except Exception as e:
-            print(f"Error al iniciar la verificación en dos pasos: {str(e)}")
-            return False
 
     def send_two_factor_pin(self, email: str, pin: str) -> bool:
         subject = "PIN de verificación en dos pasos - AgroInSight"
