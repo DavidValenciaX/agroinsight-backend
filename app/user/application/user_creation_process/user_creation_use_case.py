@@ -10,6 +10,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserSta
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
+from app.infrastructure.common.datetime_utils import ensure_utc
 
 class UserCreationUseCase:
     """
@@ -134,13 +135,23 @@ class UserCreationUseCase:
             bool: True si la confirmación se creó y envió correctamente, False en caso contrario.
         """
         try:
+            # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
+            last_confirmation = self.user_repository.get_last_user_confirmation(user.id)
+            if last_confirmation and (datetime.now(timezone.utc) - ensure_utc(last_confirmation.created_at)).total_seconds() < 180:
+
+                raise DomainException(
+                    message="Ya has solicitado un PIN recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
+                )
+            
             # Generar PIN y su hash
             expiration_time = 10  # minutos
             pin, pin_hash = generate_pin()
             confirmation = ConfirmacionUsuario(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=expiration_time)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=expiration_time),
+                resends=0  # Inicializamos resends en 0
             )
 
             # Enviar correo de confirmación y agregar la confirmación al repositorio

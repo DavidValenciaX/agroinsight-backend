@@ -40,6 +40,21 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al actualizar el usuario: {e}")
             return None
+        
+    def get_last_user_confirmation(self, user_id: int):
+        return self.db.query(ConfirmacionUsuario).filter(
+            ConfirmacionUsuario.usuario_id == user_id
+        ).order_by(ConfirmacionUsuario.created_at.desc()).first()
+
+    def get_last_two_factor_verification(self, user_id: int):
+        return self.db.query(VerificacionDospasos).filter(
+            VerificacionDospasos.usuario_id == user_id
+        ).order_by(VerificacionDospasos.created_at.desc()).first()
+
+    def get_last_password_recovery(self, user_id: int):
+        return self.db.query(RecuperacionContrasena).filter(
+            RecuperacionContrasena.usuario_id == user_id
+        ).order_by(RecuperacionContrasena.created_at.desc()).first()
     
     def update_user_info(self, user: User, user_data: dict) -> Optional[User]:
         """Actualiza la información del usuario con los datos proporcionados"""

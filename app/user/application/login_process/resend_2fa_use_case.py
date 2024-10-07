@@ -8,7 +8,7 @@ from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-
+from app.infrastructure.common.datetime_utils import ensure_utc
 class Resend2faUseCase:
     def __init__(self, db: Session):
         self.db = db
@@ -30,12 +30,21 @@ class Resend2faUseCase:
             return state_validation_result
         
         # Verificar si hay una confirmación pendiente
-        pending_verification = self.user_repository.get_user_pending_2fa_verification(user.id)
-        if not pending_verification:
+        last_verification = self.user_repository.get_last_two_factor_verification(user.id)
+        if not last_verification:
             raise DomainException(
                 message="No hay una verificación de doble factor de autenticación pendiente para reenviar el PIN.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+        
+        # Si es el primer reenvío (resends == 0), permitir sin restricción
+        if last_verification.resends > 0:
+            # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
+            if (datetime.now(timezone.utc) - ensure_utc(last_verification.created_at)).total_seconds() < 180:
+                raise DomainException(
+                    message="Ya has solicitado un PIN de autenticación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
+                )
         
         try:
             # Eliminar cualquier verificación de dos factores existente
@@ -48,7 +57,8 @@ class Resend2faUseCase:
             verification = VerificacionDospasos(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10),
+                resends=last_verification.resends + 1 if last_verification else 0
             )
             
             self.user_repository.add_two_factor_verification(verification)

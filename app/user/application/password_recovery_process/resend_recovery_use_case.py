@@ -7,6 +7,7 @@ from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
+from app.infrastructure.common.datetime_utils import ensure_utc
 
 class ResendRecoveryUseCase:
     def __init__(self, db: Session):
@@ -28,14 +29,22 @@ class ResendRecoveryUseCase:
         if state_validation_result:
             return state_validation_result
 
+        last_recovery = self.user_repository.get_last_password_recovery(user.id)
 
-        recovery = self.user_repository.get_password_recovery(user.id)
-
-        if not recovery:
+        if not last_recovery:
             raise DomainException(
                 message="No hay un registro de recuperación de contraseña pendiente.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+
+        # Si es el primer reenvío (resends == 0), permitir sin restricción
+        if last_recovery.resends > 0:
+            # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
+            if (datetime.now(timezone.utc) - ensure_utc(last_recovery.created_at)).total_seconds() < 180:
+                raise DomainException(
+                    message="Ya has solicitado un PIN de recuperación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
+                )
 
         # Generar un nuevo PIN y su hash
         pin, pin_hash = generate_pin()
@@ -46,10 +55,11 @@ class ResendRecoveryUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-        recovery.pin = pin_hash
-        recovery.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
-        recovery.intentos = 0
-        self.user_repository.update_password_recovery(recovery)
+        last_recovery.pin = pin_hash
+        last_recovery.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
+        last_recovery.intentos = 0
+        last_recovery.resends += 1 if last_recovery else 0 # Incrementar el contador de reenvíos
+        self.user_repository.update_password_recovery(last_recovery)
         return SuccessResponse(
             message="Se ha reenviado el PIN de recuperación a tu correo electrónico."
         )

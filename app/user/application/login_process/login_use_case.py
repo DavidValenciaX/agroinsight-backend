@@ -10,6 +10,7 @@ from app.infrastructure.services.email_service import send_email
 from app.infrastructure.security.security_utils import verify_password
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.infrastructure.common.datetime_utils import ensure_utc
 
 class LoginUseCase:
     def __init__(self, db: Session):
@@ -70,6 +71,14 @@ class LoginUseCase:
 
     def initiate_two_factor_auth(self, user: UserInDB) -> bool:
         try:
+            # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
+            last_verification = self.user_repository.get_last_two_factor_verification(user.id)
+            if last_verification and (datetime.now(timezone.utc) - ensure_utc(last_verification.created_at)).total_seconds() < 180:
+                raise DomainException(
+                    message="Ya has solicitado un PIN de autenticación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
+                )
+            
             # Eliminar cualquier verificación anterior
             self.user_repository.delete_two_factor_verification(user.id)
             
@@ -80,7 +89,8 @@ class LoginUseCase:
             verification = VerificacionDospasos(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=5)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=5),
+                resends=0  # Inicializamos resends en 0
             )
             
             # Enviar el PIN al correo electrónico del usuario

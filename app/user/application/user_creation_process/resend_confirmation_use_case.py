@@ -8,7 +8,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserNot
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.user.infrastructure.orm_models import ConfirmacionUsuario
-
+from app.infrastructure.common.datetime_utils import ensure_utc
 
 class ResendConfirmationUseCase:
     def __init__(self, db: Session):
@@ -30,13 +30,25 @@ class ResendConfirmationUseCase:
         if state_validation_result:
             return state_validation_result
 
+        # Obtener la última confirmación del usuario
+        last_confirmation = self.user_repository.get_last_user_confirmation(user.id)
+
         # Verificar si hay una confirmación pendiente
-        pending_confirmation = self.user_repository.get_user_pending_confirmation(user.id)
-        if not pending_confirmation:
+        if not last_confirmation:
             raise DomainException(
                 message="No hay una confirmación pendiente para reenviar el PIN.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+
+        # Si es el primer reenvío (resends == 0), permitir sin restricción
+        if last_confirmation.resends > 0:
+            # Si ya ha reenviado al menos una vez, verificar si han pasado 3 minutos
+            time_since_last_send = (datetime.now(timezone.utc) - ensure_utc(last_confirmation.created_at)).total_seconds()
+            if time_since_last_send < 180:
+                raise DomainException(
+                    message="Ya has solicitado un PIN recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
+                )
 
         try:
             # Eliminar confirmaciones existentes
@@ -47,7 +59,8 @@ class ResendConfirmationUseCase:
             confirmation = ConfirmacionUsuario(
                 usuario_id=user.id,
                 pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
+                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10),
+                resends=last_confirmation.resends + 1 if last_confirmation else 0
             )
 
             # Enviar el correo electrónico con el nuevo PIN
@@ -56,21 +69,19 @@ class ResendConfirmationUseCase:
                     message="No se pudo enviar el correo electrónico.",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-            
+
             self.user_repository.add_user_confirmation(confirmation)
             return SuccessResponse(
                 message="PIN de confirmación reenviado con éxito."
             )
 
         except Exception as e:
-            # Manejar excepciones específicas si es necesario
             raise DomainException(
                 message=f"Error al reenviar el PIN de confirmación: {str(e)}",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     def resend_confirmation_email(self, email: str, pin: str) -> bool:
-        """Envía un correo electrónico con el PIN de confirmación."""
         subject = "Confirma tu registro en AgroInSight"
         text_content = f"Reenvío: Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, func
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
 from datetime import datetime, timezone
@@ -119,6 +119,8 @@ class ConfirmacionUsuario(Base):
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=func.utc_timestamp())
+    resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="confirmacion")
     
@@ -142,6 +144,8 @@ class VerificacionDospasos(Base):
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=func.utc_timestamp())
+    resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="verificacion_dos_pasos")
     
@@ -167,6 +171,8 @@ class RecuperacionContrasena(Base):
     expiracion = Column(DateTime, nullable=False)
     intentos = Column(Integer, default=0)
     pin_confirmado = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=func.utc_timestamp())
+    resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="recuperacion_contrasena")
     

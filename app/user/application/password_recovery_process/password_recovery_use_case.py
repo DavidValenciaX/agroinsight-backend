@@ -9,6 +9,7 @@ from app.infrastructure.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.infrastructure.common.datetime_utils import ensure_utc
 
 class PasswordRecoveryUseCase:
     def __init__(self, db: Session):
@@ -29,6 +30,14 @@ class PasswordRecoveryUseCase:
         )
         if state_validation_result:
             return state_validation_result
+            
+        # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
+        last_recovery = self.user_repository.get_last_password_recovery(user.id)
+        if last_recovery and (datetime.now(timezone.utc) - ensure_utc(last_recovery.created_at)).total_seconds() < 180:
+            raise DomainException(
+                message="Ya has solicitado un PIN de recuperación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS
+            )
 
         self.user_repository.delete_password_recovery(user.id)
 
@@ -37,7 +46,8 @@ class PasswordRecoveryUseCase:
         recovery = RecuperacionContrasena(
             usuario_id=user.id,
             pin=pin_hash,
-            expiracion=datetime.now(timezone.utc) + timedelta(minutes=10)
+            expiracion=datetime.now(timezone.utc) + timedelta(minutes=10),
+            resends=0  # Inicializamos resends en 0
         )
         
         if not self.send_password_recovery_email(email, pin):
