@@ -47,21 +47,15 @@ class Resend2faUseCase:
                 )
         
         try:
-            # Eliminar cualquier verificación de dos factores existente
-            self.user_repository.delete_two_factor_verification(user.id)
-            
             # Generar un nuevo PIN y su hash
             pin, pin_hash = generate_pin()
             
-            # Crear un nuevo registro de verificación de dos pasos
-            verification = VerificacionDospasos(
-                usuario_id=user.id,
-                pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10),
-                resends=last_verification.resends + 1 if last_verification else 0
-            )
-            
-            self.user_repository.add_two_factor_verification(verification)
+            # Actualizar el registro existente de verificación de dos pasos
+            last_verification.pin = pin_hash
+            last_verification.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
+            last_verification.resends += 1
+            last_verification.intentos = 0
+            self.user_repository.update_two_factor_verification(last_verification)
             
             # Enviar el PIN al correo electrónico del usuario
             if not self.send_two_factor_pin(user.email, pin):

@@ -58,7 +58,7 @@ class ResendRecoveryUseCase:
         last_recovery.pin = pin_hash
         last_recovery.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
         last_recovery.intentos = 0
-        last_recovery.resends += 1 if last_recovery else 0 # Incrementar el contador de reenvíos
+        last_recovery.resends += 1
         self.user_repository.update_password_recovery(last_recovery)
         return SuccessResponse(
             message="Se ha reenviado el PIN de recuperación a tu correo electrónico."

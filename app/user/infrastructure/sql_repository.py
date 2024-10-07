@@ -219,6 +219,16 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al agregar la verificación de dos pasos: {e}")
             return False
+        
+    def update_two_factor_verification(self, verification: VerificacionDospasos) -> bool:
+        try:
+            self.db.commit()
+            self.db.refresh(verification)
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar la verificacion en dos pasos: {e}")
+            return False
     
     def get_user_pending_2fa_verification(self, user_id: int) -> Optional[VerificacionDospasos]:
         """Verifica si el usuario tiene una verificacion 2fa pendiente."""
