@@ -51,17 +51,16 @@ class ResendConfirmationUseCase:
                 )
 
         try:
-            # Eliminar confirmaciones existentes
-            self.user_repository.delete_user_confirmations(user.id)
 
             # Generar nuevo PIN y su hash
             pin, pin_hash = generate_pin()
-            confirmation = ConfirmacionUsuario(
-                usuario_id=user.id,
-                pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=10),
-                resends=last_confirmation.resends + 1 if last_confirmation else 0
-            )
+            
+            # Actualizar el registro de confirmación de usuario
+            last_confirmation.pin = pin_hash
+            last_confirmation.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
+            last_confirmation.resends += 1
+            last_confirmation.intentos = 0
+            self.user_repository.update_user_confirmation(last_confirmation)
 
             # Enviar el correo electrónico con el nuevo PIN
             if not self.resend_confirmation_email(email, pin):
@@ -70,7 +69,7 @@ class ResendConfirmationUseCase:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            self.user_repository.add_user_confirmation(confirmation)
+            self.user_repository.add_user_confirmation(last_confirmation)
             return SuccessResponse(
                 message="PIN de confirmación reenviado con éxito."
             )

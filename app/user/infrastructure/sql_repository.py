@@ -157,6 +157,15 @@ class UserRepository:
             print(f"Error al agregar la confirmación del usuario: {e}")
             return False
 
+    def update_user_confirmation(self, confirmation: ConfirmacionUsuario) -> bool:
+        try:
+            self.db.commit()
+            self.db.refresh(confirmation)
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar la confirmación del usuario: {e}")
+            return False
         
     def get_user_pending_confirmation(self, user_id: int) -> Optional[ConfirmacionUsuario]:
         """Verifica si el usuario tiene una confirmación pendiente."""
