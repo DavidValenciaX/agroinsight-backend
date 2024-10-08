@@ -8,9 +8,9 @@ así como para el manejo de autenticación y autorización.
 from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from app.user.application.deactivate_user_use_case import DeactivateUserUseCase
+from app.user.application.admin_deactivates_user_use_case import DeactivateUserUseCase
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
-from app.user.application.admin_update_user_use_case import AdminUpdateUserUseCase
+from app.user.application.admin_updates_user_use_case import AdminUpdateUserUseCase
 from app.user.application.user_register_process.user_register_use_case import UserCreationUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
 from app.user.application.admin_creates_user_use_case import UserCreationByAdminUseCase
@@ -18,13 +18,13 @@ from app.user.application.password_recovery_process.password_recovery_use_case i
 from app.user.application.user_register_process.resend_confirmation_use_case import ResendConfirmationUseCase
 from app.user.application.user_register_process.confirmation_use_case import ConfirmationUseCase
 from app.user.application.login_process.resend_2fa_use_case import Resend2faUseCase
-from app.user.application.login_process.verify_use_case import VerifyUseCase
-from app.user.application.list_users_use_case import ListUsersUseCase
+from app.user.application.login_process.verify_2fa_use_case import VerifyUseCase
+from app.user.application.admin_list_users_use_case import ListUsersUseCase
 from app.user.application.password_recovery_process.resend_recovery_use_case import ResendRecoveryUseCase
-from app.user.application.password_recovery_process.confirm_recovery_pin_use_case import ConfirmRecoveryPinUseCase
+from app.user.application.password_recovery_process.confirm_recovery_use_case import ConfirmRecoveryPinUseCase
 from app.user.application.password_recovery_process.reset_password_use_case import ResetPasswordUseCase
 from app.user.application.get_current_user_use_case import GetCurrentUserUseCase
-from app.user.application.get_user_by_id_use_case import GetUserByIdUseCase
+from app.user.application.admin_get_user_by_id_use_case import GetUserByIdUseCase
 from app.user.application.logout_use_case import LogoutUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
