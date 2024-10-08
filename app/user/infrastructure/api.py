@@ -11,12 +11,12 @@ from sqlalchemy.orm import Session
 from app.user.application.deactivate_user_use_case import DeactivateUserUseCase
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
 from app.user.application.admin_update_user_use_case import AdminUpdateUserUseCase
-from app.user.application.user_creation_process.user_register_use_case import UserCreationUseCase
+from app.user.application.user_register_process.user_register_use_case import UserCreationUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
 from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
 from app.user.application.password_recovery_process.password_recovery_use_case import PasswordRecoveryUseCase
-from app.user.application.user_creation_process.resend_confirmation_use_case import ResendConfirmationUseCase
-from app.user.application.user_creation_process.confirmation_use_case import ConfirmationUseCase
+from app.user.application.user_register_process.resend_confirmation_use_case import ResendConfirmationUseCase
+from app.user.application.user_register_process.confirmation_use_case import ConfirmationUseCase
 from app.user.application.login_process.resend_2fa_use_case import Resend2faUseCase
 from app.user.application.login_process.verify_use_case import VerifyUseCase
 from app.user.application.list_users_use_case import ListUsersUseCase
