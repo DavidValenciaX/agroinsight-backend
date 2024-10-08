@@ -12,7 +12,7 @@ class ListAssignmentsUseCase:
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
 
-    def execute(self, user_id: int, page: int, per_page: int, current_user: UserInDB) -> PaginatedAssignmentListResponse:
+    def list_assignments(self, user_id: int, page: int, per_page: int, current_user: UserInDB) -> PaginatedAssignmentListResponse:
         if not self.user_can_list_assignments(current_user):
             raise InsufficientPermissionsException()
 

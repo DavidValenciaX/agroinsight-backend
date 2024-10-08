@@ -40,7 +40,7 @@ def create_task(
     """
     create_task_use_case = CreateTaskUseCase(db)
     try:
-        return create_task_use_case.execute(task, current_user)
+        return create_task_use_case.create_task(task, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -71,7 +71,7 @@ def create_assignment(
     """
     create_assignment_use_case = CreateAssignmentUseCase(db)
     try:
-        return create_assignment_use_case.execute(assignment, current_user)
+        return create_assignment_use_case.create_assignment(assignment, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -106,7 +106,7 @@ def list_assignments(
     """
     list_assignments_use_case = ListAssignmentsUseCase(db)
     try:
-        return list_assignments_use_case.execute(user_id, page, per_page, current_user)
+        return list_assignments_use_case.list_assignments(user_id, page, per_page, current_user)
     except DomainException as e:
         raise e
     except Exception as e:

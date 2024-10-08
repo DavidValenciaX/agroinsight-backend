@@ -11,7 +11,7 @@ class CreateAssignmentUseCase:
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
 
-    def execute(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> SuccessResponse:
         if not self.user_can_create_assignment(current_user):
             raise InsufficientPermissionsException()
 

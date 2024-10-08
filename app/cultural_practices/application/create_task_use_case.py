@@ -11,7 +11,7 @@ class CreateTaskUseCase:
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
 
-    def execute(self, tarea_data: TareaLaborCulturalCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_task(self, tarea_data: TareaLaborCulturalCreate, current_user: UserInDB) -> SuccessResponse:
         if not self.user_can_create_tarea(current_user):
             raise InsufficientPermissionsException()
 
