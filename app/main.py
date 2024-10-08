@@ -6,7 +6,8 @@ y los manejadores de excepciones.
 """
 
 from fastapi import FastAPI, HTTPException
-from app.user.infrastructure.api import router as user_router
+from app.user.infrastructure.user_api import user_router
+from app.user.infrastructure.admin_api import admin_router
 from app.farm.infrastructure.api import router as farm_router
 from app.plot.infrastructure.api import router as plot_router
 from app.cultural_practices.infrastructure.api import router as cultural_practices_router
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 app.include_router(user_router)
+app.include_router(admin_router)
 app.include_router(farm_router)
 app.include_router(plot_router)
 app.include_router(cultural_practices_router)
