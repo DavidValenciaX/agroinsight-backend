@@ -18,7 +18,7 @@ class AssignUsersToFarmUseCase:
         allowed_roles = ["Superusuario", "Administrador de Finca"]
         return any(role.nombre in allowed_roles for role in user.roles)
     
-    def execute_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> SuccessResponse:
+    def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> SuccessResponse:
         if not self.user_can_assign_users(current_user):
             raise InsufficientPermissionsException()
 

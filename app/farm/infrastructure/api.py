@@ -44,7 +44,7 @@ def create_farm(
     """
     crear_farm_use_case = CreateFarmUseCase(db)
     try:
-        return crear_farm_use_case.execute(farm, current_user)
+        return crear_farm_use_case.create_farm(farm, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -77,7 +77,7 @@ def list_farms(
     """
     list_farms_use_case = ListFarmsUseCase(db)
     try:
-        return list_farms_use_case.execute(current_user, page, per_page)
+        return list_farms_use_case.list_farms(current_user, page, per_page)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -108,7 +108,7 @@ def assign_users_to_farm_by_email(
     """
     assign_users_use_case = AssignUsersToFarmUseCase(db)
     try:
-        return assign_users_use_case.execute_by_emails(assignment_data, current_user)
+        return assign_users_use_case.assign_users_by_emails(assignment_data, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -158,7 +158,7 @@ def list_farm_users(
     
     use_case = ListFarmUsersUseCase(db)
     try:
-        return use_case.execute(farm_id, role, role_id, current_user, page, per_page)
+        return use_case.list_farm_users(farm_id, role, role_id, current_user, page, per_page)
     except DomainException as e:
         raise e
     except Exception as e:

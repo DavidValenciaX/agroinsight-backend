@@ -13,7 +13,7 @@ class ListFarmsUseCase:
         self.db = db
         self.farm_repository = FarmRepository(db)
 
-    def execute(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
+    def list_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
         if not self.user_can_list_farms(current_user):
             raise InsufficientPermissionsException()
 

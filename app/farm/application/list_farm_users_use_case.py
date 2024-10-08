@@ -15,7 +15,7 @@ class ListFarmUsersUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
 
-    def execute(self, farm_id: int, role_name: Optional[str], role_id: Optional[int], current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmUserListResponse:
+    def list_farm_users(self, farm_id: int, role_name: Optional[str], role_id: Optional[int], current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmUserListResponse:
         self.validate_params(page, per_page)
         
         if not self.user_can_list_farm_users(current_user, farm_id):

@@ -11,7 +11,7 @@ class CreateFarmUseCase:
         self.db = db
         self.farm_repository = FarmRepository(db)
 
-    def execute(self, farm_data: FarmCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_farm(self, farm_data: FarmCreate, current_user: UserInDB) -> SuccessResponse:
         # Verificar si el usuario tiene permisos para crear fincas
         if not self.user_can_create_farm(current_user):
             raise InsufficientPermissionsException()
