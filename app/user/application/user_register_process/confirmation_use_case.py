@@ -12,7 +12,7 @@ class ConfirmationUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
         
-    def execute(self, email: str, pin: str) -> SuccessResponse:
+    def confirm_user(self, email: str, pin: str) -> SuccessResponse:
         # Obtener el usuario por correo electrónico
         user = self.user_repository.get_user_by_email(email)
         if not user:

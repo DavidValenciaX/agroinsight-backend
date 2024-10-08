@@ -18,7 +18,7 @@ class LoginUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
         
-    def execute(self, email: str, password: str) -> SuccessResponse:
+    def login_user(self, email: str, password: str) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()

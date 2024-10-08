@@ -122,7 +122,7 @@ def confirm_user_registration(
     """
     confirmation_use_case = ConfirmationUseCase(db)
     try:
-        return confirmation_use_case.execute(confirmation.email, confirmation.pin)
+        return confirmation_use_case.confirm_user(confirmation.email, confirmation.pin)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -148,7 +148,7 @@ def login_for_access_token(login_request: LoginRequest, db: Session = Depends(ge
     """
     login_use_case = LoginUseCase(db)
     try:
-        return login_use_case.execute(login_request.email, login_request.password)
+        return login_use_case.login_user(login_request.email, login_request.password)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -177,7 +177,7 @@ def resend_2fa_pin_endpoint(
     """
     resend_2fa_use_case = Resend2faUseCase(db)
     try:
-        return resend_2fa_use_case.execute(resend_request.email)
+        return resend_2fa_use_case.resend_2fa(resend_request.email)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:

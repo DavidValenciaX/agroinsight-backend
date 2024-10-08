@@ -15,7 +15,7 @@ class Resend2faUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
         
-    def execute(self, email: str) -> SuccessResponse:
+    def resend_2fa(self, email: str) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()
@@ -46,33 +46,30 @@ class Resend2faUseCase:
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
         
-        try:
-            # Generar un nuevo PIN y su hash
-            pin, pin_hash = generate_pin()
-            
-            # Actualizar el registro existente de verificación de dos pasos
-            last_verification.pin = pin_hash
-            last_verification.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
-            last_verification.resends += 1
-            last_verification.intentos = 0
-            self.user_repository.update_two_factor_verification(last_verification)
-            
-            # Enviar el PIN al correo electrónico del usuario
-            if not self.send_two_factor_pin(user.email, pin):
-                raise DomainException(
-                    message="No se pudo reenviar el PIN. Verifique el correo electrónico o intenta más tarde.",
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
-            return SuccessResponse(
-                message="PIN de verificación en dos pasos reenviado con éxito."
-            )
-
-        except Exception as e:
+        # Generar un nuevo PIN y su hash
+        pin, pin_hash = generate_pin()
+        
+        # Actualizar el registro existente de verificación de dos pasos
+        last_verification.pin = pin_hash
+        last_verification.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
+        last_verification.resends += 1
+        last_verification.intentos = 0
+        if not self.user_repository.update_two_factor_verification(last_verification):
             raise DomainException(
-                message=f"Error al reenviar el PIN de doble verificación: {str(e)}",
+                message="No se pudo actualizar la verificación de doble factor de autenticación",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+        # Enviar el PIN al correo electrónico del usuario
+        if not self.send_two_factor_pin(user.email, pin):
+            raise DomainException(
+                message="No se pudo reenviar el PIN. Verifique el correo electrónico o intenta más tarde.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return SuccessResponse(
+            message="PIN de verificación en dos pasos reenviado con éxito."
+        )
         
     def send_two_factor_pin(self, email: str, pin: str) -> bool:
         subject = "Reenvío de PIN de verificación en dos pasos - AgroInSight"
