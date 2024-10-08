@@ -71,9 +71,6 @@ class UserCreationUseCase:
             if state_validation_result:
                 return state_validation_result
 
-        # Hash del password
-        hashed_password = hash_password(user_data.password)
-
         # Obtener estado "pendiente" del usuario
         pending_state_id = self.user_repository.get_pending_user_state_id()
         if not pending_state_id:
@@ -91,6 +88,9 @@ class UserCreationUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+        # Hash del password
+        hashed_password = hash_password(user_data.password)
+
         # Crear nuevo usuario
         new_user = User(
             nombre=user_data.nombre,
@@ -106,15 +106,6 @@ class UserCreationUseCase:
             raise DomainException(
                 message="No se pudo asignar el rol de Usuario No Confirmado.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-        # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
-        last_confirmation = self.user_repository.get_last_user_confirmation(created_user.id)
-        if last_confirmation and (datetime.now(timezone.utc) - ensure_utc(last_confirmation.created_at)).total_seconds() < 180:
-
-            raise DomainException(
-                message="Ya has solicitado un PIN recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS
             )
         
         # Generar PIN y su hash
