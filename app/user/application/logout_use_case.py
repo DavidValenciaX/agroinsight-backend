@@ -8,7 +8,7 @@ class LogoutUseCase:
     def __init__(self, db: Session):
         self.user_repository = UserRepository(db)
     
-    def execute(self, token: str, user_id: int) -> SuccessResponse:
+    def logout(self, token: str, user_id: int) -> SuccessResponse:
         success = self.user_repository.blacklist_token(token, user_id)
         if not success:
             raise DomainException(

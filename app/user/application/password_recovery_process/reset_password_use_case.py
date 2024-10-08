@@ -12,7 +12,7 @@ class ResetPasswordUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
 
-    def execute(self, email: str, new_password: str) -> SuccessResponse:
+    def reset_password(self, email: str, new_password: str) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()

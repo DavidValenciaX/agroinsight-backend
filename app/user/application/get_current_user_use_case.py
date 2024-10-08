@@ -10,7 +10,7 @@ class GetCurrentUserUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, current_user) -> UserResponse:
+    def get_current_user(self, current_user) -> UserResponse:
         if not current_user:
             raise MissingTokenException()
             

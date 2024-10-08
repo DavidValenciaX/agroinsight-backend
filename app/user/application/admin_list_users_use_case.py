@@ -5,12 +5,12 @@ from app.user.domain.schemas import UserResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.mappers.response_mappers import map_user_to_response
 
-class ListUsersUseCase:
+class AdminListUsersUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, current_user) -> List[UserResponse]:
+    def admin_list_users(self, current_user) -> List[UserResponse]:
         if not current_user:
             raise MissingTokenException()
             

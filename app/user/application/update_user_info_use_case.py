@@ -10,7 +10,7 @@ class UpdateUserInfoUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def execute(self, current_user: UserInDB, user_update: UserUpdate) -> SuccessResponse:
+    def update_user_info(self, current_user: UserInDB, user_update: UserUpdate) -> SuccessResponse:
         # Verificar si el email ya está en uso por otro usuario
         if user_update.email and user_update.email != current_user.email:
             existing_user = self.user_repository.get_user_by_email(user_update.email)

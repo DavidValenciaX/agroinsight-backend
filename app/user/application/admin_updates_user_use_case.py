@@ -5,12 +5,12 @@ from app.infrastructure.common.common_exceptions import DomainException, Insuffi
 from fastapi import status
 from app.infrastructure.mappers.response_mappers import map_user_to_response
 
-class AdminUpdateUserUseCase:
+class AdminUpdatesUserUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
 
-    def execute(self, user_id: int, user_update: AdminUserUpdate, current_user: UserInDB) -> UserResponse:
+    def admin_updates_user(self, user_id: int, user_update: AdminUserUpdate, current_user: UserInDB) -> UserResponse:
         # Obtener los roles que tienen permisos administrativos
         admin_roles = self.user_repository.get_admin_roles()
         admin_role_ids = {admin_role.id for admin_role in admin_roles}

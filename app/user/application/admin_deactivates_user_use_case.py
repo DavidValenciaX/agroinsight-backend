@@ -4,12 +4,12 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, UserNotRegisteredException
 from fastapi import status
 
-class DeactivateUserUseCase:
+class AdminDeactivatesUserUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
     
-    def execute(self, user_id: int, current_user):
+    def admin_deactivates_user(self, user_id: int, current_user):
         # Verificar si el usuario actual tiene permisos de administrador
         admin_roles = self.user_repository.get_admin_roles()
         admin_role_ids = {role.id for role in admin_roles}

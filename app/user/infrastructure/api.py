@@ -8,23 +8,23 @@ así como para el manejo de autenticación y autorización.
 from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from app.user.application.admin_deactivates_user_use_case import DeactivateUserUseCase
+from app.user.application.admin_deactivates_user_use_case import AdminDeactivatesUserUseCase
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
-from app.user.application.admin_updates_user_use_case import AdminUpdateUserUseCase
+from app.user.application.admin_updates_user_use_case import AdminUpdatesUserUseCase
 from app.user.application.user_register_process.user_register_use_case import UserCreationUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
-from app.user.application.admin_creates_user_use_case import UserCreationByAdminUseCase
+from app.user.application.admin_creates_user_use_case import AdminCreatesUserUseCase
 from app.user.application.password_recovery_process.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.application.user_register_process.resend_confirmation_use_case import ResendConfirmationUseCase
 from app.user.application.user_register_process.confirmation_use_case import ConfirmationUseCase
 from app.user.application.login_process.resend_2fa_use_case import Resend2faUseCase
 from app.user.application.login_process.verify_2fa_use_case import VerifyUseCase
-from app.user.application.admin_list_users_use_case import ListUsersUseCase
+from app.user.application.admin_list_users_use_case import AdminListUsersUseCase
 from app.user.application.password_recovery_process.resend_recovery_use_case import ResendRecoveryUseCase
 from app.user.application.password_recovery_process.confirm_recovery_use_case import ConfirmRecoveryPinUseCase
 from app.user.application.password_recovery_process.reset_password_use_case import ResetPasswordUseCase
 from app.user.application.get_current_user_use_case import GetCurrentUserUseCase
-from app.user.application.admin_get_user_by_id_use_case import GetUserByIdUseCase
+from app.user.application.admin_get_user_by_id_use_case import AdminGetUserByIdUseCase
 from app.user.application.logout_use_case import LogoutUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
@@ -214,7 +214,7 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
         )
 
 @router.post(
-    "/admin/creates", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED
+    "/admin/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED
 )
 def create_user_by_admin(
     user: UserCreateByAdmin,
@@ -235,7 +235,7 @@ def create_user_by_admin(
     Raises:
         HTTPException: Si ocurre un error durante la creación del usuario.
     """
-    user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
+    user_creation_by_admin_use_case = AdminCreatesUserUseCase(db)
     try:
         return user_creation_by_admin_use_case.admin_creates_user(user, current_user)
     except (DomainException, UserStateException) as e:
@@ -261,9 +261,9 @@ def list_users(db: Session = Depends(getDb), current_user=Depends(get_current_us
     Raises:
         HTTPException: Si ocurre un error durante la obtención de la lista de usuarios.
     """
-    list_users_use_case = ListUsersUseCase(db)
+    list_users_use_case = AdminListUsersUseCase(db)
     try:
-        return list_users_use_case.execute(current_user)
+        return list_users_use_case.admin_list_users(current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -289,7 +289,7 @@ def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db
     """
     me_use_case = GetCurrentUserUseCase(db)
     try:
-        return me_use_case.execute(current_user)
+        return me_use_case.get_current_user(current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -314,9 +314,9 @@ def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depe
     Raises:
         HTTPException: Si ocurre un error durante la obtención del usuario.
     """
-    get_user_by_id_use_case = GetUserByIdUseCase(db)
+    get_user_by_id_use_case = AdminGetUserByIdUseCase(db)
     try:
-        return get_user_by_id_use_case.execute(user_id, current_user)
+        return get_user_by_id_use_case.admin_get_user_by_id(user_id, current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -347,7 +347,7 @@ def update_user_info(
     """
     update_use_case = UpdateUserInfoUseCase(db)
     try:
-        return update_use_case.execute(current_user, user_update)
+        return update_use_case.update_user_info(current_user, user_update)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -378,9 +378,9 @@ def admin_update_user(
     Raises:
         HTTPException: Si ocurre un error durante la actualización del usuario.
     """
-    update_user_use_case = AdminUpdateUserUseCase(db)
+    update_user_use_case = AdminUpdatesUserUseCase(db)
     try:
-        return update_user_use_case.execute(user_id, user_update, current_user)
+        return update_user_use_case.admin_updates_user(user_id, user_update, current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -409,9 +409,9 @@ def deactivate_user(
     Raises:
         HTTPException: Si ocurre un error durante la desactivación del usuario.
     """
-    deactivate_use_case = DeactivateUserUseCase(db)
+    deactivate_use_case = AdminDeactivatesUserUseCase(db)
     try:
-        return deactivate_use_case.execute(user_id, current_user)
+        return deactivate_use_case.admin_deactivates_user(user_id, current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -440,7 +440,7 @@ def initiate_password_recovery(
     """
     password_recovery_use_case = PasswordRecoveryUseCase(db)
     try:
-        return password_recovery_use_case.execute(recovery_request.email)
+        return password_recovery_use_case.recovery_password(recovery_request.email)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -469,7 +469,7 @@ def resend_recovery_pin(
     """
     password_recovery_use_case = ResendRecoveryUseCase(db)
     try:
-        return password_recovery_use_case.execute(recovery_request.email)
+        return password_recovery_use_case.resend_recovery(recovery_request.email)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -498,7 +498,7 @@ def confirm_recovery_pin(
     """
     password_recovery_use_case = ConfirmRecoveryPinUseCase(db)
     try:
-        return password_recovery_use_case.execute(pin_confirmation.email, pin_confirmation.pin)
+        return password_recovery_use_case.confirm_recovery(pin_confirmation.email, pin_confirmation.pin)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -527,7 +527,7 @@ def reset_password(
     """
     password_recovery_use_case = ResetPasswordUseCase(db)
     try:
-        return password_recovery_use_case.execute(reset_request.email, reset_request.new_password)
+        return password_recovery_use_case.reset_password(reset_request.email, reset_request.new_password)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -559,7 +559,7 @@ def logout(
     token = credentials.credentials
     logout_use_case = LogoutUseCase(db)
     try:
-        return logout_use_case.execute(token, current_user.id)
+        return logout_use_case.logout(token, current_user.id)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

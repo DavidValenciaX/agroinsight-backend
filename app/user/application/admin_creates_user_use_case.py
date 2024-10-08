@@ -8,7 +8,7 @@ from app.infrastructure.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User
 
 
-class UserCreationByAdminUseCase:
+class AdminCreatesUserUseCase:
     def __init__(self, db: Session):
         self.user_repository = UserRepository(db)
 
