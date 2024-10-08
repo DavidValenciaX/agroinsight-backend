@@ -41,7 +41,7 @@ def create_plot(
     """
     create_plot_use_case = CreatePlotUseCase(db)
     try:
-        return create_plot_use_case.execute(plot, current_user)
+        return create_plot_use_case.create_plot(plot, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -76,7 +76,7 @@ def list_plots(
     """
     list_plots_use_case = ListPlotsUseCase(db)
     try:
-        return list_plots_use_case.execute(current_user, finca_id, page, per_page)
+        return list_plots_use_case.list_plots(current_user, finca_id, page, per_page)
     except DomainException as e:
         raise e
     except Exception as e:

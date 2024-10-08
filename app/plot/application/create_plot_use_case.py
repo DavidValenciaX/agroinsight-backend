@@ -11,7 +11,7 @@ class CreatePlotUseCase:
         self.db = db
         self.plot_repository = PlotRepository(db)
 
-    def execute(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
         # Verificar si el usuario tiene permisos para crear lotes
         if not self.user_can_create_plot(current_user):
             raise InsufficientPermissionsException()

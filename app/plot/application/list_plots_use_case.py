@@ -13,7 +13,7 @@ class ListPlotsUseCase:
         self.db = db
         self.plot_repository = PlotRepository(db)
 
-    def execute(self, current_user: UserInDB, finca_id: int, page: int, per_page: int) -> PaginatedPlotListResponse:
+    def list_plots(self, current_user: UserInDB, finca_id: int, page: int, per_page: int) -> PaginatedPlotListResponse:
         farm = self.plot_repository.get_farm_by_id(finca_id)
         if not farm:
             raise DomainException(
