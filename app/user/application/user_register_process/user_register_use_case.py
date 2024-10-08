@@ -117,17 +117,17 @@ class UserCreationUseCase:
             expiracion=datetime.now(timezone.utc) + timedelta(minutes=expiration_time),
             resends=0
         )
+        
+        if not self.user_repository.add_user_confirmation(confirmation):
+            return DomainException(
+                message="Error al agregar la confirmación del usuario.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         # Enviar correo de confirmación y agregar la confirmación al repositorio
         if not self.send_confirmation_email(created_user.email, pin):
             return DomainException(
                 message="Error al enviar el correo de confirmación.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
-        if not self.user_repository.add_user_confirmation(confirmation):
-            return DomainException(
-                message="Error al agregar la confirmación del usuario.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     

@@ -16,7 +16,7 @@ class ResendConfirmationUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
 
-    def execute(self, email: str) -> SuccessResponse:
+    def resend_confirmation(self, email: str) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()
@@ -50,35 +50,32 @@ class ResendConfirmationUseCase:
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
 
-        try:
-
-            # Generar nuevo PIN y su hash
-            pin, pin_hash = generate_pin()
-            
-            # Actualizar el registro de confirmación de usuario
-            last_confirmation.pin = pin_hash
-            last_confirmation.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
-            last_confirmation.resends += 1
-            last_confirmation.intentos = 0
-            self.user_repository.update_user_confirmation(last_confirmation)
-
-            # Enviar el correo electrónico con el nuevo PIN
-            if not self.resend_confirmation_email(email, pin):
-                raise DomainException(
-                    message="No se pudo enviar el correo electrónico.",
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
-            self.user_repository.add_user_confirmation(last_confirmation)
-            return SuccessResponse(
-                message="PIN de confirmación reenviado con éxito."
-            )
-
-        except Exception as e:
+        # Generar nuevo PIN y su hash
+        pin, pin_hash = generate_pin()
+        
+        # Actualizar el registro de confirmación de usuario con manejo de errores
+        last_confirmation.pin = pin_hash
+        last_confirmation.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
+        last_confirmation.resends += 1
+        last_confirmation.intentos = 0
+        
+        if not self.user_repository.update_user_confirmation(last_confirmation):
+            # Log the error or handle it as needed
             raise DomainException(
-                message=f"Error al reenviar el PIN de confirmación: {str(e)}",
+                message="Error al actualizar la confirmación del usuario",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+        # Enviar el correo electrónico con el nuevo PIN
+        if not self.resend_confirmation_email(email, pin):
+            raise DomainException(
+                message="Error al reenviar el correo de confirmación.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        return SuccessResponse(
+            message="PIN de confirmación reenviado con éxito."
+        )
 
     def resend_confirmation_email(self, email: str, pin: str) -> bool:
         subject = "Confirma tu registro en AgroInSight"

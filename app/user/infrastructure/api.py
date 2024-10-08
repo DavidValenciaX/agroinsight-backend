@@ -93,7 +93,7 @@ def resend_confirmation_pin_endpoint(
     """
     resend_confirmation_use_case = ResendConfirmationUseCase(db)
     try:
-        return resend_confirmation_use_case.execute(resend_request.email)
+        return resend_confirmation_use_case.resend_confirmation(resend_request.email)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
