@@ -86,37 +86,6 @@ def list_farms(
             detail=f"Error interno al listar las fincas: {str(e)}"
         )
         
-@router.post("/assign-users-by-id", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def assign_users_to_farm(
-    assignment_data: FarmUserAssignmentById,
-    db: Session = Depends(getDb),
-    current_user: UserInDB = Depends(get_current_user)
-):
-    """
-    Asigna usuarios a una finca utilizando sus IDs.
-
-    Parameters:
-        assignment_data (FarmUserAssignmentById): Datos de asignación de usuarios.
-        db (Session): Sesión de base de datos.
-        current_user (UserInDB): Usuario actual autenticado.
-
-    Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que los usuarios fueron asignados exitosamente.
-
-    Raises:
-        HTTPException: Si ocurre un error durante la asignación de usuarios.
-    """
-    assign_users_use_case = AssignUsersToFarmUseCase(db)
-    try:
-        return assign_users_use_case.execute_by_id(assignment_data, current_user)
-    except DomainException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno al asignar usuario a una finca {str(e)}"
-        )
-        
 @router.post("/assign-users-by-email", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def assign_users_to_farm_by_email(
     assignment_data: FarmUserAssignmentByEmail,
