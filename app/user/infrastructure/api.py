@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.user.application.deactivate_user_use_case import DeactivateUserUseCase
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
 from app.user.application.admin_update_user_use_case import AdminUpdateUserUseCase
-from app.user.application.user_creation_process.user_creation_use_case import UserCreationUseCase
+from app.user.application.user_creation_process.user_register_use_case import UserCreationUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
 from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
 from app.user.application.password_recovery_process.password_recovery_use_case import PasswordRecoveryUseCase
@@ -38,7 +38,7 @@ security_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/user", tags=["user"])
 
-@router.post("/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_user(
     user: UserCreate,
     db: Session = Depends(getDb),
@@ -62,7 +62,7 @@ def create_user(
     creation_use_case = UserCreationUseCase(db)
     # Llamamos al caso de uso sin manejar excepciones aquí
     try:
-        return creation_use_case.execute(user)
+        return creation_use_case.register_user(user)
     except (DomainException, UserStateException) as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e

@@ -38,9 +38,9 @@ class UserCreationUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(self.user_repository)
 
-    def execute(self, user_data: UserCreate) -> SuccessResponse:
+    def register_user(self, user_data: UserCreate) -> SuccessResponse:
         """
-        Ejecuta el proceso de creación de un nuevo usuario.
+        Crea al nuevo usuario.
 
         Este método realiza las siguientes operaciones:
         
@@ -108,59 +108,41 @@ class UserCreationUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        # Intentar crear la confirmación y enviar el correo
-        if not self.create_and_send_confirmation(created_user):
-            # Si falla la confirmación, eliminar el usuario
-            self.user_repository.delete_user(created_user)
+        # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
+        last_confirmation = self.user_repository.get_last_user_confirmation(created_user.id)
+        if last_confirmation and (datetime.now(timezone.utc) - ensure_utc(last_confirmation.created_at)).total_seconds() < 180:
+
             raise DomainException(
-                message="Error al crear la confirmación de usuario.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                message="Ya has solicitado un PIN recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS
             )
-            
+        
+        # Generar PIN y su hash
+        expiration_time = 10  # minutos
+        pin, pin_hash = generate_pin()
+        confirmation = ConfirmacionUsuario(
+            usuario_id=created_user.id,
+            pin=pin_hash,
+            expiracion=datetime.now(timezone.utc) + timedelta(minutes=expiration_time),
+            resends=0
+        )
+
+        # Enviar correo de confirmación y agregar la confirmación al repositorio
+        if not self.send_confirmation_email(created_user.email, pin):
+            return DomainException(
+                message="Error al enviar el correo de confirmación.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        if not self.user_repository.add_user_confirmation(confirmation):
+            return DomainException(
+                message="Error al agregar la confirmación del usuario.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
         return SuccessResponse(
                 message="Usuario creado. Por favor, revisa tu email para confirmar el registro."
             )
-
-    def create_and_send_confirmation(self, user: User) -> bool:
-        """
-        Crea y envía una confirmación de registro al usuario.
-
-        Este método genera un PIN de confirmación, crea un registro de confirmación
-        en la base de datos y envía un correo electrónico con el PIN al usuario.
-
-        Parameters:
-            user (User): El usuario para el cual se crea la confirmación.
-
-        Returns:
-            bool: True si la confirmación se creó y envió correctamente, False en caso contrario.
-        """
-        try:
-            # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
-            last_confirmation = self.user_repository.get_last_user_confirmation(user.id)
-            if last_confirmation and (datetime.now(timezone.utc) - ensure_utc(last_confirmation.created_at)).total_seconds() < 180:
-
-                raise DomainException(
-                    message="Ya has solicitado un PIN recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS
-                )
-            
-            # Generar PIN y su hash
-            expiration_time = 10  # minutos
-            pin, pin_hash = generate_pin()
-            confirmation = ConfirmacionUsuario(
-                usuario_id=user.id,
-                pin=pin_hash,
-                expiracion=datetime.now(timezone.utc) + timedelta(minutes=expiration_time),
-                resends=0  # Inicializamos resends en 0
-            )
-
-            # Enviar correo de confirmación y agregar la confirmación al repositorio
-            if not self.send_confirmation_email(user.email, pin):
-                return False
-            return self.user_repository.add_user_confirmation(confirmation)
-        except Exception as e:
-            print(f"Error al crear la confirmación del usuario: {str(e)}")
-            return False
 
     def send_confirmation_email(self, email: str, pin: str) -> bool:
         """
