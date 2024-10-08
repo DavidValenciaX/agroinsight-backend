@@ -13,7 +13,7 @@ from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
 from app.user.application.admin_update_user_use_case import AdminUpdateUserUseCase
 from app.user.application.user_register_process.user_register_use_case import UserCreationUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
-from app.user.application.user_creation_by_admin_use_case import UserCreationByAdminUseCase
+from app.user.application.admin_creates_user_use_case import UserCreationByAdminUseCase
 from app.user.application.password_recovery_process.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.application.user_register_process.resend_confirmation_use_case import ResendConfirmationUseCase
 from app.user.application.user_register_process.confirmation_use_case import ConfirmationUseCase
@@ -204,7 +204,7 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
     verify_use_case = VerifyUseCase(db)
     try:
         # Ejecuta el caso de uso y obtiene los datos del token
-        return verify_use_case.execute(auth_request.email, auth_request.pin)
+        return verify_use_case.verify_2fa(auth_request.email, auth_request.pin)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -214,7 +214,7 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
         )
 
 @router.post(
-    "/admin/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED
+    "/admin/creates", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED
 )
 def create_user_by_admin(
     user: UserCreateByAdmin,
@@ -237,7 +237,7 @@ def create_user_by_admin(
     """
     user_creation_by_admin_use_case = UserCreationByAdminUseCase(db)
     try:
-        return user_creation_by_admin_use_case.execute(user, current_user)
+        return user_creation_by_admin_use_case.admin_creates_user(user, current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
