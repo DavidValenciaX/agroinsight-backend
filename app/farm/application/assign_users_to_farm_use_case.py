@@ -15,8 +15,7 @@ class AssignUsersToFarmUseCase:
         self.user_repository = UserRepository(db)
 
     def user_can_assign_users(self, user: UserInDB) -> bool:
-        allowed_roles = ["Administrador de Finca"]
-        return any(role.nombre in allowed_roles for role in user.roles)
+        return any(role.rol.nombre == "Administrador de Finca" for role in user.roles_fincas)
     
     def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> SuccessResponse:
         if not self.user_can_assign_users(current_user):
@@ -38,8 +37,20 @@ class AssignUsersToFarmUseCase:
                     status_code=status.HTTP_404_NOT_FOUND
                 )
             user_ids.append(user.id)
+            
+        # Verificar si el usuario tiene el rol de "Administrador de Finca" en la finca
+        if not self.farm_repository.user_has_access_to_farm(current_user.id, assignment_data.farm_id):
+            raise InsufficientPermissionsException()
+        
+        # Buscar el rol de "Trabajador Agrícola"
+        rol_trabajador_agricola = self.user_repository.get_role_by_name("Trabajador Agrícola")
+        if not rol_trabajador_agricola:
+            raise DomainException(
+                message="El rol de 'Trabajador Agrícola' no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
 
-        self.farm_repository.assign_users_to_farm(assignment_data.farm_id, user_ids)
+        self.farm_repository.assign_users_to_farm(assignment_data.farm_id, user_ids, rol_trabajador_agricola.id)
 
         return SuccessResponse(
             message="Usuarios asignados exitosamente a la finca."

@@ -46,7 +46,7 @@ class CreatePlotUseCase:
     def user_can_create_plot(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear lotes
         allowed_roles = ["Administrador de Finca"]
-        return any(role.nombre in allowed_roles for role in user.roles)
+        return any(role.rol.nombre in allowed_roles for role in user.roles_fincas)
 
     def validate_plot_data(self, plot_data: PlotCreate):
         # Implementar validaciones adicionales si es necesario

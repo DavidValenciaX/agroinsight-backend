@@ -38,4 +38,4 @@ class ListAssignmentsUseCase:
 
     def user_can_list_assignments(self, user: UserInDB) -> bool:
         allowed_roles = ["Administrador de Finca"]
-        return any(role.nombre in allowed_roles for role in user.roles)
+        return any(role.rol.nombre in allowed_roles for role in user.roles_fincas)

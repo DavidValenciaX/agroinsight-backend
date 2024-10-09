@@ -59,7 +59,7 @@ class CreateTaskUseCase:
 
     def user_can_create_tarea(self, user: UserInDB) -> bool:
         allowed_roles = ["Administrador de Finca"]
-        return any(role.nombre in allowed_roles for role in user.roles)
+        return any(role.rol.nombre in allowed_roles for role in user.roles_fincas)
 
     def validate_tarea_data(self, tarea_data: TareaLaborCulturalCreate):
         # Obtener la fecha actual
