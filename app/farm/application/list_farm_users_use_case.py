@@ -15,7 +15,7 @@ class ListFarmUsersUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
 
-    def list_farm_users(self, farm_id: int, role_name: Optional[str], role_id: Optional[int], current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmUserListResponse:
+    def list_farm_users(self, farm_id: int, role_id: int, current_user: UserInDB, page: Optional[int], per_page: Optional[int]) -> PaginatedFarmUserListResponse:
         self.validate_params(page, per_page)
         
         if not self.user_can_list_farm_users(current_user, farm_id):
@@ -28,7 +28,7 @@ class ListFarmUsersUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        role = self.get_role(role_name, role_id)
+        role = self.get_role(role_id)
 
         total_users, users = self.farm_repository.list_farm_users_by_role_paginated(farm_id, role.id, page, per_page)
 
@@ -44,31 +44,20 @@ class ListFarmUsersUseCase:
             total_pages=total_pages
         )
 
-    def get_role(self, role_name: Optional[str], role_id: Optional[int]):
-        if role_name:
-            role = self.user_repository.get_role_by_name(role_name)
-            if not role:
-                raise DomainException(
-                    message=f"El rol '{role_name}' no existe.",
-                    status_code=status.HTTP_404_NOT_FOUND
-                )
-        elif role_id:
-            role = self.user_repository.get_role_by_id(role_id)
-            if not role:
-                raise DomainException(
-                    message=f"El rol con ID '{role_id}' no existe.",
-                    status_code=status.HTTP_404_NOT_FOUND
-                )
-        else:
+    def get_role(self, role_id: Optional[int]):
+
+        role = self.user_repository.get_role_by_id(role_id)
+        if not role:
             raise DomainException(
-                message="Debe proporcionar un nombre de rol o un ID de rol.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                message=f"El rol con ID '{role_id}' no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
             )
+            
         return role
 
     def user_can_list_farm_users(self, user: UserInDB, farm_id: int) -> bool:
-        allowed_roles = ["Administrador de Finca"]
-        has_allowed_role = any(role.nombre in allowed_roles for role in user.roles)
+        
+        has_allowed_role = any(role.rol.nombre == "Administrador de Finca" for role in user.roles_fincas)
         
         # Si es Administrador de Finca, verificar si está vinculado a la finca
         if has_allowed_role:

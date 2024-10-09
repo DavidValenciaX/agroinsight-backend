@@ -5,7 +5,7 @@ Incluye endpoints para la creación de fincas, asignación de usuarios,
 listado de fincas y usuarios de una finca específica.
 """
 
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
@@ -120,10 +120,9 @@ def assign_users_to_farm_by_email(
 @router.get("/{farm_id}/users", response_model=PaginatedFarmUserListResponse, status_code=status.HTTP_200_OK)
 def list_farm_users(
     farm_id: int,
-    role: str = Query(None, description="Nombre del rol a filtrar"),
-    role_id: int = Query(None, description="ID del rol a filtrar"),
-    page: int = Query(1, ge=1),
-    per_page: int = Query(10, ge=1, le=100),
+    role_id: int = Query(None),
+    page: Optional[int] = Query(1, ge=1),
+    per_page: Optional[int] = Query(10, ge=1, le=100),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(getDb)
 ):
@@ -132,7 +131,6 @@ def list_farm_users(
 
     Parameters:
         farm_id (int): ID de la finca.
-        role (str): Nombre del rol a filtrar.
         role_id (int): ID del rol a filtrar.
         page (int): Número de página.
         per_page (int): Elementos por página.
@@ -145,20 +143,15 @@ def list_farm_users(
     Raises:
         HTTPException: Si ocurre un error durante la obtención de la lista de usuarios.
     """
-    if role is None and role_id is None:
+    if role_id is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Debe proporcionar 'role' o 'role_id'"
-        )
-    if role is not None and role_id is not None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Proporcione 'role' o 'role_id', no ambos"
+            detail="Debe proporcionar 'role_id'"
         )
     
     use_case = ListFarmUsersUseCase(db)
     try:
-        return use_case.list_farm_users(farm_id, role, role_id, current_user, page, per_page)
+        return use_case.list_farm_users(farm_id, role_id, current_user, page, per_page)
     except DomainException as e:
         raise e
     except Exception as e:
