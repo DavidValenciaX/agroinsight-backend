@@ -83,3 +83,6 @@ generate_responses.py
 
 # Ignorar la carpeta site generada por mkdocs
 site/
+
+# Database
+Agroinsightdb.sql

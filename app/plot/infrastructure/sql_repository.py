@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from app.plot.infrastructure.orm_models import Plot
 from app.plot.domain.schemas import PlotCreate
 from typing import Optional
-from app.farm.infrastructure.orm_models import UsuarioFinca, Finca
+from app.user.infrastructure.orm_models import UsuarioFincaRol
+from app.farm.infrastructure.orm_models import Finca
 from typing import List, Tuple
 from sqlalchemy import func
 
@@ -30,7 +31,7 @@ class PlotRepository:
             return None
         
     def list_plots(self, user_id: int) -> List[Plot]:
-            return self.db.query(Plot).join(UsuarioFinca, Plot.finca_id == UsuarioFinca.finca_id).filter(UsuarioFinca.usuario_id == user_id).all()
+            return self.db.query(Plot).join(UsuarioFincaRol, Plot.finca_id == UsuarioFincaRol.finca_id).filter(UsuarioFincaRol.usuario_id == user_id).all()
         
     def list_plots_by_farm(self, finca_id: int) -> List[Plot]:
         return self.db.query(Plot).filter(Plot.finca_id == finca_id).all()
@@ -47,9 +48,9 @@ class PlotRepository:
         return self.db.query(Finca).filter(Finca.id == finca_id).first()
 
     def check_user_farm_access(self, user_id: int, finca_id: int) -> bool:
-        access = self.db.query(UsuarioFinca).filter(
-            UsuarioFinca.usuario_id == user_id,
-            UsuarioFinca.finca_id == finca_id
+        access = self.db.query(UsuarioFincaRol).filter(
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.finca_id == finca_id
         ).first()
         return access is not None
     

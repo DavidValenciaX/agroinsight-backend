@@ -14,7 +14,7 @@ from app.user.application.admin_use_cases.admin_creates_user_use_case import Adm
 from app.user.application.admin_use_cases.admin_list_users_use_case import AdminListUsersUseCase
 from app.user.application.admin_use_cases.admin_get_user_by_id_use_case import AdminGetUserByIdUseCase
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
-from app.user.application.user_register_process.user_register_use_case import UserCreationUseCase
+from app.user.application.user_register_process.user_register_use_case import UserRegisterUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
 from app.user.application.password_recovery_process.password_recovery_use_case import PasswordRecoveryUseCase
 from app.user.application.user_register_process.resend_confirmation_use_case import ResendConfirmationUseCase
@@ -59,7 +59,7 @@ def create_user(
     Raises:
         HTTPException: Si ocurre un error durante el registro, como datos inválidos o un usuario ya existente.
     """
-    creation_use_case = UserCreationUseCase(db)
+    creation_use_case = UserRegisterUseCase(db)
     # Llamamos al caso de uso sin manejar excepciones aquí
     try:
         return creation_use_case.register_user(user)

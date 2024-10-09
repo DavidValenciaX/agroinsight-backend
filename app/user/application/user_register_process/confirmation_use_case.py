@@ -31,7 +31,7 @@ class ConfirmationUseCase:
         pending_confirmation = self.user_repository.get_user_pending_confirmation(user.id)
         if not pending_confirmation:
             raise DomainException(
-                message="No hay una confirmación pendiente para reenviar el PIN.",
+                message="No hay un registro de confirmación para este usuario.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
@@ -70,18 +70,18 @@ class ConfirmationUseCase:
             
         self.user_repository.update_user_state(user.id, active_state_id)
         
-        # Actualizar el rol de usuario no confirmado a usuario
+        # Actualizar el rol de rol no confirmado a rol no asignado
         unconfirmed_user_role = self.user_repository.get_unconfirmed_user_role()
         if not unconfirmed_user_role:
             raise DomainException(
-                message="No se pudo encontrar el rol de usuario 'Usuario no confirmado'.",
+                message="No se pudo encontrar el rol de usuario 'Rol no confirmado'.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
         confirmed_user_role = self.user_repository.get_registered_user_role()
         if not confirmed_user_role:
             raise DomainException(
-                message="No se pudo encontrar el rol de usuario 'Usuario'.",
+                message="No se pudo encontrar el rol de usuario 'Rol no asignado'.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         

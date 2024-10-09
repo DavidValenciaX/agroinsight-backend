@@ -3,7 +3,7 @@ from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserCreateByAdmin
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, MissingTokenException, UserAlreadyRegisteredException, UserStateException
+from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException, UserAlreadyRegisteredException, UserStateException
 from app.infrastructure.security.security_utils import hash_password
 from app.user.infrastructure.orm_models import User
 
@@ -16,16 +16,10 @@ class AdminCreatesUserUseCase:
         if not current_user:
             raise MissingTokenException()
 
-        # Verificar que el usuario actual tiene roles de administrador
-        admin_roles = self.user_repository.get_admin_roles()
-        admin_role_ids = {admin_role.id for admin_role in admin_roles}
-        if not any(role.id in admin_role_ids for role in current_user.roles):
-            raise InsufficientPermissionsException()
-            
         # Verificar si el correo electrónico ya existe
         existing_user = self.user_repository.get_user_by_email(user_data.email)
         if existing_user:
-                raise UserAlreadyRegisteredException()
+            raise UserAlreadyRegisteredException()
 
         # Verificar si el rol proporcionado es válido
         role = self.user_repository.get_role_by_id(user_data.role_id)
@@ -60,8 +54,8 @@ class AdminCreatesUserUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Asignar el rol especificado
-        self.user_repository.assign_role_to_user(created_user.id, user_data.role_id)
+        # Asignar el rol especificado en la finca
+        self.user_repository.assign_role_to_user(created_user.id, user_data.role_id, user_data.finca_id)
 
         return SuccessResponse(
             message="Usuario creado y activado exitosamente."

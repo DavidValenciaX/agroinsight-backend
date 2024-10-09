@@ -21,7 +21,6 @@ class User(Base):
     - **failed_attempts** (int): Número de intentos fallidos de inicio de sesión.
     - **locked_until** (datetime): Fecha y hora hasta la cual el usuario está bloqueado.
     - **state_id** (int): Identificador del estado del usuario.
-    - **roles** (List[Role]): Lista de roles asociados al usuario.
     - **estado** (EstadoUsuario): Estado actual del usuario.
     - **confirmacion** (ConfirmacionUsuario): Información de confirmación del usuario.
     - **verificacion_dos_pasos** (VerificacionDospasos): Información de verificación de dos pasos.
@@ -41,28 +40,25 @@ class User(Base):
     locked_until = Column(DateTime, nullable=True)
     state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
 
-    roles = relationship("Role", secondary="usuario_rol", back_populates="users")
     estado = relationship("EstadoUsuario")
     confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
-    fincas = relationship("Finca", secondary="usuario_finca", back_populates="usuarios")
     asignaciones = relationship("Asignacion", back_populates="usuario")
-    
-class UserRole(Base):
-    """
-    Representa la tabla 'usuario_rol' en la base de datos.
+    finca_roles = relationship("UsuarioFincaRol", back_populates="usuario")
 
-    Atributos:
-    ----------
-    - **usuario_id** (int): Identificador del usuario.
-    - **rol_id** (int): Identificador del rol.
-    """
-    __tablename__ = "usuario_rol"
-    
-    usuario_id = Column(Integer, ForeignKey(USUARIO_ID), primary_key=True)
-    rol_id = Column(Integer, ForeignKey('rol.id'), primary_key=True)
+class UsuarioFincaRol(Base):
+    __tablename__ = "usuario_finca_rol"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    usuario_id = Column(Integer, ForeignKey('usuario.id'), nullable=False)
+    finca_id = Column(Integer, ForeignKey('finca.id'), nullable=True)
+    rol_id = Column(Integer, ForeignKey('rol.id'), nullable=False)
+
+    usuario = relationship("User", back_populates="finca_roles")
+    finca = relationship("Finca", back_populates="usuario_roles")
+    rol = relationship("Role", back_populates="usuario_fincas")
     
 class Role(Base):
     """
@@ -81,7 +77,7 @@ class Role(Base):
     nombre = Column(String(50), unique=True, index=True)
     descripcion = Column(Text)
 
-    users = relationship("User", secondary="usuario_rol", back_populates="roles")
+    usuario_fincas = relationship("UsuarioFincaRol", back_populates="rol")
     
 class EstadoUsuario(Base):
     """

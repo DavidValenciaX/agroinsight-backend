@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 
-admin_router = APIRouter(prefix="/user", tags=["admin"])
+admin_router = APIRouter(prefix="/user", tags=["superuser"])
 
 @admin_router.post(
     "/admin/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED
@@ -101,7 +101,7 @@ def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depe
             detail=f"Error interno al obtener el usuario: {str(e)}"
         )
         
-@admin_router.put("/{user_id}/update", response_model=UserResponse, status_code=status.HTTP_200_OK)
+@admin_router.put("/{user_id}/update", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def admin_update_user(
     user_id: int,
     user_update: AdminUserUpdate,
@@ -118,7 +118,7 @@ def admin_update_user(
         current_user (UserInDB): Usuario actual autenticado.
 
     Returns:
-        UserResponse: Un objeto UserResponse con la información actualizada del usuario.
+        SuccessResponse: Un objeto SuccessResponse indicando que el usuario fue actualizado exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante la actualización del usuario.

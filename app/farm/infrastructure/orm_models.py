@@ -15,8 +15,8 @@ class Finca(Base):
     longitud = Column(DECIMAL(11, 8), nullable=False)
 
     unidad_area = relationship("UnidadMedida")
-    usuarios = relationship("User", secondary="usuario_finca", back_populates="fincas")
     lotes = relationship("Plot", back_populates="finca")
+    usuario_roles = relationship("UsuarioFincaRol", back_populates="finca")
     
 class CategoriaUnidadMedida(Base):
     __tablename__ = "categoria_unidad_medida"
@@ -36,9 +36,3 @@ class UnidadMedida(Base):
     categoria_id = Column(Integer, ForeignKey('categoria_unidad_medida.id'), nullable=False)
 
     categoria = relationship("CategoriaUnidadMedida", back_populates="unidades")
-    
-class UsuarioFinca(Base):
-    __tablename__ = "usuario_finca"
-
-    usuario_id = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
-    finca_id = Column(Integer, ForeignKey('finca.id'), primary_key=True)

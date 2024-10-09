@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, field_validator
 from pydantic_core import PydanticCustomError
@@ -94,8 +94,10 @@ class UserCreateByAdmin(UserCreate):
         - email (EmailStr): Correo electrónico único del usuario.
         - password (str): Contraseña del usuario.
         - roles (List[int]): Lista de IDs de roles asignados al usuario.
+        - finca_id (int): ID de la finca a la que pertenece el usuario.
     """
     role_id: int
+    finca_id: int
 
 class RoleInfo(BaseModel):
     """
@@ -138,6 +140,10 @@ class UserInDB(BaseModel):
     _validate_email = field_validator('email')(validate_email)
     _validate_password = field_validator('password')(validate_password)
 
+class RolFinca(BaseModel):
+    rol: str
+    finca: Optional[str]
+
 class UserResponse(BaseModel):
     """
     Esquema para la respuesta que contiene información del usuario.
@@ -156,8 +162,7 @@ class UserResponse(BaseModel):
     apellido: str
     email: str
     estado: str
-    rol: str
-    fincas: List[str]  # Add this line to include farm names
+    roles_fincas: List[RolFinca]  # Updated to include farm names
 
     class Config:
         from_attributes = True
@@ -247,12 +252,14 @@ class AdminUserUpdate(BaseModel):
         - email (Optional[EmailStr]): Nuevo correo electrónico del usuario.
         - roles (Optional[List[int]]): Nueva lista de IDs de roles asignados al usuario.
         - estado_id (Optional[int]): Nuevo ID de estado del usuario.
+        - finca_id (Optional[int]): Nuevo ID de finca del usuario.
     """
     nombre: str
     apellido: str
     email: str
     estado_id: int
     rol_id: int
+    finca_id: int
 
     class Config:
         from_attributes = True

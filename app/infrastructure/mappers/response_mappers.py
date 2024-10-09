@@ -1,18 +1,27 @@
-
 from app.cultural_practices.domain.schemas import AssignmentResponse
 from app.user.domain.schemas import UserResponse
 from app.farm.domain.schemas import FarmResponse
 from app.plot.domain.schemas import PlotResponse
 
 def map_user_to_response(user) -> UserResponse:
+    roles_fincas = [
+        {
+            "rol": ufr.rol.nombre,
+            "finca": ufr.finca.nombre if ufr.finca else None
+        }
+        for ufr in user.finca_roles
+    ]
+    
+    if not roles_fincas:
+        roles_fincas = [{"rol": "No asignado", "finca": "Ninguna finca creada"}]
+    
     return UserResponse(
         id=user.id,
         nombre=user.nombre,
         apellido=user.apellido,
         email=user.email,
         estado=user.estado.nombre if user.estado else "Desconocido",
-        rol=", ".join([role.nombre for role in user.roles]) if user.roles else "Rol no asignado",
-        fincas=[finca.nombre for finca in user.fincas]
+        roles_fincas=roles_fincas
     )
 
 def map_farm_to_response(farm) -> FarmResponse:
@@ -23,7 +32,16 @@ def map_farm_to_response(farm) -> FarmResponse:
         area_total=farm.area_total,
         unidad_area=farm.unidad_area.abreviatura if farm.unidad_area else "Desconocida",
         latitud=farm.latitud,
-        longitud=farm.longitud
+        longitud=farm.longitud,
+        usuarios=[
+            {
+                "id": ufr.usuario.id,
+                "nombre": ufr.usuario.nombre,
+                "apellido": ufr.usuario.apellido,
+                "rol": ufr.rol.nombre
+            }
+            for ufr in farm.usuario_roles
+        ]
     )
 
 def map_plot_to_response(plot) -> PlotResponse:

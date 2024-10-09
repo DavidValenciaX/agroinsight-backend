@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
+from app.farm.infrastructure.orm_models import Finca
 from app.user.infrastructure.orm_models import (
-    User, EstadoUsuario, Role, UserRole, RecuperacionContrasena,
+    User, EstadoUsuario, Role, UsuarioFincaRol, RecuperacionContrasena,
     VerificacionDospasos, ConfirmacionUsuario, BlacklistedToken
 )
 from datetime import datetime, timezone, timedelta
@@ -26,10 +27,10 @@ class UserRepository:
         return self.db.query(User).filter(User.email == email).first()
     
     def get_user_by_id(self, user_id: int) -> Optional[User]:
-        return self.db.query(User).options(joinedload(User.roles)).get(user_id)
+        return self.db.query(User).get(user_id)
     
     def get_all_users(self) -> List[User]:
-            return self.db.query(User).options(joinedload(User.roles), joinedload(User.estado)).all()
+        return self.db.query(User).options(joinedload(User.estado)).all()
     
     def update_user(self, user: User) -> Optional[User]:
         try:
@@ -82,6 +83,8 @@ class UserRepository:
             user.apellido = user_data['apellido']
         if 'email' in user_data and user_data['email']:
             user.email = user_data['email']
+            
+        print(user_data['finca_id'])
 
         # Cambiar el estado del usuario basado en el estado_id
         if 'estado_id' in user_data and user_data['estado_id']:
@@ -91,15 +94,30 @@ class UserRepository:
             
             user.state_id = estado.id
 
-        # Cambiar el rol del usuario basado en el rol_id
+        # Cambiar el rol del usuario basado en el rol_id, asegurando que esté asociado a la finca
         if 'rol_id' in user_data and user_data['rol_id']:
             nuevo_rol = self.get_role_by_id(user_data['rol_id'])
             if not nuevo_rol:
                 raise ValueError("Rol no válido")
+        
+        if 'finca_id' in user_data and user_data['finca_id']:
+            finca = self.db.query(Finca).filter(Finca.id == user_data['finca_id']).first()
+            if not finca:
+                raise ValueError("Finca no válida")
             
-            # Eliminar el rol actual y asignar el nuevo rol
-            self.db.query(UserRole).filter(UserRole.usuario_id == user.id).delete()
-            user_role = UserRole(usuario_id=user.id, rol_id=nuevo_rol.id)
+        # Verificar si el usuario tiene el rol de trabajador asociado a la finca especificada
+        user_finca_rol = (
+            self.db.query(UsuarioFincaRol)
+            .filter(UsuarioFincaRol.usuario_id == user.id)
+            .filter(UsuarioFincaRol.finca_id == finca.id)
+            .filter(UsuarioFincaRol.rol_id == nuevo_rol.id)
+            .first()
+            )
+            
+        if not user_finca_rol:
+            # Eliminar el rol actual y asignar el nuevo rol asociado a la finca
+            self.db.query(UsuarioFincaRol).filter(UsuarioFincaRol.usuario_id == user.id, UsuarioFincaRol.finca_id == finca.id).delete()
+            user_role = UsuarioFincaRol(usuario_id=user.id, finca_id=finca.id, rol_id=nuevo_rol.id)
             self.db.add(user_role)
 
         try:
@@ -375,15 +393,15 @@ class UserRepository:
         return False
 
     def get_unconfirmed_user_role(self) -> Optional[Role]:
-        return self.db.query(Role).filter(Role.nombre == "Usuario No Confirmado").first()
+        return self.db.query(Role).filter(Role.nombre == "Rol no confirmado").first()
     
     def get_registered_user_role(self) -> Optional[Role]:
-        return self.db.query(Role).filter(Role.nombre == "Usuario").first()
+        return self.db.query(Role).filter(Role.nombre == "Rol no asignado").first()
 
-    def assign_role_to_user(self, user_id: int, role_id: int) -> bool:
+    def assign_role_to_user(self, user_id: int, role_id: int, farm_id: int = None) -> bool:
         try:
-            user_role = UserRole(usuario_id=user_id, rol_id=role_id)
-            self.db.add(user_role)
+            user_farm_role = UsuarioFincaRol(usuario_id=user_id, rol_id=role_id, finca_id=farm_id)
+            self.db.add(user_farm_role)
             self.db.commit()
             return True
         except Exception as e:
@@ -391,27 +409,32 @@ class UserRepository:
             print(f"Error al asignar rol al usuario: {e}")
             return False
 
-    def change_user_role(self, user_id: int, old_role:Role, new_role:Role) -> bool:
-        
-        if old_role and new_role:
-            user_role = self.db.query(UserRole).filter(
-                UserRole.usuario_id == user_id,
-                UserRole.rol_id == old_role.id
-            ).first()
+    def change_user_role(self, user_id: int, old_role: Role, new_role: Role, farm_id: int = None) -> bool:
+        user_farm_role = self.db.query(UsuarioFincaRol).filter(
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.rol_id == old_role.id,
+            UsuarioFincaRol.finca_id == farm_id
+        ).first()
 
-            if user_role:
-                user_role.rol_id = new_role.id
-                try:
-                    self.db.commit()
-                    self.db.refresh(user_role)
-                    return True
-                except Exception as e:
-                    self.db.rollback()
-                    print(f"Error al cambiar el rol del usuario: {e}")
-                    return False
+        if user_farm_role:
+            user_farm_role.rol_id = new_role.id
+            try:
+                self.db.commit()
+                self.db.refresh(user_farm_role)
+                return True
+            except Exception as e:
+                self.db.rollback()
+                print(f"Error al cambiar el rol del usuario: {e}")
+                return False
 
         return False
 
     # Métodos auxiliares
     def get_role_by_name(self, role_name: str) -> Optional[Role]:
         return self.db.query(Role).filter(Role.nombre == role_name).first()
+    
+    def get_user_finca_roles(self, user_id: int, finca_id: int) -> List[Role]:
+        return self.db.query(Role).join(UsuarioFincaRol).filter(
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.finca_id == finca_id
+        ).all()

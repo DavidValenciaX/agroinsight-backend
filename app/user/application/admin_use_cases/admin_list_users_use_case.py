@@ -13,14 +13,6 @@ class AdminListUsersUseCase:
     def admin_list_users(self, current_user) -> List[UserResponse]:
         if not current_user:
             raise MissingTokenException()
-            
-        # Verificar que el usuario actual tiene roles de administrador
-        admin_roles = self.user_repository.get_admin_roles()
-        if not any(
-            role.id in [admin_role.id for admin_role in admin_roles]
-            for role in current_user.roles
-        ):
-            raise InsufficientPermissionsException()
         
         users = self.user_repository.get_all_users()
         if not users:

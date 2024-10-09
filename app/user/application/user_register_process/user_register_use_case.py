@@ -12,7 +12,7 @@ from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
 from app.infrastructure.common.datetime_utils import ensure_utc
 
-class UserCreationUseCase:
+class UserRegisterUseCase:
     """
     Caso de uso para la creación de un nuevo usuario en el sistema.
 
@@ -47,7 +47,7 @@ class UserCreationUseCase:
         1. Verifica si el usuario ya existe.
         2. Valida el estado del usuario si ya existe.
         3. Crea un nuevo usuario con estado pendiente.
-        4. Asigna el rol de usuario no confirmado.
+        4. Asigna el rol de rol no confirmado.
         5. Crea y envía una confirmación por correo electrónico.
 
         Parameters:
@@ -84,7 +84,7 @@ class UserCreationUseCase:
         unconfirmed_role = self.user_repository.get_unconfirmed_user_role()
         if not unconfirmed_role:
             raise DomainException(
-                message="No se pudo encontrar el rol de Usuario No Confirmado.",
+                message="No se pudo encontrar el rol de Rol no confirmado.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -100,13 +100,6 @@ class UserCreationUseCase:
             state_id=pending_state_id
         )
         created_user = self.user_repository.create_user(new_user)
-            
-        if not self.user_repository.assign_role_to_user(created_user.id, unconfirmed_role.id):
-            self.user_repository.delete_user(created_user)  # Eliminar el usuario si falla la asignación del rol
-            raise DomainException(
-                message="No se pudo asignar el rol de Usuario No Confirmado.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
         
         # Generar PIN y su hash
         expiration_time = 10  # minutos

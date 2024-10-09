@@ -15,7 +15,7 @@ class CreateFarmUseCase:
         # Verificar si el usuario tiene permisos para crear fincas
         if not self.user_can_create_farm(current_user):
             raise InsufficientPermissionsException()
-
+        
         # Validar los datos de entrada
         self.validate_farm_data(farm_data)
         
@@ -38,9 +38,9 @@ class CreateFarmUseCase:
 
     def user_can_create_farm(self, user: UserInDB) -> bool:
         # Implementar la lógica para verificar si el usuario puede crear fincas
-        # Por ejemplo, verificar si tiene un rol específico
+        # Por ejemplo, verificar si tiene un rol específico en alguna finca
         allowed_roles = ["Superusuario", "Administrador de Finca"]
-        return any(role.nombre in allowed_roles for role in user.roles)
+        return any(role.rol.nombre in allowed_roles for role in user.finca_roles)
 
     def validate_farm_data(self, farm_data: FarmCreate):
         # Implementar validaciones adicionales si es necesario

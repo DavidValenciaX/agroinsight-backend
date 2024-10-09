@@ -9,13 +9,7 @@ class AdminDeactivatesUserUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
     
-    def admin_deactivates_user(self, user_id: int, current_user):
-        # Verificar si el usuario actual tiene permisos de administrador
-        admin_roles = self.user_repository.get_admin_roles()
-        admin_role_ids = {role.id for role in admin_roles}
-        
-        if not any(role.id in admin_role_ids for role in current_user.roles):
-            raise InsufficientPermissionsException()
+    def admin_deactivates_user(self, user_id: int, current_user) -> SuccessResponse:
         
         # Verificar si el usuario a desactivar existe
         user_to_deactivate = self.user_repository.get_user_by_id(user_id)

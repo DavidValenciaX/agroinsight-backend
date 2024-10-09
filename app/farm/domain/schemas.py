@@ -12,14 +12,22 @@ class FarmCreate(BaseModel):
     latitud: Decimal = Field(..., ge=-90, le=90)
     longitud: Decimal = Field(..., ge=-180, le=180)
 
+class UsuarioFarm(BaseModel):
+    id: int
+    nombre: str
+    apellido: str
+    rol: str
+    finca: Optional[str]
+
 class FarmResponse(BaseModel):
     id: int
     nombre: str
     ubicacion: str
-    area_total: Decimal
+    area_total: float
     unidad_area: str
-    latitud: Decimal
-    longitud: Decimal
+    latitud: float
+    longitud: float
+    usuarios: List[UsuarioFarm]
 
     class Config:
         from_attributes = True
@@ -78,3 +86,9 @@ class PaginatedFarmUserListResponse(BaseModel):
     page: int
     per_page: int
     total_pages: int
+
+class UsuarioFarm(BaseModel):
+    id: int
+    nombre: str
+    apellido: str
+    rol: str
