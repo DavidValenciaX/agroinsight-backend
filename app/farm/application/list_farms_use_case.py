@@ -2,22 +2,23 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import PaginatedFarmListResponse
-from app.user.domain.schemas import UserInDB, UserResponse
-from app.infrastructure.common.common_exceptions import InsufficientPermissionsException
+from app.user.domain.schemas import UserInDB
 from app.infrastructure.mappers.response_mappers import map_farm_to_response
-from fastapi import status
 from math import ceil
+from app.user.infrastructure.sql_repository import UserRepository
 
 class ListFarmsUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.farm_repository = FarmRepository(db)
-
+        self.user_repository = UserRepository(db)
     def list_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
-        if not self.user_can_list_farms(current_user):
-            raise InsufficientPermissionsException()
+        
+        # Obtener id del rol de administrador de finca
+        rol_administrador_finca = self.user_repository.get_role_by_name("Administrador de Finca")
 
-        total_farms, farms = self.farm_repository.list_farms_paginated(current_user.id, page, per_page)
+        # Filtrar las fincas donde el usuario es administrador
+        total_farms, farms = self.farm_repository.list_farms_by_role_paginated(current_user.id, rol_administrador_finca.id, page, per_page)
 
         # Usar la función de mapeo para construir FarmResponse para cada finca
         farm_responses = [map_farm_to_response(farm) for farm in farms]
@@ -31,7 +32,3 @@ class ListFarmsUseCase:
             per_page=per_page,
             total_pages=total_pages
         )
-
-    def user_can_list_farms(self, user: UserInDB) -> bool:
-        # Verificar si el usuario tiene el rol de "Administrador de Finca" en alguna finca
-        return any(role.rol.nombre == "Administrador de Finca" for role in user.roles_fincas)

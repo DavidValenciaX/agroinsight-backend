@@ -13,7 +13,7 @@ class CreatePlotUseCase:
 
     def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
         # Verificar si el usuario tiene permisos para crear lotes
-        if not self.user_can_create_plot(current_user):
+        if not self.user_can_create_plot(current_user, plot_data.finca_id):
             raise InsufficientPermissionsException()
             
         if not self.user_has_access_to_farm(current_user.id, plot_data.finca_id):
@@ -42,12 +42,7 @@ class CreatePlotUseCase:
             )
 
         return SuccessResponse(message="Lote creado exitosamente")
-
-    def user_can_create_plot(self, user: UserInDB) -> bool:
-        # Implementar la lógica para verificar si el usuario puede crear lotes
-        allowed_roles = ["Administrador de Finca"]
-        return any(role.rol.nombre in allowed_roles for role in user.roles_fincas)
-
+    
     def validate_plot_data(self, plot_data: PlotCreate):
         # Implementar validaciones adicionales si es necesario
         if plot_data.area <= 0:

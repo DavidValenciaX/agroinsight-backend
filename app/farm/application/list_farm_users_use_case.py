@@ -18,7 +18,15 @@ class ListFarmUsersUseCase:
     def list_farm_users(self, farm_id: int, role_id: int, current_user: UserInDB, page: Optional[int], per_page: Optional[int]) -> PaginatedFarmUserListResponse:
         self.validate_params(page, per_page)
         
-        if not self.user_can_list_farm_users(current_user, farm_id):
+        rol_administrador_finca = self.user_repository.get_role_by_name("Administrador de Finca")
+        if not rol_administrador_finca:
+            raise DomainException(
+                message="El rol de 'Administrador de Finca' no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Verificar si es administrador de la finca
+        if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id, rol_administrador_finca.id):
             raise InsufficientPermissionsException()
 
         farm = self.farm_repository.get_farm_by_id(farm_id)
@@ -54,16 +62,6 @@ class ListFarmUsersUseCase:
             )
             
         return role
-
-    def user_can_list_farm_users(self, user: UserInDB, farm_id: int) -> bool:
-        
-        has_allowed_role = any(role.rol.nombre == "Administrador de Finca" for role in user.roles_fincas)
-        
-        # Si es Administrador de Finca, verificar si está vinculado a la finca
-        if has_allowed_role:
-            return self.farm_repository.user_has_access_to_farm(user.id, farm_id)
-        
-        return False
 
     def validate_params(self, page: int, per_page: int):
         if page < 1:

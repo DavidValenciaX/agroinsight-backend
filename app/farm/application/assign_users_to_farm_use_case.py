@@ -13,13 +13,8 @@ class AssignUsersToFarmUseCase:
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
-
-    def user_can_assign_users(self, user: UserInDB) -> bool:
-        return any(role.rol.nombre == "Administrador de Finca" for role in user.roles_fincas)
     
     def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> SuccessResponse:
-        if not self.user_can_assign_users(current_user):
-            raise InsufficientPermissionsException()
 
         farm = self.farm_repository.get_farm_by_id(assignment_data.farm_id)
         if not farm:
@@ -39,7 +34,15 @@ class AssignUsersToFarmUseCase:
             user_ids.append(user.id)
             
         # Verificar si el usuario tiene el rol de "Administrador de Finca" en la finca
-        if not self.farm_repository.user_has_access_to_farm(current_user.id, assignment_data.farm_id):
+        rol_administrador_finca = self.user_repository.get_role_by_name("Administrador de Finca")
+        
+        if not rol_administrador_finca:
+            raise DomainException(
+                message="El rol de 'Administrador de Finca' no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+        
+        if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id, rol_administrador_finca.id):
             raise InsufficientPermissionsException()
         
         # Buscar el rol de "Trabajador Agrícola"
@@ -49,7 +52,23 @@ class AssignUsersToFarmUseCase:
                 message="El rol de 'Trabajador Agrícola' no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
-
+            
+        # Validar que los usuarios no tengan un rol asignado en la finca
+        for email in assignment_data.user_emails:
+            user = self.user_repository.get_user_by_email(email)
+            if not user:
+                raise DomainException(
+                    message=f"El usuario con email {email} no existe.",
+                    status_code=status.HTTP_404_NOT_FOUND
+                )
+            
+            existing_assignment = self.farm_repository.get_user_farm_role(user.id, assignment_data.farm_id)
+            if existing_assignment:
+                raise DomainException(
+                    message=f"El usuario con email {email} ya tiene un rol asignado en la finca.",
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
+        
         self.farm_repository.assign_users_to_farm(assignment_data.farm_id, user_ids, rol_trabajador_agricola.id)
 
         return SuccessResponse(

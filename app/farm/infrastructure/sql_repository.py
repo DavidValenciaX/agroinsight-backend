@@ -58,13 +58,23 @@ class FarmRepository:
             Finca.nombre == farm_name
         ).first() is not None
         
-    def list_farms_paginated(self, user_id: int, page: int, per_page: int) -> Tuple[int, List[Finca]]:
-        query = self.db.query(Finca).join(UsuarioFincaRol).filter(UsuarioFincaRol.usuario_id == user_id)
+    def list_farms_by_role_paginated(self, user_id: int, rol_id: int, page: int, per_page: int) -> Tuple[int, List[Finca]]:
+        # Filtrar las fincas donde el usuario tiene el rol de "Administrador de Finca"
+        query = self.db.query(Finca).join(UsuarioFincaRol).filter(
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.rol_id == rol_id
+        )
         
         total = query.count()
         farms = query.offset((page - 1) * per_page).limit(per_page).all()
         
         return total, farms
+    
+    def get_user_farm_role(self, user_id: int, farm_id: int) -> UsuarioFincaRol:
+        return self.db.query(UsuarioFincaRol).filter(
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.finca_id == farm_id
+        ).first()
     
     def assign_users_to_farm(self, farm_id: int, user_ids: List[int], role_id: int) -> List[int]:
         assigned_user_ids = []
@@ -94,4 +104,11 @@ class FarmRepository:
         return self.db.query(UsuarioFincaRol).filter(
             UsuarioFincaRol.usuario_id == user_id,
             UsuarioFincaRol.finca_id == farm_id
+        ).first() is not None
+        
+    def user_is_farm_admin(self, user_id: int, farm_id: int, rol_administrador_finca_id: int) -> bool:
+        return self.db.query(UsuarioFincaRol).filter(
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.finca_id == farm_id,
+            UsuarioFincaRol.rol_id == rol_administrador_finca_id
         ).first() is not None
