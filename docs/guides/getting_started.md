@@ -299,7 +299,7 @@ class CreateSoilAnalysisUseCase:
         return SoilAnalysisResponse.model_validate(soil_analysis)
 
     def user_can_create_soil_analysis(self, user: UserInDB) -> bool:
-        allowed_roles = ["Superusuario", "Administrador de Finca", "Agrónomo"]
+        allowed_roles = ["Administrador de Finca", "Agrónomo"]
         return any(role.nombre in allowed_roles for role in user.roles)
 ```
 

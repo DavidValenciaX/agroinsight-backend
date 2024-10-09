@@ -67,12 +67,8 @@ class ListFarmUsersUseCase:
         return role
 
     def user_can_list_farm_users(self, user: UserInDB, farm_id: int) -> bool:
-        allowed_roles = ["Superusuario", "Administrador de Finca"]
+        allowed_roles = ["Administrador de Finca"]
         has_allowed_role = any(role.nombre in allowed_roles for role in user.roles)
-        
-        # Si es Superusuario, tiene acceso a todas las fincas
-        if "Superusuario" in [role.nombre for role in user.roles]:
-            return True
         
         # Si es Administrador de Finca, verificar si está vinculado a la finca
         if has_allowed_role:

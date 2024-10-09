@@ -15,7 +15,7 @@ class AssignUsersToFarmUseCase:
         self.user_repository = UserRepository(db)
 
     def user_can_assign_users(self, user: UserInDB) -> bool:
-        allowed_roles = ["Superusuario", "Administrador de Finca"]
+        allowed_roles = ["Administrador de Finca"]
         return any(role.nombre in allowed_roles for role in user.roles)
     
     def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> SuccessResponse:

@@ -58,7 +58,7 @@ class CreateTaskUseCase:
         return SuccessResponse(message="Tarea creada exitosamente")
 
     def user_can_create_tarea(self, user: UserInDB) -> bool:
-        allowed_roles = ["Superusuario", "Administrador de Finca"]
+        allowed_roles = ["Administrador de Finca"]
         return any(role.nombre in allowed_roles for role in user.roles)
 
     def validate_tarea_data(self, tarea_data: TareaLaborCulturalCreate):

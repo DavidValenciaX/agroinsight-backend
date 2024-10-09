@@ -33,5 +33,5 @@ class ListFarmsUseCase:
         )
 
     def user_can_list_farms(self, user: UserInDB) -> bool:
-        allowed_roles = ["Superusuario", "Administrador de Finca"]
+        allowed_roles = ["Administrador de Finca"]
         return any(role.nombre in allowed_roles for role in user.roles)
