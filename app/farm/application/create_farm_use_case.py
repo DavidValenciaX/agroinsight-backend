@@ -40,7 +40,7 @@ class CreateFarmUseCase:
         # Implementar la lógica para verificar si el usuario puede crear fincas
         # Por ejemplo, verificar si tiene un rol específico en alguna finca
         allowed_roles = ["Administrador de Finca"]
-        return any(role.rol.nombre in allowed_roles for role in user.finca_roles)
+        return any(role.rol.nombre in allowed_roles for role in user.roles_fincas)
 
     def validate_farm_data(self, farm_data: FarmCreate):
         # Implementar validaciones adicionales si es necesario

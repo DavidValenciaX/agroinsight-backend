@@ -46,7 +46,7 @@ class User(Base):
     recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
     asignaciones = relationship("Asignacion", back_populates="usuario")
-    finca_roles = relationship("UsuarioFincaRol", back_populates="usuario")
+    roles_fincas = relationship("UsuarioFincaRol", back_populates="usuario")
 
 class UsuarioFincaRol(Base):
     __tablename__ = "usuario_finca_rol"
@@ -56,7 +56,7 @@ class UsuarioFincaRol(Base):
     finca_id = Column(Integer, ForeignKey('finca.id'), nullable=True)
     rol_id = Column(Integer, ForeignKey('rol.id'), nullable=False)
 
-    usuario = relationship("User", back_populates="finca_roles")
+    usuario = relationship("User", back_populates="roles_fincas")
     finca = relationship("Finca", back_populates="usuario_roles")
     rol = relationship("Role", back_populates="usuario_fincas")
     

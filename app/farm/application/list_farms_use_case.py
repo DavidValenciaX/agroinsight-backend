@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import PaginatedFarmListResponse
-from app.user.domain.schemas import UserInDB
+from app.user.domain.schemas import UserInDB, UserResponse
 from app.infrastructure.common.common_exceptions import InsufficientPermissionsException
 from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from fastapi import status
@@ -33,5 +33,5 @@ class ListFarmsUseCase:
         )
 
     def user_can_list_farms(self, user: UserInDB) -> bool:
-        allowed_roles = ["Administrador de Finca"]
-        return any(role.nombre in allowed_roles for role in user.roles)
+        # Verificar si el usuario tiene el rol de "Administrador de Finca" en alguna finca
+        return any(role.rol.nombre == "Administrador de Finca" for role in user.roles_fincas)

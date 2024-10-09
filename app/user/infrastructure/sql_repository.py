@@ -433,7 +433,7 @@ class UserRepository:
     def get_role_by_name(self, role_name: str) -> Optional[Role]:
         return self.db.query(Role).filter(Role.nombre == role_name).first()
     
-    def get_user_finca_roles(self, user_id: int, finca_id: int) -> List[Role]:
+    def get_user_roles_fincas(self, user_id: int, finca_id: int) -> List[Role]:
         return self.db.query(Role).join(UsuarioFincaRol).filter(
             UsuarioFincaRol.usuario_id == user_id,
             UsuarioFincaRol.finca_id == finca_id

@@ -110,6 +110,10 @@ class RoleInfo(BaseModel):
     """
     id: int
     nombre: str
+    
+class RolFinca(BaseModel):
+    rol: str
+    finca: Optional[str]
 
 class UserInDB(BaseModel):
     """
@@ -121,8 +125,8 @@ class UserInDB(BaseModel):
         - nombre (str): Nombre del usuario.
         - apellido (str): Apellido del usuario.
         - email (EmailStr): Correo electrónico único del usuario.
-        - roles (List[str]): Lista de nombres de roles asignados al usuario.
         - estado (str): Estado actual del usuario.
+        - roles_fincas (List[RolFinca]): Lista de roles y fincas del usuario.
     """
     id: int
     nombre: str
@@ -132,17 +136,13 @@ class UserInDB(BaseModel):
     failed_attempts: int
     locked_until: datetime
     state_id: int
-    roles: List[RoleInfo] = []
+    roles_fincas: List[RolFinca]
 
     class Config:
         from_attributes = True
         
     _validate_email = field_validator('email')(validate_email)
     _validate_password = field_validator('password')(validate_password)
-
-class RolFinca(BaseModel):
-    rol: str
-    finca: Optional[str]
 
 class UserResponse(BaseModel):
     """
@@ -154,8 +154,8 @@ class UserResponse(BaseModel):
         - nombre (str): Nombre del usuario.
         - apellido (str): Apellido del usuario.
         - email (EmailStr): Correo electrónico único del usuario.
-        - roles (List[str]): Lista de nombres de roles asignados al usuario.
         - estado (str): Estado actual del usuario.
+        - roles_fincas (List[RolFinca]): Lista de roles y fincas del usuario.
     """
     id: int
     nombre: str

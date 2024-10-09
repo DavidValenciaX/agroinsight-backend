@@ -29,7 +29,7 @@ def create_farm(
     current_user: UserInDB = Depends(get_current_user)
 ):
     """
-    Crea una nueva finca en el sistema.
+    Crea una nueva finca en el sistema para un usuario específico.
 
     Parameters:
         farm (FarmCreate): Datos de la finca a crear.
@@ -61,7 +61,7 @@ def list_farms(
     current_user: UserInDB = Depends(get_current_user)
 ):
     """
-    Lista todas las fincas en el sistema.
+    Lista todas las fincas en el sistema para un usuario específico.
 
     Parameters:
         page (int): Número de página.
@@ -93,7 +93,7 @@ def assign_users_to_farm_by_email(
     current_user: UserInDB = Depends(get_current_user)
 ):
     """
-    Asigna usuarios a una finca utilizando sus correos electrónicos.
+    Asigna usuarios a una finca del administrador utilizando los correos electrónicos dados
 
     Parameters:
         assignment_data (FarmUserAssignmentByEmail): Datos de asignación de usuarios.

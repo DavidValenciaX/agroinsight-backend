@@ -9,11 +9,11 @@ def map_user_to_response(user) -> UserResponse:
             "rol": ufr.rol.nombre,
             "finca": ufr.finca.nombre if ufr.finca else None
         }
-        for ufr in user.finca_roles
+        for ufr in user.roles_fincas
     ]
     
     if not roles_fincas:
-        roles_fincas = [{"rol": "No asignado", "finca": "Ninguna finca creada"}]
+        roles_fincas = [{"rol": "Rol no asignado", "finca": "Ninguna finca creada"}]
     
     return UserResponse(
         id=user.id,
@@ -34,12 +34,7 @@ def map_farm_to_response(farm) -> FarmResponse:
         latitud=farm.latitud,
         longitud=farm.longitud,
         usuarios=[
-            {
-                "id": ufr.usuario.id,
-                "nombre": ufr.usuario.nombre,
-                "apellido": ufr.usuario.apellido,
-                "rol": ufr.rol.nombre
-            }
+            map_user_to_response(ufr.usuario)  # Usar map_user_to_response para cada usuario
             for ufr in farm.usuario_roles
         ]
     )
