@@ -59,3 +59,10 @@ class PlotRepository:
             Plot.nombre == nombre,
             Plot.finca_id == finca_id
         ).first()
+        
+    def plot_exists(self, plot_id: int) -> bool:
+        return self.db.query(Plot).filter(Plot.id == plot_id).first() is not None
+
+    def get_farm_id_by_plot_id(self, plot_id: int) -> int:
+        result = self.db.query(Plot.finca_id).filter(Plot.id == plot_id).first()
+        return result[0] if result else None

@@ -32,17 +32,8 @@ class AssignUsersToFarmUseCase:
                     status_code=status.HTTP_404_NOT_FOUND
                 )
             user_ids.append(user.id)
-            
-        # Verificar si el usuario tiene el rol de "Administrador de Finca" en la finca
-        rol_administrador_finca = self.user_repository.get_role_by_name("Administrador de Finca")
         
-        if not rol_administrador_finca:
-            raise DomainException(
-                message="El rol de 'Administrador de Finca' no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-        
-        if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id, rol_administrador_finca.id):
+        if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id):
             raise InsufficientPermissionsException()
         
         # Buscar el rol de "Trabajador Agrícola"

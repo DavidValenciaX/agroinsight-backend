@@ -5,8 +5,8 @@ from typing import Optional, List, Tuple
 from app.farm.infrastructure.orm_models import Finca
 from typing import List
 from fastapi import status
-
 from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.common.role_utils import ADMIN_ROLE_NAME, WORKER_ROLE_NAME
 from app.user.infrastructure.orm_models import User, UsuarioFincaRol, UsuarioFincaRol
 from app.user.infrastructure.sql_repository import UserRepository
 
@@ -29,14 +29,8 @@ class FarmRepository:
             self.db.add(new_farm)
             self.db.flush()  # Para obtener el ID de la finca recién creada
             
-            # Obtener el rol de administrador de finca
-            admin_role = self.user_repository.get_role_by_name("Administrador de Finca")
-            if not admin_role:
-                raise DomainException(
-                    message="No se pudo encontrar el rol de 'Administrador de Finca'.",
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-    
+            admin_role = self.get_admin_role()
+            
             # Crear la relación usuario-finca
             user_farm = UsuarioFincaRol(usuario_id=user_id, finca_id=new_farm.id, rol_id=admin_role.id)
             self.db.add(user_farm)
@@ -48,6 +42,15 @@ class FarmRepository:
             self.db.rollback()
             print(f"Error al crear la finca: {e}")
             return None
+        
+    # Obtener el rol de administrador de finca
+    def get_admin_role(self):
+        admin_role = self.user_repository.get_role_by_name("Administrador de Finca")
+        if not admin_role:
+            raise DomainException(
+                message="No se pudo encontrar el rol de 'Administrador de Finca'.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def list_farms(self, user_id: int) -> List[Finca]:
             return self.db.query(Finca).join(UsuarioFincaRol).filter(UsuarioFincaRol.usuario_id == user_id).all()
@@ -106,9 +109,18 @@ class FarmRepository:
             UsuarioFincaRol.finca_id == farm_id
         ).first() is not None
         
-    def user_is_farm_admin(self, user_id: int, farm_id: int, rol_administrador_finca_id: int) -> bool:
+    def user_is_farm_admin(self, user_id: int, farm_id: int) -> bool: 
+        rol_administrador_finca = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
         return self.db.query(UsuarioFincaRol).filter(
             UsuarioFincaRol.usuario_id == user_id,
             UsuarioFincaRol.finca_id == farm_id,
-            UsuarioFincaRol.rol_id == rol_administrador_finca_id
+            UsuarioFincaRol.rol_id == rol_administrador_finca.id
+        ).first() is not None
+    
+    def user_is_farm_worker(self, user_id: int, farm_id: int) -> bool:
+        rol_trabajador_finca = self.user_repository.get_role_by_name(WORKER_ROLE_NAME)
+        return self.db.query(UsuarioFincaRol).filter(
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.finca_id == farm_id,
+            UsuarioFincaRol.rol_id == rol_trabajador_finca.id
         ).first() is not None

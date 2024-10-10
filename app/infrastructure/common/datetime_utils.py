@@ -17,3 +17,6 @@ def ensure_utc(dt: datetime) -> datetime:
         return dt.replace(tzinfo=timezone.utc)
     # Si ya tiene zona horaria, devuélvelo tal como está
     return dt
+
+def get_current_date() -> datetime.date:
+    return datetime.now(timezone.utc).date()

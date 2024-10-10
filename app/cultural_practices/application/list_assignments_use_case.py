@@ -7,16 +7,18 @@ from app.infrastructure.mappers.response_mappers import map_assignment_to_respon
 from fastapi import status
 from math import ceil
 
+from app.user.infrastructure.sql_repository import UserRepository
+
 class ListAssignmentsUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
-
+        self.user_repository = UserRepository(db)
     def list_assignments(self, user_id: int, page: int, per_page: int, current_user: UserInDB) -> PaginatedAssignmentListResponse:
         if not self.user_can_list_assignments(current_user):
             raise InsufficientPermissionsException()
 
-        if not self.cultural_practice_repository.user_exists(user_id):
+        if not self.user_repository.user_exists(user_id):
             raise DomainException(
                 message="El usuario especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND

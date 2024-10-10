@@ -438,3 +438,6 @@ class UserRepository:
             UsuarioFincaRol.usuario_id == user_id,
             UsuarioFincaRol.finca_id == finca_id
         ).all()
+        
+    def user_exists(self, user_id: int) -> bool:
+        return self.db.query(User).filter(User.id == user_id).first() is not None

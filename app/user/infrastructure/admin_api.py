@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 
-admin_router = APIRouter(prefix="/user", tags=["superuser"])
+admin_router = APIRouter(prefix="/user", tags=["admin"])
 
 @admin_router.post(
     "/admin/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED

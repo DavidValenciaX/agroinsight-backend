@@ -20,15 +20,8 @@ class CreatePlotUseCase:
                 status_code=status.HTTP_403_FORBIDDEN
             )
             
-        rol_administrador_finca = self.farm_repository.get_role_by_name("Administrador de Finca")
-        if not rol_administrador_finca:
-            raise DomainException(
-                message="El rol de 'Administrador de Finca' no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-            
         #Validar si el usuario tiene permiso para crear lotes en la finca
-        if not self.farm_repository.user_is_farm_admin(current_user.id, plot_data.finca_id, rol_administrador_finca.id):
+        if not self.farm_repository.user_is_farm_admin(current_user.id, plot_data.finca_id):
             raise InsufficientPermissionsException()
         
         # Validar los datos de entrada

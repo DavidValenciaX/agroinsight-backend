@@ -1,22 +1,45 @@
 from sqlalchemy.orm import Session
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.domain.schemas import TareaLaborCulturalCreate
+from app.farm.infrastructure.sql_repository import FarmRepository
+from app.infrastructure.common.datetime_utils import get_current_date
 from app.infrastructure.common.response_models import SuccessResponse
+from app.plot.infrastructure.sql_repository import PlotRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
+from app.infrastructure.common.role_utils import get_admin_role  # Nueva importación
 
 class CreateTaskUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
+        self.farm_repository = FarmRepository(db)
+        self.plot_repository = PlotRepository(db)
 
     def create_task(self, tarea_data: TareaLaborCulturalCreate, current_user: UserInDB) -> SuccessResponse:
-        if not self.user_can_create_tarea(current_user):
+        
+        # buscar el id de la finca por medio del id del lote
+        finca_id = self.plot_repository.get_farm_id_by_plot_id(tarea_data.lote_id)
+        if not finca_id:
+            raise DomainException(
+                message="No se pudo obtener el id de la finca.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        #validar que el usuario sea administrador de la finca
+        if not self.farm_repository.user_is_farm_admin(current_user.id, finca_id):
             raise InsufficientPermissionsException()
 
         # Validar los datos de entrada
         self.validate_tarea_data(tarea_data)
+        
+        #validar que el lote existe
+        if not self.plot_repository.plot_exists(tarea_data.lote_id):
+            raise DomainException(
+                message="El lote especificado no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
         
         # Verificar si el tipo de labor cultural existe
         if not self.cultural_practice_repository.tipo_labor_cultural_exists(tarea_data.tipo_labor_id):
@@ -39,13 +62,6 @@ class CreateTaskUseCase:
                 message="No se puede crear una tarea directamente en estado 'Completada'.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
-            
-        # Verificar si el lote existe
-        if not self.cultural_practice_repository.plot_exists(tarea_data.lote_id):
-            raise DomainException(
-                message="El lote especificado no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
 
         # Crear la tarea
         tarea = self.cultural_practice_repository.create_tarea(tarea_data)
@@ -57,13 +73,9 @@ class CreateTaskUseCase:
 
         return SuccessResponse(message="Tarea creada exitosamente")
 
-    def user_can_create_tarea(self, user: UserInDB) -> bool:
-        allowed_roles = ["Administrador de Finca"]
-        return any(role.rol.nombre in allowed_roles for role in user.roles_fincas)
-
     def validate_tarea_data(self, tarea_data: TareaLaborCulturalCreate):
         # Obtener la fecha actual
-        current_date = self.cultural_practice_repository.get_current_date()
+        current_date = get_current_date()
 
         # Validar que la fecha programada no esté en el pasado
         if tarea_data.fecha_programada < current_date:
