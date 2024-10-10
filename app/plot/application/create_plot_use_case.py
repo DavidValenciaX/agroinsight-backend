@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from app.farm.infrastructure.sql_repository import FarmRepository
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PlotCreate
 from app.infrastructure.common.response_models import SuccessResponse
@@ -10,18 +11,26 @@ class CreatePlotUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.plot_repository = PlotRepository(db)
-
+        self.farm_repository = FarmRepository(db)
     def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
-        # Verificar si el usuario tiene permisos para crear lotes
-        if not self.user_can_create_plot(current_user, plot_data.finca_id):
-            raise InsufficientPermissionsException()
             
         if not self.user_has_access_to_farm(current_user.id, plot_data.finca_id):
             raise DomainException(
                 message="No tienes acceso a esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
-
+            
+        rol_administrador_finca = self.farm_repository.get_role_by_name("Administrador de Finca")
+        if not rol_administrador_finca:
+            raise DomainException(
+                message="El rol de 'Administrador de Finca' no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        #Validar si el usuario tiene permiso para crear lotes en la finca
+        if not self.farm_repository.user_is_farm_admin(current_user.id, plot_data.finca_id, rol_administrador_finca.id):
+            raise InsufficientPermissionsException()
+        
         # Validar los datos de entrada
         self.validate_plot_data(plot_data)
         
