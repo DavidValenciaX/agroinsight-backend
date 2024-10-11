@@ -90,6 +90,12 @@ class FarmRepository:
             UsuarioFincaRol.usuario_id == user_id,
             UsuarioFincaRol.finca_id == farm_id
         ).first()
+        
+    def assign_user_to_farm(self, farm_id: int, user_id: int, role_id: int) -> int:
+        user_farm_role = UsuarioFincaRol(usuario_id=user_id, finca_id=farm_id, rol_id=role_id)
+        self.db.merge(user_farm_role)
+        self.db.commit()
+        return user_id
     
     def assign_users_to_farm(self, farm_id: int, user_ids: List[int], role_id: int) -> List[int]:
         assigned_user_ids = []

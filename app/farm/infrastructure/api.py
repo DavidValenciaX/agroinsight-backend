@@ -15,7 +15,7 @@ from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, Pagin
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
-from app.infrastructure.common.response_models import SuccessResponse
+from app.infrastructure.common.response_models import MultipleResponse, SuccessResponse
 from app.farm.application.get_user_by_id_use_case import AdminGetUserByIdUseCase
 from app.user.domain.schemas import UserInDB, UserResponse
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
@@ -87,7 +87,7 @@ def list_farms(
             detail=f"Error interno al listar las fincas: {str(e)}"
         )
         
-@router.post("/assign-users-by-email", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
+@router.post("/assign-users-by-email", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
 def assign_users_to_farm_by_email(
     assignment_data: FarmUserAssignmentByEmail,
     db: Session = Depends(getDb),

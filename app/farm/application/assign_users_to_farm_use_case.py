@@ -7,6 +7,7 @@ from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
+from app.infrastructure.common.response_models import MultipleResponse
 
 class AssignUsersToFarmUseCase:
     def __init__(self, db: Session):
@@ -22,45 +23,31 @@ class AssignUsersToFarmUseCase:
                 message="La finca especificada no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
-            
-        user_ids = []
-        for email in assignment_data.user_emails:
-            user = self.user_repository.get_user_by_email(email)
-            if not user:
-                raise DomainException(
-                    message=f"El usuario con email {email} no existe.",
-                    status_code=status.HTTP_404_NOT_FOUND
-                )
-            user_ids.append(user.id)
         
         if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id):
             raise InsufficientPermissionsException()
         
         rol_trabajador_agricola = self.farm_repository.get_worker_role()
-        if not rol_trabajador_agricola:
-            raise DomainException(
-                message="El rol de 'Trabajador Agrícola' no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
             
+        messages = []
+        
         # Validar que los usuarios no tengan un rol asignado en la finca
         for email in assignment_data.user_emails:
             user = self.user_repository.get_user_by_email(email)
             if not user:
-                raise DomainException(
-                    message=f"El usuario con email {email} no existe.",
-                    status_code=status.HTTP_404_NOT_FOUND
-                )
+                messages.append(f"El usuario con email {email} no existe.")
+                continue
             
+            user_name = user.nombre + " " + user.apellido
+            
+            # Validar que el usuario no tenga un rol asignado en la finca
             existing_assignment = self.farm_repository.get_user_farm_role(user.id, assignment_data.farm_id)
             if existing_assignment:
-                raise DomainException(
-                    message=f"El usuario con email {email} ya tiene un rol asignado en la finca.",
-                    status_code=status.HTTP_400_BAD_REQUEST
-                )
-        
-        self.farm_repository.assign_users_to_farm(assignment_data.farm_id, user_ids, rol_trabajador_agricola.id)
+                messages.append(f"El usuario {user_name} ya tiene un rol asignado en la finca.")
+                continue
+            
+            self.farm_repository.assign_user_to_farm(assignment_data.farm_id, user.id, rol_trabajador_agricola.id)
+            messages.append(f"El usuario {user_name} ha sido asignado exitosamente a la finca.")
+            
 
-        return SuccessResponse(
-            message="Usuarios asignados exitosamente a la finca."
-        )
+        return MultipleResponse(messages=messages)
