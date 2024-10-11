@@ -44,3 +44,9 @@ class CulturalPracticesRepository:
     def get_lote_id_by_tarea_id(self, tarea_id: int) -> int:
         result = self.db.query(TareaLaborCultural.lote_id).filter(TareaLaborCultural.id == tarea_id).first()
         return result[0] if result else None
+    
+    def user_has_assignment(self, user_id: int, tarea_id: int) -> bool:
+        return self.db.query(Asignacion).filter(
+            Asignacion.usuario_id == user_id, 
+            Asignacion.tarea_labor_cultural_id == tarea_id
+        ).first() is not None

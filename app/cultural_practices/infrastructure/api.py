@@ -13,7 +13,7 @@ from app.cultural_practices.application.create_task_use_case import CreateTaskUs
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.infrastructure.common.response_models import SuccessResponse
+from app.infrastructure.common.response_models import SuccessResponse, MultipleResponse
 from app.user.domain.schemas import UserInDB
 
 router = APIRouter(prefix="/cultural_practices", tags=["cultural practices"])
@@ -49,7 +49,7 @@ def create_task(
             detail=f"Error interno al crear la tarea: {str(e)}"
         )
 
-@router.post("/create-assignment", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create-assignment", response_model=MultipleResponse, status_code=status.HTTP_201_CREATED)
 def create_assignment(
     assignment: AssignmentCreate,
     db: Session = Depends(getDb),
