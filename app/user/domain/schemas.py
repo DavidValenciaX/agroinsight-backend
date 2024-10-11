@@ -82,20 +82,8 @@ class ConfirmationRequest(BaseModel):
     pin: str
     
     _validate_email = field_validator('email')(validate_email)
-
-class RoleInfo(BaseModel):
-    """
-    Esquema que representa la información de un rol.
-
-    Atributos:
-    ---------
-        - id (int): Identificador único del rol.
-        - nombre (str): Nombre del rol.
-    """
-    id: int
-    nombre: str
     
-class RolFinca(BaseModel):
+class RoleFarm(BaseModel):
     rol: str
     finca: Optional[str]
 
@@ -110,7 +98,7 @@ class UserInDB(BaseModel):
         - apellido (str): Apellido del usuario.
         - email (EmailStr): Correo electrónico único del usuario.
         - estado (str): Estado actual del usuario.
-        - roles_fincas (List[RolFinca]): Lista de roles y fincas del usuario.
+        - roles_fincas (List[RoleFarm]): Lista de roles y fincas del usuario.
     """
     id: int
     nombre: str
@@ -120,7 +108,7 @@ class UserInDB(BaseModel):
     failed_attempts: int
     locked_until: datetime
     state_id: int
-    roles_fincas: List[RolFinca]
+    roles_fincas: List[RoleFarm]
 
     class Config:
         from_attributes = True
@@ -139,14 +127,14 @@ class UserResponse(BaseModel):
         - apellido (str): Apellido del usuario.
         - email (EmailStr): Correo electrónico único del usuario.
         - estado (str): Estado actual del usuario.
-        - roles_fincas (List[RolFinca]): Lista de roles y fincas del usuario.
+        - roles_fincas (List[RoleFarm]): Lista de roles y fincas del usuario.
     """
     id: int
     nombre: str
     apellido: str
     email: str
     estado: str
-    roles_fincas: List[RolFinca]  # Updated to include farm names
+    roles_fincas: List[RoleFarm]  # Updated to include farm names
 
     class Config:
         from_attributes = True

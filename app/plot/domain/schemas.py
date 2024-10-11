@@ -21,9 +21,6 @@ class PlotResponse(BaseModel):
 
     class Config:
         from_attributes = True
-
-class PlotListResponse(BaseModel):
-    plots: List[PlotResponse]
     
 class PaginatedPlotListResponse(BaseModel):
     plots: List[PlotResponse]

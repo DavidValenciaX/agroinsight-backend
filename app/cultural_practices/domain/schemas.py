@@ -16,12 +16,6 @@ class CulturalTaskBase(BaseModel):
 class CulturalTaskCreate(CulturalTaskBase):
     pass
 
-class CulturalTaskResponse(CulturalTaskBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
 class AssignmentCreate(BaseModel):
     usuario_ids: List[int]
     tarea_labor_cultural_id: int

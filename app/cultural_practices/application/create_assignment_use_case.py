@@ -3,7 +3,6 @@ from app.cultural_practices.infrastructure.sql_repository import CulturalPractic
 from app.cultural_practices.domain.schemas import AssignmentCreate, AssignmentCreateSingle
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.infrastructure.common.response_models import MultipleResponse, SuccessResponse
-from app.infrastructure.common.role_utils import get_admin_role
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException

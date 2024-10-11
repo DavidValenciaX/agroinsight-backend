@@ -25,9 +25,6 @@ class FarmResponse(BaseModel):
 
     class Config:
         from_attributes = True
-        
-class FarmListResponse(BaseModel):
-    farms: List[FarmResponse]
     
 class PaginatedFarmListResponse(BaseModel):
     farms: List[FarmResponse]
@@ -35,44 +32,10 @@ class PaginatedFarmListResponse(BaseModel):
     page: int
     per_page: int
     total_pages: int
-        
-class UnitCategoryBase(BaseModel):
-    nombre: str
-    descripcion: Optional[str] = None
-
-class UnitCategoryCreate(UnitCategoryBase):
-    pass
-
-class UnitCategory(UnitCategoryBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-class UnitOfMeasureBase(BaseModel):
-    nombre: str
-    abreviatura: str
-    categoria_id: int
-
-class UnitOfMeasureCreate(UnitOfMeasureBase):
-    pass
-
-class UnitOfMeasure(UnitOfMeasureBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-        
-class FarmUserAssignmentById(BaseModel):
-    farm_id: int
-    user_ids: List[int]
     
 class FarmUserAssignmentByEmail(BaseModel):
     farm_id: int
     user_emails: List[str]
-    
-class FarmUserListResponse(BaseModel):
-    users: List[UserResponse]
 
 class PaginatedFarmUserListResponse(BaseModel):
     users: List[UserResponse]
