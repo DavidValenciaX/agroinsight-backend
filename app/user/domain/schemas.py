@@ -83,22 +83,6 @@ class ConfirmationRequest(BaseModel):
     
     _validate_email = field_validator('email')(validate_email)
 
-class UserCreateByAdmin(UserCreate):
-    """
-    Esquema para que un administrador cree un nuevo usuario.
-
-    Atributos:
-    ---------
-        - nombre (str): Nombre del usuario.
-        - apellido (str): Apellido del usuario.
-        - email (EmailStr): Correo electrónico único del usuario.
-        - password (str): Contraseña del usuario.
-        - roles (List[int]): Lista de IDs de roles asignados al usuario.
-        - finca_id (int): ID de la finca a la que pertenece el usuario.
-    """
-    role_id: int
-    finca_id: int
-
 class RoleInfo(BaseModel):
     """
     Esquema que representa la información de un rol.
@@ -235,31 +219,6 @@ class UserUpdate(BaseModel):
     nombre: str
     apellido: str
     email: str
-
-    class Config:
-        from_attributes = True
-        
-    _validate_email = field_validator('email')(validate_email)
-        
-class AdminUserUpdate(BaseModel):
-    """
-    Esquema para que un administrador actualice la información de un usuario específico.
-
-    Atributos:
-    ---------
-        - nombre (Optional[str]): Nuevo nombre del usuario.
-        - apellido (Optional[str]): Nuevo apellido del usuario.
-        - email (Optional[EmailStr]): Nuevo correo electrónico del usuario.
-        - roles (Optional[List[int]]): Nueva lista de IDs de roles asignados al usuario.
-        - estado_id (Optional[int]): Nuevo ID de estado del usuario.
-        - finca_id (Optional[int]): Nuevo ID de finca del usuario.
-    """
-    nombre: str
-    apellido: str
-    email: str
-    estado_id: int
-    rol_id: int
-    finca_id: int
 
     class Config:
         from_attributes = True

@@ -134,9 +134,9 @@ class FarmRepository:
             UsuarioFincaRol.finca_id == farm_id,
             UsuarioFincaRol.rol_id == self.get_worker_role().id
         ).first() is not None
-
-    def get_farms_where_user_is_worker(self, user_id: int) -> List[int]:
-        # Obtener una lista de IDs de fincas donde el usuario es trabajador
+        
+    def get_farms_by_user_role(self, user_id: int, role_id: int) -> List[int]:
         return [finca_id for finca_id, in self.db.query(UsuarioFincaRol.finca_id).filter(
-            UsuarioFincaRol.usuario_id == user_id
+            UsuarioFincaRol.usuario_id == user_id,
+            UsuarioFincaRol.rol_id == role_id
         ).all()]

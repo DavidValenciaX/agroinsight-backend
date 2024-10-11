@@ -13,7 +13,7 @@ def map_user_to_response(user) -> UserResponse:
     ]
     
     if not roles_fincas:
-        roles_fincas = [{"rol": "Rol no asignado", "finca": "Ninguna finca creada"}]
+        roles_fincas = [{"rol": "Rol no asignado", "finca": "Ninguna finca asociada"}]
     
     return UserResponse(
         id=user.id,

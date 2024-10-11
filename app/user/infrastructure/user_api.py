@@ -8,11 +8,6 @@ así como para el manejo de autenticación y autorización.
 from fastapi import APIRouter, Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from app.user.application.admin_use_cases.admin_deactivates_user_use_case import AdminDeactivatesUserUseCase
-from app.user.application.admin_use_cases.admin_updates_user_use_case import AdminUpdatesUserUseCase
-from app.user.application.admin_use_cases.admin_creates_user_use_case import AdminCreatesUserUseCase
-from app.user.application.admin_use_cases.admin_list_users_use_case import AdminListUsersUseCase
-from app.user.application.admin_use_cases.admin_get_user_by_id_use_case import AdminGetUserByIdUseCase
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
 from app.user.application.user_register_process.user_register_use_case import UserRegisterUseCase
 from app.user.application.login_process.login_use_case import LoginUseCase
@@ -29,7 +24,7 @@ from app.user.application.logout_use_case import LogoutUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.infrastructure.common.response_models import SuccessResponse
-from app.user.domain.schemas import UserCreate, ResendPinConfirmRequest, ConfirmationRequest, LoginRequest, Resend2FARequest, TwoFactorAuthRequest, TokenResponse, UserCreateByAdmin, UserResponse, UserUpdate, AdminUserUpdate, PasswordRecoveryRequest, PinConfirmationRequest, PasswordResetRequest, UserInDB
+from app.user.domain.schemas import UserCreate, ResendPinConfirmRequest, ConfirmationRequest, LoginRequest, Resend2FARequest, TwoFactorAuthRequest, TokenResponse, UserResponse, UserUpdate, PasswordRecoveryRequest, PinConfirmationRequest, PasswordResetRequest, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from typing import List
 

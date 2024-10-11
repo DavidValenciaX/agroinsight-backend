@@ -11,13 +11,14 @@ from sqlalchemy.orm import Session
 from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentById, FarmUserAssignmentByEmail
+from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
 from app.infrastructure.common.response_models import SuccessResponse
-from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException
+from app.farm.application.get_user_by_id_use_case import AdminGetUserByIdUseCase
+from app.user.domain.schemas import UserInDB, UserResponse
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.user.infrastructure.orm_models import User
 
 router = APIRouter(prefix="/farm", tags=["farm"])
@@ -158,4 +159,31 @@ def list_farm_users(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail=f"Error al listar los usuarios de una finca: {str(e)}"
+        )
+        
+@router.get("/user/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+    """
+    Obtiene la información de un usuario por su ID.
+
+    Parameters:
+        user_id (int): ID del usuario a obtener.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        UserResponse: Un objeto UserResponse con la información del usuario.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención del usuario.
+    """
+    get_user_by_id_use_case = AdminGetUserByIdUseCase(db)
+    try:
+        return get_user_by_id_use_case.admin_get_user_by_id(user_id, current_user)
+    except (DomainException, UserStateException) as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener el usuario: {str(e)}"
         )

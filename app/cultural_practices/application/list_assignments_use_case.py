@@ -24,9 +24,11 @@ class ListAssignmentsUseCase:
                 message="El usuario especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+            
+        worker_role = self.farm_repository.get_worker_role()
 
         # Obtener las fincas donde el usuario es trabajador
-        worker_farm_ids = self.farm_repository.get_farms_where_user_is_worker(user_id)
+        worker_farm_ids = self.farm_repository.get_farms_by_user_role(user_id, worker_role.id)
 
         # Filtrar las fincas donde el current_user es administrador
         admin_farm_ids = [farm_id for farm_id in worker_farm_ids if self.farm_repository.user_is_farm_admin(current_user.id, farm_id)]
