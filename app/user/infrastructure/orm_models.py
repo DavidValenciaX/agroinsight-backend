@@ -21,13 +21,13 @@ class User(Base):
     - **failed_attempts** (int): Número de intentos fallidos de inicio de sesión.
     - **locked_until** (datetime): Fecha y hora hasta la cual el usuario está bloqueado.
     - **state_id** (int): Identificador del estado del usuario.
-    - **estado** (EstadoUsuario): Estado actual del usuario.
-    - **confirmacion** (ConfirmacionUsuario): Información de confirmación del usuario.
-    - **verificacion_dos_pasos** (VerificacionDospasos): Información de verificación de dos pasos.
-    - **recuperacion_contrasena** (RecuperacionContrasena): Información de recuperación de contraseña.
+    - **estado** (UserState): Estado actual del usuario.
+    - **confirmacion** (UserConfirmation): Información de confirmación del usuario.
+    - **verificacion_dos_pasos** (TwoStepVerification): Información de verificación de dos pasos.
+    - **recuperacion_contrasena** (PasswordRecovery): Información de recuperación de contraseña.
     - **blacklisted_tokens** (List[BlacklistedToken]): Lista de tokens en lista negra.
-    - **fincas** (List[Finca]): Lista de fincas asociadas al usuario.
-    - **asignaciones** (List[Asignacion]): Lista de asignaciones del usuario.
+    - **fincas** (List[Farm]): Lista de fincas asociadas al usuario.
+    - **asignaciones** (List[Assignment]): Lista de asignaciones del usuario.
     """
     __tablename__ = "usuario"
     
@@ -40,24 +40,24 @@ class User(Base):
     locked_until = Column(DateTime, nullable=True)
     state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
 
-    estado = relationship("EstadoUsuario")
-    confirmacion = relationship("ConfirmacionUsuario", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
-    verificacion_dos_pasos = relationship("VerificacionDospasos", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
-    recuperacion_contrasena = relationship("RecuperacionContrasena", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
+    estado = relationship("UserState")
+    confirmacion = relationship("UserConfirmation", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
+    verificacion_dos_pasos = relationship("TwoStepVerification", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
+    recuperacion_contrasena = relationship("PasswordRecovery", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
     blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
-    asignaciones = relationship("Asignacion", back_populates="usuario")
-    roles_fincas = relationship("UsuarioFincaRol", back_populates="usuario")
+    asignaciones = relationship("Assignment", back_populates="usuario")
+    roles_fincas = relationship("UserFarmRole", back_populates="usuario")
 
-class UsuarioFincaRol(Base):
+class UserFarmRole(Base):
     __tablename__ = "usuario_finca_rol"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     usuario_id = Column(Integer, ForeignKey('usuario.id'), nullable=False)
-    finca_id = Column(Integer, ForeignKey('finca.id'), nullable=True)
+    finca_id = Column(Integer, ForeignKey('finca.id'), nullable=False)
     rol_id = Column(Integer, ForeignKey('rol.id'), nullable=False)
 
     usuario = relationship("User", back_populates="roles_fincas")
-    finca = relationship("Finca", back_populates="usuario_roles")
+    finca = relationship("Farm", back_populates="usuario_roles")
     rol = relationship("Role", back_populates="usuario_fincas")
     
 class Role(Base):
@@ -77,9 +77,9 @@ class Role(Base):
     nombre = Column(String(50), unique=True, index=True)
     descripcion = Column(Text)
 
-    usuario_fincas = relationship("UsuarioFincaRol", back_populates="rol")
+    usuario_fincas = relationship("UserFarmRole", back_populates="rol")
     
-class EstadoUsuario(Base):
+class UserState(Base):
     """
     Representa la tabla 'estado_usuario' en la base de datos.
 
@@ -95,7 +95,7 @@ class EstadoUsuario(Base):
     nombre = Column(String(50), unique=True, index=True)
     descripcion = Column(String(255))
     
-class ConfirmacionUsuario(Base):
+class UserConfirmation(Base):
     """
     Representa la tabla 'confirmacion_usuario' en la base de datos.
 
@@ -120,7 +120,7 @@ class ConfirmacionUsuario(Base):
 
     usuario = relationship("User", back_populates="confirmacion")
     
-class VerificacionDospasos(Base):
+class TwoStepVerification(Base):
     """
     Representa la tabla 'verificacion_dos_pasos' en la base de datos.
 
@@ -145,7 +145,7 @@ class VerificacionDospasos(Base):
 
     usuario = relationship("User", back_populates="verificacion_dos_pasos")
     
-class RecuperacionContrasena(Base):
+class PasswordRecovery(Base):
     """
     Representa la tabla 'recuperacion_contrasena' en la base de datos.
 

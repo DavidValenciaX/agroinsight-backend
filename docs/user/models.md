@@ -18,19 +18,19 @@ Este documento describe los modelos ORM utilizados para la gestión de usuarios 
 
 ### Estado de Usuario
 
-::: app.user.infrastructure.orm_models.EstadoUsuario
+::: app.user.infrastructure.orm_models.UserState
 
 ### Confirmación de Usuario
 
-::: app.user.infrastructure.orm_models.ConfirmacionUsuario
+::: app.user.infrastructure.orm_models.UserConfirmation
 
 ### Verificación de Dos Pasos
 
-::: app.user.infrastructure.orm_models.VerificacionDospasos
+::: app.user.infrastructure.orm_models.TwoStepVerification
 
 ### Recuperación de Contraseña
 
-::: app.user.infrastructure.orm_models.RecuperacionContrasena
+::: app.user.infrastructure.orm_models.PasswordRecovery
 
 ### Token en Lista Negra
 

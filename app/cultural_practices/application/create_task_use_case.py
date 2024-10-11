@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
-from app.cultural_practices.domain.schemas import TareaLaborCulturalCreate
+from app.cultural_practices.domain.schemas import CulturalTaskCreate
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.infrastructure.common.datetime_utils import get_current_date
 from app.infrastructure.common.response_models import SuccessResponse
@@ -17,7 +17,7 @@ class CreateTaskUseCase:
         self.farm_repository = FarmRepository(db)
         self.plot_repository = PlotRepository(db)
 
-    def create_task(self, tarea_data: TareaLaborCulturalCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_task(self, tarea_data: CulturalTaskCreate, current_user: UserInDB) -> SuccessResponse:
         
         # buscar el id de la finca por medio del id del lote
         finca_id = self.plot_repository.get_farm_id_by_plot_id(tarea_data.lote_id)
@@ -73,7 +73,7 @@ class CreateTaskUseCase:
 
         return SuccessResponse(message="Tarea creada exitosamente")
 
-    def validate_tarea_data(self, tarea_data: TareaLaborCulturalCreate):
+    def validate_tarea_data(self, tarea_data: CulturalTaskCreate):
         # Obtener la fecha actual
         current_date = get_current_date()
 

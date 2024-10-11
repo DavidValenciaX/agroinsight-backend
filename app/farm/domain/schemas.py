@@ -36,28 +36,28 @@ class PaginatedFarmListResponse(BaseModel):
     per_page: int
     total_pages: int
         
-class CategoriaUnidadMedidaBase(BaseModel):
+class UnitCategoryBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
 
-class CategoriaUnidadMedidaCreate(CategoriaUnidadMedidaBase):
+class UnitCategoryCreate(UnitCategoryBase):
     pass
 
-class CategoriaUnidadMedida(CategoriaUnidadMedidaBase):
+class UnitCategory(UnitCategoryBase):
     id: int
 
     class Config:
         from_attributes = True
 
-class UnidadMedidaBase(BaseModel):
+class UnitOfMeasureBase(BaseModel):
     nombre: str
     abreviatura: str
     categoria_id: int
 
-class UnidadMedidaCreate(UnidadMedidaBase):
+class UnitOfMeasureCreate(UnitOfMeasureBase):
     pass
 
-class UnidadMedida(UnidadMedidaBase):
+class UnitOfMeasure(UnitOfMeasureBase):
     id: int
 
     class Config:

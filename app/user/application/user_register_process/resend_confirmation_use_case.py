@@ -7,7 +7,6 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
-from app.user.infrastructure.orm_models import ConfirmacionUsuario
 from app.infrastructure.common.datetime_utils import ensure_utc
 
 class ResendConfirmationUseCase:

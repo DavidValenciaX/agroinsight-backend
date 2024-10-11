@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey, String, Text, Date, Text, DE
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
 
-class Asignacion(Base):
+class Assignment(Base):
     __tablename__ = "asignacion"
     
     usuario_id = Column(Integer, ForeignKey("usuario.id"), primary_key=True, nullable=False)
@@ -10,9 +10,9 @@ class Asignacion(Base):
     notas = Column(Text)
 
     usuario = relationship("User", back_populates="asignaciones")
-    tarea = relationship("TareaLaborCultural", back_populates="asignaciones")
+    tarea = relationship("CulturalTask", back_populates="asignaciones")
     
-class TareaLaborCultural(Base):
+class CulturalTask(Base):
     __tablename__ = "tarea_labor_cultural"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -26,27 +26,27 @@ class TareaLaborCultural(Base):
     fecha_completada = Column(Date)
 
     # Relaciones
-    tipo_labor = relationship("TipoLaborCultural", back_populates="tareas")
-    estado = relationship("EstadoTareaLaborCultural", back_populates="tareas")
-    asignaciones = relationship("Asignacion", back_populates="tarea")    
+    tipo_labor = relationship("CulturalTaskType", back_populates="tareas")
+    estado = relationship("CulturalTaskState", back_populates="tareas")
+    asignaciones = relationship("Assignment", back_populates="tarea")    
     lote = relationship("Plot", back_populates="tareas")
 
-class EstadoTareaLaborCultural(Base):
+class CulturalTaskState(Base):
     __tablename__ = "estado_tarea_labor_cultural"
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(50), unique=True, nullable=False)
     descripcion = Column(Text)
 
-    # Relación con TareaLaborCultural
-    tareas = relationship("TareaLaborCultural", back_populates="estado")
+    # Relación con CulturalTask
+    tareas = relationship("CulturalTask", back_populates="estado")
     
-class TipoLaborCultural(Base):
+class CulturalTaskType(Base):
     __tablename__ = "tipo_labor_cultural"
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(100), unique=True, nullable=False)
     descripcion = Column(Text)
 
-    # Relación con TareaLaborCultural
-    tareas = relationship("TareaLaborCultural", back_populates="tipo_labor")
+    # Relación con CulturalTask
+    tareas = relationship("CulturalTask", back_populates="tipo_labor")

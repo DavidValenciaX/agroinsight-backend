@@ -4,7 +4,7 @@ from app.farm.domain.schemas import FarmResponse
 from app.plot.domain.schemas import PlotResponse
 
 def map_user_to_response(user) -> UserResponse:
-    roles_fincas = [
+    farm_roles = [
         {
             "rol": ufr.rol.nombre,
             "finca": ufr.finca.nombre if ufr.finca else None
@@ -12,8 +12,8 @@ def map_user_to_response(user) -> UserResponse:
         for ufr in user.roles_fincas
     ]
     
-    if not roles_fincas:
-        roles_fincas = [{"rol": "Rol no asignado", "finca": "Ninguna finca asociada"}]
+    if not farm_roles:
+        farm_roles = [{"rol": "Rol no asignado", "finca": "Ninguna finca asociada"}]
     
     return UserResponse(
         id=user.id,
@@ -21,7 +21,7 @@ def map_user_to_response(user) -> UserResponse:
         apellido=user.apellido,
         email=user.email,
         estado=user.estado.nombre if user.estado else "Desconocido",
-        roles_fincas=roles_fincas
+        roles_fincas=farm_roles
     )
 
 def map_farm_to_response(farm) -> FarmResponse:

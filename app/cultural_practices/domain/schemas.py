@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from datetime import date
 from typing import List, Optional
         
-class TareaLaborCulturalBase(BaseModel):
+class CulturalTaskBase(BaseModel):
     tipo_labor_id: int
     lote_id: int
     fecha_programada: date
@@ -13,10 +13,10 @@ class TareaLaborCulturalBase(BaseModel):
     observaciones: Optional[str] = None
     fecha_completada: Optional[date] = None
 
-class TareaLaborCulturalCreate(TareaLaborCulturalBase):
+class CulturalTaskCreate(CulturalTaskBase):
     pass
 
-class TareaLaborCulturalResponse(TareaLaborCulturalBase):
+class CulturalTaskResponse(CulturalTaskBase):
     id: int
 
     class Config:

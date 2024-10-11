@@ -13,8 +13,7 @@ class Plot(Base):
     longitud = Column(DECIMAL(11, 8), nullable=False)
     finca_id = Column(Integer, ForeignKey('finca.id'), nullable=False)
 
-    unidad_area = relationship("UnidadMedida")
-    finca = relationship("Finca", back_populates="lotes")
+    unidad_area = relationship("UnitOfMeasure")
+    finca = relationship("Farm", back_populates="lotes")
     
-    # Cambiar de 'asignaciones' a 'tareas' para reflejar la relación correcta
-    tareas = relationship("TareaLaborCultural", back_populates="lote")
+    tareas = relationship("CulturalTask", back_populates="lote")

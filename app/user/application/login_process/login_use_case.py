@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from fastapi import status
-from app.user.infrastructure.orm_models import VerificacionDospasos
+from app.user.infrastructure.orm_models import TwoStepVerification
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
@@ -55,11 +55,11 @@ class LoginUseCase:
         pin, pin_hash = generate_pin()
         
         # Crear un nuevo registro de verificación
-        verification = VerificacionDospasos(
+        verification = TwoStepVerification(
             usuario_id=user.id,
             pin=pin_hash,
             expiracion=datetime.now(timezone.utc) + timedelta(minutes=10),
-            resends=0  # Inicializamos resends en 0
+            resends=0
         )
         
         # Enviar el PIN al correo electrónico del usuario

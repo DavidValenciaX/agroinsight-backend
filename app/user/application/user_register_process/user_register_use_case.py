@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.user.infrastructure.orm_models import User, ConfirmacionUsuario
+from app.user.infrastructure.orm_models import User, UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserCreate
@@ -104,7 +104,7 @@ class UserRegisterUseCase:
         # Generar PIN y su hash
         expiration_time = 10  # minutos
         pin, pin_hash = generate_pin()
-        confirmation = ConfirmacionUsuario(
+        confirmation = UserConfirmation(
             usuario_id=created_user.id,
             pin=pin_hash,
             expiracion=datetime.now(timezone.utc) + timedelta(minutes=expiration_time),

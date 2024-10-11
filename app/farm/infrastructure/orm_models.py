@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer, String, Text, DECIMAL, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
 from sqlalchemy.orm import relationship
 
-class Finca(Base):
+class Farm(Base):
     __tablename__ = "finca"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -14,20 +14,20 @@ class Finca(Base):
     latitud = Column(DECIMAL(10, 8), nullable=False)
     longitud = Column(DECIMAL(11, 8), nullable=False)
 
-    unidad_area = relationship("UnidadMedida")
+    unidad_area = relationship("UnitOfMeasure")
     lotes = relationship("Plot", back_populates="finca")
-    usuario_roles = relationship("UsuarioFincaRol", back_populates="finca")
+    usuario_roles = relationship("UserFarmRole", back_populates="finca")
     
-class CategoriaUnidadMedida(Base):
+class UnitCategory(Base):
     __tablename__ = "categoria_unidad_medida"
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(50), unique=True, nullable=False)
     descripcion = Column(Text)
 
-    unidades = relationship("UnidadMedida", back_populates="categoria")
+    unidades = relationship("UnitOfMeasure", back_populates="categoria")
 
-class UnidadMedida(Base):
+class UnitOfMeasure(Base):
     __tablename__ = "unidad_medida"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -35,4 +35,4 @@ class UnidadMedida(Base):
     abreviatura = Column(String(10), unique=True, nullable=False)
     categoria_id = Column(Integer, ForeignKey('categoria_unidad_medida.id'), nullable=False)
 
-    categoria = relationship("CategoriaUnidadMedida", back_populates="unidades")
+    categoria = relationship("UnitCategory", back_populates="unidades")
