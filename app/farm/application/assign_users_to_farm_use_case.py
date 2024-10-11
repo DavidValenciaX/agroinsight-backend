@@ -36,8 +36,7 @@ class AssignUsersToFarmUseCase:
         if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id):
             raise InsufficientPermissionsException()
         
-        # Buscar el rol de "Trabajador Agrícola"
-        rol_trabajador_agricola = self.user_repository.get_role_by_name("Trabajador Agrícola")
+        rol_trabajador_agricola = self.farm_repository.get_worker_role()
         if not rol_trabajador_agricola:
             raise DomainException(
                 message="El rol de 'Trabajador Agrícola' no existe.",

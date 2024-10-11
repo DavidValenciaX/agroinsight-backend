@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.cultural_practices.domain.schemas import AssignmentCreate, TareaLaborCulturalCreate
 from app.cultural_practices.infrastructure.orm_models import Asignacion, EstadoTareaLaborCultural, TipoLaborCultural
 from app.cultural_practices.infrastructure.orm_models import TareaLaborCultural
+from app.plot.infrastructure.orm_models import Plot
 
 class CulturalPracticesRepository:
     def __init__(self, db: Session):
@@ -35,8 +36,13 @@ class CulturalPracticesRepository:
     def task_exists(self, task_id: int) -> bool:
         return self.db.query(TareaLaborCultural).filter(TareaLaborCultural.id == task_id).first() is not None
     
-    def list_assignments_by_user_paginated(self, user_id: int, page: int, per_page: int) -> tuple[int, List[Asignacion]]:
-        query = self.db.query(Asignacion).filter(Asignacion.usuario_id == user_id)
+    def list_assignments_by_user_paginated(self, user_id: int, page: int, per_page: int, admin_farm_ids: List[int]) -> tuple[int, List[Asignacion]]:
+        query = self.db.query(Asignacion).join(TareaLaborCultural).filter(
+            Asignacion.usuario_id == user_id,
+            TareaLaborCultural.lote_id.in_(
+                self.db.query(Plot.id).filter(Plot.finca_id.in_(admin_farm_ids))
+            )
+        )
         total_assignments = query.count()
         assignments = query.offset((page - 1) * per_page).limit(per_page).all()
         return total_assignments, assignments

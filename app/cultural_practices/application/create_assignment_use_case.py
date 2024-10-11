@@ -58,14 +58,17 @@ class CreateAssignmentUseCase:
                 messages.append(f"El usuario con ID {usuario_id} especificado no existe.")
                 continue
             
+            # obtener el nombre del usuario
+            user_name = self.user_repository.get_user_by_id(usuario_id)
+            
             # validar que el usuario es trabajador de la finca
             if not self.farm_repository.user_is_farm_worker(usuario_id, finca_id):
-                messages.append(f"El usuario con ID {usuario_id} no es trabajador de la finca.")
+                messages.append(f"El usuario {user_name.nombre} no es trabajador de la finca.")
                 continue
             
             # validar que el usuario no tenga ya asignada esa tarea
             if self.cultural_practice_repository.user_has_assignment(usuario_id, assignment_data.tarea_labor_cultural_id):
-                messages.append(f"El usuario con ID {usuario_id} ya tiene asignada la tarea con ID {assignment_data.tarea_labor_cultural_id}.")
+                messages.append(f"El usuario {user_name.nombre} ya tiene asignada la tarea con ID {assignment_data.tarea_labor_cultural_id}.")
                 continue
             
             # Crear la asignación
@@ -75,8 +78,8 @@ class CreateAssignmentUseCase:
                 notas=assignment_data.notas
             )
             if not self.cultural_practice_repository.create_assignment(assignment_data_single):
-                messages.append(f"No se pudo crear la asignación para el usuario con ID {usuario_id}.")
+                messages.append(f"No se pudo crear la asignación para el usuario {user_name.nombre}.")
                 
-            messages.append(f"Asignación creada exitosamente para el usuario con ID {usuario_id}.")
+            messages.append(f"Asignación creada exitosamente para el usuario {user_name.nombre}.")
         
         return MultipleResponse(messages=messages)

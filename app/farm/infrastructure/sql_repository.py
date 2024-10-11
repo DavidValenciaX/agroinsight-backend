@@ -45,12 +45,24 @@ class FarmRepository:
         
     # Obtener el rol de administrador de finca
     def get_admin_role(self):
-        admin_role = self.user_repository.get_role_by_name("Administrador de Finca")
+        admin_role = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
         if not admin_role:
             raise DomainException(
                 message="No se pudo encontrar el rol de 'Administrador de Finca'.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+        return admin_role
+            
+    def get_worker_role(self):
+        worker_role = self.user_repository.get_role_by_name(WORKER_ROLE_NAME)
+        if not worker_role:
+            raise DomainException(
+                message="No se pudo encontrar el rol de 'Trabajador de Finca'.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        return worker_role
     
     def list_farms(self, user_id: int) -> List[Finca]:
             return self.db.query(Finca).join(UsuarioFincaRol).filter(UsuarioFincaRol.usuario_id == user_id).all()
@@ -109,18 +121,22 @@ class FarmRepository:
             UsuarioFincaRol.finca_id == farm_id
         ).first() is not None
         
-    def user_is_farm_admin(self, user_id: int, farm_id: int) -> bool: 
-        rol_administrador_finca = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
+    def user_is_farm_admin(self, user_id: int, farm_id: int) -> bool:
         return self.db.query(UsuarioFincaRol).filter(
             UsuarioFincaRol.usuario_id == user_id,
             UsuarioFincaRol.finca_id == farm_id,
-            UsuarioFincaRol.rol_id == rol_administrador_finca.id
+            UsuarioFincaRol.rol_id == self.get_admin_role().id
         ).first() is not None
     
     def user_is_farm_worker(self, user_id: int, farm_id: int) -> bool:
-        rol_trabajador_finca = self.user_repository.get_role_by_name(WORKER_ROLE_NAME)
         return self.db.query(UsuarioFincaRol).filter(
             UsuarioFincaRol.usuario_id == user_id,
             UsuarioFincaRol.finca_id == farm_id,
-            UsuarioFincaRol.rol_id == rol_trabajador_finca.id
+            UsuarioFincaRol.rol_id == self.get_worker_role().id
         ).first() is not None
+
+    def get_farms_where_user_is_worker(self, user_id: int) -> List[int]:
+        # Obtener una lista de IDs de fincas donde el usuario es trabajador
+        return [finca_id for finca_id, in self.db.query(UsuarioFincaRol.finca_id).filter(
+            UsuarioFincaRol.usuario_id == user_id
+        ).all()]
