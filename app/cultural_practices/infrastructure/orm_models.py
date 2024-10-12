@@ -7,7 +7,6 @@ class Assignment(Base):
     
     usuario_id = Column(Integer, ForeignKey("usuario.id"), primary_key=True, nullable=False)
     tarea_labor_cultural_id = Column(Integer, ForeignKey("tarea_labor_cultural.id"), primary_key=True, nullable=False)
-    notas = Column(Text)
 
     usuario = relationship("User", back_populates="asignaciones")
     tarea = relationship("CulturalTask", back_populates="asignaciones")

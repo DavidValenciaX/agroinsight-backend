@@ -19,6 +19,12 @@ class CreateAssignmentUseCase:
         self.plot_repository = PlotRepository(db)
 
     def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> SuccessResponse:
+        # validar que se haya enviado al menos un usuario_id
+        if not assignment_data.usuario_ids:
+            raise DomainException(
+                message="Debe enviar al menos un id de usuario.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
         
         # obtener el id del lote por medio del id de la tarea
         lote_id = self.cultural_practice_repository.get_lote_id_by_tarea_id(assignment_data.tarea_labor_cultural_id)
@@ -74,8 +80,7 @@ class CreateAssignmentUseCase:
             # Crear la asignación
             assignment_data_single = AssignmentCreateSingle(
                 usuario_id=usuario_id,
-                tarea_labor_cultural_id=assignment_data.tarea_labor_cultural_id,
-                notas=assignment_data.notas
+                tarea_labor_cultural_id=assignment_data.tarea_labor_cultural_id
             )
             if not self.cultural_practice_repository.create_assignment(assignment_data_single):
                 messages.append(f"No se pudo crear la asignación para el usuario {user_name}.")

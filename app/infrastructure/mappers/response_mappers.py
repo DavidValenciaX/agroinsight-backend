@@ -51,6 +51,5 @@ def map_plot_to_response(plot) -> PlotResponse:
 def map_assignment_to_response(assignment) -> AssignmentResponse:
     return AssignmentResponse(
         usuario_id=assignment.usuario_id,
-        tarea_labor_cultural_id=assignment.tarea_labor_cultural_id,
-        notas=assignment.notas
+        tarea_labor_cultural_id=assignment.tarea_labor_cultural_id
     )

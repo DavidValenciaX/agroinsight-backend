@@ -17,17 +17,14 @@ class CulturalTaskCreate(CulturalTaskBase):
 class AssignmentCreate(BaseModel):
     usuario_ids: List[int]
     tarea_labor_cultural_id: int
-    notas: Optional[str] = None
     
 class AssignmentCreateSingle(BaseModel):
     usuario_id: int
     tarea_labor_cultural_id: int
-    notas: Optional[str] = None
 
 class AssignmentResponse(BaseModel):
     usuario_id: int
     tarea_labor_cultural_id: int
-    notas: Optional[str]
 
     class Config:
         from_attributes = True
