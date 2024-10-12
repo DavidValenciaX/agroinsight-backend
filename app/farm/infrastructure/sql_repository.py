@@ -28,7 +28,7 @@ class FarmRepository:
             admin_role = self.user_repository.get_admin_role()
             
             # Crear la relación usuario-finca
-            self.create_user_farm_role(user_id, new_farm.id, admin_role.id)
+            self.assign_user_to_farm_with_role(user_id, new_farm.id, admin_role.id)
 
             self.db.commit()
             self.db.refresh(new_farm)
@@ -64,21 +64,6 @@ class FarmRepository:
             UserFarmRole.usuario_id == user_id,
             UserFarmRole.finca_id == farm_id
         ).first()
-        
-    def assign_user_to_farm(self, farm_id: int, user_id: int, role_id: int) -> int:
-        user_farm_role = UserFarmRole(usuario_id=user_id, finca_id=farm_id, rol_id=role_id)
-        self.db.merge(user_farm_role)
-        self.db.commit()
-        return user_id
-    
-    def assign_users_to_farm(self, farm_id: int, user_ids: List[int], role_id: int) -> List[int]:
-        assigned_user_ids = []
-        for user_id in user_ids:
-            user_farm_role = UserFarmRole(usuario_id=user_id, finca_id=farm_id, rol_id=role_id)
-            self.db.merge(user_farm_role)
-            assigned_user_ids.append(user_id)
-        self.db.commit()
-        return assigned_user_ids
 
     def get_farm_by_id(self, farm_id: int) -> Farm:
         return self.db.query(Farm).filter(Farm.id == farm_id).first()
@@ -121,7 +106,7 @@ class FarmRepository:
             UserFarmRole.rol_id == role_id
         ).all()]
 
-    def create_user_farm_role(self, user_id: int, farm_id: int, role_id: int):
+    def assign_user_to_farm_with_role(self, user_id: int, farm_id: int, role_id: int):
         try:
             user_farm = UserFarmRole(usuario_id=user_id, finca_id=farm_id, rol_id=role_id)
             self.db.add(user_farm)

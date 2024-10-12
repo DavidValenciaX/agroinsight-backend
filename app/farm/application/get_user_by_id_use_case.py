@@ -29,6 +29,9 @@ class AdminGetUserByIdUseCase:
         
         # Verificar si el current_user es administrador en la finca especificada
         if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
-            raise InsufficientPermissionsException()
+            raise DomainException(
+                message="No tienes permisos para obtener información de este usuario.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
         
         return map_user_to_response(user)

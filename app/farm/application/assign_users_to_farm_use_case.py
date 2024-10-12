@@ -15,16 +15,10 @@ class AssignUsersToFarmUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
     
-    def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, farm_id: int, current_user: UserInDB) -> SuccessResponse:
+    def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> SuccessResponse:
 
         if not current_user:
             raise MissingTokenException()
-        
-        if farm_id != assignment_data.farm_id:
-            raise DomainException(
-                message="El ID de la finca en la URL no coincide con el ID de la finca en el cuerpo de la solicitud.",
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
         
         farm = self.farm_repository.get_farm_by_id(assignment_data.farm_id)
         if not farm:
@@ -34,7 +28,10 @@ class AssignUsersToFarmUseCase:
             )
         
         if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id):
-            raise InsufficientPermissionsException()
+            raise DomainException(
+                message="No tienes permisos para asignar usuarios a esta finca.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
         
         rol_trabajador_agricola = self.user_repository.get_worker_role()
             
@@ -55,7 +52,7 @@ class AssignUsersToFarmUseCase:
                 messages.append(f"El usuario {user_name} ya tiene un rol asignado en la finca.")
                 continue
             
-            self.farm_repository.assign_user_to_farm(assignment_data.farm_id, user.id, rol_trabajador_agricola.id)
+            self.farm_repository.assign_user_to_farm_with_role(user.id, assignment_data.farm_id,  rol_trabajador_agricola.id)
             messages.append(f"El usuario {user_name} ha sido asignado exitosamente a la finca.")
             
 

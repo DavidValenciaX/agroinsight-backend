@@ -44,8 +44,10 @@ class CreateAssignmentUseCase:
         
         # validar que el usuario sea administrador de la finca
         if not self.farm_repository.user_is_farm_admin(current_user.id, finca_id):
-            raise InsufficientPermissionsException()
-        
+            raise DomainException(
+                message="No tienes permisos para asignar tareas en esta finca.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
         
         # Validar que la tarea existe
         if not self.cultural_practice_repository.task_exists(assignment_data.tarea_labor_cultural_id):

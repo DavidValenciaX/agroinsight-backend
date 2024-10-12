@@ -29,7 +29,10 @@ class CreateTaskUseCase:
         
         #validar que el usuario sea administrador de la finca
         if not self.farm_repository.user_is_farm_admin(current_user.id, finca_id):
-            raise InsufficientPermissionsException()
+            raise DomainException(
+                message="No tienes permisos para crear tareas en esta finca.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
 
         # Validar los datos de entrada
         self.validate_tarea_data(tarea_data)

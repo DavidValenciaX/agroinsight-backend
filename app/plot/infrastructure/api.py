@@ -17,11 +17,10 @@ from app.plot.domain.schemas import PaginatedPlotListResponse
 from app.plot.application.list_plots_use_case import ListPlotsUseCase
 from fastapi import Query
 
-router = APIRouter(prefix="/farm", tags=["plot"])
+router = APIRouter(tags=["plot"])
 
-@router.post("/{farm_id}/plot/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/plot/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_plot(
-    farm_id: int,
     plot: PlotCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -43,7 +42,7 @@ def create_plot(
     """
     create_plot_use_case = CreatePlotUseCase(db)
     try:
-        return create_plot_use_case.create_plot(plot, farm_id, current_user)
+        return create_plot_use_case.create_plot(plot, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -52,7 +51,7 @@ def create_plot(
             detail=f"Error interno al crear el lote: {str(e)}"
         )
         
-@router.get("/{farm_id}/plot/list", response_model=PaginatedPlotListResponse, status_code=status.HTTP_200_OK)
+@router.get("/farm/{farm_id}/plot/list", response_model=PaginatedPlotListResponse, status_code=status.HTTP_200_OK)
 def list_plots(
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
@@ -64,7 +63,7 @@ def list_plots(
     Lista todos los lotes de una finca específica.
 
     Parameters:
-        finca_id (int): ID de la finca.
+        farm_id (int): ID de la finca.
         page (int): Número de página.
         per_page (int): Elementos por página.
         db (Session): Sesión de base de datos.

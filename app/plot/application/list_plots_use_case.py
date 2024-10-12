@@ -24,7 +24,10 @@ class ListPlotsUseCase:
             )
             
         if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
-            raise InsufficientPermissionsException()
+            raise DomainException(
+                message="No tienes permisos para obtener información de los lotes de esta finca.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
 
         total_plots, plots = self.plot_repository.list_plots_by_farm_paginated(farm_id, page, per_page)
 

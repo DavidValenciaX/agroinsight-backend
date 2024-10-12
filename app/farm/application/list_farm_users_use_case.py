@@ -27,7 +27,10 @@ class ListFarmUsersUseCase:
             
         # Verificar si current_user es administrador de la finca
         if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
-            raise InsufficientPermissionsException()
+            raise DomainException(
+                message="No tienes permisos para obtener información de los usuarios de esta finca.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
 
         role = self.user_repository.get_role_by_id(role_id)
         if not role:
