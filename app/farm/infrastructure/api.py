@@ -87,8 +87,9 @@ def list_farms(
             detail=f"Error interno al listar las fincas: {str(e)}"
         )
         
-@router.post("/assign-users-by-email", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
+@router.post("/{farm_id}/assign-users-by-email", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
 def assign_users_to_farm_by_email(
+    farm_id: int,
     assignment_data: FarmUserAssignmentByEmail,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -109,7 +110,7 @@ def assign_users_to_farm_by_email(
     """
     assign_users_use_case = AssignUsersToFarmUseCase(db)
     try:
-        return assign_users_use_case.assign_users_by_emails(assignment_data, current_user)
+        return assign_users_use_case.assign_users_by_emails(assignment_data, farm_id, current_user)
     except DomainException as e:
         raise e
     except Exception as e:

@@ -20,8 +20,6 @@ class AdminGetUserByIdUseCase:
         if not user:
             raise UserNotRegisteredException()
         
-        worker_role = self.user_repository.get_worker_role()
-        
         # Verificar si el user_id es trabajador en la finca especificada
         if not self.farm_repository.user_is_farm_worker(user_id, farm_id):
             raise DomainException(

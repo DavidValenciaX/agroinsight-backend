@@ -13,9 +13,15 @@ class CreatePlotUseCase:
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
         
-    def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_plot(self, plot_data: PlotCreate, farm_id: int, current_user: UserInDB) -> SuccessResponse:
         if not current_user:
             raise MissingTokenException()
+        
+        if farm_id != plot_data.finca_id:
+            raise DomainException(
+                message="El ID de la finca en la URL no coincide con el ID de la finca en el cuerpo de la solicitud.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
             
         #Validar si el usuario tiene permiso para crear lotes en la finca
         if not self.farm_repository.user_is_farm_admin(current_user.id, plot_data.finca_id):

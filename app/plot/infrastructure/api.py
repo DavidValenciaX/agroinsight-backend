@@ -17,18 +17,20 @@ from app.plot.domain.schemas import PaginatedPlotListResponse
 from app.plot.application.list_plots_use_case import ListPlotsUseCase
 from fastapi import Query
 
-router = APIRouter(prefix="/plot", tags=["plot"])
+router = APIRouter(prefix="/farm", tags=["plot"])
 
-@router.post("/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/{farm_id}/plot/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_plot(
+    farm_id: int,
     plot: PlotCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
     """
-    Crea un nuevo lote en el sistema.
+    Crea un nuevo lote en el sistema dentro de una finca específica.
 
     Parameters:
+        farm_id (int): ID de la finca desde la URL.
         plot (PlotCreate): Datos del lote a crear.
         db (Session): Sesión de base de datos.
         current_user (UserInDB): Usuario actual autenticado.
@@ -37,11 +39,11 @@ def create_plot(
         SuccessResponse: Un objeto SuccessResponse indicando que el lote fue creado exitosamente.
 
     Raises:
-        HTTPException: Si ocurre un error durante la creación del lote.
+        HTTPException: Si ocurre un error durante la creación del lote o si hay inconsistencia en los IDs de finca.
     """
     create_plot_use_case = CreatePlotUseCase(db)
     try:
-        return create_plot_use_case.create_plot(plot, current_user)
+        return create_plot_use_case.create_plot(plot, farm_id, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -50,9 +52,9 @@ def create_plot(
             detail=f"Error interno al crear el lote: {str(e)}"
         )
         
-@router.get("/list/{finca_id}", response_model=PaginatedPlotListResponse, status_code=status.HTTP_200_OK)
+@router.get("/{farm_id}/plot/list", response_model=PaginatedPlotListResponse, status_code=status.HTTP_200_OK)
 def list_plots(
-    finca_id: int,
+    farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
@@ -76,7 +78,7 @@ def list_plots(
     """
     list_plots_use_case = ListPlotsUseCase(db)
     try:
-        return list_plots_use_case.list_plots(current_user, finca_id, page, per_page)
+        return list_plots_use_case.list_plots(current_user, farm_id, page, per_page)
     except DomainException as e:
         raise e
     except Exception as e:

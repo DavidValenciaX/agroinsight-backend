@@ -15,10 +15,16 @@ class AssignUsersToFarmUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
     
-    def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> SuccessResponse:
+    def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, farm_id: int, current_user: UserInDB) -> SuccessResponse:
 
         if not current_user:
             raise MissingTokenException()
+        
+        if farm_id != assignment_data.farm_id:
+            raise DomainException(
+                message="El ID de la finca en la URL no coincide con el ID de la finca en el cuerpo de la solicitud.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
         
         farm = self.farm_repository.get_farm_by_id(assignment_data.farm_id)
         if not farm:

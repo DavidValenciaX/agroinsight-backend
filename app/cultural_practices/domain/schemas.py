@@ -47,7 +47,7 @@ class TaskResponse(BaseModel):
     lote_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PaginatedTaskListResponse(BaseModel):
     tasks: List[TaskResponse]
