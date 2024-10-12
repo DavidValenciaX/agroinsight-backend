@@ -80,6 +80,13 @@ class FarmRepository:
         users = query.offset(offset).limit(per_page).all()
         return total, users
     
+    def list_farm_users_paginated(self, farm_id: int, page: int, per_page: int):
+        offset = (page - 1) * per_page
+        query = self.db.query(User).join(UserFarmRole).filter(UserFarmRole.finca_id == farm_id)
+        total = query.count()
+        users = query.offset(offset).limit(per_page).all()
+        return total, users
+    
     def user_has_access_to_farm(self, user_id: int, farm_id: int) -> bool:
         return self.db.query(UserFarmRole).filter(
             UserFarmRole.usuario_id == user_id,

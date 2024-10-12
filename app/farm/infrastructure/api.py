@@ -121,7 +121,6 @@ def assign_users_to_farm_by_email(
 @router.get("/{farm_id}/users", response_model=PaginatedFarmUserListResponse, status_code=status.HTTP_200_OK)
 def list_farm_users(
     farm_id: int,
-    role_id: int = Query(None),
     page: Optional[int] = Query(1, ge=1),
     per_page: Optional[int] = Query(10, ge=1, le=100),
     current_user: User = Depends(get_current_user),
@@ -144,15 +143,10 @@ def list_farm_users(
     Raises:
         HTTPException: Si ocurre un error durante la obtención de la lista de usuarios.
     """
-    if role_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Debe proporcionar 'role_id'"
-        )
     
     use_case = ListFarmUsersUseCase(db)
     try:
-        return use_case.list_farm_users(farm_id, role_id, current_user, page, per_page)
+        return use_case.list_farm_users(farm_id, current_user, page, per_page)
     except DomainException as e:
         raise e
     except Exception as e:

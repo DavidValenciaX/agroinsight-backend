@@ -14,11 +14,11 @@ from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.infrastructure.common.response_models import SuccessResponse, MultipleResponse
 from app.user.domain.schemas import UserInDB
-from app.cultural_practices.application.list_tasks_by_user_use_case import ListTasksByUserUseCase
+from app.cultural_practices.application.list_tasks_by_user_and_farm_use_case import ListTasksByUserAndFarmUseCase
 
-router = APIRouter(prefix="/cultural_practices", tags=["cultural practices"])
+router = APIRouter(tags=["cultural practices"])
 
-@router.post("/create-task", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/task/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 def create_task(
     task: CulturalTaskCreate,
     db: Session = Depends(getDb),
@@ -49,7 +49,7 @@ def create_task(
             detail=f"Error interno al crear la tarea: {str(e)}"
         )
 
-@router.post("/create-assignment", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
+@router.post("/assignment/create", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
 def create_assignment(
     assignment: AssignmentCreate,
     db: Session = Depends(getDb),
@@ -80,8 +80,9 @@ def create_assignment(
             detail=f"Error interno al asignar la tarea: {str(e)}"
         )
 
-@router.get("/list-tasks/{user_id}", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
-def list_tasks_by_user(
+@router.get("/farm/{farm_id}/user/{user_id}/tasks/list", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
+def list_tasks_by_user_and_farm(
+    farm_id: int,
     user_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -104,9 +105,9 @@ def list_tasks_by_user(
     Raises:
         HTTPException: Si ocurre un error durante la obtención de la lista de tareas.
     """
-    list_tasks_by_user_use_case = ListTasksByUserUseCase(db)
+    list_tasks_by_user_and_farm_use_case = ListTasksByUserAndFarmUseCase(db)
     try:
-        return list_tasks_by_user_use_case.list_tasks_by_user(user_id, page, per_page, current_user)
+        return list_tasks_by_user_and_farm_use_case.list_tasks_by_user_and_farm(farm_id, user_id, page, per_page, current_user)
     except DomainException as e:
         raise e
     except Exception as e:

@@ -15,7 +15,7 @@ class ListFarmUsersUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
 
-    def list_farm_users(self, farm_id: int, role_id: int, current_user: UserInDB, page: Optional[int], per_page: Optional[int]) -> PaginatedFarmUserListResponse:
+    def list_farm_users(self, farm_id: int, current_user: UserInDB, page: Optional[int], per_page: Optional[int]) -> PaginatedFarmUserListResponse:
         self.validate_params(page, per_page)
         
         farm = self.farm_repository.get_farm_by_id(farm_id)
@@ -32,14 +32,7 @@ class ListFarmUsersUseCase:
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
-        role = self.user_repository.get_role_by_id(role_id)
-        if not role:
-            raise DomainException(
-                message=f"El rol con ID '{role_id}' no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-
-        total_users, users = self.farm_repository.list_farm_users_by_role_paginated(farm_id, role.id, page, per_page)
+        total_users, users = self.farm_repository.list_farm_users_paginated(farm_id, page, per_page)
 
         user_responses = [map_user_to_response(user) for user in users]
 

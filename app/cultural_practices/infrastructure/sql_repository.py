@@ -82,3 +82,16 @@ class CulturalPracticesRepository:
         except Exception as e:
             print(f"Error al listar las tareas: {e}")
             return 0, []
+        
+    def list_tasks_by_user_and_farm_paginated(self, user_id: int, farm_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
+        try:
+            query = self.db.query(CulturalTask).join(Assignment).filter(
+                Assignment.usuario_id == user_id,
+                CulturalTask.lote_id.in_(self.db.query(Plot.id).filter(Plot.finca_id == farm_id))
+            )
+            total_tasks = query.count()
+            tasks = query.offset((page - 1) * per_page).limit(per_page).all()
+            return total_tasks, tasks
+        except Exception as e:
+            print(f"Error al listar las tareas: {e}")
+            return 0, []

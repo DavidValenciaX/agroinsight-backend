@@ -19,11 +19,12 @@ class CreateAssignmentUseCase:
         self.plot_repository = PlotRepository(db)
 
     def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> SuccessResponse:
-        # validar que se haya enviado al menos un usuario_id
-        if not assignment_data.usuario_ids:
+        
+        # Validar que la tarea existe
+        if not self.cultural_practice_repository.task_exists(assignment_data.tarea_labor_cultural_id):
             raise DomainException(
-                message="Debe enviar al menos un id de usuario.",
-                status_code=status.HTTP_400_BAD_REQUEST
+                message="La tarea especificada no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
             )
         
         # obtener el id del lote por medio del id de la tarea
@@ -47,13 +48,6 @@ class CreateAssignmentUseCase:
             raise DomainException(
                 message="No tienes permisos para asignar tareas en esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Validar que la tarea existe
-        if not self.cultural_practice_repository.task_exists(assignment_data.tarea_labor_cultural_id):
-            raise DomainException(
-                message="La tarea especificada no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
             )
         
         messages = []
