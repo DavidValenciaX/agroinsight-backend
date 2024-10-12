@@ -49,7 +49,7 @@ def create_task(
             detail=f"Error interno al crear la tarea: {str(e)}"
         )
 
-@router.post("/create-assignment", response_model=MultipleResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create-assignment", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
 def create_assignment(
     assignment: AssignmentCreate,
     db: Session = Depends(getDb),

@@ -15,7 +15,7 @@ class UserStateException(Exception):
         
 class UserNotRegisteredException(DomainException):
     def __init__(self):
-        super().__init__("La cuenta con este email no está registrada", status.HTTP_401_UNAUTHORIZED)
+        super().__init__("La cuenta no está registrada", status.HTTP_401_UNAUTHORIZED)
         
 class InsufficientPermissionsException(DomainException):
     def __init__(self):
