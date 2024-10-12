@@ -12,13 +12,10 @@ class CreatePlotUseCase:
         self.db = db
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
+        
     def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
-            
-        if not self.user_has_access_to_farm(current_user.id, plot_data.finca_id):
-            raise DomainException(
-                message="No tienes acceso a esta finca.",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+        if not current_user:
+            raise MissingTokenException()
             
         #Validar si el usuario tiene permiso para crear lotes en la finca
         if not self.farm_repository.user_is_farm_admin(current_user.id, plot_data.finca_id):
@@ -52,7 +49,3 @@ class CreatePlotUseCase:
                 message="El área del lote debe ser mayor que cero.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
-        # Agregar más validaciones según sea necesario
-        
-    def user_has_access_to_farm(self, user_id: int, finca_id: int) -> bool:
-        return self.plot_repository.check_user_farm_access(user_id, finca_id)
