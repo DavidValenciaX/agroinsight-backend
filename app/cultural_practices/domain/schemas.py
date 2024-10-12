@@ -1,4 +1,3 @@
-from decimal import Decimal
 from pydantic import BaseModel, Field
 from datetime import date
 from typing import List, Optional
@@ -6,12 +5,11 @@ from typing import List, Optional
 class CulturalTaskBase(BaseModel):
     tipo_labor_id: int
     lote_id: int
-    fecha_programada: date
+    fecha_inicio_estimada: date
     descripcion: Optional[str] = Field(None, max_length=500)
-    costo_mano_obra: Decimal = Field(..., ge=0, decimal_places=2)
     estado_id: int
-    observaciones: Optional[str] = None
-    fecha_completada: Optional[date] = None
+    fecha_finalizacion: Optional[date] = None
+    nombre: str = Field(..., max_length=255)
 
 class CulturalTaskCreate(CulturalTaskBase):
     pass

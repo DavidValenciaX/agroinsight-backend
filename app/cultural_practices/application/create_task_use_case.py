@@ -10,6 +10,7 @@ from app.infrastructure.common.common_exceptions import DomainException, Insuffi
 from fastapi import status
 
 class CreateTaskUseCase:
+    COMPLETED_STATE_NAME = "Completada"
     def __init__(self, db: Session):
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
@@ -56,14 +57,14 @@ class CreateTaskUseCase:
         
         # Obtener el nombre del estado de tarea
         estado_nombre = self.cultural_practice_repository.get_estado_tarea_nombre(tarea_data.estado_id)
-        if estado_nombre == "Completada":
+        if estado_nombre == self.COMPLETED_STATE_NAME:
             raise DomainException(
-                message="No se puede crear una tarea directamente en estado 'Completada'.",
+                message=f"No se puede crear una tarea directamente en estado '{self.COMPLETED_STATE_NAME}'.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
 
         # Crear la tarea
-        tarea = self.cultural_practice_repository.create_tarea(tarea_data)
+        tarea = self.cultural_practice_repository.create_task(tarea_data)
         if not tarea:
             raise DomainException(
                 message="No se pudo crear la tarea de labor cultural.",
@@ -77,14 +78,14 @@ class CreateTaskUseCase:
         current_date = get_current_date()
 
         # Validar que la fecha programada no esté en el pasado
-        if tarea_data.fecha_programada < current_date:
+        if tarea_data.fecha_inicio_estimada < current_date:
             raise DomainException(
                 message="La fecha programada no puede ser anterior a la fecha actual.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         
         # Validar que si hay fecha completada, no sea anterior a la fecha programada
-        if tarea_data.fecha_completada and tarea_data.fecha_completada < tarea_data.fecha_programada:
+        if tarea_data.fecha_finalizacion and tarea_data.fecha_finalizacion < tarea_data.fecha_inicio_estimada:
             raise DomainException(
                 message="La fecha de completado no puede ser anterior a la fecha programada.",
                 status_code=status.HTTP_400_BAD_REQUEST

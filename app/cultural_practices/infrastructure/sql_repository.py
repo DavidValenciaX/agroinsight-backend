@@ -19,33 +19,47 @@ class CulturalPracticesRepository:
         estado = self.db.query(CulturalTaskState).filter(CulturalTaskState.id == estado_id).first()
         return estado.nombre if estado else None
 
-    def create_tarea(self, tarea_data: CulturalTaskCreate) -> CulturalTask:
-        db_tarea = CulturalTask(**tarea_data.model_dump())
-        self.db.add(db_tarea)
-        self.db.commit()
-        self.db.refresh(db_tarea)
-        return db_tarea
+    def create_task(self, tarea_data: CulturalTaskCreate) -> CulturalTask:
+        try:
+            db_tarea = CulturalTask(**tarea_data.model_dump())
+            self.db.add(db_tarea)
+            self.db.commit()
+            self.db.refresh(db_tarea)
+            return db_tarea
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error creating task: {e}")
+            return None
 
     def create_assignment(self, assignment_data: AssignmentCreate) -> Assignment:
-        new_assignment = Assignment(**assignment_data.model_dump())
-        self.db.add(new_assignment)
-        self.db.commit()
-        self.db.refresh(new_assignment)
-        return new_assignment
+        try:
+            new_assignment = Assignment(**assignment_data.model_dump())
+            self.db.add(new_assignment)
+            self.db.commit()
+            self.db.refresh(new_assignment)
+            return new_assignment
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error creating assignment: {e}")
+            return None
 
     def task_exists(self, task_id: int) -> bool:
         return self.db.query(CulturalTask).filter(CulturalTask.id == task_id).first() is not None
     
     def list_assignments_by_user_paginated(self, user_id: int, page: int, per_page: int, admin_farm_ids: List[int]) -> tuple[int, List[Assignment]]:
-        query = self.db.query(Assignment).join(CulturalTask).filter(
-            Assignment.usuario_id == user_id,
-            CulturalTask.lote_id.in_(
-                self.db.query(Plot.id).filter(Plot.finca_id.in_(admin_farm_ids))
+        try:
+            query = self.db.query(Assignment).join(CulturalTask).filter(
+                Assignment.usuario_id == user_id,
+                CulturalTask.lote_id.in_(
+                    self.db.query(Plot.id).filter(Plot.finca_id.in_(admin_farm_ids))
+                )
             )
-        )
-        total_assignments = query.count()
-        assignments = query.offset((page - 1) * per_page).limit(per_page).all()
-        return total_assignments, assignments
+            total_assignments = query.count()
+            assignments = query.offset((page - 1) * per_page).limit(per_page).all()
+            return total_assignments, assignments
+        except Exception as e:
+            print(f"Error listing assignments: {e}")
+            return 0, []
     
     def get_lote_id_by_tarea_id(self, tarea_id: int) -> int:
         result = self.db.query(CulturalTask.lote_id).filter(CulturalTask.id == tarea_id).first()

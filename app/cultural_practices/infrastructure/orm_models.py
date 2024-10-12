@@ -16,20 +16,20 @@ class CulturalTask(Base):
     __tablename__ = "tarea_labor_cultural"
 
     id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(255), nullable=False)
     tipo_labor_id = Column(Integer, ForeignKey("tipo_labor_cultural.id"), nullable=False)
-    fecha_programada = Column(Date, nullable=False)
+    fecha_inicio_estimada = Column(Date, nullable=False)
+    fecha_finalizacion = Column(Date)
     descripcion = Column(Text)
-    costo_mano_obra = Column(DECIMAL(10, 2), nullable=False, default=0)
     estado_id = Column(Integer, ForeignKey("estado_tarea_labor_cultural.id"), nullable=False)
     lote_id = Column(Integer, ForeignKey('lote.id'), nullable=False)
-    observaciones = Column(Text)
-    fecha_completada = Column(Date)
 
     # Relaciones
     tipo_labor = relationship("CulturalTaskType", back_populates="tareas")
     estado = relationship("CulturalTaskState", back_populates="tareas")
     asignaciones = relationship("Assignment", back_populates="tarea")    
     lote = relationship("Plot", back_populates="tareas")
+
 
 class CulturalTaskState(Base):
     __tablename__ = "estado_tarea_labor_cultural"

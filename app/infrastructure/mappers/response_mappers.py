@@ -31,8 +31,6 @@ def map_farm_to_response(farm) -> FarmResponse:
         ubicacion=farm.ubicacion,
         area_total=farm.area_total,
         unidad_area=farm.unidad_area.abreviatura if farm.unidad_area else "Desconocida",
-        latitud=farm.latitud,
-        longitud=farm.longitud,
         usuarios=[
             map_user_to_response(ufr.usuario)  # Usar map_user_to_response para cada usuario
             for ufr in farm.usuario_roles
