@@ -161,12 +161,18 @@ def list_farm_users(
             detail=f"Error al listar los usuarios de una finca: {str(e)}"
         )
         
-@router.get("/user/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
-def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depends(get_current_user)):
+@router.get("/{farm_id}/user/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+def get_user_by_id(
+    farm_id: int,
+    user_id: int,
+    db: Session = Depends(getDb),
+    current_user=Depends(get_current_user)
+):
     """
-    Obtiene la información de un usuario por su ID.
+    Obtiene la información de un usuario por su ID y verifica roles en una finca específica.
 
     Parameters:
+        farm_id (int): ID de la finca para verificar roles.
         user_id (int): ID del usuario a obtener.
         db (Session): Sesión de base de datos.
         current_user (UserInDB): Usuario actual autenticado.
@@ -179,7 +185,7 @@ def get_user_by_id(user_id: int, db: Session = Depends(getDb), current_user=Depe
     """
     get_user_by_id_use_case = AdminGetUserByIdUseCase(db)
     try:
-        return get_user_by_id_use_case.admin_get_user_by_id(user_id, current_user)
+        return get_user_by_id_use_case.admin_get_user_by_id(user_id, farm_id, current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:

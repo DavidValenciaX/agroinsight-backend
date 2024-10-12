@@ -1,4 +1,4 @@
-from app.cultural_practices.domain.schemas import AssignmentResponse
+from app.cultural_practices.domain.schemas import AssignmentResponse, TaskResponse
 from app.user.domain.schemas import UserResponse
 from app.farm.domain.schemas import FarmResponse
 from app.plot.domain.schemas import PlotResponse
@@ -52,4 +52,16 @@ def map_assignment_to_response(assignment) -> AssignmentResponse:
     return AssignmentResponse(
         usuario_id=assignment.usuario_id,
         tarea_labor_cultural_id=assignment.tarea_labor_cultural_id
+    )
+    
+def map_task_to_response(task) -> TaskResponse:
+    return TaskResponse(
+        id=task.id,
+        nombre=task.nombre,
+        tipo_labor_id=task.tipo_labor_id,
+        fecha_inicio_estimada=task.fecha_inicio_estimada,
+        fecha_finalizacion=task.fecha_finalizacion,
+        descripcion=task.descripcion,
+        estado_id=task.estado_id,
+        lote_id=task.lote_id
     )

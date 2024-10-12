@@ -5,8 +5,7 @@ Incluye endpoints para la creación de tareas y asignaciones, así como para lis
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from app.cultural_practices.application.list_assignments_use_case import ListAssignmentsUseCase
-from app.cultural_practices.domain.schemas import AssignmentCreate, CulturalTaskCreate
+from app.cultural_practices.domain.schemas import AssignmentCreate, CulturalTaskCreate, PaginatedTaskListResponse
 from app.cultural_practices.application.create_assignment_use_case import CreateAssignmentUseCase
 from app.cultural_practices.domain.schemas import PaginatedAssignmentListResponse
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
@@ -15,6 +14,7 @@ from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.infrastructure.common.response_models import SuccessResponse, MultipleResponse
 from app.user.domain.schemas import UserInDB
+from app.cultural_practices.application.list_tasks_by_user_use_case import ListTasksByUserUseCase
 
 router = APIRouter(prefix="/cultural_practices", tags=["cultural practices"])
 
@@ -79,9 +79,9 @@ def create_assignment(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al asignar la tarea: {str(e)}"
         )
-        
-@router.get("/list-assignments/{user_id}", response_model=PaginatedAssignmentListResponse, status_code=status.HTTP_200_OK)
-def list_assignments(
+
+@router.get("/list-tasks/{user_id}", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
+def list_tasks_by_user(
     user_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -89,7 +89,7 @@ def list_assignments(
     current_user: UserInDB = Depends(get_current_user)
 ):
     """
-    Lista todas las asignaciones de prácticas culturales para un usuario específico.
+    Lista todas las tareas asignadas a un usuario específico.
 
     Parameters:
         user_id (int): ID del usuario.
@@ -99,18 +99,18 @@ def list_assignments(
         current_user (UserInDB): Usuario actual autenticado.
 
     Returns:
-        PaginatedAssignmentListResponse: Una lista paginada de asignaciones.
+        PaginatedTaskListResponse: Una lista paginada de tareas.
 
     Raises:
-        HTTPException: Si ocurre un error durante la obtención de la lista de asignaciones.
+        HTTPException: Si ocurre un error durante la obtención de la lista de tareas.
     """
-    list_assignments_use_case = ListAssignmentsUseCase(db)
+    list_tasks_by_user_use_case = ListTasksByUserUseCase(db)
     try:
-        return list_assignments_use_case.list_assignments(user_id, page, per_page, current_user)
+        return list_tasks_by_user_use_case.list_tasks_by_user(user_id, page, per_page, current_user)
     except DomainException as e:
         raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno al listar las asignaciones: {str(e)}"
+            detail=f"Error interno al listar las tareas: {str(e)}"
         )

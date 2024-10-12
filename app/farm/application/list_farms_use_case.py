@@ -14,6 +14,8 @@ class ListFarmsUseCase:
         self.user_repository = UserRepository(db)
         
     def list_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
+        if not current_user:
+            raise MissingTokenException()
         
         # Obtener id del rol de administrador de finca
         rol_administrador_finca = self.user_repository.get_admin_role()

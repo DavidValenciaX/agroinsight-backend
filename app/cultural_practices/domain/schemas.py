@@ -35,3 +35,23 @@ class PaginatedAssignmentListResponse(BaseModel):
     page: int
     per_page: int
     total_pages: int
+
+class TaskResponse(BaseModel):
+    id: int
+    nombre: str
+    tipo_labor_id: int
+    fecha_inicio_estimada: date
+    fecha_finalizacion: Optional[date]
+    descripcion: Optional[str]
+    estado_id: int
+    lote_id: int
+
+    class Config:
+        orm_mode = True
+
+class PaginatedTaskListResponse(BaseModel):
+    tasks: List[TaskResponse]
+    total_tasks: int
+    page: int
+    per_page: int
+    total_pages: int

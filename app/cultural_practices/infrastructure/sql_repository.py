@@ -28,7 +28,7 @@ class CulturalPracticesRepository:
             return db_tarea
         except Exception as e:
             self.db.rollback()
-            print(f"Error creating task: {e}")
+            print(f"Error al crear la tarea: {e}")
             return None
 
     def create_assignment(self, assignment_data: AssignmentCreate) -> Assignment:
@@ -40,7 +40,7 @@ class CulturalPracticesRepository:
             return new_assignment
         except Exception as e:
             self.db.rollback()
-            print(f"Error creating assignment: {e}")
+            print(f"Error al crear la asignación: {e}")
             return None
 
     def task_exists(self, task_id: int) -> bool:
@@ -58,7 +58,7 @@ class CulturalPracticesRepository:
             assignments = query.offset((page - 1) * per_page).limit(per_page).all()
             return total_assignments, assignments
         except Exception as e:
-            print(f"Error listing assignments: {e}")
+            print(f"Error al listar las asignaciones: {e}")
             return 0, []
     
     def get_lote_id_by_tarea_id(self, tarea_id: int) -> int:
@@ -70,3 +70,15 @@ class CulturalPracticesRepository:
             Assignment.usuario_id == user_id, 
             Assignment.tarea_labor_cultural_id == tarea_id
         ).first() is not None
+
+    def list_tasks_by_user_paginated(self, user_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
+        try:
+            query = self.db.query(CulturalTask).join(Assignment).filter(
+                Assignment.usuario_id == user_id
+            )
+            total_tasks = query.count()
+            tasks = query.offset((page - 1) * per_page).limit(per_page).all()
+            return total_tasks, tasks
+        except Exception as e:
+            print(f"Error al listar las tareas: {e}")
+            return 0, []

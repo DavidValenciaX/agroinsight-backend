@@ -17,19 +17,24 @@ class ListFarmUsersUseCase:
 
     def list_farm_users(self, farm_id: int, role_id: int, current_user: UserInDB, page: Optional[int], per_page: Optional[int]) -> PaginatedFarmUserListResponse:
         self.validate_params(page, per_page)
-            
-        # Verificar si es administrador de la finca
-        if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
-            raise InsufficientPermissionsException()
-
+        
         farm = self.farm_repository.get_farm_by_id(farm_id)
         if not farm:
             raise DomainException(
                 message="La finca especificada no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+            
+        # Verificar si current_user es administrador de la finca
+        if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
+            raise InsufficientPermissionsException()
 
-        role = self.get_role(role_id)
+        role = self.user_repository.get_role_by_id(role_id)
+        if not role:
+            raise DomainException(
+                message=f"El rol con ID '{role_id}' no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
 
         total_users, users = self.farm_repository.list_farm_users_by_role_paginated(farm_id, role.id, page, per_page)
 
@@ -44,17 +49,6 @@ class ListFarmUsersUseCase:
             per_page=per_page,
             total_pages=total_pages
         )
-
-    def get_role(self, role_id: Optional[int]):
-
-        role = self.user_repository.get_role_by_id(role_id)
-        if not role:
-            raise DomainException(
-                message=f"El rol con ID '{role_id}' no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-            
-        return role
 
     def validate_params(self, page: int, per_page: int):
         if page < 1:

@@ -12,7 +12,7 @@ class AdminGetUserByIdUseCase:
         self.user_repository = UserRepository(db)
         self.farm_repository = FarmRepository(db)
         
-    def admin_get_user_by_id(self, user_id: int, current_user) -> UserResponse:
+    def admin_get_user_by_id(self, user_id: int, farm_id: int, current_user) -> UserResponse:
         if not current_user:
             raise MissingTokenException()
         
@@ -22,17 +22,15 @@ class AdminGetUserByIdUseCase:
         
         worker_role = self.user_repository.get_worker_role()
         
-        #obtener las fincas donde el usuario es trabajador 
-        user_farms = self.farm_repository.get_farms_by_user_role(user_id, worker_role.id)
-        if not user_farms:
+        # Verificar si el user_id es trabajador en la finca especificada
+        if not self.farm_repository.user_is_farm_worker(user_id, farm_id):
             raise DomainException(
-                message="El usuario no está asignado a ninguna finca",
+                message="El usuario no es trabajador en la finca especificada",
                 status_code=status.HTTP_400_BAD_REQUEST
-                )
+            )
         
-        # Verificar si el current_user es administrador en las fincas donde el user es trabajador
-        for farm in user_farms:
-            if self.farm_repository.user_is_farm_admin(current_user.id, farm):
-                return map_user_to_response(user)
-            
-        raise InsufficientPermissionsException()
+        # Verificar si el current_user es administrador en la finca especificada
+        if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
+            raise InsufficientPermissionsException()
+        
+        return map_user_to_response(user)

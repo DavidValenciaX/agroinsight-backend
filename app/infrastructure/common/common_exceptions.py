@@ -31,4 +31,4 @@ class UserHasBeenBlockedException(DomainException):
         
 class MissingTokenException(DomainException):
     def __init__(self):
-        super().__init__("Se requiere autenticación", status.HTTP_401_UNAUTHORIZED)
+        super().__init__("Se requiere un token deautenticación", status.HTTP_401_UNAUTHORIZED)
