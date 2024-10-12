@@ -16,7 +16,7 @@ class ListFarmsUseCase:
     def list_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
         
         # Obtener id del rol de administrador de finca
-        rol_administrador_finca = self.farm_repository.get_admin_role()
+        rol_administrador_finca = self.user_repository.get_admin_role()
 
         # Filtrar las fincas donde el usuario es administrador
         total_farms, farms = self.farm_repository.list_farms_by_role_paginated(current_user.id, rol_administrador_finca.id, page, per_page)

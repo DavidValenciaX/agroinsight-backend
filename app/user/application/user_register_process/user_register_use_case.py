@@ -36,7 +36,7 @@ class UserRegisterUseCase:
         """
         self.db = db
         self.user_repository = UserRepository(db)
-        self.state_validator = UserStateValidator(self.user_repository)
+        self.state_validator = UserStateValidator(db)
 
     def register_user(self, user_data: UserCreate) -> SuccessResponse:
         """

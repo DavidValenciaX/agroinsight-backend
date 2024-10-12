@@ -2,6 +2,10 @@ from datetime import datetime, timezone
 from fastapi import status
 from app.infrastructure.common.common_exceptions import UserStateException
 from enum import Enum, auto
+from sqlalchemy.orm import Session
+from app.infrastructure.common.datetime_utils import ensure_utc
+
+from app.user.infrastructure.sql_repository import UserRepository
 
 class UserState(Enum):
     ACTIVE = auto()
@@ -10,8 +14,8 @@ class UserState(Enum):
     PENDING = auto()
 
 class UserStateValidator:
-    def __init__(self, user_repository):
-        self.user_repository = user_repository
+    def __init__(self, db: Session):
+        self.user_repository = UserRepository(db)
 
     def validate_user_state(self, user, allowed_states=None, disallowed_states=None):
         self.allowed_states = allowed_states
@@ -88,10 +92,7 @@ class UserStateValidator:
     def _try_unlock_user(self, user):
         current_time = datetime.now(timezone.utc)
         
-        if user.locked_until:
-            user.locked_until = user.locked_until.replace(tzinfo=timezone.utc)
-        
-        if user.locked_until and current_time > user.locked_until:
+        if ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until):
             user.failed_attempts = 0
             user.locked_until = None
             user.state_id = self.user_repository.get_active_user_state_id()

@@ -25,7 +25,7 @@ class ListAssignmentsUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
-        worker_role = self.farm_repository.get_worker_role()
+        worker_role = self.user_repository.get_worker_role()
 
         # Obtener las fincas donde el usuario es trabajador
         worker_farm_ids = self.farm_repository.get_farms_by_user_role(user_id, worker_role.id)

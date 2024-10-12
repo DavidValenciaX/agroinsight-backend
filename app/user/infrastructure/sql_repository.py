@@ -1,11 +1,25 @@
 from sqlalchemy.orm import Session, joinedload
 from app.farm.infrastructure.orm_models import Farm
+from app.infrastructure.common.common_exceptions import DomainException
 from app.user.infrastructure.orm_models import (
     User, UserState, Role, UserFarmRole, PasswordRecovery,
     TwoStepVerification, UserConfirmation, BlacklistedToken
 )
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List
+from fastapi import status
+
+# Constantes para roles
+ADMIN_ROLE_NAME = "Administrador de Finca"
+WORKER_ROLE_NAME = "Trabajador agrícola"
+UNCONFIRMED_ROLE_NAME = "Rol no confirmado"
+UNASSIGNED_ROLE_NAME = "Rol no asignado"
+
+# Constantes para estados
+ACTIVE_STATE_NAME = "active"
+LOCKED_STATE_NAME = "locked"
+PENDING_STATE_NAME = "pending"
+INACTIVE_STATE_NAME = "inactive"
 
 class UserRepository:
     def __init__(self, db: Session):
@@ -354,24 +368,20 @@ class UserRepository:
         return self.db.query(Role).filter(Role.id == role_id).first()
 
     def get_active_user_state_id(self) -> Optional[int]:
-        active_state = self.db.query(UserState).filter(UserState.nombre == "active").first()
+        active_state = self.db.query(UserState).filter(UserState.nombre == ACTIVE_STATE_NAME).first()
         return active_state.id if active_state else None
 
     def get_locked_user_state_id(self) -> Optional[int]:
-        locked_state = self.db.query(UserState).filter(UserState.nombre == "locked").first()
+        locked_state = self.db.query(UserState).filter(UserState.nombre == LOCKED_STATE_NAME).first()
         return locked_state.id if locked_state else None
 
     def get_pending_user_state_id(self) -> Optional[int]:
-        pending_state = self.db.query(UserState).filter(UserState.nombre == "pending").first()
+        pending_state = self.db.query(UserState).filter(UserState.nombre == PENDING_STATE_NAME).first()
         return pending_state.id if pending_state else None
 
     def get_inactive_user_state_id(self) -> Optional[int]:
-        inactive_state = self.db.query(UserState).filter(UserState.nombre == "inactive").first()
+        inactive_state = self.db.query(UserState).filter(UserState.nombre == INACTIVE_STATE_NAME).first()
         return inactive_state.id if inactive_state else None
-
-    def get_admin_roles(self) -> List[Role]:
-        admin_roles = self.db.query(Role).filter(Role.nombre.in_(["Administrador de Finca"])).all()
-        return admin_roles
 
     def deactivate_user(self, user_id: int) -> bool:
         user = self.get_user_by_id(user_id)
@@ -393,10 +403,10 @@ class UserRepository:
         return False
 
     def get_unconfirmed_user_role(self) -> Optional[Role]:
-        return self.db.query(Role).filter(Role.nombre == "Rol no confirmado").first()
+        return self.db.query(Role).filter(Role.nombre == UNCONFIRMED_ROLE_NAME).first()
     
     def get_registered_user_role(self) -> Optional[Role]:
-        return self.db.query(Role).filter(Role.nombre == "Rol no asignado").first()
+        return self.db.query(Role).filter(Role.nombre == UNASSIGNED_ROLE_NAME).first()
 
     def assign_role_to_user(self, user_id: int, role_id: int, farm_id: int = None) -> bool:
         try:
@@ -430,8 +440,21 @@ class UserRepository:
         return False
 
     # Métodos auxiliares
+    
     def get_role_by_name(self, role_name: str) -> Optional[Role]:
         return self.db.query(Role).filter(Role.nombre == role_name).first()
+    
+    def get_admin_role(self):
+        try:
+            return self.get_role_by_name(ADMIN_ROLE_NAME)
+        except Exception as e:
+            raise DomainException(message = f"Error al obtener el rol de administrador: {str(e)}", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get_worker_role(self):
+        try:
+            return self.get_role_by_name(WORKER_ROLE_NAME)
+        except Exception as e:
+            raise DomainException(message = f"Error al obtener el rol de trabajador: {str(e)}", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def get_user_roles_fincas(self, user_id: int, finca_id: int) -> List[Role]:
         return self.db.query(Role).join(UserFarmRole).filter(

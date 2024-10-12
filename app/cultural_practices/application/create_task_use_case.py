@@ -8,7 +8,6 @@ from app.plot.infrastructure.sql_repository import PlotRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
 from fastapi import status
-from app.infrastructure.common.role_utils import get_admin_role  # Nueva importación
 
 class CreateTaskUseCase:
     def __init__(self, db: Session):

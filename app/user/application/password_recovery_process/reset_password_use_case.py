@@ -10,7 +10,7 @@ class ResetPasswordUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
-        self.state_validator = UserStateValidator(self.user_repository)
+        self.state_validator = UserStateValidator(db)
 
     def reset_password(self, email: str, new_password: str) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)

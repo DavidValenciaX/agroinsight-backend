@@ -27,7 +27,7 @@ class AssignUsersToFarmUseCase:
         if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id):
             raise InsufficientPermissionsException()
         
-        rol_trabajador_agricola = self.farm_repository.get_worker_role()
+        rol_trabajador_agricola = self.user_repository.get_worker_role()
             
         messages = []
         

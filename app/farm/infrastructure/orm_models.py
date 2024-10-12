@@ -11,8 +11,6 @@ class Farm(Base):
     ubicacion = Column(String(255))
     area_total = Column(DECIMAL(10, 2), nullable=False)
     unidad_area_id = Column(Integer, ForeignKey('unidad_medida.id'), nullable=False)
-    latitud = Column(DECIMAL(10, 8), nullable=False)
-    longitud = Column(DECIMAL(11, 8), nullable=False)
 
     unidad_area = relationship("UnitOfMeasure")
     lotes = relationship("Plot", back_populates="finca")

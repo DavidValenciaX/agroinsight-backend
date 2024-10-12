@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from decimal import Decimal
-from typing import Optional, List
+from typing import List
 
 from app.user.domain.schemas import UserResponse
 
@@ -9,8 +9,6 @@ class FarmCreate(BaseModel):
     ubicacion: str = Field(..., min_length=1, max_length=255)
     area_total: Decimal = Field(..., gt=0)
     unidad_area_id: int
-    latitud: Decimal = Field(..., ge=-90, le=90)
-    longitud: Decimal = Field(..., ge=-180, le=180)
 
 
 class FarmResponse(BaseModel):
@@ -19,8 +17,6 @@ class FarmResponse(BaseModel):
     ubicacion: str
     area_total: float
     unidad_area: str
-    latitud: float
-    longitud: float
     usuarios: List[UserResponse]
 
     class Config:

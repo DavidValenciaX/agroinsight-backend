@@ -20,7 +20,7 @@ class AdminGetUserByIdUseCase:
         if not user:
             raise UserNotRegisteredException()
         
-        worker_role = self.farm_repository.get_worker_role()
+        worker_role = self.user_repository.get_worker_role()
         
         #obtener las fincas donde el usuario es trabajador 
         user_farms = self.farm_repository.get_farms_by_user_role(user_id, worker_role.id)

@@ -5,7 +5,6 @@ from typing import Optional, List, Tuple
 from typing import List
 from fastapi import status
 from app.infrastructure.common.common_exceptions import DomainException
-from app.infrastructure.common.role_utils import ADMIN_ROLE_NAME, WORKER_ROLE_NAME
 from app.user.infrastructure.orm_models import User, UserFarmRole
 from app.user.infrastructure.sql_repository import UserRepository
 
@@ -22,17 +21,14 @@ class FarmRepository:
                 ubicacion=farm_data.ubicacion,
                 area_total=farm_data.area_total,
                 unidad_area_id=farm_data.unidad_area_id,
-                latitud=farm_data.latitud,
-                longitud=farm_data.longitud
             )
             self.db.add(new_farm)
             self.db.flush()  # Para obtener el ID de la finca recién creada
             
-            admin_role = self.get_admin_role()
+            admin_role = self.user_repository.get_admin_role()
             
             # Crear la relación usuario-finca
-            user_farm = UserFarmRole(usuario_id=user_id, finca_id=new_farm.id, rol_id=admin_role.id)
-            self.db.add(user_farm)
+            self.create_user_farm_role(user_id, new_farm.id, admin_role.id)
 
             self.db.commit()
             self.db.refresh(new_farm)
@@ -41,27 +37,6 @@ class FarmRepository:
             self.db.rollback()
             print(f"Error al crear la finca: {e}")
             return None
-        
-    # Obtener el rol de administrador de finca
-    def get_admin_role(self):
-        admin_role = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
-        if not admin_role:
-            raise DomainException(
-                message="No se pudo encontrar el rol de 'Administrador de Finca'.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
-        return admin_role
-            
-    def get_worker_role(self):
-        worker_role = self.user_repository.get_role_by_name(WORKER_ROLE_NAME)
-        if not worker_role:
-            raise DomainException(
-                message="No se pudo encontrar el rol de 'Trabajador agrícola'.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
-        return worker_role
     
     def list_farms(self, user_id: int) -> List[Farm]:
             return self.db.query(Farm).join(UserFarmRole).filter(UserFarmRole.usuario_id == user_id).all()
@@ -130,14 +105,14 @@ class FarmRepository:
         return self.db.query(UserFarmRole).filter(
             UserFarmRole.usuario_id == user_id,
             UserFarmRole.finca_id == farm_id,
-            UserFarmRole.rol_id == self.get_admin_role().id
+            UserFarmRole.rol_id == self.user_repository.get_admin_role().id
         ).first() is not None
     
     def user_is_farm_worker(self, user_id: int, farm_id: int) -> bool:
         return self.db.query(UserFarmRole).filter(
             UserFarmRole.usuario_id == user_id,
             UserFarmRole.finca_id == farm_id,
-            UserFarmRole.rol_id == self.get_worker_role().id
+            UserFarmRole.rol_id == self.user_repository.get_worker_role().id
         ).first() is not None
         
     def get_farms_by_user_role(self, user_id: int, role_id: int) -> List[int]:
@@ -145,3 +120,16 @@ class FarmRepository:
             UserFarmRole.usuario_id == user_id,
             UserFarmRole.rol_id == role_id
         ).all()]
+
+    def create_user_farm_role(self, user_id: int, farm_id: int, role_id: int):
+        try:
+            user_farm = UserFarmRole(usuario_id=user_id, finca_id=farm_id, rol_id=role_id)
+            self.db.add(user_farm)
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al crear al asignar rol a usuario en finca: {e}")
+            raise DomainException(
+                message="No se pudo asignar el rol al usuario en la finca.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
