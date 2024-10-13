@@ -464,3 +464,34 @@ class UserRepository:
         
     def user_exists(self, user_id: int) -> bool:
         return self.db.query(User).filter(User.id == user_id).first() is not None
+
+    def delete_expired_confirmations_and_users(self) -> int:
+        """
+        Elimina las confirmaciones de usuario expiradas y los usuarios asociados.
+
+        Returns:
+            int: El número de confirmaciones eliminadas.
+        """
+        try:
+            # Obtener las confirmaciones expiradas
+            expired_confirmations = self.db.query(UserConfirmation).filter(
+                UserConfirmation.expiracion < datetime.now(timezone.utc)
+            ).all()
+
+            # Eliminar usuarios asociados a las confirmaciones expiradas
+            for confirmation in expired_confirmations:
+                user = self.get_user_by_id(confirmation.usuario_id)
+                if user:
+                    self.db.delete(user)
+
+            # Eliminar confirmaciones expiradas
+            deleted_count = self.db.query(UserConfirmation).filter(
+                UserConfirmation.expiracion < datetime.now(timezone.utc)
+            ).delete(synchronize_session=False)
+
+            self.db.commit()
+            return deleted_count
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al eliminar confirmaciones expiradas y usuarios: {e}")
+            return 0

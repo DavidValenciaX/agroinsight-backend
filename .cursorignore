@@ -7,3 +7,5 @@ README.md
 poetry.lock
 pyproject.toml
 __pycache__/
+docs/
+mkdocs.yml

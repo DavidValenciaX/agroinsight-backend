@@ -60,6 +60,9 @@ class UserRegisterUseCase:
             DomainException: Si ocurre un error durante el proceso de creación.
             UserStateException: Si el estado del usuario no es válido.
         """
+        # Eliminar confirmaciones expiradas
+        self.user_repository.delete_expired_confirmations_and_users()
+
         user = self.user_repository.get_user_by_email(user_data.email)
         
         if user:
