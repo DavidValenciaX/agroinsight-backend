@@ -11,7 +11,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserSta
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc
+from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc, get_db_utc_time
 
 class UserRegisterUseCase:
     """
@@ -71,7 +71,6 @@ class UserRegisterUseCase:
             if expired_confirmation:
                 # Eliminar el usuario y la confirmación expirada
                 self.user_repository.delete_user(user)
-                # self.user_repository.delete_user_confirmations(user.id)
             else:
                 # Validar el estado del usuario si no tiene confirmación expirada
                 state_validation_result = self.state_validator.validate_user_state(
@@ -111,19 +110,18 @@ class UserRegisterUseCase:
         )
         created_user = self.user_repository.create_user(new_user)
         
-        
-        
         # Generar PIN y su hash
         pin, pin_hash = generate_pin()
         
         expiration_time = 10  # minutos
-        expiration_datetime = datetime_timezone_utc_now() + timedelta(minutes=expiration_time)
+        expiration_datetime = get_db_utc_time() + timedelta(minutes=expiration_time)
 
         confirmation = UserConfirmation(
             usuario_id=created_user.id,
             pin=pin_hash,
             expiracion=expiration_datetime,
-            resends=0
+            resends=0,
+            created_at=get_db_utc_time()
         )
         
         if not self.user_repository.add_user_confirmation(confirmation):

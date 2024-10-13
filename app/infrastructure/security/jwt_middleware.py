@@ -29,16 +29,27 @@ def get_current_user(
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        
+        # Obtener el email del payload
         email: str = payload.get("sub")
         if email is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No se pudieron validar las credenciales.")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No se pudo validar el email")
+        
+        # Obtener el tiempo de expiración del payload
         exp = payload.get("exp")
         if exp is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="El token no tiene expiración.")
-        if datetime.fromtimestamp(exp, tz=timezone.utc) < datetime_timezone_utc_now():
+        
+        # Convertir el tiempo de expiración a un objeto datetime
+        expiration_time = datetime.fromtimestamp(exp, tz=timezone.utc)
+        
+        # Comparar el tiempo de expiración con el tiempo actual
+        current_time = datetime_timezone_utc_now()
+        
+        if expiration_time < current_time:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="El token ha expirado.")
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No se pudieron validar las credenciales.")
+    except JWTError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"No se pudieron validar las credenciales. {e}")
     
     user = user_repository.get_user_by_email(email)
     if user is None:

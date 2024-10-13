@@ -16,11 +16,13 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     access_token_expire_minutes = 120
     to_encode = data.copy()
     
+    current_time = datetime_timezone_utc_now()
+    
     if expires_delta:
-        expire = datetime_timezone_utc_now() + expires_delta
+        expire = current_time + expires_delta
     else:
-        expire = datetime_timezone_utc_now() + timedelta(minutes=access_token_expire_minutes)
+        expire = current_time + timedelta(minutes=access_token_expire_minutes)
+    
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
