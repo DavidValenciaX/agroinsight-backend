@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, func
+from sqlalchemy import TIMESTAMP, Column, Integer, String, DateTime, ForeignKey, Text, Boolean, func
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
-from datetime import datetime, timezone
 
 # Definir constantes para evitar la duplicación de literales
 USUARIO_ID = 'usuario.id'
@@ -32,12 +31,12 @@ class User(Base):
     __tablename__ = "usuario"
     
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(50), index=True)
-    apellido = Column(String(50), index=True)
-    email = Column(String(100), unique=True, index=True)
-    password = Column(String(255))
-    failed_attempts = Column(Integer, default=0)
-    locked_until = Column(DateTime, nullable=True)
+    nombre = Column(String(50), nullable=False, index=True)
+    apellido = Column(String(50), nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False, index=True)
+    password = Column(String(255), nullable=False)
+    failed_attempts = Column(Integer, default=0, nullable=False)
+    locked_until = Column(TIMESTAMP(timezone=True), nullable=True)  # Actualizado a TIMESTAMP
     state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
 
     estado = relationship("UserState")
@@ -74,7 +73,7 @@ class Role(Base):
     __tablename__ = "rol"
     
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(50), unique=True, index=True)
+    nombre = Column(String(50), unique=True, nullable=False, index=True)
     descripcion = Column(Text)
 
     usuario_fincas = relationship("UserFarmRole", back_populates="rol")
@@ -92,8 +91,8 @@ class UserState(Base):
     __tablename__ = "estado_usuario"
     
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(50), unique=True, index=True)
-    descripcion = Column(String(255))
+    nombre = Column(String(50), unique=True, nullable=False, index=True)
+    descripcion = Column(Text)
     
 class UserConfirmation(Base):
     """
@@ -113,9 +112,9 @@ class UserConfirmation(Base):
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID, ondelete="CASCADE"), nullable=False)
     pin = Column(String(64), nullable=False, unique=True, index=True)
-    expiracion = Column(DateTime, nullable=False)
+    expiracion = Column(TIMESTAMP(timezone=True), nullable=False)
     intentos = Column(Integer, default=0)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=func.utc_timestamp())
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="confirmacion")
@@ -138,9 +137,9 @@ class TwoStepVerification(Base):
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID, ondelete="CASCADE"), nullable=False)
     pin = Column(String(64), nullable=False, unique=True, index=True)
-    expiracion = Column(DateTime, nullable=False)
+    expiracion = Column(TIMESTAMP(timezone=True), nullable=False)
     intentos = Column(Integer, default=0)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=func.utc_timestamp())
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="verificacion_dos_pasos")
@@ -164,10 +163,10 @@ class PasswordRecovery(Base):
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID, ondelete="CASCADE"), nullable=False)
     pin = Column(String(64), nullable=False, unique=True, index=True)
-    expiracion = Column(DateTime, nullable=False)
+    expiracion = Column(TIMESTAMP(timezone=True), nullable=False)
     intentos = Column(Integer, default=0)
     pin_confirmado = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=func.utc_timestamp())
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="recuperacion_contrasena")
@@ -188,7 +187,7 @@ class BlacklistedToken(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     token = Column(String(500), unique=True, nullable=False, index=True)
-    blacklisted_at = Column(DateTime, default=datetime.now(timezone.utc))
-    
+    blacklisted_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID), nullable=False)
+    
     usuario = relationship("User", back_populates="blacklisted_tokens")
