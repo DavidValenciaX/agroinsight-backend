@@ -14,7 +14,7 @@ class Assignment(Base):
 class CulturalTask(Base):
     __tablename__ = "tarea_labor_cultural"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nombre = Column(String(255), nullable=False)
     tipo_labor_id = Column(Integer, ForeignKey("tipo_labor_cultural.id"), nullable=False)
     fecha_inicio_estimada = Column(Date, nullable=False)
@@ -33,7 +33,7 @@ class CulturalTask(Base):
 class CulturalTaskState(Base):
     __tablename__ = "estado_tarea_labor_cultural"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nombre = Column(String(50), unique=True, nullable=False)
     descripcion = Column(Text)
 
@@ -43,7 +43,7 @@ class CulturalTaskState(Base):
 class CulturalTaskType(Base):
     __tablename__ = "tipo_labor_cultural"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nombre = Column(String(100), unique=True, nullable=False)
     descripcion = Column(Text)
 

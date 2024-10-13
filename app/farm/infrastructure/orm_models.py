@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
-from sqlalchemy.orm import relationship
 
 class Farm(Base):
     __tablename__ = "finca"
