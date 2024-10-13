@@ -4,7 +4,7 @@ from jose import jwt, JWTError
 from fastapi import status
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now
+from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, get_db_utc_time
 from app.infrastructure.config.settings import SECRET_KEY, ALGORITHM
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
@@ -44,7 +44,7 @@ def get_current_user(
         expiration_time = datetime.fromtimestamp(exp, tz=timezone.utc)
         
         # Comparar el tiempo de expiración con el tiempo actual
-        current_time = datetime_timezone_utc_now()
+        current_time = get_db_utc_time()
         
         if expiration_time < current_time:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="El token ha expirado.")

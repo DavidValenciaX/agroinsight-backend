@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from app.farm.infrastructure.orm_models import Farm
 from app.infrastructure.common.common_exceptions import DomainException
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now
+from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, get_db_utc_time
 from app.user.infrastructure.orm_models import (
     User, UserState, Role, UserFarmRole, PasswordRecovery,
     TwoStepVerification, UserConfirmation, BlacklistedToken
@@ -157,7 +157,7 @@ class UserRepository:
     def block_user(self, user_id: int, lock_duration: timedelta) -> bool:
         user = self.get_user_by_id(user_id)
         if user:
-            user.locked_until = datetime_timezone_utc_now() + lock_duration
+            user.locked_until = get_db_utc_time() + lock_duration
             user.state_id = self.get_locked_user_state_id()  # Estado bloqueado
             try:
                 self.db.commit()
@@ -215,24 +215,24 @@ class UserRepository:
 
         # Ahora que tienes el objeto, puedes imprimir el valor de expiracion real
         print("Fecha de expiración en BD:", user_confirmation.expiracion)
-        print("Fecha actual:", datetime_timezone_utc_now())
+        print("Fecha actual:", get_db_utc_time())
 
         # Realiza la verificación para confirmar si la confirmación sigue pendiente
-        if user_confirmation.expiracion > datetime_timezone_utc_now():
+        if user_confirmation.expiracion > get_db_utc_time():
             return user_confirmation
         else:
             print("La confirmación ha expirado.")
         
         return self.db.query(UserConfirmation).filter(
             UserConfirmation.usuario_id == user_id,
-            UserConfirmation.expiracion > datetime_timezone_utc_now()
+            UserConfirmation.expiracion > get_db_utc_time()
         ).first()
 
     def get_user_confirmation(self, user_id: int, pin_hash: str) -> Optional[UserConfirmation]:
         return self.db.query(UserConfirmation).filter(
             UserConfirmation.usuario_id == user_id,
             UserConfirmation.pin == pin_hash,
-            UserConfirmation.expiracion > datetime_timezone_utc_now()
+            UserConfirmation.expiracion > get_db_utc_time()
         ).first()
 
     def increment_confirmation_attempts(self, user_id: int) -> int:
@@ -297,14 +297,14 @@ class UserRepository:
         """Verifica si el usuario tiene una verificacion 2fa pendiente."""
         return self.db.query(TwoStepVerification).filter(
             TwoStepVerification.usuario_id == user_id,
-            TwoStepVerification.expiracion > datetime_timezone_utc_now()
+            TwoStepVerification.expiracion > get_db_utc_time()
         ).first()
     
     def get_two_factor_verification(self, user_id: int, pin_hash: str) -> Optional[TwoStepVerification]:
         return self.db.query(TwoStepVerification).filter(
             TwoStepVerification.usuario_id == user_id,
             TwoStepVerification.pin == pin_hash,
-            TwoStepVerification.expiracion > datetime_timezone_utc_now()
+            TwoStepVerification.expiracion > get_db_utc_time()
         ).first()
         
     def increment_two_factor_attempts(self, user_id: int) -> int:
@@ -354,7 +354,7 @@ class UserRepository:
     def get_password_recovery(self, user_id: int) -> Optional[PasswordRecovery]:
         return self.db.query(PasswordRecovery).filter(
             PasswordRecovery.usuario_id == user_id,
-            PasswordRecovery.expiracion > datetime_timezone_utc_now()
+            PasswordRecovery.expiracion > get_db_utc_time()
         ).first()
 
     def delete_recovery(self, recovery: PasswordRecovery) -> bool:
@@ -497,7 +497,7 @@ class UserRepository:
         try:
             # Obtener las confirmaciones expiradas
             expired_confirmations = self.db.query(UserConfirmation).filter(
-                UserConfirmation.expiracion < datetime_timezone_utc_now()
+                UserConfirmation.expiracion < get_db_utc_time()
             ).all()
 
             # Eliminar usuarios asociados a las confirmaciones expiradas
@@ -508,7 +508,7 @@ class UserRepository:
 
             # Eliminar confirmaciones expiradas
             deleted_count = self.db.query(UserConfirmation).filter(
-                UserConfirmation.expiracion < datetime_timezone_utc_now()
+                UserConfirmation.expiracion < get_db_utc_time()
             ).delete(synchronize_session=False)
 
             self.db.commit()
@@ -527,14 +527,14 @@ class UserRepository:
         """
         return self.db.query(UserConfirmation).filter(
             UserConfirmation.usuario_id == user_id,
-            UserConfirmation.expiracion < datetime_timezone_utc_now()
+            UserConfirmation.expiracion < get_db_utc_time()
         ).first()
         
     def delete_expired_confirmation(self, user_id: int) -> int: 
         try:
             deleted_count = self.db.query(UserConfirmation).filter(
                 UserConfirmation.usuario_id == user_id,         
-                UserConfirmation.expiracion < datetime_timezone_utc_now()
+                UserConfirmation.expiracion < get_db_utc_time()
             ).delete(synchronize_session=False)
             self.db.commit()
             return deleted_count
@@ -553,7 +553,7 @@ class UserRepository:
         try:
             deleted_count = self.db.query(TwoStepVerification).filter(
                 TwoStepVerification.usuario_id == user_id,
-                TwoStepVerification.expiracion < datetime_timezone_utc_now()
+                TwoStepVerification.expiracion < get_db_utc_time()
             ).delete(synchronize_session=False)
 
             self.db.commit()
@@ -561,4 +561,24 @@ class UserRepository:
         except Exception as e:
             self.db.rollback()
             print(f"Error al eliminar verificaciones de dos pasos expiradas: {e}")
+            return 0
+
+    def delete_expired_password_recoveries(self, user_id: int) -> int:
+        """
+        Elimina las recuperaciones de contraseña expiradas de un usuario específico.
+
+        Returns:
+            int: El número de recuperaciones eliminadas.
+        """
+        try:
+            deleted_count = self.db.query(PasswordRecovery).filter(
+                PasswordRecovery.usuario_id == user_id,
+                PasswordRecovery.expiracion < get_db_utc_time()
+            ).delete(synchronize_session=False)
+
+            self.db.commit()
+            return deleted_count
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al eliminar recuperaciones de contraseña expiradas: {e}")
             return 0

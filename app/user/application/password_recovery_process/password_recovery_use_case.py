@@ -9,7 +9,7 @@ from app.infrastructure.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc
+from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc, get_db_utc_time
 
 class PasswordRecoveryUseCase:
     def __init__(self, db: Session):
@@ -22,6 +22,9 @@ class PasswordRecoveryUseCase:
         if not user:
             raise UserNotRegisteredException()
             
+        # Eliminar recuperaciones de contraseña expiradas
+        self.user_repository.delete_expired_password_recoveries(user.id)
+        
         # Validar el estado del usuario
         state_validation_result = self.state_validator.validate_user_state(
             user,
@@ -33,7 +36,7 @@ class PasswordRecoveryUseCase:
             
         # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
         last_recovery = self.user_repository.get_last_password_recovery(user.id)
-        if last_recovery and (datetime_timezone_utc_now() - ensure_utc(last_recovery.created_at)).total_seconds() < 180:
+        if last_recovery and (get_db_utc_time() - ensure_utc(last_recovery.created_at)).total_seconds() < 180:
             raise DomainException(
                 message="Ya has solicitado un PIN de recuperación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS
@@ -42,12 +45,16 @@ class PasswordRecoveryUseCase:
         self.user_repository.delete_password_recovery(user.id)
 
         pin, pin_hash = generate_pin()
+        
+        expiration_time = 10  # minutos
+        expiration_datetime = get_db_utc_time() + timedelta(minutes=expiration_time)
 
         recovery = PasswordRecovery(
             usuario_id=user.id,
             pin=pin_hash,
-            expiracion=datetime_timezone_utc_now() + timedelta(minutes=10),
-            resends=0  # Inicializamos resends en 0
+            expiracion=expiration_datetime,
+            resends=0,
+            created_at=get_db_utc_time()
         )
         
         if not self.send_password_recovery_email(email, pin):

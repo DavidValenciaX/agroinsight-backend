@@ -7,7 +7,7 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc
+from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc, get_db_utc_time
 
 class ResendConfirmationUseCase:
     def __init__(self, db: Session):
@@ -42,7 +42,7 @@ class ResendConfirmationUseCase:
         # Si es el primer reenvío (resends == 0), permitir sin restricción
         if last_confirmation.resends > 0:
             # Si ya ha reenviado al menos una vez, verificar si han pasado 3 minutos
-            time_since_last_send = (datetime_timezone_utc_now() - ensure_utc(last_confirmation.created_at)).total_seconds()
+            time_since_last_send = (get_db_utc_time() - ensure_utc(last_confirmation.created_at)).total_seconds()
             if time_since_last_send < 180:
                 raise DomainException(
                     message="Ya has solicitado un PIN recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
@@ -52,11 +52,15 @@ class ResendConfirmationUseCase:
         # Generar nuevo PIN y su hash
         pin, pin_hash = generate_pin()
         
+        expiration_time = 10  # minutos
+        expiration_datetime = get_db_utc_time() + timedelta(minutes=expiration_time)
+        
         # Actualizar el registro de confirmación de usuario con manejo de errores
         last_confirmation.pin = pin_hash
-        last_confirmation.expiracion = datetime_timezone_utc_now() + timedelta(minutes=10)
+        last_confirmation.expiracion = expiration_datetime
         last_confirmation.resends += 1
         last_confirmation.intentos = 0
+        last_confirmation.created_at = get_db_utc_time()
         
         if not self.user_repository.update_user_confirmation(last_confirmation):
             # Log the error or handle it as needed

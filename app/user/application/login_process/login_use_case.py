@@ -10,7 +10,7 @@ from app.infrastructure.services.email_service import send_email
 from app.infrastructure.security.security_utils import verify_password
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc
+from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc, get_db_utc_time
 
 class LoginUseCase:
     def __init__(self, db: Session):
@@ -45,7 +45,7 @@ class LoginUseCase:
         
         # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
         last_verification = self.user_repository.get_last_two_factor_verification(user.id)
-        if last_verification and (datetime_timezone_utc_now() - ensure_utc(last_verification.created_at)).total_seconds() < 180:
+        if last_verification and (get_db_utc_time() - ensure_utc(last_verification.created_at)).total_seconds() < 180:
             raise DomainException(
                 message="Ya has solicitado un PIN de autenticación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS
@@ -57,12 +57,16 @@ class LoginUseCase:
         # Generar el PIN y su hash
         pin, pin_hash = generate_pin()
         
+        expiration_time = 10  # minutos
+        expiration_datetime = get_db_utc_time() + timedelta(minutes=expiration_time)
+        
         # Crear un nuevo registro de verificación
         verification = TwoStepVerification(
             usuario_id=user.id,
             pin=pin_hash,
-            expiracion=datetime_timezone_utc_now() + timedelta(minutes=10),
-            resends=0
+            expiracion=expiration_datetime,
+            resends=0,
+            created_at=get_db_utc_time()
         )
         
         # Enviar el PIN al correo electrónico del usuario
@@ -85,7 +89,7 @@ class LoginUseCase:
         user.failed_attempts += 1
         
         if user.failed_attempts >= max_failed_attempts:
-            user.locked_until = datetime_timezone_utc_now() + timedelta(minutes=block_time)
+            user.locked_until = get_db_utc_time() + timedelta(minutes=block_time)
             user.state_id = self.user_repository.get_locked_user_state_id()
             self.user_repository.update_user(user)
             raise UserHasBeenBlockedException(block_time)
