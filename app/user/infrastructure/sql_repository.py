@@ -495,3 +495,15 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al eliminar confirmaciones expiradas y usuarios: {e}")
             return 0
+
+    def get_expired_confirmation(self, user_id: int) -> Optional[UserConfirmation]:
+        """
+        Obtiene la confirmación expirada de un usuario específico.
+
+        Returns:
+            UserConfirmation: La confirmación expirada si existe, de lo contrario None.
+        """
+        return self.db.query(UserConfirmation).filter(
+            UserConfirmation.usuario_id == user_id,
+            UserConfirmation.expiracion < datetime.now(timezone.utc)
+        ).first()

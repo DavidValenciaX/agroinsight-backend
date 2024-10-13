@@ -44,11 +44,12 @@ class UserRegisterUseCase:
 
         Este método realiza las siguientes operaciones:
         
-        1. Verifica si el usuario ya existe.
-        2. Valida el estado del usuario si ya existe.
-        3. Crea un nuevo usuario con estado pendiente.
-        4. Asigna el rol de rol no confirmado.
-        5. Crea y envía una confirmación por correo electrónico.
+        1. Verificar si el usuario ya existe.
+        2. Verificar si la confirmación del usuario ha expirado.
+        3. Validar el estado del usuario si no tiene confirmación expirada.
+        4. Crea un nuevo usuario con estado pendiente.
+        5. Asigna el rol de rol no confirmado.
+        6. Crea y envía una confirmación por correo electrónico.
 
         Parameters:
             user_data (UserCreate): Datos del usuario a crear.
@@ -60,19 +61,24 @@ class UserRegisterUseCase:
             DomainException: Si ocurre un error durante el proceso de creación.
             UserStateException: Si el estado del usuario no es válido.
         """
-        # Eliminar confirmaciones expiradas
-        self.user_repository.delete_expired_confirmations_and_users()
-
+        # Verificar si el usuario ya existe
         user = self.user_repository.get_user_by_email(user_data.email)
         
         if user:
-
-            state_validation_result = self.state_validator.validate_user_state(
-                user,
-                disallowed_states=[UserState.ACTIVE, UserState.PENDING, UserState.INACTIVE, UserState.LOCKED]
-            )
-            if state_validation_result:
-                return state_validation_result
+            # Verificar si la confirmación del usuario ha expirado
+            expired_confirmation = self.user_repository.get_expired_confirmation(user.id)
+            if expired_confirmation:
+                # Eliminar el usuario y la confirmación expirada
+                self.user_repository.delete_user(user)
+                self.user_repository.delete_user_confirmations(user.id)
+            else:
+                # Validar el estado del usuario si no tiene confirmación expirada
+                state_validation_result = self.state_validator.validate_user_state(
+                    user,
+                    disallowed_states=[UserState.ACTIVE, UserState.PENDING, UserState.INACTIVE, UserState.LOCKED]
+                )
+                if state_validation_result:
+                    return state_validation_result
 
         # Obtener estado "pendiente" del usuario
         pending_state_id = self.user_repository.get_pending_user_state_id()
