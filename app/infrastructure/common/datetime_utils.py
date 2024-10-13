@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import pytz
 
 def ensure_utc(dt: datetime) -> datetime:
     """
@@ -19,4 +20,16 @@ def ensure_utc(dt: datetime) -> datetime:
     return dt
 
 def get_current_date() -> datetime.date:
-    return datetime.now(timezone.utc).date()
+    return datetime_timezone_utc_now().date()
+
+def datetime_timezone_utc_now() -> datetime:
+    """
+    Devuelve la fecha y hora actual con zona horaria UTC.
+
+    Returns:
+        datetime: Objeto datetime consciente de zona horaria UTC.
+    """
+    
+    local_time = datetime.now()
+    utc_time = local_time.replace(tzinfo=timezone.utc)
+    return utc_time

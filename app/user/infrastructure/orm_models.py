@@ -112,7 +112,7 @@ class UserConfirmation(Base):
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID, ondelete="CASCADE"), nullable=False)
     pin = Column(String(64), nullable=False, unique=True, index=True)
-    expiracion = Column(TIMESTAMP(timezone=True), nullable=False)
+    expiracion = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     intentos = Column(Integer, default=0)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     resends = Column(Integer, default=0)

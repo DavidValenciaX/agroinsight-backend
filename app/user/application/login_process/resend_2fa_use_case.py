@@ -7,7 +7,7 @@ from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.infrastructure.common.datetime_utils import ensure_utc
+from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc
 class Resend2faUseCase:
     def __init__(self, db: Session):
         self.db = db
@@ -39,7 +39,7 @@ class Resend2faUseCase:
         # Si es el primer reenvío (resends == 0), permitir sin restricción
         if last_verification.resends > 0:
             # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
-            if (datetime.now(timezone.utc) - ensure_utc(last_verification.created_at)).total_seconds() < 180:
+            if (datetime_timezone_utc_now() - ensure_utc(last_verification.created_at)).total_seconds() < 180:
                 raise DomainException(
                     message="Ya has solicitado un PIN de autenticación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
@@ -50,7 +50,7 @@ class Resend2faUseCase:
         
         # Actualizar el registro existente de verificación de dos pasos
         last_verification.pin = pin_hash
-        last_verification.expiracion = datetime.now(timezone.utc) + timedelta(minutes=10)
+        last_verification.expiracion = datetime_timezone_utc_now() + timedelta(minutes=10)
         last_verification.resends += 1
         last_verification.intentos = 0
         if not self.user_repository.update_two_factor_verification(last_verification):
