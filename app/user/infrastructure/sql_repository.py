@@ -201,28 +201,7 @@ class UserRepository:
             return False
         
     def get_user_pending_confirmation(self, user_id: int) -> Optional[UserConfirmation]:
-        """Verifica si el usuario tiene una confirmación pendiente."""
-        
-        # Primero obtiene el registro de UserConfirmation para el user_id dado
-        user_confirmation = self.db.query(UserConfirmation).filter(
-            UserConfirmation.usuario_id == user_id
-        ).first()
-
-        # Si no se encuentra el registro, imprime un mensaje apropiado para depurar y retorna None
-        if not user_confirmation:
-            print("No se encontró ninguna confirmación para este usuario.")
-            return None
-
-        # Ahora que tienes el objeto, puedes imprimir el valor de expiracion real
-        print("Fecha de expiración en BD:", user_confirmation.expiracion)
-        print("Fecha actual:", get_datetime_utc_time())
-
-        # Realiza la verificación para confirmar si la confirmación sigue pendiente
-        if user_confirmation.expiracion > get_datetime_utc_time():
-            return user_confirmation
-        else:
-            print("La confirmación ha expirado.")
-        
+        """Verifica si el usuario tiene una confirmación pendiente."""        
         return self.db.query(UserConfirmation).filter(
             UserConfirmation.usuario_id == user_id,
             UserConfirmation.expiracion > get_datetime_utc_time()
