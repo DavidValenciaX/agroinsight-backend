@@ -7,7 +7,7 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
-from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 
 class ResendConfirmationUseCase:
     def __init__(self, db: Session):
@@ -38,14 +38,17 @@ class ResendConfirmationUseCase:
                 message="No hay una confirmación pendiente para reenviar el PIN.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+            
+        # Definimos el tiempo de espera en minutos
+        warning_time = 3
 
         # Si es el primer reenvío (resends == 0), permitir sin restricción
         if last_confirmation.resends > 0:
             # Si ya ha reenviado al menos una vez, verificar si han pasado 3 minutos
-            time_since_last_send = (get_db_utc_time() - ensure_utc(last_confirmation.created_at)).total_seconds()
-            if time_since_last_send < 180:
+            time_since_last_send = (datetime_utc_time() - ensure_utc(last_confirmation.created_at)).total_seconds()
+            if time_since_last_send < warning_time * 60:
                 raise DomainException(
-                    message="Ya has solicitado un PIN recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    message=f"Ya has solicitado un PIN recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
 
@@ -53,14 +56,14 @@ class ResendConfirmationUseCase:
         pin, pin_hash = generate_pin()
         
         expiration_time = 10  # minutos
-        expiration_datetime = get_db_utc_time() + timedelta(minutes=expiration_time)
+        expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_time)
         
         # Actualizar el registro de confirmación de usuario con manejo de errores
         last_confirmation.pin = pin_hash
         last_confirmation.expiracion = expiration_datetime
         last_confirmation.resends += 1
         last_confirmation.intentos = 0
-        last_confirmation.created_at = get_db_utc_time()
+        last_confirmation.created_at = datetime_utc_time()
         
         if not self.user_repository.update_user_confirmation(last_confirmation):
             # Log the error or handle it as needed

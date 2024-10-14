@@ -3,7 +3,7 @@ from fastapi import status
 from app.infrastructure.common.common_exceptions import UserStateException
 from enum import Enum, auto
 from sqlalchemy.orm import Session
-from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
@@ -78,7 +78,7 @@ class UserStateValidator:
     def _handle_locked_state(self, user: UserInDB):
         if not self._try_unlock_user(user):
             # Si el usuario sigue bloqueado, calculamos el tiempo restante y lanzamos una excepción
-            time_left = user.locked_until - get_db_utc_time()
+            time_left = user.locked_until - datetime_utc_time()
             minutos_restantes = max(time_left.seconds // 60, 1)  # Aseguramos que sea al menos 1 minuto
             raise UserStateException(
                 message=f"La cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
@@ -91,7 +91,7 @@ class UserStateValidator:
 
 
     def _try_unlock_user(self, user: UserInDB):
-        current_time = get_db_utc_time()
+        current_time = datetime_utc_time()
         
         if ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until):
             user.failed_attempts = 0

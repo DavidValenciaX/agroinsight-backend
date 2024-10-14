@@ -7,7 +7,7 @@ from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
-from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 
 class ResendRecoveryUseCase:
     def __init__(self, db: Session):
@@ -35,14 +35,17 @@ class ResendRecoveryUseCase:
             raise DomainException(
                 message="No hay un registro de recuperación de contraseña pendiente.",
                 status_code=status.HTTP_404_NOT_FOUND
-            )
+            )       
+
+        # Definimos el tiempo de espera en minutos
+        warning_time = 3
 
         # Si es el primer reenvío (resends == 0), permitir sin restricción
         if last_recovery.resends > 0:
             # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
-            if (get_db_utc_time() - ensure_utc(last_recovery.created_at)).total_seconds() < 180:
+            if (datetime_utc_time() - ensure_utc(last_recovery.created_at)).total_seconds() < warning_time * 60:
                 raise DomainException(
-                    message="Ya has solicitado un PIN de recuperación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    message=f"Ya has solicitado un PIN de recuperación recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
 
@@ -56,7 +59,7 @@ class ResendRecoveryUseCase:
             )
         
         last_recovery.pin = pin_hash
-        last_recovery.expiracion = get_db_utc_time() + timedelta(minutes=10)
+        last_recovery.expiracion = datetime_utc_time() + timedelta(minutes=10)
         last_recovery.intentos = 0
         last_recovery.resends += 1
         self.user_repository.update_password_recovery(last_recovery)

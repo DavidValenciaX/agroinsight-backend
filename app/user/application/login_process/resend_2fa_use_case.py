@@ -7,7 +7,7 @@ from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 
 class Resend2faUseCase:
     def __init__(self, db: Session):
@@ -36,13 +36,16 @@ class Resend2faUseCase:
                 message="No hay una verificación de doble factor de autenticación pendiente para reenviar el PIN.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+            
+        # Definimos el tiempo de espera en minutos
+        warning_time = 3
         
         # Si es el primer reenvío (resends == 0), permitir sin restricción
         if last_verification.resends > 0:
             # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
-            if (get_db_utc_time() - ensure_utc(last_verification.created_at)).total_seconds() < 180:
+            if (datetime_utc_time() - ensure_utc(last_verification.created_at)).total_seconds() < warning_time * 60:
                 raise DomainException(
-                    message="Ya has solicitado un PIN de autenticación recientemente. Por favor, espera 3 minutos antes de solicitar uno nuevo.",
+                    message=f"Ya has solicitado un PIN de autenticación recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
         
@@ -50,14 +53,14 @@ class Resend2faUseCase:
         pin, pin_hash = generate_pin()
         
         expiration_time = 10  # minutos
-        expiration_datetime = get_db_utc_time() + timedelta(minutes=expiration_time)
+        expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_time)
         
         # Actualizar el registro existente de verificación de dos pasos
         last_verification.pin = pin_hash
         last_verification.expiracion = expiration_datetime
         last_verification.resends += 1
         last_verification.intentos = 0
-        last_verification.created_at = get_db_utc_time()
+        last_verification.created_at = datetime_utc_time()
         
         if not self.user_repository.update_two_factor_verification(last_verification):
             raise DomainException(

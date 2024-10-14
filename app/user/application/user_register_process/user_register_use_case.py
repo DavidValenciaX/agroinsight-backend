@@ -12,7 +12,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserSta
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
-from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import datetime_utc_time
 
 class UserRegisterUseCase:
     """
@@ -115,14 +115,14 @@ class UserRegisterUseCase:
         pin, pin_hash = generate_pin()
         
         expiration_time = 10  # minutos
-        expiration_datetime = get_db_utc_time() + timedelta(minutes=expiration_time)
+        expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_time)
 
         confirmation = UserConfirmation(
             usuario_id=created_user.id,
             pin=pin_hash,
             expiracion=expiration_datetime,
             resends=0,
-            created_at=get_db_utc_time()
+            created_at=datetime_utc_time()
         )
         
         if not self.user_repository.add_user_confirmation(confirmation):

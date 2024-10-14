@@ -8,14 +8,14 @@ def ensure_utc(dt: datetime) -> datetime:
     # Si ya tiene zona horaria, devuélvelo tal como está
     return dt
 
-def get_datetime_utc_time() -> datetime:
+def datetime_utc_time() -> datetime:
     # Obtener la hora actual en UTC directamente
     return datetime.now(timezone.utc)
 
 def get_current_date() -> datetime.date:
-    return get_datetime_utc_time().date()
+    return datetime_utc_time().date()
 
-def get_db_utc_time() -> datetime:
+def db_utc_time() -> datetime:
     """
     Obtiene la hora UTC directamente desde la base de datos PostgreSQL.
     

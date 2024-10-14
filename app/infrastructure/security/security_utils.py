@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 from jose import jwt
-from app.infrastructure.common.datetime_utils import get_db_utc_time
+from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.config.settings import SECRET_KEY, ALGORITHM
 from datetime import timedelta, datetime, timezone
 
@@ -16,7 +16,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     access_token_expire_minutes = 120
     to_encode = data.copy()
     
-    current_time = get_db_utc_time()
+    current_time = datetime_utc_time()
     
     if expires_delta:
         expire = current_time + expires_delta
