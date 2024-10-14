@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
-from fastapi import status
+from fastapi import BackgroundTasks, status
 from app.user.infrastructure.orm_models import TwoStepVerification
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
@@ -18,7 +18,7 @@ class LoginUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
         
-    def login_user(self, email: str, password: str) -> SuccessResponse:
+    def login_user(self, email: str, password: str, background_tasks: BackgroundTasks) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()
@@ -77,11 +77,7 @@ class LoginUseCase:
         )
         
         # Enviar el PIN al correo electrónico del usuario
-        if not self.send_two_factor_pin(user.email, pin):
-            return DomainException(
-                message="Error al enviar el PIN de autenticación.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        background_tasks.add_task(self.send_two_factor_pin, user.email, pin)
 
         self.user_repository.add_two_factor_verification(verification)
         return SuccessResponse(

@@ -72,6 +72,7 @@ def register_user(
 @user_router.post("/resend-confirm-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ):
     """
@@ -89,7 +90,7 @@ def resend_confirmation_pin_endpoint(
     """
     resend_confirmation_use_case = ResendConfirmationUseCase(db)
     try:
-        return resend_confirmation_use_case.resend_confirmation(resend_request.email)
+        return resend_confirmation_use_case.resend_confirmation(resend_request.email, background_tasks)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -128,12 +129,13 @@ def confirm_user_registration(
         ) from e
     
 @user_router.post("/login", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
+def login_for_access_token(login_request: LoginRequest, background_tasks: BackgroundTasks, db: Session = Depends(getDb)):
     """
-    Inicia sesión y obtiene un token de acceso.
+    Inicia el proceso de doble factor de autenticación.
 
     Parameters:
         login_request (LoginRequest): Datos de inicio de sesión del usuario.
+        background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
     Returns:
@@ -144,7 +146,7 @@ def login_for_access_token(login_request: LoginRequest, db: Session = Depends(ge
     """
     login_use_case = LoginUseCase(db)
     try:
-        return login_use_case.login_user(login_request.email, login_request.password)
+        return login_use_case.login_user(login_request.email, login_request.password, background_tasks)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -156,10 +158,11 @@ def login_for_access_token(login_request: LoginRequest, db: Session = Depends(ge
 @user_router.post("/resend-2fa-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ):
     """
-    Reenvía el PIN de autenticación de dos factores al usuario.
+    Reenvía el PIN de doble factor de autenticación al usuario.
 
     Parameters:
         resend_request (Resend2FARequest): Solicitud de reenvío de PIN de 2FA.
@@ -173,7 +176,7 @@ def resend_2fa_pin_endpoint(
     """
     resend_2fa_use_case = Resend2faUseCase(db)
     try:
-        return resend_2fa_use_case.resend_2fa(resend_request.email)
+        return resend_2fa_use_case.resend_2fa(resend_request.email, background_tasks)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -185,7 +188,7 @@ def resend_2fa_pin_endpoint(
 @user_router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
     """
-    Verifica el inicio de sesión utilizando autenticación de dos factores.
+    Verifica el inicio de sesión utilizando el PIN de doble factor de autenticación.
 
     Parameters:
         auth_request (TwoFactorAuthRequest): Datos de autenticación de dos factores.
@@ -199,7 +202,6 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
     """
     verify_use_case = VerifyUseCase(db)
     try:
-        # Ejecuta el caso de uso y obtiene los datos del token
         return verify_use_case.verify_2fa(auth_request.email, auth_request.pin)
     except (DomainException, UserStateException) as e:
         raise e
@@ -224,9 +226,9 @@ def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db
     Raises:
         HTTPException: Si ocurre un error durante la obtención de la información del usuario.
     """
-    me_use_case = GetCurrentUserUseCase(db)
+    get_current_user_use_case = GetCurrentUserUseCase(db)
     try:
-        return me_use_case.get_current_user(current_user)
+        return get_current_user_use_case.get_current_user(current_user)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -255,9 +257,9 @@ def update_user_info(
     Raises:
         HTTPException: Si ocurre un error durante la actualización de la información del usuario.
     """
-    update_use_case = UpdateUserInfoUseCase(db)
+    update_user_info_use_case = UpdateUserInfoUseCase(db)
     try:
-        return update_use_case.update_user_info(current_user, user_update)
+        return update_user_info_use_case.update_user_info(current_user, user_update)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -269,6 +271,7 @@ def update_user_info(
 @user_router.post("/password-recovery", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def initiate_password_recovery(
     recovery_request: PasswordRecoveryRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ):
     """
@@ -286,7 +289,7 @@ def initiate_password_recovery(
     """
     password_recovery_use_case = PasswordRecoveryUseCase(db)
     try:
-        return password_recovery_use_case.recovery_password(recovery_request.email)
+        return password_recovery_use_case.recovery_password(recovery_request.email, background_tasks)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:
@@ -298,6 +301,7 @@ def initiate_password_recovery(
 @user_router.post("/resend-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ):
     """
@@ -315,7 +319,7 @@ def resend_recovery_pin(
     """
     password_recovery_use_case = ResendRecoveryUseCase(db)
     try:
-        return password_recovery_use_case.resend_recovery(recovery_request.email)
+        return password_recovery_use_case.resend_recovery(recovery_request.email, background_tasks)
     except (DomainException, UserStateException) as e:
         raise e
     except Exception as e:

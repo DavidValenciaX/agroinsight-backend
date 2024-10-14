@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
-from fastapi import status
+from fastapi import BackgroundTasks, status
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
@@ -15,7 +15,7 @@ class ResendConfirmationUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
 
-    def resend_confirmation(self, email: str) -> SuccessResponse:
+    def resend_confirmation(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()
@@ -73,11 +73,8 @@ class ResendConfirmationUseCase:
             )
 
         # Enviar el correo electrónico con el nuevo PIN
-        if not self.resend_confirmation_email(email, pin):
-            raise DomainException(
-                message="Error al reenviar el correo de confirmación.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        background_tasks.add_task(self.resend_confirmation_email, email, pin)
+
         
         return SuccessResponse(
             message="PIN de confirmación reenviado con éxito."

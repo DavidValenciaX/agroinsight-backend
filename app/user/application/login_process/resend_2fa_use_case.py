@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
-from fastapi import status
+from fastapi import BackgroundTasks, status
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
@@ -15,7 +15,7 @@ class Resend2faUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
         
-    def resend_2fa(self, email: str) -> SuccessResponse:
+    def resend_2fa(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()
@@ -69,11 +69,7 @@ class Resend2faUseCase:
             )
         
         # Enviar el PIN al correo electrónico del usuario
-        if not self.send_two_factor_pin(user.email, pin):
-            raise DomainException(
-                message="No se pudo reenviar el PIN. Verifique el correo electrónico o intenta más tarde.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        background_tasks.add_task(self.send_two_factor_pin, user.email, pin)
 
         return SuccessResponse(
             message="PIN de verificación en dos pasos reenviado con éxito."

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import status
+from fastapi import BackgroundTasks, status
 from datetime import datetime, timedelta, timezone
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
@@ -15,7 +15,7 @@ class ResendRecoveryUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
 
-    def resend_recovery(self, email: str) -> SuccessResponse:
+    def resend_recovery(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise UserNotRegisteredException()
@@ -52,11 +52,7 @@ class ResendRecoveryUseCase:
         # Generar un nuevo PIN y su hash
         pin, pin_hash = generate_pin()
 
-        if not self.send_password_recovery_email(email, pin):
-            raise DomainException(
-                message="No se pudo reenviar el PIN de recuperación a tu correo electrónico.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        background_tasks.add_task(self.send_password_recovery_email, email, pin)
         
         last_recovery.pin = pin_hash
         last_recovery.expiracion = datetime_utc_time() + timedelta(minutes=10)
