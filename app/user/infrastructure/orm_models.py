@@ -1,5 +1,6 @@
 from sqlalchemy import TIMESTAMP, Column, Integer, String, DateTime, ForeignKey, Text, Boolean, func
 from sqlalchemy.orm import relationship
+from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.db.connection import Base
 
 # Definir constantes para evitar la duplicación de literales
@@ -118,6 +119,10 @@ class UserConfirmation(Base):
     resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="confirmacion")
+    
+    def is_expired(self) -> bool:
+        """Verifica si la confirmación está expirada."""
+        return self.expiracion < datetime_utc_time()
     
 class TwoStepVerification(Base):
     """

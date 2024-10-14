@@ -34,7 +34,7 @@ security_scheme = HTTPBearer()
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 @user_router.post("/register", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-def create_user(
+async def create_user(
     user: UserCreate,
     db: Session = Depends(getDb),
 ):
@@ -57,7 +57,7 @@ def create_user(
     creation_use_case = UserRegisterUseCase(db)
     # Llamamos al caso de uso sin manejar excepciones aquí
     try:
-        return creation_use_case.register_user(user)
+        return await creation_use_case.register_user(user)
     except (DomainException, UserStateException) as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e

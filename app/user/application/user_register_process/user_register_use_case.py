@@ -13,6 +13,7 @@ from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
 from app.infrastructure.common.datetime_utils import datetime_utc_time
+from fastapi.concurrency import run_in_threadpool
 
 class UserRegisterUseCase:
     """
@@ -40,7 +41,7 @@ class UserRegisterUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
 
-    def register_user(self, user_data: UserCreate) -> SuccessResponse:
+    async def register_user(self, user_data: UserCreate) -> SuccessResponse:
         """
         Crea al nuevo usuario.
 
@@ -63,17 +64,14 @@ class UserRegisterUseCase:
             DomainException: Si ocurre un error durante el proceso de creación.
             UserStateException: Si el estado del usuario no es válido.
         """
-        # Verificar si el usuario ya existe
-        user = self.user_repository.get_user_by_email(user_data.email)
+        # Envolver operaciones de base de datos con run_in_threadpool
+        user = await run_in_threadpool(self.user_repository.get_user_with_confirmation, user_data.email)
         
         if user:
-            # Verificar si la confirmación del usuario ha expirado
-            expired_confirmation = self.user_repository.get_expired_confirmation(user.id)
+            expired_confirmation = user.confirmacion if user.confirmacion and user.confirmacion.is_expired() else None
             if expired_confirmation:
-                # Eliminar el usuario y la confirmación expirada
-                self.user_repository.delete_user(user)
+                await run_in_threadpool(self.user_repository.delete_user, user)
             else:
-                # Validar el estado del usuario si no tiene confirmación expirada
                 state_validation_result = self.state_validator.validate_user_state(
                     user,
                     disallowed_states=[UserState.ACTIVE, UserState.PENDING, UserState.INACTIVE, UserState.LOCKED]
@@ -81,21 +79,13 @@ class UserRegisterUseCase:
                 if state_validation_result:
                     return state_validation_result
 
-        # Obtener estado "pendiente" del usuario
-        pending_state_id = self.user_repository.get_pending_user_state_id()
+        # Obtener estado "pendiente" del usuario (caché o consulta única)
+        pending_state_id = await run_in_threadpool(self.user_repository.get_pending_user_state_id)
         if not pending_state_id:
             raise UserStateException(
                 message="No se pudo encontrar el estado de usuario pendiente.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 user_state="unknown"
-            )
-
-        # Obtener rol "no confirmado"
-        unconfirmed_role = self.user_repository.get_unconfirmed_user_role()
-        if not unconfirmed_role:
-            raise DomainException(
-                message="No se pudo encontrar el rol de Rol no confirmado.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         # Hash del password
@@ -109,7 +99,7 @@ class UserRegisterUseCase:
             password=hashed_password,
             state_id=pending_state_id
         )
-        created_user = self.user_repository.create_user(new_user)
+        created_user = await run_in_threadpool(self.user_repository.create_user, new_user)
         
         # Generar PIN y su hash
         pin, pin_hash = generate_pin()
@@ -125,34 +115,21 @@ class UserRegisterUseCase:
             created_at=datetime_utc_time()
         )
         
-        if not self.user_repository.add_user_confirmation(confirmation):
-            return DomainException(
+        result = await run_in_threadpool(self.user_repository.add_user_confirmation, confirmation)
+        if not result:
+            raise DomainException(
                 message="Error al agregar la confirmación del usuario.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Enviar correo de confirmación y agregar la confirmación al repositorio
-        if not self.send_confirmation_email(created_user.email, pin):
-            return DomainException(
-                message="Error al enviar el correo de confirmación.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        # Enviar correo de confirmación de manera asíncrona
+        await self.send_confirmation_email(created_user.email, pin)
     
         return SuccessResponse(
                 message="Usuario creado. Por favor, revisa tu email para confirmar el registro."
             )
 
-    def send_confirmation_email(self, email: str, pin: str) -> bool:
-        """
-        Envía un correo electrónico de confirmación al usuario.
-
-        Parameters:
-            email (str): La dirección de correo electrónico del usuario.
-            pin (str): El PIN de confirmación generado.
-
-        Returns:
-            bool: True si el correo se envió correctamente, False en caso contrario.
-        """
+    async def send_confirmation_email(self, email: str, pin: str) -> bool:
         subject = "Confirma tu registro en AgroInSight"
         text_content = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""
@@ -163,4 +140,4 @@ class UserRegisterUseCase:
             </body>
         </html>
         """
-        return send_email(email, subject, text_content, html_content)
+        return await send_email(email, subject, text_content, html_content)

@@ -44,6 +44,7 @@ mkdocs-material = "^9.5.39"
 mkdocstrings = {extras = ["python"], version = "^0.26.1"}
 aiopg = "^1.4.0"
 psycopg2-binary = "^2.9.9"
+aiosmtplib = "^3.0.2"
 
 [build-system]
 requires = ["poetry-core"]

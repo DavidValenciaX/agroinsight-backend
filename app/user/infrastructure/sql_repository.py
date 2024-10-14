@@ -561,3 +561,12 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al eliminar recuperaciones de contraseña expiradas: {e}")
             return 0
+        
+    def get_user_with_confirmation(self, email: str) -> Optional[User]:
+        """
+        Obtiene un usuario junto con sus confirmaciones.
+
+        Returns:
+            User: El usuario con sus confirmaciones si existe, de lo contrario None.
+        """
+        return self.db.query(User).options(joinedload(User.confirmacion)).filter(User.email == email).first()

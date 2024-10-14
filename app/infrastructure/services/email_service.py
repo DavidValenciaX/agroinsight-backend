@@ -1,8 +1,8 @@
 import os
-import smtplib
 import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from aiosmtplib import SMTP
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -12,7 +12,7 @@ GMAIL_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465
 
-def send_email(to_email: str, subject: str, text_content: str, html_content: str):
+async def send_email(to_email: str, subject: str, text_content: str, html_content: str):
     try:
         message = MIMEMultipart("alternative")
         message["Subject"] = subject
@@ -26,9 +26,12 @@ def send_email(to_email: str, subject: str, text_content: str, html_content: str
         message.attach(part2)
 
         context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
-            server.login(GMAIL_USER, GMAIL_PASSWORD)
-            server.sendmail(GMAIL_USER, to_email, message.as_string())
+        smtp = SMTP(hostname=SMTP_SERVER, port=SMTP_PORT, use_tls=True)
+
+        # Conectar usando el contexto SSL
+        await smtp.connect(tls_context=context)
+        await smtp.login(GMAIL_USER, GMAIL_PASSWORD)
+        await smtp.sendmail(GMAIL_USER, to_email, message.as_string())
         return True
     except Exception as e:
         print(f"Error al enviar el correo electrónico: {e}")
