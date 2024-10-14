@@ -27,7 +27,7 @@ class UserRepository:
         self.db = db
 
     # Métodos relacionados con el usuario
-    def create_user(self, user: User) -> Optional[User]:
+    def register_user(self, user: User) -> Optional[User]:
         try:
             self.db.add(user)
             self.db.commit()

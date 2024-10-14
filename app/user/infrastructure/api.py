@@ -5,7 +5,7 @@ Incluye endpoints para la creación, actualización, eliminación y recuperació
 así como para el manejo de autenticación y autorización.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Security
+from fastapi import APIRouter, Depends, HTTPException, status, Security, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
@@ -34,8 +34,9 @@ security_scheme = HTTPBearer()
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 @user_router.post("/register", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def create_user(
+def register_user(
     user: UserCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(getDb),
 ):
     """
@@ -57,7 +58,7 @@ async def create_user(
     creation_use_case = UserRegisterUseCase(db)
     # Llamamos al caso de uso sin manejar excepciones aquí
     try:
-        return await creation_use_case.register_user(user)
+        return creation_use_case.register_user(user, background_tasks)
     except (DomainException, UserStateException) as e:
         # Permite que los manejadores de excepciones globales de FastAPI manejen las excepciones
         raise e
@@ -66,7 +67,7 @@ async def create_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno en el registro de usuario: {str(e)}"
-        )
+        ) from e
         
 @user_router.post("/resend-confirm-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_confirmation_pin_endpoint(
@@ -95,7 +96,7 @@ def resend_confirmation_pin_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al reenviar el PIN de confirmación: {str(e)}"
-        )
+        ) from e
         
 @user_router.post("/confirm", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def confirm_user_registration(
@@ -124,7 +125,7 @@ def confirm_user_registration(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al confirmar el registro de usuario: {str(e)}"
-        )
+        ) from e
     
 @user_router.post("/login", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def login_for_access_token(login_request: LoginRequest, db: Session = Depends(getDb)):
@@ -150,7 +151,7 @@ def login_for_access_token(login_request: LoginRequest, db: Session = Depends(ge
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al procesar el inicio de sesión: {str(e)}"
-        )
+        ) from e
     
 @user_router.post("/resend-2fa-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_2fa_pin_endpoint(
@@ -179,7 +180,7 @@ def resend_2fa_pin_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al reenviar el PIN de doble factor de autenticación: {str(e)}"
-        )
+        ) from e
         
 @user_router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
@@ -206,7 +207,7 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al verificar el inicio de sesión: {str(e)}"
-        )
+        ) from e
 
 @user_router.get("/me", response_model=UserResponse)
 def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
@@ -232,7 +233,7 @@ def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al obtener la información del usuario: {str(e)}"
-        )
+        ) from e
     
 @user_router.put("/me/update", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def update_user_info(
@@ -263,7 +264,7 @@ def update_user_info(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"No se pudo actualizar la información del usuario: {str(e)}"
-        )
+        ) from e
     
 @user_router.post("/password-recovery", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def initiate_password_recovery(
@@ -292,7 +293,7 @@ def initiate_password_recovery(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al iniciar el proceso de recuperación de contraseña: {str(e)}"
-        )
+        ) from e
         
 @user_router.post("/resend-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def resend_recovery_pin(
@@ -321,7 +322,7 @@ def resend_recovery_pin(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno en el reenvio del PIN de recuperación de contraseña: {str(e)}"
-        )
+        ) from e
         
 @user_router.post("/confirm-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def confirm_recovery_pin(
@@ -350,7 +351,7 @@ def confirm_recovery_pin(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al confirmar el PIN de recuperación: {str(e)}"
-        )
+        ) from e
         
 @user_router.post("/reset-password", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def reset_password(
@@ -379,7 +380,7 @@ def reset_password(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al reestablecer la contraseña: {str(e)}"
-        )
+        ) from e
         
 @user_router.post("/logout", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def logout(
@@ -409,4 +410,4 @@ def logout(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"No se pudo cerrar la sesión: {str(e)}"
-        )
+        ) from e

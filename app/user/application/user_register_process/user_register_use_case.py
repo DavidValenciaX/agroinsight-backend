@@ -1,7 +1,7 @@
 import pytz
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from fastapi import status
+from fastapi import BackgroundTasks, status
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.orm_models import User, UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
@@ -13,7 +13,6 @@ from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
 from app.infrastructure.common.datetime_utils import datetime_utc_time
-from fastapi.concurrency import run_in_threadpool
 
 class UserRegisterUseCase:
     """
@@ -41,7 +40,7 @@ class UserRegisterUseCase:
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
 
-    async def register_user(self, user_data: UserCreate) -> SuccessResponse:
+    def register_user(self, user_data: UserCreate, background_tasks: BackgroundTasks) -> SuccessResponse:
         """
         Crea al nuevo usuario.
 
@@ -64,13 +63,13 @@ class UserRegisterUseCase:
             DomainException: Si ocurre un error durante el proceso de creación.
             UserStateException: Si el estado del usuario no es válido.
         """
-        # Envolver operaciones de base de datos con run_in_threadpool
-        user = await run_in_threadpool(self.user_repository.get_user_with_confirmation, user_data.email)
+
+        user = self.user_repository.get_user_with_confirmation(user_data.email)
         
         if user:
             expired_confirmation = user.confirmacion if user.confirmacion and user.confirmacion.is_expired() else None
             if expired_confirmation:
-                await run_in_threadpool(self.user_repository.delete_user, user)
+                self.user_repository.delete_user(user)
             else:
                 state_validation_result = self.state_validator.validate_user_state(
                     user,
@@ -80,7 +79,7 @@ class UserRegisterUseCase:
                     return state_validation_result
 
         # Obtener estado "pendiente" del usuario (caché o consulta única)
-        pending_state_id = await run_in_threadpool(self.user_repository.get_pending_user_state_id)
+        pending_state_id = self.user_repository.get_pending_user_state_id()
         if not pending_state_id:
             raise UserStateException(
                 message="No se pudo encontrar el estado de usuario pendiente.",
@@ -99,7 +98,7 @@ class UserRegisterUseCase:
             password=hashed_password,
             state_id=pending_state_id
         )
-        created_user = await run_in_threadpool(self.user_repository.create_user, new_user)
+        created_user = self.user_repository.register_user(new_user)
         
         # Generar PIN y su hash
         pin, pin_hash = generate_pin()
@@ -115,7 +114,7 @@ class UserRegisterUseCase:
             created_at=datetime_utc_time()
         )
         
-        result = await run_in_threadpool(self.user_repository.add_user_confirmation, confirmation)
+        result = self.user_repository.add_user_confirmation(confirmation)
         if not result:
             raise DomainException(
                 message="Error al agregar la confirmación del usuario.",
@@ -123,13 +122,13 @@ class UserRegisterUseCase:
             )
 
         # Enviar correo de confirmación de manera asíncrona
-        await self.send_confirmation_email(created_user.email, pin)
+        background_tasks.add_task(self.send_confirmation_email, created_user.email, pin)
     
         return SuccessResponse(
                 message="Usuario creado. Por favor, revisa tu email para confirmar el registro."
             )
 
-    async def send_confirmation_email(self, email: str, pin: str) -> bool:
+    def send_confirmation_email(self, email: str, pin: str) -> bool:
         subject = "Confirma tu registro en AgroInSight"
         text_content = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""
@@ -140,4 +139,4 @@ class UserRegisterUseCase:
             </body>
         </html>
         """
-        return await send_email(email, subject, text_content, html_content)
+        return send_email(email, subject, text_content, html_content)
