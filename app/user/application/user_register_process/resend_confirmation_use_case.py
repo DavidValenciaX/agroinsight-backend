@@ -7,7 +7,7 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
 
 class ResendConfirmationUseCase:
     def __init__(self, db: Session):

@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
-from app.infrastructure.db.connection import SessionLocal
-from sqlalchemy import text
+from sqlalchemy import func
 
 def ensure_utc(dt: datetime) -> datetime:
     if dt.tzinfo is None:
@@ -9,12 +8,12 @@ def ensure_utc(dt: datetime) -> datetime:
     # Si ya tiene zona horaria, devuélvelo tal como está
     return dt
 
-def datetime_timezone_utc_now() -> datetime:
+def get_datetime_utc_time() -> datetime:
     # Obtener la hora actual en UTC directamente
     return datetime.now(timezone.utc)
 
 def get_current_date() -> datetime.date:
-    return datetime_timezone_utc_now().date()
+    return get_datetime_utc_time().date()
 
 def get_db_utc_time() -> datetime:
     """
@@ -28,12 +27,7 @@ def get_db_utc_time() -> datetime:
     Returns:
         datetime: Tiempo UTC actual obtenido de la base de datos.
     """
-    # Crear la sesión manualmente
-    session = SessionLocal()
-    try:
-        # Consulta para obtener el tiempo en UTC desde la base de datos
-        result = session.execute(text("SELECT current_timestamp AT TIME ZONE 'UTC' AS utc_time"))
-        utc_time = result.scalar()  # Obtener el valor del primer resultado
-        return utc_time
-    finally:
-        session.close()  
+
+    utc_time = func.timezone('UTC', func.current_timestamp()) # Obtener el valor del primer resultado
+    return utc_time
+

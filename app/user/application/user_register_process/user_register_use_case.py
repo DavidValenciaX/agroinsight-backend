@@ -1,4 +1,5 @@
 import pytz
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.user.domain.user_state_validator import UserState, UserStateValidator
@@ -11,7 +12,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserSta
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
 
 class UserRegisterUseCase:
     """

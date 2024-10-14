@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from app.farm.infrastructure.orm_models import Farm
 from app.infrastructure.common.common_exceptions import DomainException
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, get_db_utc_time
+from app.infrastructure.common.datetime_utils import get_datetime_utc_time, get_db_utc_time
 from app.user.infrastructure.orm_models import (
     User, UserState, Role, UserFarmRole, PasswordRecovery,
     TwoStepVerification, UserConfirmation, BlacklistedToken
@@ -215,24 +215,24 @@ class UserRepository:
 
         # Ahora que tienes el objeto, puedes imprimir el valor de expiracion real
         print("Fecha de expiración en BD:", user_confirmation.expiracion)
-        print("Fecha actual:", get_db_utc_time())
+        print("Fecha actual:", get_datetime_utc_time())
 
         # Realiza la verificación para confirmar si la confirmación sigue pendiente
-        if user_confirmation.expiracion > get_db_utc_time():
+        if user_confirmation.expiracion > get_datetime_utc_time():
             return user_confirmation
         else:
             print("La confirmación ha expirado.")
         
         return self.db.query(UserConfirmation).filter(
             UserConfirmation.usuario_id == user_id,
-            UserConfirmation.expiracion > get_db_utc_time()
+            UserConfirmation.expiracion > get_datetime_utc_time()
         ).first()
 
     def get_user_confirmation(self, user_id: int, pin_hash: str) -> Optional[UserConfirmation]:
         return self.db.query(UserConfirmation).filter(
             UserConfirmation.usuario_id == user_id,
             UserConfirmation.pin == pin_hash,
-            UserConfirmation.expiracion > get_db_utc_time()
+            UserConfirmation.expiracion > get_datetime_utc_time()
         ).first()
 
     def increment_confirmation_attempts(self, user_id: int) -> int:

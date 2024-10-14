@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 from jose import jwt
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, get_db_utc_time
+from app.infrastructure.common.datetime_utils import get_db_utc_time
 from app.infrastructure.config.settings import SECRET_KEY, ALGORITHM
 from datetime import timedelta, datetime, timezone
 

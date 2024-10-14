@@ -7,7 +7,7 @@ from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc
+from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
 
 class ResendRecoveryUseCase:
     def __init__(self, db: Session):

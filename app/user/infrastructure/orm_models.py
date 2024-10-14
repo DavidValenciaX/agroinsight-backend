@@ -114,7 +114,7 @@ class UserConfirmation(Base):
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(TIMESTAMP(timezone=True), nullable=False)
     intentos = Column(Integer, default=0)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.timezone('UTC', func.current_timestamp()))
     resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="confirmacion")
@@ -139,7 +139,7 @@ class TwoStepVerification(Base):
     pin = Column(String(64), nullable=False, unique=True, index=True)
     expiracion = Column(TIMESTAMP(timezone=True), nullable=False)
     intentos = Column(Integer, default=0)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.timezone('UTC', func.current_timestamp()))
     resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="verificacion_dos_pasos")
@@ -166,7 +166,7 @@ class PasswordRecovery(Base):
     expiracion = Column(TIMESTAMP(timezone=True), nullable=False)
     intentos = Column(Integer, default=0)
     pin_confirmado = Column(Boolean, default=False, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.timezone('UTC', func.current_timestamp()))
     resends = Column(Integer, default=0)
 
     usuario = relationship("User", back_populates="recuperacion_contrasena")
@@ -187,7 +187,7 @@ class BlacklistedToken(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     token = Column(String(500), unique=True, nullable=False, index=True)
-    blacklisted_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+    blacklisted_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.timezone('UTC', func.current_timestamp()))
     usuario_id = Column(Integer, ForeignKey(USUARIO_ID), nullable=False)
     
     usuario = relationship("User", back_populates="blacklisted_tokens")

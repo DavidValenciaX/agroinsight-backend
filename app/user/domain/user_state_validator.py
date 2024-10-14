@@ -3,8 +3,9 @@ from fastapi import status
 from app.infrastructure.common.common_exceptions import UserStateException
 from enum import Enum, auto
 from sqlalchemy.orm import Session
-from app.infrastructure.common.datetime_utils import datetime_timezone_utc_now, ensure_utc, get_db_utc_time
+from app.infrastructure.common.datetime_utils import ensure_utc, get_db_utc_time
 
+from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
 
 class UserState(Enum):
@@ -74,7 +75,7 @@ class UserStateValidator:
         elif state == UserState.LOCKED:
             return self._handle_locked_state(user)
 
-    def _handle_locked_state(self, user):
+    def _handle_locked_state(self, user: UserInDB):
         if not self._try_unlock_user(user):
             # Si el usuario sigue bloqueado, calculamos el tiempo restante y lanzamos una excepción
             time_left = user.locked_until - get_db_utc_time()
@@ -89,7 +90,7 @@ class UserStateValidator:
         return self._validate_state(user)
 
 
-    def _try_unlock_user(self, user):
+    def _try_unlock_user(self, user: UserInDB):
         current_time = get_db_utc_time()
         
         if ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until):
