@@ -1,8 +1,10 @@
 from datetime import timedelta, datetime, timezone
+from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.user.infrastructure.orm_models import UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.infrastructure.services.pin_service import generate_pin
@@ -29,11 +31,11 @@ class ResendConfirmationUseCase:
         if state_validation_result:
             return state_validation_result
 
-        # Obtener la última confirmación del usuario
-        last_confirmation = user.confirmacion
+        # Obtener confirmación del usuario
+        confirmation = self.get_last_confirmation(user.confirmacion)
 
         # Verificar si hay una confirmación pendiente
-        if not last_confirmation:
+        if not confirmation:
             raise DomainException(
                 message="No hay una confirmación pendiente para reenviar el PIN.",
                 status_code=status.HTTP_404_NOT_FOUND
@@ -43,10 +45,9 @@ class ResendConfirmationUseCase:
         warning_time = 3
 
         # Si es el primer reenvío (resends == 0), permitir sin restricción
-        if last_confirmation.resends > 0:
+        if confirmation.resends > 0:
             # Si ya ha reenviado al menos una vez, verificar si han pasado 3 minutos
-            time_since_last_send = (datetime_utc_time() - ensure_utc(last_confirmation.created_at)).total_seconds()
-            if time_since_last_send < warning_time * 60:
+            if self.was_recently_requested(confirmation, warning_time):
                 raise DomainException(
                     message=f"Ya has solicitado un PIN recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
@@ -59,13 +60,13 @@ class ResendConfirmationUseCase:
         expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_time)
         
         # Actualizar el registro de confirmación de usuario con manejo de errores
-        last_confirmation.pin = pin_hash
-        last_confirmation.expiracion = expiration_datetime
-        last_confirmation.resends += 1
-        last_confirmation.intentos = 0
-        last_confirmation.created_at = datetime_utc_time()
+        confirmation.pin = pin_hash
+        confirmation.expiracion = expiration_datetime
+        confirmation.resends += 1
+        confirmation.intentos = 0
+        confirmation.created_at = datetime_utc_time()
         
-        if not self.user_repository.update_user_confirmation(last_confirmation):
+        if not self.user_repository.update_user_confirmation(confirmation):
             # Log the error or handle it as needed
             raise DomainException(
                 message="Error al actualizar la confirmación del usuario",
@@ -91,3 +92,22 @@ class ResendConfirmationUseCase:
         </html>
         """
         return send_email(email, subject, text_content, html_content)
+    
+    def was_recently_requested(self, confirmation: UserConfirmation, minutes: int = 3) -> bool:
+        """Verifica si la verificación de confirmación se solicitó hace menos de x minutos."""
+        return (datetime_utc_time() - ensure_utc(confirmation.created_at)).total_seconds() < minutes * 60
+    
+    def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
+        """Obtiene la última confirmación del usuario."""
+        if isinstance(confirmation, list) and confirmation:
+            # Ordenar las confirmaciones por fecha de creación de forma ascendente
+            confirmation.sort(key=lambda c: c.created_at)
+            # Tomar el último registro
+            latest_confirmation = confirmation[-1]
+            # Eliminar todas las confirmaciones anteriores a la última
+            for old_confirmation in confirmation[:-1]:
+                self.user_repository.delete_user_confirmation(old_confirmation)
+            # Actualizar la variable confirmation para solo trabajar con la última
+            return latest_confirmation
+        # Si no hay confirmaciones, retornar None
+        return None

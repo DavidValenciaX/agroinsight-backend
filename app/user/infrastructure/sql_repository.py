@@ -101,20 +101,17 @@ class UserRepository:
             print(f"Error al eliminar el usuario: {str(e)}")
             return False
     
-    def block_user(self, user_id: int, lock_duration: timedelta) -> bool:
-        user = self.get_user_by_id(user_id)
-        if user:
-            user.locked_until = datetime_utc_time() + lock_duration
-            user.state_id = self.get_locked_user_state_id()  # Estado bloqueado
-            try:
-                self.db.commit()
-                self.db.refresh(user)
-                return True
-            except Exception as e:
-                self.db.rollback()
-                print(f"Error al bloquear el usuario: {e}")
-                return False
-        return False
+    def block_user(self, user: User, lock_duration: timedelta) -> bool:
+        user.locked_until = datetime_utc_time() + lock_duration
+        user.state_id = self.get_locked_user_state_id()  # Estado bloqueado
+        try:
+            self.db.commit()
+            self.db.refresh(user)
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al bloquear el usuario: {e}")
+            return False
     
     # Métodos relacionados con la confirmación de usuario
     def add_user_confirmation(self, confirmation: UserConfirmation) -> bool:
@@ -137,14 +134,14 @@ class UserRepository:
             print(f"Error al actualizar la confirmación del usuario: {e}")
             return False
         
-    def delete_user_confirmations(self, user_id: int) -> bool:
+    def delete_user_confirmation(self, confirmation: UserConfirmation) -> bool:
         try:
-            self.db.query(UserConfirmation).filter(UserConfirmation.usuario_id == user_id).delete()
+            self.db.delete(confirmation)
             self.db.commit()
             return True
         except Exception as e:
             self.db.rollback()
-            print(f"Error al eliminar confirmaciones del usuario: {e}")
+            print(f"Error al eliminar la confirmación del usuario: {e}")
             return False
     
     # Métodos relacionados con la verificación en dos pasos
@@ -168,15 +165,15 @@ class UserRepository:
             print(f"Error al actualizar la verificacion en dos pasos: {e}")
             return False
         
-    def delete_two_factor_verification(self, user_id: int) -> int:
+    def delete_two_factor_verification(self, verification: TwoStepVerification) -> bool:
         try:
-            deleted = self.db.query(TwoStepVerification).filter(TwoStepVerification.usuario_id == user_id).delete()
+            self.db.delete(verification)
             self.db.commit()
-            return deleted
+            return True
         except Exception as e:
             self.db.rollback()
             print(f"Error al eliminar la verificación de dos pasos: {e}")
-            return 0
+            return False
     
     def get_user_pending_2fa_verification(self, user_id: int) -> Optional[TwoStepVerification]:
         """Verifica si el usuario tiene una verificacion 2fa pendiente."""
@@ -348,26 +345,6 @@ class UserRepository:
         
     def user_exists(self, user_id: int) -> bool:
         return self.db.query(User).filter(User.id == user_id).first() is not None
-
-    def delete_expired_two_factor_verifications(self, user_id: int) -> int:
-        """
-        Elimina las verificaciones de dos pasos expiradas de un usuario específico.
-
-        Returns:
-            int: El número de verificaciones eliminadas.
-        """
-        try:
-            deleted_count = self.db.query(TwoStepVerification).filter(
-                TwoStepVerification.usuario_id == user_id,
-                TwoStepVerification.expiracion < datetime_utc_time()
-            ).delete(synchronize_session=False)
-
-            self.db.commit()
-            return deleted_count
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al eliminar verificaciones de dos pasos expiradas: {e}")
-            return 0
 
     def delete_expired_password_recoveries(self, user_id: int) -> int:
         """

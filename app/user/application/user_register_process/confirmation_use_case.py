@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time
@@ -30,7 +31,7 @@ class ConfirmationUseCase:
             return state_validation_result
         
         # Verificar si hay una confirmación pendiente
-        confirmation = user.confirmacion
+        confirmation = self.get_last_confirmation(user.confirmacion)
         if not confirmation:
             raise DomainException(
                 message="No hay un registro de confirmación para este usuario.",
@@ -79,7 +80,7 @@ class ConfirmationUseCase:
         self._update_user_state(user, active_state_id)
         
         # Eliminar el registro de confirmación
-        self.user_repository.delete_user_confirmations(user.id)
+        self.user_repository.delete_user_confirmation(confirmation)
         return SuccessResponse(
                 message="Usuario confirmado exitosamente."
             )
@@ -98,3 +99,18 @@ class ConfirmationUseCase:
         """Actualiza el estado del usuario."""
         user.state_id = active_state_id
         self.user_repository.update_user(user)
+
+    def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
+        """Obtiene la última confirmación del usuario."""
+        if isinstance(confirmation, list) and confirmation:
+            # Ordenar las confirmaciones por fecha de creación de forma ascendente
+            confirmation.sort(key=lambda c: c.created_at)
+            # Tomar el último registro
+            latest_confirmation = confirmation[-1]
+            # Eliminar todas las confirmaciones anteriores a la última
+            for old_confirmation in confirmation[:-1]:
+                self.user_repository.delete_user_confirmation(old_confirmation)
+            # Actualizar la variable confirmation para solo trabajar con la última
+            return latest_confirmation
+        # Si no hay confirmaciones, retornar None
+        return None

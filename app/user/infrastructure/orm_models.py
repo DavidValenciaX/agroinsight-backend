@@ -41,12 +41,12 @@ class User(Base):
     state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
 
     estado = relationship("UserState")
-    confirmacion = relationship("UserConfirmation", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
-    verificacion_dos_pasos = relationship("TwoStepVerification", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
-    recuperacion_contrasena = relationship("PasswordRecovery", back_populates="usuario", uselist=False, cascade=CASCADE_DELETE_ORPHAN)
-    blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario")
-    asignaciones = relationship("Assignment", back_populates="usuario")
-    roles_fincas = relationship("UserFarmRole", back_populates="usuario")
+    confirmacion = relationship("UserConfirmation", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
+    verificacion_dos_pasos = relationship("TwoStepVerification", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
+    recuperacion_contrasena = relationship("PasswordRecovery", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
+    blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
+    asignaciones = relationship("Assignment", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
+    roles_fincas = relationship("UserFarmRole", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
 
 class UserFarmRole(Base):
     __tablename__ = "usuario_finca_rol"

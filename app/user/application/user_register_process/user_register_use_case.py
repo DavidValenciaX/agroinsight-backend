@@ -1,3 +1,4 @@
+from typing import Optional
 import pytz
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -66,7 +67,8 @@ class UserRegisterUseCase:
         user = self.user_repository.get_user_with_confirmation(user_data.email)
         
         if user:
-            expired_confirmation = user.confirmacion if user.confirmacion and self._is_confirmation_expired(user.confirmacion) else None
+            confirmations = self.get_last_confirmation(user.confirmacion)
+            expired_confirmation = confirmations if confirmations and self._is_confirmation_expired(confirmations) else None
             if expired_confirmation:
                 self.user_repository.delete_user(user)
             else:
@@ -113,8 +115,7 @@ class UserRegisterUseCase:
             created_at=datetime_utc_time()
         )
         
-        result = self.user_repository.add_user_confirmation(confirmation)
-        if not result:
+        if not self.user_repository.add_user_confirmation(confirmation):
             raise DomainException(
                 message="Error al agregar la confirmación del usuario.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -143,3 +144,18 @@ class UserRegisterUseCase:
     def _is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
         """Verifica si la confirmación ha expirado."""
         return confirmation.expiracion < datetime_utc_time()
+    
+    def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
+        """Obtiene la última confirmación del usuario."""
+        if isinstance(confirmation, list) and confirmation:
+            # Ordenar las confirmaciones por fecha de creación de forma ascendente
+            confirmation.sort(key=lambda c: c.created_at)
+            # Tomar el último registro
+            latest_confirmation = confirmation[-1]
+            # Eliminar todas las confirmaciones anteriores a la última
+            for old_confirmation in confirmation[:-1]:
+                self.user_repository.delete_user_confirmation(old_confirmation)
+            # Actualizar la variable confirmation para solo trabajar con la última
+            return latest_confirmation
+        # Si no hay confirmaciones, retornar None
+        return None
