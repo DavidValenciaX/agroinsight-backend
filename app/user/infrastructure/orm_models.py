@@ -120,10 +120,6 @@ class UserConfirmation(Base):
 
     usuario = relationship("User", back_populates="confirmacion")
     
-    def is_expired(self) -> bool:
-        """Verifica si la confirmación está expirada."""
-        return self.expiracion < datetime_utc_time()
-    
 class TwoStepVerification(Base):
     """
     Representa la tabla 'verificacion_dos_pasos' en la base de datos.

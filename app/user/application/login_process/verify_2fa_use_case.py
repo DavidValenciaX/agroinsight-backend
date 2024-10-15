@@ -50,7 +50,7 @@ class VerifyUseCase:
                 self.user_repository.delete_two_factor_verification(user.id)
                 raise UserHasBeenBlockedException(block_time)
             raise DomainException(
-                message="PIN de verificación inválido o expirado.",
+                message="PIN de verificación incorrecto.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
 

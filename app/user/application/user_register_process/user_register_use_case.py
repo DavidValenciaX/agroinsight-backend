@@ -67,7 +67,7 @@ class UserRegisterUseCase:
         user = self.user_repository.get_user_with_confirmation(user_data.email)
         
         if user:
-            expired_confirmation = user.confirmacion if user.confirmacion and user.confirmacion.is_expired() else None
+            expired_confirmation = user.confirmacion if user.confirmacion and self._is_confirmation_expired(user.confirmacion) else None
             if expired_confirmation:
                 self.user_repository.delete_user(user)
             else:
@@ -140,3 +140,7 @@ class UserRegisterUseCase:
         </html>
         """
         return send_email(email, subject, text_content, html_content)
+    
+    def _is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
+        """Verifica si la confirmación ha expirado."""
+        return confirmation.expiracion < datetime_utc_time()

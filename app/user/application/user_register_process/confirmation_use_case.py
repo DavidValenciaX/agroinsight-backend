@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import status
+from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.common.response_models import SuccessResponse
+from app.user.infrastructure.orm_models import User, UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException, UserStateException
 from app.infrastructure.services.pin_service import hash_pin
@@ -14,7 +16,7 @@ class ConfirmationUseCase:
         
     def confirm_user(self, email: str, pin: str) -> SuccessResponse:
         # Obtener el usuario por correo electrónico
-        user = self.user_repository.get_user_by_email(email)
+        user = self.user_repository.get_user_with_confirmation(email)
         if not user:
             raise UserNotRegisteredException()
         
@@ -28,33 +30,40 @@ class ConfirmationUseCase:
             return state_validation_result
         
         # Verificar si hay una confirmación pendiente
-        pending_confirmation = self.user_repository.get_user_pending_confirmation(user.id)
-        if not pending_confirmation:
+        confirmation = user.confirmacion
+        if not confirmation:
             raise DomainException(
                 message="No hay un registro de confirmación para este usuario.",
                 status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Verificar si la confirmación está expirada
+        if self._is_confirmation_expired(confirmation):
+            # Eliminar usuario y con el se elimina su confirmación
+            self.user_repository.delete_user(user)
+            raise DomainException(
+                message="La confirmación ha expirado. Por favor, inicie el proceso de registro nuevamente.",
+                status_code=status.HTTP_400_BAD_REQUEST
             )
             
         # Hashear el PIN proporcionado
         pin_hash = hash_pin(pin)
         
         # Obtener el registro de confirmación
-        confirm_pin = self.user_repository.get_user_confirmation(user.id, pin_hash)
+        confirm_pin = confirmation.pin == pin_hash
         
         if not confirm_pin:
             # Manejar intentos fallidos de confirmación
-            intentos = self.user_repository.increment_confirmation_attempts(user.id)
+            intentos = self._increment_confirmation_attempts(confirmation)
             if intentos >= 3:
-                # Eliminar confirmación de usuario
-                self.user_repository.delete_user_confirmations(user.id)
-                # Eliminar usuario
+                # Eliminar usuario y con el se elimina su confirmación
                 self.user_repository.delete_user(user)
                 raise DomainException(
-                    message="Demasiados intentos. Por favor, inténtalo de nuevo más tarde.",
+                    message="Demasiados intentos. Por favor, inicie el proceso de registro nuevamente.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
             raise DomainException(
-                message="PIN de confirmación inválido o expirado.",
+                message="PIN de confirmación incorrecto.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         
@@ -67,28 +76,25 @@ class ConfirmationUseCase:
                 user_state="unknown"
             )
             
-            
-        self.user_repository.update_user_state(user.id, active_state_id)
-        
-        # Actualizar el rol de rol no confirmado a rol no asignado
-        unconfirmed_user_role = self.user_repository.get_unconfirmed_user_role()
-        if not unconfirmed_user_role:
-            raise DomainException(
-                message="No se pudo encontrar el rol de usuario 'Rol no confirmado'.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
-        confirmed_user_role = self.user_repository.get_registered_user_role()
-        if not confirmed_user_role:
-            raise DomainException(
-                message="No se pudo encontrar el rol de usuario 'Rol no asignado'.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
-        self.user_repository.change_user_role(user.id, unconfirmed_user_role, confirmed_user_role)
+        self._update_user_state(user, active_state_id)
         
         # Eliminar el registro de confirmación
         self.user_repository.delete_user_confirmations(user.id)
         return SuccessResponse(
-                    message="Usuario confirmado exitosamente."
-                )
+                message="Usuario confirmado exitosamente."
+            )
+        
+    def _is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
+        """Verifica si la confirmación ha expirado."""
+        return confirmation.expiracion < datetime_utc_time()
+    
+    def _increment_confirmation_attempts(self, confirmation: UserConfirmation) -> int:
+        """Incrementa los intentos de confirmación."""
+        confirmation.intentos += 1
+        self.user_repository.update_confirmation(confirmation)
+        return confirmation.intentos
+    
+    def _update_user_state(self, user: User, active_state_id: int) -> None:
+        """Actualiza el estado del usuario."""
+        user.state_id = active_state_id
+        self.user_repository.update_user(user)

@@ -16,7 +16,7 @@ class ResendConfirmationUseCase:
         self.state_validator = UserStateValidator(db)
 
     def resend_confirmation(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
-        user = self.user_repository.get_user_by_email(email)
+        user = self.user_repository.get_user_with_confirmation(email)
         if not user:
             raise UserNotRegisteredException()
 
@@ -30,7 +30,7 @@ class ResendConfirmationUseCase:
             return state_validation_result
 
         # Obtener la última confirmación del usuario
-        last_confirmation = self.user_repository.get_last_user_confirmation(user.id)
+        last_confirmation = user.confirmacion
 
         # Verificar si hay una confirmación pendiente
         if not last_confirmation:
@@ -74,7 +74,6 @@ class ResendConfirmationUseCase:
 
         # Enviar el correo electrónico con el nuevo PIN
         background_tasks.add_task(self.resend_confirmation_email, email, pin)
-
         
         return SuccessResponse(
             message="PIN de confirmación reenviado con éxito."

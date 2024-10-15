@@ -213,33 +213,6 @@ class UserRepository:
             UserConfirmation.pin == pin_hash,
             UserConfirmation.expiracion > datetime_utc_time()
         ).first()
-
-    def increment_confirmation_attempts(self, user_id: int) -> int:
-        confirmation = self.get_user_pending_confirmation(user_id)
-        if confirmation:
-            confirmation.intentos += 1
-            try:
-                self.db.commit()
-                return confirmation.intentos
-            except Exception as e:
-                self.db.rollback()
-                print(f"Error al incrementar intentos de confirmación: {e}")
-                return confirmation.intentos
-        return 0
-
-    def update_user_state(self, user_id: int, new_state_id: int) -> bool:
-        user = self.get_user_by_id(user_id)
-        if user:
-            user.state_id = new_state_id
-            try:
-                self.db.commit()
-                self.db.refresh(user)
-                return True
-            except Exception as e:
-                self.db.rollback()
-                print(f"Error al actualizar el estado del usuario: {e}")
-                return False
-        return False
     
     # Métodos relacionados con la verificación en dos pasos        
     def delete_two_factor_verification(self, user_id: int) -> int:
@@ -570,3 +543,13 @@ class UserRepository:
             User: El usuario con sus confirmaciones si existe, de lo contrario None.
         """
         return self.db.query(User).options(joinedload(User.confirmacion)).filter(User.email == email).first()
+    
+    def update_confirmation(self, confirmation: UserConfirmation) -> bool:
+        try:
+            self.db.commit()
+            self.db.refresh(confirmation)
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar la confirmación: {e}")
+            return False

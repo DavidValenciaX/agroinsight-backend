@@ -56,7 +56,7 @@ class ConfirmRecoveryPinUseCase:
                 self.user_repository.update_password_recovery(recovery)
                 
             raise DomainException(
-                message="PIN de verificación inválido o expirado.",
+                message="PIN de recuperación incorrecto.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         # Marcar el PIN como confirmado
