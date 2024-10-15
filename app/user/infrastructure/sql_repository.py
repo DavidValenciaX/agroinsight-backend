@@ -27,7 +27,22 @@ class UserRepository:
         self.db = db
 
     # Métodos relacionados con el usuario
-    def register_user(self, user: User) -> Optional[User]:
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        return self.db.query(User).filter(User.email == email).first()
+    
+    def get_user_by_id(self, user_id: int) -> Optional[User]:
+        return self.db.query(User).get(user_id)
+    
+    def get_user_with_confirmation(self, email: str) -> Optional[User]:
+        return self.db.query(User).options(joinedload(User.confirmacion)).filter(User.email == email).first()
+    
+    def get_user_with_two_factor_verification(self, email: str) -> Optional[User]:
+        return self.db.query(User).options(joinedload(User.verificacion_dos_pasos)).filter(User.email == email).first()
+    
+    def get_all_users(self) -> List[User]:
+        return self.db.query(User).options(joinedload(User.estado)).all()
+    
+    def add_user(self, user: User) -> Optional[User]:
         try:
             self.db.add(user)
             self.db.commit()
@@ -37,16 +52,7 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al crear el usuario: {e}")
             return None
-    
-    def get_user_by_email(self, email: str) -> Optional[User]:
-        return self.db.query(User).filter(User.email == email).first()
-    
-    def get_user_by_id(self, user_id: int) -> Optional[User]:
-        return self.db.query(User).get(user_id)
-    
-    def get_all_users(self) -> List[User]:
-        return self.db.query(User).options(joinedload(User.estado)).all()
-    
+        
     def update_user(self, user: User) -> Optional[User]:
         try:
             self.db.commit()
@@ -56,11 +62,6 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al actualizar el usuario: {e}")
             return None
-        
-    def get_last_user_confirmation(self, user_id: int):
-        return self.db.query(UserConfirmation).filter(
-            UserConfirmation.usuario_id == user_id
-        ).order_by(UserConfirmation.created_at.desc()).first()
 
     def get_last_two_factor_verification(self, user_id: int):
         return self.db.query(TwoStepVerification).filter(
@@ -89,60 +90,6 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al actualizar el usuario: {e}")
             return None
-        
-    def update_user_info_by_admin(self, user: User, user_data: dict) -> Optional[User]:
-        """Actualiza la información del usuario con los datos proporcionados por un administrador."""
-        if 'nombre' in user_data and user_data['nombre']:
-            user.nombre = user_data['nombre']
-        if 'apellido' in user_data and user_data['apellido']:
-            user.apellido = user_data['apellido']
-        if 'email' in user_data and user_data['email']:
-            user.email = user_data['email']
-            
-        print(user_data['finca_id'])
-
-        # Cambiar el estado del usuario basado en el estado_id
-        if 'estado_id' in user_data and user_data['estado_id']:
-            estado = self.get_state_by_id(user_data['estado_id'])
-            if not estado:
-                raise ValueError("Estado no válido")
-            
-            user.state_id = estado.id
-
-        # Cambiar el rol del usuario basado en el rol_id, asegurando que esté asociado a la finca
-        if 'rol_id' in user_data and user_data['rol_id']:
-            nuevo_rol = self.get_role_by_id(user_data['rol_id'])
-            if not nuevo_rol:
-                raise ValueError("Rol no válido")
-        
-        if 'finca_id' in user_data and user_data['finca_id']:
-            farm = self.db.query(Farm).filter(Farm.id == user_data['finca_id']).first()
-            if not farm:
-                raise ValueError("Finca no válida")
-            
-        # Verificar si el usuario tiene el rol de trabajador asociado a la finca especificada
-        user_finca_rol = (
-            self.db.query(UserFarmRole)
-            .filter(UserFarmRole.usuario_id == user.id)
-            .filter(UserFarmRole.finca_id == farm.id)
-            .filter(UserFarmRole.rol_id == nuevo_rol.id)
-            .first()
-            )
-            
-        if not user_finca_rol:
-            # Eliminar el rol actual y asignar el nuevo rol asociado a la finca
-            self.db.query(UserFarmRole).filter(UserFarmRole.usuario_id == user.id, UserFarmRole.finca_id == farm.id).delete()
-            user_role = UserFarmRole(usuario_id=user.id, finca_id=farm.id, rol_id=nuevo_rol.id)
-            self.db.add(user_role)
-
-        try:
-            self.db.commit()
-            self.db.refresh(user)
-            return user
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al actualizar el usuario por admin: {e}")
-            return None
     
     def delete_user(self, user: User) -> bool:
         try:
@@ -170,16 +117,6 @@ class UserRepository:
         return False
     
     # Métodos relacionados con la confirmación de usuario
-    def delete_user_confirmations(self, user_id: int) -> int:
-        try:
-            deleted = self.db.query(UserConfirmation).filter(UserConfirmation.usuario_id == user_id).delete()
-            self.db.commit()
-            return deleted
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al eliminar confirmaciones del usuario: {e}")
-            return 0
-
     def add_user_confirmation(self, confirmation: UserConfirmation) -> bool:
         try:
             self.db.add(confirmation)
@@ -200,31 +137,17 @@ class UserRepository:
             print(f"Error al actualizar la confirmación del usuario: {e}")
             return False
         
-    def get_user_pending_confirmation(self, user_id: int) -> Optional[UserConfirmation]:
-        """Verifica si el usuario tiene una confirmación pendiente."""        
-        return self.db.query(UserConfirmation).filter(
-            UserConfirmation.usuario_id == user_id,
-            UserConfirmation.expiracion > datetime_utc_time()
-        ).first()
-
-    def get_user_confirmation(self, user_id: int, pin_hash: str) -> Optional[UserConfirmation]:
-        return self.db.query(UserConfirmation).filter(
-            UserConfirmation.usuario_id == user_id,
-            UserConfirmation.pin == pin_hash,
-            UserConfirmation.expiracion > datetime_utc_time()
-        ).first()
-    
-    # Métodos relacionados con la verificación en dos pasos        
-    def delete_two_factor_verification(self, user_id: int) -> int:
+    def delete_user_confirmations(self, user_id: int) -> bool:
         try:
-            deleted = self.db.query(TwoStepVerification).filter(TwoStepVerification.usuario_id == user_id).delete()
+            self.db.query(UserConfirmation).filter(UserConfirmation.usuario_id == user_id).delete()
             self.db.commit()
-            return deleted
+            return True
         except Exception as e:
             self.db.rollback()
-            print(f"Error al eliminar la verificación de dos pasos: {e}")
-            return 0
-
+            print(f"Error al eliminar confirmaciones del usuario: {e}")
+            return False
+    
+    # Métodos relacionados con la verificación en dos pasos
     def add_two_factor_verification(self, verification: TwoStepVerification) -> bool:
         try:
             self.db.add(verification)
@@ -244,6 +167,16 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al actualizar la verificacion en dos pasos: {e}")
             return False
+        
+    def delete_two_factor_verification(self, user_id: int) -> int:
+        try:
+            deleted = self.db.query(TwoStepVerification).filter(TwoStepVerification.usuario_id == user_id).delete()
+            self.db.commit()
+            return deleted
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al eliminar la verificación de dos pasos: {e}")
+            return 0
     
     def get_user_pending_2fa_verification(self, user_id: int) -> Optional[TwoStepVerification]:
         """Verifica si el usuario tiene una verificacion 2fa pendiente."""
@@ -272,16 +205,12 @@ class UserRepository:
                 return verification.intentos
         return 0
 
-    # Métodos relacionados con la recuperación de contraseña        
-    def delete_password_recovery(self, user_id: int) -> int:
-        try:
-            deleted = self.db.query(PasswordRecovery).filter(PasswordRecovery.usuario_id == user_id).delete()
-            self.db.commit()
-            return deleted
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al eliminar la recuperación de contraseña: {e}")
-            return 0
+    # Métodos relacionados con la recuperación de contraseña
+    def get_password_recovery(self, user_id: int) -> Optional[PasswordRecovery]:
+        return self.db.query(PasswordRecovery).filter(
+            PasswordRecovery.usuario_id == user_id,
+            PasswordRecovery.expiracion > datetime_utc_time()
+        ).first()    
 
     def add_password_recovery(self, recovery: PasswordRecovery) -> bool:
         try:
@@ -302,12 +231,16 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al actualizar la recuperación de contraseña: {e}")
             return False
-
-    def get_password_recovery(self, user_id: int) -> Optional[PasswordRecovery]:
-        return self.db.query(PasswordRecovery).filter(
-            PasswordRecovery.usuario_id == user_id,
-            PasswordRecovery.expiracion > datetime_utc_time()
-        ).first()
+        
+    def delete_password_recovery(self, user_id: int) -> int:
+        try:
+            deleted = self.db.query(PasswordRecovery).filter(PasswordRecovery.usuario_id == user_id).delete()
+            self.db.commit()
+            return deleted
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al eliminar la recuperación de contraseña: {e}")
+            return 0
 
     def delete_recovery(self, recovery: PasswordRecovery) -> bool:
         try:
@@ -393,36 +326,13 @@ class UserRepository:
             print(f"Error al asignar rol al usuario: {e}")
             return False
 
-    def change_user_role(self, user_id: int, old_role: Role, new_role: Role, farm_id: int = None) -> bool:
-        user_farm_role = self.db.query(UserFarmRole).filter(
-            UserFarmRole.usuario_id == user_id,
-            UserFarmRole.rol_id == old_role.id,
-            UserFarmRole.finca_id == farm_id
-        ).first()
-
-        if user_farm_role:
-            user_farm_role.rol_id = new_role.id
-            try:
-                self.db.commit()
-                self.db.refresh(user_farm_role)
-                return True
-            except Exception as e:
-                self.db.rollback()
-                print(f"Error al cambiar el rol del usuario: {e}")
-                return False
-
-        return False
-
     # Métodos auxiliares
     
     def get_role_by_name(self, role_name: str) -> Optional[Role]:
         return self.db.query(Role).filter(Role.nombre == role_name).first()
     
     def get_admin_role(self):
-        try:
-            return self.get_role_by_name(ADMIN_ROLE_NAME)
-        except Exception as e:
-            raise DomainException(message = f"Error al obtener el rol de administrador: {str(e)}", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return self.get_role_by_name(ADMIN_ROLE_NAME)
 
     def get_worker_role(self):
         try:
@@ -438,62 +348,6 @@ class UserRepository:
         
     def user_exists(self, user_id: int) -> bool:
         return self.db.query(User).filter(User.id == user_id).first() is not None
-
-    def delete_expired_confirmations_and_users(self) -> int:
-        """
-        Elimina las confirmaciones de usuario expiradas y los usuarios asociados.
-
-        Returns:
-            int: El número de confirmaciones eliminadas.
-        """
-        try:
-            # Obtener las confirmaciones expiradas
-            expired_confirmations = self.db.query(UserConfirmation).filter(
-                UserConfirmation.expiracion < datetime_utc_time()
-            ).all()
-
-            # Eliminar usuarios asociados a las confirmaciones expiradas
-            for confirmation in expired_confirmations:
-                user = self.get_user_by_id(confirmation.usuario_id)
-                if user:
-                    self.db.delete(user)
-
-            # Eliminar confirmaciones expiradas
-            deleted_count = self.db.query(UserConfirmation).filter(
-                UserConfirmation.expiracion < datetime_utc_time()
-            ).delete(synchronize_session=False)
-
-            self.db.commit()
-            return deleted_count
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al eliminar confirmaciones expiradas y usuarios: {e}")
-            return 0
-
-    def get_expired_confirmation(self, user_id: int) -> Optional[UserConfirmation]:
-        """
-        Obtiene la confirmación expirada de un usuario específico.
-
-        Returns:
-            UserConfirmation: La confirmación expirada si existe, de lo contrario None.
-        """
-        return self.db.query(UserConfirmation).filter(
-            UserConfirmation.usuario_id == user_id,
-            UserConfirmation.expiracion < datetime_utc_time()
-        ).first()
-        
-    def delete_expired_confirmation(self, user_id: int) -> int: 
-        try:
-            deleted_count = self.db.query(UserConfirmation).filter(
-                UserConfirmation.usuario_id == user_id,         
-                UserConfirmation.expiracion < datetime_utc_time()
-            ).delete(synchronize_session=False)
-            self.db.commit()
-            return deleted_count
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al eliminar confirmaciones expiradas: {e}")
-            return 0
 
     def delete_expired_two_factor_verifications(self, user_id: int) -> int:
         """
@@ -534,22 +388,3 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al eliminar recuperaciones de contraseña expiradas: {e}")
             return 0
-        
-    def get_user_with_confirmation(self, email: str) -> Optional[User]:
-        """
-        Obtiene un usuario junto con sus confirmaciones.
-
-        Returns:
-            User: El usuario con sus confirmaciones si existe, de lo contrario None.
-        """
-        return self.db.query(User).options(joinedload(User.confirmacion)).filter(User.email == email).first()
-    
-    def update_confirmation(self, confirmation: UserConfirmation) -> bool:
-        try:
-            self.db.commit()
-            self.db.refresh(confirmation)
-            return True
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al actualizar la confirmación: {e}")
-            return False

@@ -91,7 +91,7 @@ class ConfirmationUseCase:
     def _increment_confirmation_attempts(self, confirmation: UserConfirmation) -> int:
         """Incrementa los intentos de confirmación."""
         confirmation.intentos += 1
-        self.user_repository.update_confirmation(confirmation)
+        self.user_repository.update_user_confirmation(confirmation)
         return confirmation.intentos
     
     def _update_user_state(self, user: User, active_state_id: int) -> None:

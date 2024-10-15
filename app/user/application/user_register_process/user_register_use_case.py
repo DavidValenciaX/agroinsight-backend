@@ -50,8 +50,7 @@ class UserRegisterUseCase:
         2. Verificar si la confirmación del usuario ha expirado.
         3. Validar el estado del usuario si no tiene confirmación expirada.
         4. Crea un nuevo usuario con estado pendiente.
-        5. Asigna el rol de rol no confirmado.
-        6. Crea y envía una confirmación por correo electrónico.
+        5. Crea y envía una confirmación por correo electrónico.
 
         Parameters:
             user_data (UserCreate): Datos del usuario a crear.
@@ -98,7 +97,7 @@ class UserRegisterUseCase:
             password=hashed_password,
             state_id=pending_state_id
         )
-        created_user = self.user_repository.register_user(new_user)
+        created_user = self.user_repository.add_user(new_user)
         
         # Generar PIN y su hash
         pin, pin_hash = generate_pin()
