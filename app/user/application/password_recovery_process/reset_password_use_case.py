@@ -1,8 +1,10 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.security.security_utils import hash_password, verify_password
+from app.user.infrastructure.orm_models import PasswordRecovery
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 
@@ -13,7 +15,7 @@ class ResetPasswordUseCase:
         self.state_validator = UserStateValidator(db)
 
     def reset_password(self, email: str, new_password: str) -> SuccessResponse:
-        user = self.user_repository.get_user_by_email(email)
+        user = self.user_repository.get_user_with_password_recovery(email)
         if not user:
             raise UserNotRegisteredException()
             
@@ -26,7 +28,7 @@ class ResetPasswordUseCase:
         if state_validation_result:
             return state_validation_result
 
-        recovery = self.user_repository.get_password_recovery(user.id)
+        recovery = self.get_last_password_recovery(user.recuperacion_contrasena)
 
         if not recovery:
             raise DomainException(
@@ -56,7 +58,7 @@ class ResetPasswordUseCase:
             )
         
         # Eliminar la solicitud de recuperación de contraseña
-        if not self.user_repository.delete_recovery(recovery):
+        if not self.user_repository.delete_password_recovery(recovery):
             raise DomainException(
                 message="No se pudo eliminar el registro de recuperación de contraseña.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -65,3 +67,13 @@ class ResetPasswordUseCase:
         return SuccessResponse(
             message= "Contraseña restablecida correctamente."
         )
+        
+    def get_last_password_recovery(self, recovery: PasswordRecovery) -> Optional[PasswordRecovery]:
+        """Obtiene la última recuperación de contraseña del usuario."""
+        if isinstance(recovery, list) and recovery:
+            recovery.sort(key=lambda r: r.created_at)
+            latest_recovery = recovery[-1]
+            for old_recovery in recovery[:-1]:
+                self.user_repository.delete_password_recovery(old_recovery)
+            return latest_recovery
+        return None

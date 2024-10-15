@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from datetime import datetime, timedelta, timezone
@@ -18,12 +19,9 @@ class PasswordRecoveryUseCase:
         self.state_validator = UserStateValidator(db)
 
     def recovery_password(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
-        user = self.user_repository.get_user_by_email(email)
+        user = self.user_repository.get_user_with_password_recovery(email)
         if not user:
             raise UserNotRegisteredException()
-            
-        # Eliminar recuperaciones de contraseña expiradas
-        self.user_repository.delete_expired_password_recoveries(user.id)
         
         # Validar el estado del usuario
         state_validation_result = self.state_validator.validate_user_state(
@@ -38,14 +36,14 @@ class PasswordRecoveryUseCase:
         warning_time = 3
             
         # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
-        last_recovery = self.user_repository.get_last_password_recovery(user.id)
-        if last_recovery and (datetime_utc_time() - ensure_utc(last_recovery.created_at)).total_seconds() < warning_time * 60:
+        recovery = self.get_last_password_recovery(user.recuperacion_contrasena)
+        if recovery and self.was_recently_requested(recovery, warning_time):
             raise DomainException(
                 message=f"Ya has solicitado un PIN de recuperación recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS
             )
 
-        self.user_repository.delete_password_recovery(user.id)
+        self.user_repository.delete_password_recovery(recovery)
 
         pin, pin_hash = generate_pin()
         
@@ -74,3 +72,22 @@ class PasswordRecoveryUseCase:
         html_content = f"<html><body><p><strong>Tu PIN de recuperación de contraseña es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)
+    
+    def was_recently_requested(self, recovery: PasswordRecovery, minutes: int = 3) -> bool:
+        """Verifica si la recuperación de contraseña se solicitó hace menos de x minutos."""
+        return (datetime_utc_time() - ensure_utc(recovery.created_at)).total_seconds() < minutes * 60
+    
+    def get_last_password_recovery(self, recovery: PasswordRecovery) -> Optional[PasswordRecovery]:
+        """Obtiene la última recuperación de contraseña del usuario."""
+        if isinstance(recovery, list) and recovery:
+            # Ordenar las recuperaciones por fecha de creación de forma ascendente
+            recovery.sort(key=lambda r: r.created_at)
+            # Tomar el último registro
+            latest_recovery = recovery[-1]
+            # Eliminar todas las recuperaciones anteriores a la última
+            for old_recovery in recovery[:-1]:
+                self.user_repository.delete_password_recovery(old_recovery)
+            # Actualizar la variable recovery para solo trabajar con la última
+            return latest_recovery
+        # Si no hay recuperaciones, retornar None
+        return None

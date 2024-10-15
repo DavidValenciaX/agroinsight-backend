@@ -39,6 +39,9 @@ class UserRepository:
     def get_user_with_two_factor_verification(self, email: str) -> Optional[User]:
         return self.db.query(User).options(joinedload(User.verificacion_dos_pasos)).filter(User.email == email).first()
     
+    def get_user_with_password_recovery(self, email: str) -> Optional[User]:
+        return self.db.query(User).options(joinedload(User.recuperacion_contrasena)).filter(User.email == email).first()
+    
     def get_all_users(self) -> List[User]:
         return self.db.query(User).options(joinedload(User.estado)).all()
     
@@ -228,18 +231,8 @@ class UserRepository:
             self.db.rollback()
             print(f"Error al actualizar la recuperación de contraseña: {e}")
             return False
-        
-    def delete_password_recovery(self, user_id: int) -> int:
-        try:
-            deleted = self.db.query(PasswordRecovery).filter(PasswordRecovery.usuario_id == user_id).delete()
-            self.db.commit()
-            return deleted
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al eliminar la recuperación de contraseña: {e}")
-            return 0
 
-    def delete_recovery(self, recovery: PasswordRecovery) -> bool:
+    def delete_password_recovery(self, recovery: PasswordRecovery) -> bool:
         try:
             self.db.delete(recovery)
             self.db.commit()
