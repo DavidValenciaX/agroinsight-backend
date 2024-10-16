@@ -15,9 +15,7 @@ from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_ti
 from app.user.infrastructure.orm_models import UserState as UserStateModel
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador agrícola"
-UNCONFIRMED_ROLE_NAME = "Rol no confirmado"
-UNASSIGNED_ROLE_NAME = "Rol no asignado"
+WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 # Constantes para estados
 ACTIVE_STATE_NAME = "active"

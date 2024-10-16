@@ -12,9 +12,7 @@ from fastapi import status
 
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador agrícola"
-UNCONFIRMED_ROLE_NAME = "Rol no confirmado"
-UNASSIGNED_ROLE_NAME = "Rol no asignado"
+WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 # Constantes para estados
 ACTIVE_STATE_NAME = "active"
@@ -197,18 +195,6 @@ class UserRepository:
     
     def get_role_by_name(self, role_name: str) -> Optional[Role]:
         return self.db.query(Role).filter(Role.nombre == role_name).first()
-    
-    def get_unconfirmed_user_role(self) -> Optional[Role]:
-        return self.get_role_by_name(UNCONFIRMED_ROLE_NAME)
-    
-    def get_registered_user_role(self) -> Optional[Role]:
-        return self.get_role_by_name(UNASSIGNED_ROLE_NAME)
-    
-    def get_admin_role(self) -> Optional[Role]:
-        return self.get_role_by_name(ADMIN_ROLE_NAME)
-
-    def get_worker_role(self) -> Optional[Role]:
-        return self.get_role_by_name(WORKER_ROLE_NAME)
         
     def user_exists(self, user_id: int) -> bool:
         return self.db.query(User).filter(User.id == user_id).first() is not None

@@ -5,6 +5,7 @@ from app.plot.domain.schemas import PlotCreate
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
+from app.infrastructure.common.common_exceptions import MissingTokenException
 from fastapi import status
 
 class CreatePlotUseCase:

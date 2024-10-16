@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
+from app.user.infrastructure.orm_models import Role
 from app.user.infrastructure.sql_repository import UserRepository
 from app.farm.domain.schemas import FarmUserAssignmentByEmail
 from app.infrastructure.common.response_models import SuccessResponse
@@ -8,6 +9,16 @@ from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, MissingTokenException
 from fastapi import status
 from app.infrastructure.common.response_models import MultipleResponse
+
+# Constantes para roles
+ADMIN_ROLE_NAME = "Administrador de Finca"
+WORKER_ROLE_NAME = "Trabajador Agrícola"
+
+# Constantes para estados
+ACTIVE_STATE_NAME = "active"
+LOCKED_STATE_NAME = "locked"
+PENDING_STATE_NAME = "pending"
+INACTIVE_STATE_NAME = "inactive"
 
 class AssignUsersToFarmUseCase:
     def __init__(self, db: Session):
@@ -33,7 +44,7 @@ class AssignUsersToFarmUseCase:
                 status_code=status.HTTP_403_FORBIDDEN
             )
         
-        rol_trabajador_agricola = self.user_repository.get_worker_role()
+        rol_trabajador_agricola = self.get_worker_role()
             
         messages = []
         
@@ -47,7 +58,7 @@ class AssignUsersToFarmUseCase:
             user_name = user.nombre + " " + user.apellido
             
             # Validar que el usuario no tenga un rol asignado en la finca
-            existing_assignment = self.farm_repository.get_user_farm_role(user.id, assignment_data.farm_id)
+            existing_assignment = self.farm_repository.get_user_farm(user.id, assignment_data.farm_id)
             if existing_assignment:
                 messages.append(f"El usuario {user_name} ya tiene un rol asignado en la finca.")
                 continue
@@ -57,3 +68,6 @@ class AssignUsersToFarmUseCase:
             
 
         return MultipleResponse(messages=messages)
+
+    def get_worker_role(self) -> Optional[Role]:
+        return self.user_repository.get_role_by_name(WORKER_ROLE_NAME)

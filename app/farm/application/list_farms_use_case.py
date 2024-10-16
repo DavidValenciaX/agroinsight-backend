@@ -1,11 +1,24 @@
 # app/farm/application/list_farms_use_case.py
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import PaginatedFarmListResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from math import ceil
+from app.user.infrastructure.orm_models import Role
 from app.user.infrastructure.sql_repository import UserRepository
+from app.infrastructure.common.common_exceptions import MissingTokenException
+
+# Constantes para roles
+ADMIN_ROLE_NAME = "Administrador de Finca"
+WORKER_ROLE_NAME = "Trabajador Agrícola"
+
+# Constantes para estados
+ACTIVE_STATE_NAME = "active"
+LOCKED_STATE_NAME = "locked"
+PENDING_STATE_NAME = "pending"
+INACTIVE_STATE_NAME = "inactive"
 
 class ListFarmsUseCase:
     def __init__(self, db: Session):
@@ -18,7 +31,7 @@ class ListFarmsUseCase:
             raise MissingTokenException()
         
         # Obtener id del rol de administrador de finca
-        rol_administrador_finca = self.user_repository.get_admin_role()
+        rol_administrador_finca = self.get_admin_role()
 
         # Filtrar las fincas donde el usuario es administrador
         total_farms, farms = self.farm_repository.list_farms_by_role_paginated(current_user.id, rol_administrador_finca.id, page, per_page)
@@ -35,3 +48,6 @@ class ListFarmsUseCase:
             per_page=per_page,
             total_pages=total_pages
         )
+        
+    def get_admin_role(self) -> Optional[Role]:
+        return self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
