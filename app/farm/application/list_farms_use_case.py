@@ -8,7 +8,8 @@ from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from math import ceil
 from app.user.infrastructure.orm_models import Role
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import MissingTokenException
+from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException
+from fastapi import status
 
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
@@ -50,4 +51,10 @@ class ListFarmsUseCase:
         )
         
     def get_admin_role(self) -> Optional[Role]:
-        return self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
+        rol_administrador_finca = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
+        if not rol_administrador_finca:
+            raise DomainException(
+                message="No se pudo obtener el rol de Administrador de Finca.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return rol_administrador_finca

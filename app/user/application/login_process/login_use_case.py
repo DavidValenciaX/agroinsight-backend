@@ -132,11 +132,39 @@ class LoginUseCase:
             return latest_verification
         # Si no hay verificaciones, retornar None
         return None
+    
+    def is_user_blocked(self, user: User) -> bool:
+        return user.locked_until and datetime_utc_time() < user.locked_until and user.state_id == self.get_locked_user_state().id
 
     def block_user(self, user: User, lock_duration: timedelta) -> bool:
-        user.locked_until = datetime_utc_time() + lock_duration
-        user.state_id = self.get_locked_user_state().id
-        return self.user_repository.update_user(user)
+        try:
+            user.locked_until = datetime_utc_time() + lock_duration
+            user.state_id = self.get_locked_user_state().id
+            if not self.user_repository.update_user(user):
+                raise DomainException(
+                    message="No se pudo actualizar el estado del usuario.",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            
+            # Verificación adicional
+            if not self.is_user_blocked(user):
+                raise DomainException(
+                    message="No se pudo bloquear el usuario.",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            
+            return True
+        except Exception as e:
+            raise DomainException(
+                message=f"Error al bloquear el usuario: {str(e)}",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def get_locked_user_state(self) -> Optional[UserStateModel]:
-        return self.user_repository.get_state_by_name(LOCKED_STATE_NAME)
+        locked_state = self.user_repository.get_state_by_name(LOCKED_STATE_NAME)
+        if not locked_state:
+            raise DomainException(
+                message="No se pudo obtener el estado de usuario bloqueado.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return locked_state

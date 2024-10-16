@@ -172,4 +172,11 @@ class UserRegisterUseCase:
         return None
     
     def get_pending_user_state(self) -> Optional[UserStateModel]:
-        return self.user_repository.get_state_by_name(PENDING_STATE_NAME)
+        pending_state = self.user_repository.get_state_by_name(PENDING_STATE_NAME)
+        if not pending_state:
+            raise UserStateException(
+                message="No se pudo encontrar el estado de usuario pendiente.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
+            )
+        return pending_state

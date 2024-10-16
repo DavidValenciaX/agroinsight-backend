@@ -129,4 +129,11 @@ class ConfirmationUseCase:
         return None
     
     def get_active_user_state(self) -> Optional[UserStateModel]:
-        return self.user_repository.get_state_by_name(ACTIVE_STATE_NAME)
+        active_state = self.user_repository.get_state_by_name(ACTIVE_STATE_NAME)
+        if not active_state:
+            raise UserStateException(
+                message="No se pudo encontrar el estado de usuario activo.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
+            )
+        return active_state

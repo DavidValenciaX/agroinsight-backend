@@ -137,7 +137,19 @@ class FarmRepository:
             )
 
     def get_worker_role(self) -> Optional[Role]:
-        return self.user_repository.get_role_by_name(WORKER_ROLE_NAME)
+        rol_trabajador_agricola = self.user_repository.get_role_by_name(WORKER_ROLE_NAME) 
+        if not rol_trabajador_agricola:
+            raise DomainException(
+                message="No se pudo asignar el rol de Trabajador Agrícola.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return rol_trabajador_agricola
     
     def get_admin_role(self) -> Optional[Role]:
-        return self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
+        rol_administrador_finca = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
+        if not rol_administrador_finca:
+            raise DomainException(
+                message="No se pudo obtener el rol de Administrador de Finca.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return rol_administrador_finca

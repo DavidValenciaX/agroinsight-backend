@@ -61,6 +61,10 @@ class CreateAssignmentUseCase:
             
             # obtener el nombre del usuario
             user = self.user_repository.get_user_by_id(usuario_id)
+            if not user:
+                messages.append(f"El usuario con ID {usuario_id} especificado no existe.")
+                continue
+            
             user_name = user.nombre + " " + user.apellido
             
             # validar que el usuario es trabajador de la finca
