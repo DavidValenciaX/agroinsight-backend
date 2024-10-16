@@ -171,9 +171,8 @@ class UserRepository:
             return False
 
     # Métodos relacionados con la lista negra de tokens
-    def blacklist_token(self, token: str, user_id: int) -> bool:
+    def blacklist_token(self, blacklisted: BlacklistedToken) -> bool:
         try:
-            blacklisted = BlacklistedToken(token=token, usuario_id=user_id)
             self.db.add(blacklisted)
             self.db.commit()
             return True
