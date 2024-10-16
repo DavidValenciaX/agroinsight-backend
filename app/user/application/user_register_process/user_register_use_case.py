@@ -14,6 +14,19 @@ from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from datetime import datetime, timezone, timedelta
 from app.infrastructure.common.datetime_utils import datetime_utc_time
+from app.user.infrastructure.orm_models import UserState as UserStateModel
+
+# Constantes para roles
+ADMIN_ROLE_NAME = "Administrador de Finca"
+WORKER_ROLE_NAME = "Trabajador agrícola"
+UNCONFIRMED_ROLE_NAME = "Rol no confirmado"
+UNASSIGNED_ROLE_NAME = "Rol no asignado"
+
+# Constantes para estados
+ACTIVE_STATE_NAME = "active"
+LOCKED_STATE_NAME = "locked"
+PENDING_STATE_NAME = "pending"
+INACTIVE_STATE_NAME = "inactive"
 
 class UserRegisterUseCase:
     """
@@ -80,7 +93,7 @@ class UserRegisterUseCase:
                     return state_validation_result
 
         # Obtener estado "pendiente" del usuario (caché o consulta única)
-        pending_state_id = self.user_repository.get_pending_user_state().id
+        pending_state_id = self.get_pending_user_state().id
         if not pending_state_id:
             raise UserStateException(
                 message="No se pudo encontrar el estado de usuario pendiente.",
@@ -159,3 +172,6 @@ class UserRegisterUseCase:
             return latest_confirmation
         # Si no hay confirmaciones, retornar None
         return None
+    
+    def get_pending_user_state(self) -> Optional[UserStateModel]:
+        return self.user_repository.get_state_by_name(PENDING_STATE_NAME)

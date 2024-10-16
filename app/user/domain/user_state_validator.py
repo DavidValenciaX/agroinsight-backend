@@ -1,12 +1,25 @@
 from datetime import datetime, timezone
+from typing import Optional
 from fastapi import status
 from app.infrastructure.common.common_exceptions import UserStateException
 from enum import Enum, auto
 from sqlalchemy.orm import Session
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
-
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
+from app.user.infrastructure.orm_models import UserState as UserStateModel
+
+# Constantes para roles
+ADMIN_ROLE_NAME = "Administrador de Finca"
+WORKER_ROLE_NAME = "Trabajador agrícola"
+UNCONFIRMED_ROLE_NAME = "Rol no confirmado"
+UNASSIGNED_ROLE_NAME = "Rol no asignado"
+
+# Constantes para estados
+ACTIVE_STATE_NAME = "active"
+LOCKED_STATE_NAME = "locked"
+PENDING_STATE_NAME = "pending"
+INACTIVE_STATE_NAME = "inactive"
 
 class UserState(Enum):
     ACTIVE = auto()
@@ -38,10 +51,10 @@ class UserStateValidator:
         return None
 
     def get_user_state(self, user):
-        active_state = self.user_repository.get_active_user_state()
-        inactive_state = self.user_repository.get_inactive_user_state()
-        locked_state = self.user_repository.get_locked_user_state()
-        pending_state = self.user_repository.get_pending_user_state()
+        active_state = self.get_active_user_state()
+        inactive_state = self.get_inactive_user_state()
+        locked_state = self.get_locked_user_state()
+        pending_state = self.get_pending_user_state()
         if active_state and user.state_id == active_state.id:
             return UserState.ACTIVE
         elif inactive_state and user.state_id == inactive_state.id:
@@ -100,10 +113,22 @@ class UserStateValidator:
         if ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until):
             user.failed_attempts = 0
             user.locked_until = None
-            user.state_id = self.user_repository.get_active_user_state().id
+            user.state_id = self.get_active_user_state().id
             updated_user = self.user_repository.update_user(user)
             
-            if updated_user and updated_user.state_id == self.user_repository.get_active_user_state().id:
+            if updated_user and updated_user.state_id == self.get_active_user_state().id:
                 return True  # Usuario desbloqueado exitosamente
         
         return False  # Usuario sigue bloqueado
+    
+    def get_active_user_state(self) -> Optional[UserStateModel]:
+        return self.user_repository.get_state_by_name(ACTIVE_STATE_NAME)
+    
+    def get_locked_user_state(self) -> Optional[UserStateModel]:
+        return self.user_repository.get_state_by_name(LOCKED_STATE_NAME)
+    
+    def get_pending_user_state(self) -> Optional[UserStateModel]:
+        return self.user_repository.get_state_by_name(PENDING_STATE_NAME)
+    
+    def get_inactive_user_state(self) -> Optional[UserStateModel]:
+        return self.user_repository.get_state_by_name(INACTIVE_STATE_NAME)

@@ -10,6 +10,18 @@ from app.infrastructure.services.pin_service import hash_pin
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.orm_models import UserState as UserStateModel
 
+# Constantes para roles
+ADMIN_ROLE_NAME = "Administrador de Finca"
+WORKER_ROLE_NAME = "Trabajador agrícola"
+UNCONFIRMED_ROLE_NAME = "Rol no confirmado"
+UNASSIGNED_ROLE_NAME = "Rol no asignado"
+
+# Constantes para estados
+ACTIVE_STATE_NAME = "active"
+LOCKED_STATE_NAME = "locked"
+PENDING_STATE_NAME = "pending"
+INACTIVE_STATE_NAME = "inactive"
+
 class ConfirmationUseCase:
     def __init__(self, db: Session):
         self.db = db
@@ -93,7 +105,7 @@ class ConfirmationUseCase:
     def activate_user(self, user: User) -> None:
         """Activa el usuario."""
         # Actualizar el estado del usuario a activo
-        active_state = self.user_repository.get_active_user_state()
+        active_state = self.get_active_user_state()
         if not active_state:
             raise UserStateException(
                 message="No se pudo encontrar el estado de usuario activo.",
@@ -117,3 +129,6 @@ class ConfirmationUseCase:
             return latest_confirmation
         # Si no hay confirmaciones, retornar None
         return None
+    
+    def get_active_user_state(self) -> Optional[UserStateModel]:
+        return self.user_repository.get_state_by_name(ACTIVE_STATE_NAME)

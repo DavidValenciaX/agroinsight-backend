@@ -187,18 +187,9 @@ class UserRepository:
     # Métodos relacionados con estados
     def get_state_by_id(self, state_id: int) -> Optional[UserState]:
         return self.db.query(UserState).filter(UserState.id == state_id).first()
-
-    def get_active_user_state(self) -> Optional[UserState]:
-        return self.db.query(UserState).filter(UserState.nombre == ACTIVE_STATE_NAME).first()
-
-    def get_locked_user_state(self) -> Optional[UserState]:
-        return self.db.query(UserState).filter(UserState.nombre == LOCKED_STATE_NAME).first()
-
-    def get_pending_user_state(self) -> Optional[UserState]:
-        return self.db.query(UserState).filter(UserState.nombre == PENDING_STATE_NAME).first()
-
-    def get_inactive_user_state(self) -> Optional[UserState]:
-        return self.db.query(UserState).filter(UserState.nombre == INACTIVE_STATE_NAME).first()
+    
+    def get_state_by_name(self, state_name: str) -> Optional[UserState]:
+        return self.db.query(UserState).filter(UserState.nombre == state_name).first()
     
     # Métodos relacionados con roles
     def get_role_by_id(self, role_id: int) -> Optional[Role]:
@@ -208,15 +199,15 @@ class UserRepository:
         return self.db.query(Role).filter(Role.nombre == role_name).first()
     
     def get_unconfirmed_user_role(self) -> Optional[Role]:
-        return self.db.query(Role).filter(Role.nombre == UNCONFIRMED_ROLE_NAME).first()
+        return self.get_role_by_name(UNCONFIRMED_ROLE_NAME)
     
     def get_registered_user_role(self) -> Optional[Role]:
-        return self.db.query(Role).filter(Role.nombre == UNASSIGNED_ROLE_NAME).first()
+        return self.get_role_by_name(UNASSIGNED_ROLE_NAME)
     
-    def get_admin_role(self):
+    def get_admin_role(self) -> Optional[Role]:
         return self.get_role_by_name(ADMIN_ROLE_NAME)
 
-    def get_worker_role(self):
+    def get_worker_role(self) -> Optional[Role]:
         return self.get_role_by_name(WORKER_ROLE_NAME)
         
     def user_exists(self, user_id: int) -> bool:

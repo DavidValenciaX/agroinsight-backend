@@ -10,6 +10,19 @@ from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.orm_models import PasswordRecovery, User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
+from app.user.infrastructure.orm_models import UserState as UserStateModel
+
+# Constantes para roles
+ADMIN_ROLE_NAME = "Administrador de Finca"
+WORKER_ROLE_NAME = "Trabajador agrícola"
+UNCONFIRMED_ROLE_NAME = "Rol no confirmado"
+UNASSIGNED_ROLE_NAME = "Rol no asignado"
+
+# Constantes para estados
+ACTIVE_STATE_NAME = "active"
+LOCKED_STATE_NAME = "locked"
+PENDING_STATE_NAME = "pending"
+INACTIVE_STATE_NAME = "inactive"
 
 class ConfirmRecoveryPinUseCase:
     def __init__(self, db: Session):
@@ -92,5 +105,8 @@ class ConfirmRecoveryPinUseCase:
     
     def block_user(self, user: User, lock_duration: timedelta) -> bool:
         user.locked_until = datetime_utc_time() + lock_duration
-        user.state_id = self.user_repository.get_locked_user_state().id
+        user.state_id = self.get_locked_user_state().id
         return self.user_repository.update_user(user)
+    
+    def get_locked_user_state(self) -> Optional[UserStateModel]:
+        return self.user_repository.get_state_by_name(LOCKED_STATE_NAME)
