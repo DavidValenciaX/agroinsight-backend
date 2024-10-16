@@ -38,13 +38,17 @@ class UserStateValidator:
         return None
 
     def get_user_state(self, user):
-        if user.state_id == self.user_repository.get_active_user_state_id():
+        active_state = self.user_repository.get_active_user_state()
+        inactive_state = self.user_repository.get_inactive_user_state()
+        locked_state = self.user_repository.get_locked_user_state()
+        pending_state = self.user_repository.get_pending_user_state()
+        if active_state and user.state_id == active_state.id:
             return UserState.ACTIVE
-        elif user.state_id == self.user_repository.get_inactive_user_state_id():
+        elif inactive_state and user.state_id == inactive_state.id:
             return UserState.INACTIVE
-        elif user.state_id == self.user_repository.get_locked_user_state_id():
+        elif locked_state and user.state_id == locked_state.id:
             return UserState.LOCKED
-        elif user.state_id == self.user_repository.get_pending_user_state_id():
+        elif pending_state and user.state_id == pending_state.id:
             return UserState.PENDING
         else:
             raise UserStateException(
@@ -96,10 +100,10 @@ class UserStateValidator:
         if ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until):
             user.failed_attempts = 0
             user.locked_until = None
-            user.state_id = self.user_repository.get_active_user_state_id()
+            user.state_id = self.user_repository.get_active_user_state().id
             updated_user = self.user_repository.update_user(user)
             
-            if updated_user and updated_user.state_id == self.user_repository.get_active_user_state_id():
+            if updated_user and updated_user.state_id == self.user_repository.get_active_user_state().id:
                 return True  # Usuario desbloqueado exitosamente
         
         return False  # Usuario sigue bloqueado

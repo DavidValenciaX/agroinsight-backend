@@ -80,7 +80,7 @@ class UserRegisterUseCase:
                     return state_validation_result
 
         # Obtener estado "pendiente" del usuario (caché o consulta única)
-        pending_state_id = self.user_repository.get_pending_user_state_id()
+        pending_state_id = self.user_repository.get_pending_user_state().id
         if not pending_state_id:
             raise UserStateException(
                 message="No se pudo encontrar el estado de usuario pendiente.",

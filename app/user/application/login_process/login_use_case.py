@@ -125,5 +125,5 @@ class LoginUseCase:
 
     def block_user(self, user: User, lock_duration: timedelta) -> bool:
         user.locked_until = datetime_utc_time() + lock_duration
-        user.state_id = self.user_repository.get_locked_user_state_id()
+        user.state_id = self.user_repository.get_locked_user_state().id
         return self.user_repository.update_user(user)

@@ -188,21 +188,17 @@ class UserRepository:
     def get_state_by_id(self, state_id: int) -> Optional[UserState]:
         return self.db.query(UserState).filter(UserState.id == state_id).first()
 
-    def get_active_user_state_id(self) -> Optional[int]:
-        active_state = self.db.query(UserState).filter(UserState.nombre == ACTIVE_STATE_NAME).first()
-        return active_state.id if active_state else None
+    def get_active_user_state(self) -> Optional[UserState]:
+        return self.db.query(UserState).filter(UserState.nombre == ACTIVE_STATE_NAME).first()
 
-    def get_locked_user_state_id(self) -> Optional[int]:
-        locked_state = self.db.query(UserState).filter(UserState.nombre == LOCKED_STATE_NAME).first()
-        return locked_state.id if locked_state else None
+    def get_locked_user_state(self) -> Optional[UserState]:
+        return self.db.query(UserState).filter(UserState.nombre == LOCKED_STATE_NAME).first()
 
-    def get_pending_user_state_id(self) -> Optional[int]:
-        pending_state = self.db.query(UserState).filter(UserState.nombre == PENDING_STATE_NAME).first()
-        return pending_state.id if pending_state else None
+    def get_pending_user_state(self) -> Optional[UserState]:
+        return self.db.query(UserState).filter(UserState.nombre == PENDING_STATE_NAME).first()
 
-    def get_inactive_user_state_id(self) -> Optional[int]:
-        inactive_state = self.db.query(UserState).filter(UserState.nombre == INACTIVE_STATE_NAME).first()
-        return inactive_state.id if inactive_state else None
+    def get_inactive_user_state(self) -> Optional[UserState]:
+        return self.db.query(UserState).filter(UserState.nombre == INACTIVE_STATE_NAME).first()
     
     # Métodos relacionados con roles
     def get_role_by_id(self, role_id: int) -> Optional[Role]:

@@ -8,6 +8,7 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException, UserStateException
 from app.infrastructure.services.pin_service import hash_pin
 from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.user.infrastructure.orm_models import UserState as UserStateModel
 
 class ConfirmationUseCase:
     def __init__(self, db: Session):
@@ -68,19 +69,12 @@ class ConfirmationUseCase:
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         
-        # Actualizar el estado del usuario a activo
-        active_state_id = self.user_repository.get_active_user_state_id()
-        if not active_state_id:
-            raise UserStateException(
-                message="No se pudo encontrar el estado de usuario activo.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user_state="unknown"
-            )
             
-        self.update_user_state(user, active_state_id)
+        self.activate_user(user)
         
         # Eliminar el registro de confirmación
         self.user_repository.delete_user_confirmation(confirmation)
+        
         return SuccessResponse(
                 message="Usuario confirmado exitosamente."
             )
@@ -94,10 +88,19 @@ class ConfirmationUseCase:
         confirmation.intentos += 1
         self.user_repository.update_user_confirmation(confirmation)
         return confirmation.intentos
-    
-    def update_user_state(self, user: User, active_state_id: int) -> None:
-        """Actualiza el estado del usuario."""
-        user.state_id = active_state_id
+
+        
+    def activate_user(self, user: User) -> None:
+        """Activa el usuario."""
+        # Actualizar el estado del usuario a activo
+        active_state = self.user_repository.get_active_user_state()
+        if not active_state:
+            raise UserStateException(
+                message="No se pudo encontrar el estado de usuario activo.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user_state="unknown"
+            )
+        user.state_id = active_state.id
         self.user_repository.update_user(user)
 
     def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
