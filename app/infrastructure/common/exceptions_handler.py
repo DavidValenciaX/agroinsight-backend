@@ -123,8 +123,7 @@ def user_state_exception_handler(request: Request, exc: UserStateException):
                 "route": str(request.url),
                 "status_code": exc.status_code,
                 "message": exc.message,
-                "user_state": exc.user_state,
-                "details": []
+                "user_state": exc.user_state
             }
         }
     )

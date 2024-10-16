@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import status
-from app.infrastructure.common.common_exceptions import UserStateException
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from enum import Enum, auto
 from sqlalchemy.orm import Session
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
@@ -89,35 +89,56 @@ class UserStateValidator:
             )
         elif state == UserState.LOCKED:
             return self.handle_locked_state(user)
+        
+    def should_unlock_user(self, user: UserInDB) -> bool:
+        """Verifica si el usuario cumple las condiciones para ser desbloqueado."""
+        current_time = datetime_utc_time()
+        return ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until)
 
     def handle_locked_state(self, user: UserInDB):
-        if not self.try_unlock_user(user):
-            # Si el usuario sigue bloqueado, calculamos el tiempo restante y lanzamos una excepción
-            time_left = user.locked_until - datetime_utc_time()
-            minutos_restantes = max(time_left.seconds // 60, 1)  # Aseguramos que sea al menos 1 minuto
-            raise UserStateException(
-                message=f"La cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
-                status_code=status.HTTP_403_FORBIDDEN,
-                user_state="locked"
+        # Verifica si el usuario debería desbloquearse
+        if self.should_unlock_user(user):
+            try:
+                # Intenta desbloquear al usuario
+                if self.unlock_user(user):
+                    # Si el desbloqueo fue exitoso, valida el estado actualizado del usuario
+                    return self.validate_state(user)
+            except Exception as e:
+                raise DomainException(
+                    message=f"Error al intentar desbloquear el usuario: {str(e)}",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                ) from e
+        
+        # Si el usuario no cumple las condiciones para desbloquearse, calcula el tiempo restante y lanza una excepción
+        time_left = user.locked_until - datetime_utc_time()
+        minutos_restantes = max(time_left.seconds // 60, 1)  # Asegura al menos 1 minuto
+        raise UserStateException(
+            message=f"La cuenta está bloqueada. Intenta nuevamente en {minutos_restantes} minutos.",
+            status_code=status.HTTP_403_FORBIDDEN,
+            user_state="locked"
+        )
+        
+    def is_user_unlocked(self, user: UserInDB) -> bool:
+        """Verifica si el usuario está desbloqueado revisando que `locked_until` sea None y tenga el estado de 'activo'."""
+        return user.locked_until is None and user.state_id == self.get_active_user_state().id
+
+    def unlock_user(self, user: UserInDB) -> bool:
+        """Desbloquea al usuario."""
+        user.failed_attempts = 0
+        user.locked_until = None
+        user.state_id = self.get_active_user_state().id
+        
+        # Actualiza el usuario en la base de datos
+        updated_user = self.user_repository.update_user(user)
+        
+        # Verifica si el usuario está efectivamente desbloqueado
+        if not updated_user or not self.is_user_unlocked(updated_user):
+            raise DomainException(
+                message="No se pudo desbloquear al usuario.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
-        # Si el usuario se desbloqueó exitosamente, volver a validar el estado
-        return self.validate_state(user)
-
-
-    def try_unlock_user(self, user: UserInDB):
-        current_time = datetime_utc_time()
         
-        if ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until):
-            user.failed_attempts = 0
-            user.locked_until = None
-            user.state_id = self.get_active_user_state().id
-            updated_user = self.user_repository.update_user(user)
-            
-            if updated_user and updated_user.state_id == self.get_active_user_state().id:
-                return True  # Usuario desbloqueado exitosamente
-        
-        return False  # Usuario sigue bloqueado
+        return True  # Usuario desbloqueado exitosamente
     
     def get_active_user_state(self) -> Optional[UserStateModel]:
         active_state = self.user_repository.get_state_by_name(ACTIVE_STATE_NAME)
