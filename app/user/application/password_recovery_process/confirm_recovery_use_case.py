@@ -7,7 +7,7 @@ from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.user.infrastructure.orm_models import PasswordRecovery
+from app.user.infrastructure.orm_models import PasswordRecovery, User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 
@@ -60,7 +60,7 @@ class ConfirmRecoveryPinUseCase:
             if recovery.intentos >= 3:
                 block_time = 10
                 self.user_repository.delete_password_recovery(recovery)
-                self.user_repository.block_user(user, timedelta(minutes=block_time))
+                self.block_user(user, timedelta(minutes=block_time))
                 raise UserHasBeenBlockedException(block_time)
                 
             raise DomainException(
@@ -89,3 +89,8 @@ class ConfirmRecoveryPinUseCase:
                 self.user_repository.delete_password_recovery(old_recovery)
             return latest_recovery
         return None
+    
+    def block_user(self, user: User, lock_duration: timedelta) -> bool:
+        user.locked_until = datetime_utc_time() + lock_duration
+        user.state_id = self.user_repository.get_locked_user_state_id()
+        return self.user_repository.update_user(user)

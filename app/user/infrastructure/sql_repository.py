@@ -76,18 +76,6 @@ class UserRepository:
             print(f"Error al eliminar el usuario: {str(e)}")
             return False
     
-    def block_user(self, user: User, lock_duration: timedelta) -> bool:
-        user.locked_until = datetime_utc_time() + lock_duration
-        user.state_id = self.get_locked_user_state_id()  # Estado bloqueado
-        try:
-            self.db.commit()
-            self.db.refresh(user)
-            return True
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al bloquear el usuario: {e}")
-            return False
-    
     # Métodos relacionados con la confirmación de usuario
     def add_user_confirmation(self, confirmation: UserConfirmation) -> bool:
         try:

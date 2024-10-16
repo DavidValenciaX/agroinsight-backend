@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.domain.schemas import TokenResponse
-from app.user.infrastructure.orm_models import TwoStepVerification
+from app.user.infrastructure.orm_models import TwoStepVerification, User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.security.security_utils import create_access_token
@@ -48,7 +48,7 @@ class VerifyUseCase:
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         
-        # Verificar si el PIN es correcto y no ha expirado
+        # Verificar si el PIN es correcto
         pin_hash = hash_pin(pin)
         verify_pin = verification.pin == pin_hash
         
@@ -57,7 +57,7 @@ class VerifyUseCase:
             if attempts >= 3:
                 block_time = 10
                 # Bloquear usuario por 10 minutos
-                self.user_repository.block_user(user, timedelta(minutes=block_time))
+                self.block_user(user, timedelta(minutes=block_time))
                 # Eliminar la verificación
                 self.user_repository.delete_two_factor_verification(verification)
                 raise UserHasBeenBlockedException(block_time)
@@ -98,3 +98,8 @@ class VerifyUseCase:
             return latest_verification
         # Si no hay verificaciones, retornar None
         return None
+    
+    def block_user(self, user: User, lock_duration: timedelta) -> bool:
+        user.locked_until = datetime_utc_time() + lock_duration
+        user.state_id = self.user_repository.get_locked_user_state_id()
+        return self.user_repository.update_user(user)

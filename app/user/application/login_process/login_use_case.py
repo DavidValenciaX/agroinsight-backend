@@ -89,10 +89,8 @@ class LoginUseCase:
         self.user_repository.update_user(user)
 
         if user.failed_attempts >= max_failed_attempts:
-            user.locked_until = datetime_utc_time() + timedelta(minutes=block_time)
-            user.state_id = self.user_repository.get_locked_user_state_id()
-            self.user_repository.update_user(user)
-            raise UserHasBeenBlockedException(block_time)  
+            self.block_user(user, timedelta(minutes=block_time))
+            raise UserHasBeenBlockedException(block_time)
 
         raise DomainException(
             message="Contraseña incorrecta.",
@@ -125,3 +123,7 @@ class LoginUseCase:
         # Si no hay verificaciones, retornar None
         return None
 
+    def block_user(self, user: User, lock_duration: timedelta) -> bool:
+        user.locked_until = datetime_utc_time() + lock_duration
+        user.state_id = self.user_repository.get_locked_user_state_id()
+        return self.user_repository.update_user(user)
