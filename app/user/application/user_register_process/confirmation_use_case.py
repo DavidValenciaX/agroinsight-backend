@@ -39,7 +39,7 @@ class ConfirmationUseCase:
             )
             
         # Verificar si la confirmación está expirada
-        if self._is_confirmation_expired(confirmation):
+        if self.is_confirmation_expired(confirmation):
             # Eliminar usuario y con el se elimina su confirmación
             self.user_repository.delete_user(user)
             raise DomainException(
@@ -55,7 +55,7 @@ class ConfirmationUseCase:
         
         if not confirm_pin:
             # Manejar intentos fallidos de confirmación
-            intentos = self._increment_confirmation_attempts(confirmation)
+            intentos = self.increment_confirmation_attempts(confirmation)
             if intentos >= 3:
                 # Eliminar usuario y con el se elimina su confirmación
                 self.user_repository.delete_user(user)
@@ -77,7 +77,7 @@ class ConfirmationUseCase:
                 user_state="unknown"
             )
             
-        self._update_user_state(user, active_state_id)
+        self.update_user_state(user, active_state_id)
         
         # Eliminar el registro de confirmación
         self.user_repository.delete_user_confirmation(confirmation)
@@ -85,17 +85,17 @@ class ConfirmationUseCase:
                 message="Usuario confirmado exitosamente."
             )
         
-    def _is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
+    def is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
         """Verifica si la confirmación ha expirado."""
         return confirmation.expiracion < datetime_utc_time()
     
-    def _increment_confirmation_attempts(self, confirmation: UserConfirmation) -> int:
+    def increment_confirmation_attempts(self, confirmation: UserConfirmation) -> int:
         """Incrementa los intentos de confirmación."""
         confirmation.intentos += 1
         self.user_repository.update_user_confirmation(confirmation)
         return confirmation.intentos
     
-    def _update_user_state(self, user: User, active_state_id: int) -> None:
+    def update_user_state(self, user: User, active_state_id: int) -> None:
         """Actualiza el estado del usuario."""
         user.state_id = active_state_id
         self.user_repository.update_user(user)

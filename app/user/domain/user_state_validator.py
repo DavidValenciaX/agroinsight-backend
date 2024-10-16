@@ -21,23 +21,23 @@ class UserStateValidator:
     def validate_user_state(self, user, allowed_states=None, disallowed_states=None):
         self.allowed_states = allowed_states
         self.disallowed_states = disallowed_states
-        return self._validate_state(user)
+        return self.validate_state(user)
 
-    def _validate_state(self, user):
-        user_state = self._get_user_state(user)
+    def validate_state(self, user):
+        user_state = self.get_user_state(user)
 
         if self.allowed_states and user_state not in self.allowed_states:
-            return self._handle_disallowed_state(user_state, user)
+            return self.handle_disallowed_state(user_state, user)
 
         if self.disallowed_states and user_state in self.disallowed_states:
-            return self._handle_disallowed_state(user_state, user)
+            return self.handle_disallowed_state(user_state, user)
 
         if user_state == UserState.LOCKED:
-            return self._handle_locked_state(user)
+            return self.handle_locked_state(user)
 
         return None
 
-    def _get_user_state(self, user):
+    def get_user_state(self, user):
         if user.state_id == self.user_repository.get_active_user_state_id():
             return UserState.ACTIVE
         elif user.state_id == self.user_repository.get_inactive_user_state_id():
@@ -53,7 +53,7 @@ class UserStateValidator:
                 user_state="unknown"
             )
 
-    def _handle_disallowed_state(self, state, user):
+    def handle_disallowed_state(self, state, user):
         if state == UserState.ACTIVE:
             raise UserStateException(
                 message="La cuenta ya está registrada y activa.",
@@ -73,10 +73,10 @@ class UserStateValidator:
                 user_state="pending"
             )
         elif state == UserState.LOCKED:
-            return self._handle_locked_state(user)
+            return self.handle_locked_state(user)
 
-    def _handle_locked_state(self, user: UserInDB):
-        if not self._try_unlock_user(user):
+    def handle_locked_state(self, user: UserInDB):
+        if not self.try_unlock_user(user):
             # Si el usuario sigue bloqueado, calculamos el tiempo restante y lanzamos una excepción
             time_left = user.locked_until - datetime_utc_time()
             minutos_restantes = max(time_left.seconds // 60, 1)  # Aseguramos que sea al menos 1 minuto
@@ -87,10 +87,10 @@ class UserStateValidator:
             )
             
         # Si el usuario se desbloqueó exitosamente, volver a validar el estado
-        return self._validate_state(user)
+        return self.validate_state(user)
 
 
-    def _try_unlock_user(self, user: UserInDB):
+    def try_unlock_user(self, user: UserInDB):
         current_time = datetime_utc_time()
         
         if ensure_utc(user.locked_until) and current_time > ensure_utc(user.locked_until):

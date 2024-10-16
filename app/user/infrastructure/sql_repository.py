@@ -88,24 +88,6 @@ class UserRepository:
             print(f"Error al bloquear el usuario: {e}")
             return False
     
-    def update_user_info(self, user: User, user_data: dict) -> Optional[User]:
-        """Actualiza la información del usuario con los datos proporcionados"""
-        if 'nombre' in user_data and user_data['nombre']:
-            user.nombre = user_data['nombre']
-        if 'apellido' in user_data and user_data['apellido']:
-            user.apellido = user_data['apellido']
-        if 'email' in user_data and user_data['email']:
-            user.email = user_data['email']
-
-        try:
-            self.db.commit()
-            self.db.refresh(user)
-            return user
-        except Exception as e:
-            self.db.rollback()
-            print(f"Error al actualizar el usuario: {e}")
-            return None
-    
     # Métodos relacionados con la confirmación de usuario
     def add_user_confirmation(self, confirmation: UserConfirmation) -> bool:
         try:

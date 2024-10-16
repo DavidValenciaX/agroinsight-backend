@@ -50,8 +50,7 @@ class ResetPasswordUseCase:
 
         user.password = hash_password(new_password)
         # Actualizar usuario en la base de datos
-        updated_user = self.user_repository.update_user(user)
-        if not updated_user:
+        if not self.user_repository.update_user(user):
             raise DomainException(
                 message="No se pudo actualizar la contraseña del usuario.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
