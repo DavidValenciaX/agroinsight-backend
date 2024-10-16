@@ -15,16 +15,6 @@ CUSTOM_MESSAGES = {
     'json_invalid': 'Error de decodificación de json',
     'less_than_equal': 'La entrada debe ser menor o igual a {le}',
     'greater_than_equal': 'La entrada debe ser mayor o igual a {ge}',
-    # Agregar otros tipos de error y mensajes personalizados si es necesario
-}
-
-HTTP_CUSTOM_MESSAGES = {
-    403: "No tiene permisos para realizar esta acción.",
-    404: "Recurso no encontrado.",
-    405: "Método no permitido.",
-    406: "No aceptable.",
-    409: "Conflicto con el estado actual del recurso.",
-    # Agrega más códigos de estado y mensajes según tus necesidades
 }
 
 def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[Dict]:
@@ -59,7 +49,6 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
             }
     }
     
-    # Log the detailed error
     logger.error(f"Validation error: {error_response}")
 
     return JSONResponse(
@@ -87,8 +76,7 @@ def custom_exception_handler(request: Request, exc: Exception):
     )
 
 def custom_http_exception_handler(request: Request, exc: HTTPException):
-    message = HTTP_CUSTOM_MESSAGES.get(exc.status_code, exc.detail)
-    logger.warning(f"HTTPException en {request.url}: status_code={exc.status_code}, message='{message}'")
+    logger.warning(f"HTTPException en {request.url}: status_code={exc.status_code}, message='{exc.detail}'")
     
     return JSONResponse(
         status_code=exc.status_code,
@@ -96,12 +84,10 @@ def custom_http_exception_handler(request: Request, exc: HTTPException):
             "error": {
                 "route": str(request.url),
                 "status_code": exc.status_code,
-                "message": message,
-                "details": []
+                "message": exc.detail
             }
         },
     )
-
     
 def domain_exception_handler(request: Request, exc: DomainException):
     error_response = {
