@@ -16,6 +16,13 @@ from datetime import datetime, timezone, timedelta
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.infrastructure.orm_models import UserState as UserStateModel
 
+"""
+Este módulo contiene la implementación del caso de uso para el registro de usuarios.
+
+Incluye la clase UserRegisterUseCase que maneja la lógica de negocio para crear nuevos usuarios,
+validar sus estados, y enviar correos de confirmación.
+"""
+
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
 WORKER_ROLE_NAME = "Trabajador Agrícola"
@@ -35,18 +42,17 @@ class UserRegisterUseCase:
     y el envío de correos de confirmación.
 
     Attributes:
-    ----------
-        - db (Session): La sesión de base de datos para realizar operaciones.
-        - user_repository (UserRepository): Repositorio para operaciones de usuario.
-        - state_validator (UserStateValidator): Validador de estados de usuario.
+        db (Session): La sesión de base de datos para realizar operaciones.
+        user_repository (UserRepository): Repositorio para operaciones de usuario.
+        state_validator (UserStateValidator): Validador de estados de usuario.
     """
+
     def __init__(self, db: Session):
         """
-        Inicializa una nueva instancia de UserCreationUseCase.
+        Inicializa una nueva instancia de UserRegisterUseCase.
 
-        Parameters:
-        -------
-            - db (Session): La sesión de base de datos a utilizar.
+        Args:
+            db (Session): La sesión de base de datos a utilizar.
         """
         self.db = db
         self.user_repository = UserRepository(db)
@@ -54,18 +60,18 @@ class UserRegisterUseCase:
 
     def register_user(self, user_data: UserCreate, background_tasks: BackgroundTasks) -> SuccessResponse:
         """
-        Crea al nuevo usuario.
+        Crea un nuevo usuario en el sistema.
 
         Este método realiza las siguientes operaciones:
-        
-        1. Verificar si el usuario ya existe.
-        2. Verificar si la confirmación del usuario ha expirado.
-        3. Validar el estado del usuario si no tiene confirmación expirada.
+        1. Verifica si el usuario ya existe.
+        2. Verifica si la confirmación del usuario ha expirado.
+        3. Valida el estado del usuario si no tiene confirmación expirada.
         4. Crea un nuevo usuario con estado pendiente.
         5. Crea y envía una confirmación por correo electrónico.
 
-        Parameters:
+        Args:
             user_data (UserCreate): Datos del usuario a crear.
+            background_tasks (BackgroundTasks): Tareas en segundo plano para enviar el correo.
 
         Returns:
             SuccessResponse: Respuesta indicando el éxito de la operación.
@@ -74,7 +80,6 @@ class UserRegisterUseCase:
             DomainException: Si ocurre un error durante el proceso de creación.
             UserStateException: Si el estado del usuario no es válido.
         """
-
         user = self.user_repository.get_user_with_confirmation(user_data.email)
         
         if user:
@@ -140,6 +145,16 @@ class UserRegisterUseCase:
             )
 
     def send_confirmation_email(self, email: str, pin: str) -> bool:
+        """
+        Envía un correo electrónico de confirmación al usuario.
+
+        Args:
+            email (str): Dirección de correo electrónico del usuario.
+            pin (str): PIN de confirmación generado.
+
+        Returns:
+            bool: True si el correo se envió correctamente, False en caso contrario.
+        """
         subject = "Confirma tu registro en AgroInSight"
         text_content = f"Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""
@@ -153,11 +168,27 @@ class UserRegisterUseCase:
         return send_email(email, subject, text_content, html_content)
     
     def is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
-        """Verifica si la confirmación ha expirado."""
+        """
+        Verifica si la confirmación del usuario ha expirado.
+
+        Args:
+            confirmation (UserConfirmation): Objeto de confirmación del usuario.
+
+        Returns:
+            bool: True si la confirmación ha expirado, False en caso contrario.
+        """
         return confirmation.expiracion < datetime_utc_time()
     
     def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
-        """Obtiene la última confirmación del usuario."""
+        """
+        Obtiene la última confirmación del usuario y elimina las anteriores.
+
+        Args:
+            confirmation (UserConfirmation): Lista de confirmaciones del usuario.
+
+        Returns:
+            Optional[UserConfirmation]: La última confirmación del usuario o None si no hay confirmaciones.
+        """
         if isinstance(confirmation, list) and confirmation:
             # Ordenar las confirmaciones por fecha de creación de forma ascendente
             confirmation.sort(key=lambda c: c.created_at)
@@ -172,6 +203,15 @@ class UserRegisterUseCase:
         return None
     
     def get_pending_user_state(self) -> Optional[UserStateModel]:
+        """
+        Obtiene el estado 'pendiente' del usuario.
+
+        Returns:
+            Optional[UserStateModel]: El estado 'pendiente' del usuario.
+
+        Raises:
+            UserStateException: Si no se puede encontrar el estado 'pendiente'.
+        """
         pending_state = self.user_repository.get_state_by_name(PENDING_STATE_NAME)
         if not pending_state:
             raise UserStateException(

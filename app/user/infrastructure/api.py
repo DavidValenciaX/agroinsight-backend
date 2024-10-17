@@ -38,22 +38,20 @@ def register_user(
     user: UserCreate,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb),
-):
+) -> SuccessResponse:
     """
     Registra un nuevo usuario en el sistema.
 
-    Este endpoint recibe los datos de un nuevo usuario, los valida, y si todo es correcto,
-    crea una nueva cuenta de usuario en el sistema.
-
-    Parameters:
+    Args:
         user (UserCreate): Datos del usuario a registrar.
+        background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse con un mensaje indicando que el usuario fue registrado exitosamente.
+        SuccessResponse: Objeto con mensaje de éxito.
 
     Raises:
-        HTTPException: Si ocurre un error durante el registro, como datos inválidos o un usuario ya existente.
+        HTTPException: Si ocurre un error durante el registro.
     """
     creation_use_case = UserRegisterUseCase(db)
     # Llamamos al caso de uso sin manejar excepciones aquí
@@ -74,16 +72,17 @@ def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
-):
+) -> SuccessResponse:
     """
     Reenvía el PIN de confirmación al correo electrónico del usuario.
 
-    Parameters:
+    Args:
         resend_request (ResendPinConfirmRequest): Solicitud de reenvío de PIN.
+        background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que el PIN fue reenviado exitosamente.
+        SuccessResponse: Objeto indicando que el PIN fue reenviado exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante el reenvío del PIN.
@@ -103,16 +102,16 @@ def resend_confirmation_pin_endpoint(
 def confirm_user_registration(
     confirmation: ConfirmationRequest,
     db: Session = Depends(getDb)
-):
+) -> SuccessResponse:
     """
     Confirma el registro de un usuario utilizando un PIN.
 
-    Parameters:
+    Args:
         confirmation (ConfirmationRequest): Datos de confirmación del usuario.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que el registro fue confirmado exitosamente.
+        SuccessResponse: Objeto indicando que el registro fue confirmado exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante la confirmación del registro.
@@ -129,17 +128,17 @@ def confirm_user_registration(
         ) from e
     
 @user_router.post("/login", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def login_for_access_token(login_request: LoginRequest, background_tasks: BackgroundTasks, db: Session = Depends(getDb)):
+def login_for_access_token(login_request: LoginRequest, background_tasks: BackgroundTasks, db: Session = Depends(getDb)) -> SuccessResponse:
     """
     Inicia el proceso de doble factor de autenticación.
 
-    Parameters:
+    Args:
         login_request (LoginRequest): Datos de inicio de sesión del usuario.
         background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse con el token de acceso.
+        SuccessResponse: Objeto con el token de acceso.
 
     Raises:
         HTTPException: Si ocurre un error durante el inicio de sesión.
@@ -160,16 +159,17 @@ def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
-):
+) -> SuccessResponse:
     """
     Reenvía el PIN de doble factor de autenticación al usuario.
 
-    Parameters:
+    Args:
         resend_request (Resend2FARequest): Solicitud de reenvío de PIN de 2FA.
+        background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que el PIN de 2FA fue reenviado exitosamente.
+        SuccessResponse: Objeto indicando que el PIN de 2FA fue reenviado exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante el reenvío del PIN de 2FA.
@@ -186,16 +186,16 @@ def resend_2fa_pin_endpoint(
         ) from e
         
 @user_router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
-def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)):
+def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)) -> TokenResponse:
     """
     Verifica el inicio de sesión utilizando el PIN de doble factor de autenticación.
 
-    Parameters:
+    Args:
         auth_request (TwoFactorAuthRequest): Datos de autenticación de dos factores.
         db (Session): Sesión de base de datos.
 
     Returns:
-        TokenResponse: Un objeto TokenResponse con el token de acceso.
+        TokenResponse: Objeto con el token de acceso.
 
     Raises:
         HTTPException: Si ocurre un error durante la verificación del inicio de sesión.
@@ -212,16 +212,16 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
         ) from e
 
 @user_router.get("/me", response_model=UserResponse)
-def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)):
+def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)) -> UserResponse:
     """
     Obtiene la información del usuario actual.
 
-    Parameters:
+    Args:
         current_user (UserInDB): Usuario actual autenticado.
         db (Session): Sesión de base de datos.
 
     Returns:
-        UserResponse: Un objeto UserResponse con la información del usuario actual.
+        UserResponse: Objeto con la información del usuario actual.
 
     Raises:
         HTTPException: Si ocurre un error durante la obtención de la información del usuario.
@@ -242,17 +242,17 @@ def update_user_info(
     user_update: UserUpdate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> SuccessResponse:
     """
     Actualiza la información del usuario actual.
 
-    Parameters:
+    Args:
         user_update (UserUpdate): Datos de actualización del usuario.
         db (Session): Sesión de base de datos.
         current_user (UserInDB): Usuario actual autenticado.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que la información fue actualizada exitosamente.
+        SuccessResponse: Objeto indicando que la información fue actualizada exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante la actualización de la información del usuario.
@@ -273,16 +273,17 @@ def initiate_password_recovery(
     recovery_request: PasswordRecoveryRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
-):
+) -> SuccessResponse:
     """
     Inicia el proceso de recuperación de contraseña para un usuario.
 
-    Parameters:
+    Args:
         recovery_request (PasswordRecoveryRequest): Solicitud de recuperación de contraseña.
+        background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que el proceso de recuperación fue iniciado exitosamente.
+        SuccessResponse: Objeto indicando que el proceso de recuperación fue iniciado exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante el inicio del proceso de recuperación.
@@ -303,16 +304,17 @@ def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
-):
+) -> SuccessResponse:
     """
     Reenvía el PIN de recuperación de contraseña al usuario.
 
-    Parameters:
+    Args:
         recovery_request (PasswordRecoveryRequest): Solicitud de reenvío de PIN de recuperación.
+        background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que el PIN de recuperación fue reenviado exitosamente.
+        SuccessResponse: Objeto indicando que el PIN de recuperación fue reenviado exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante el reenvío del PIN de recuperación.
@@ -332,16 +334,16 @@ def resend_recovery_pin(
 def confirm_recovery_pin(
     pin_confirmation: PinConfirmationRequest,
     db: Session = Depends(getDb)
-):
+) -> SuccessResponse:
     """
     Confirma el PIN de recuperación de contraseña.
 
-    Parameters:
+    Args:
         pin_confirmation (PinConfirmationRequest): Datos de confirmación del PIN de recuperación.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que el PIN de recuperación fue confirmado exitosamente.
+        SuccessResponse: Objeto indicando que el PIN de recuperación fue confirmado exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante la confirmación del PIN de recuperación.
@@ -361,16 +363,16 @@ def confirm_recovery_pin(
 def reset_password(
     reset_request: PasswordResetRequest,
     db: Session = Depends(getDb)
-):
+) -> SuccessResponse:
     """
     Restablece la contraseña de un usuario.
 
-    Parameters:
+    Args:
         reset_request (PasswordResetRequest): Solicitud de restablecimiento de contraseña.
         db (Session): Sesión de base de datos.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que la contraseña fue restablecida exitosamente.
+        SuccessResponse: Objeto indicando que la contraseña fue restablecida exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante el restablecimiento de la contraseña.
@@ -391,17 +393,17 @@ def logout(
     current_user: UserInDB = Depends(get_current_user),
     db: Session = Depends(getDb),
     credentials: HTTPAuthorizationCredentials = Security(security_scheme)
-):
+) -> SuccessResponse:
     """
     Cierra la sesión del usuario actual.
 
-    Parameters:
+    Args:
         current_user (UserInDB): Usuario actual autenticado.
         db (Session): Sesión de base de datos.
         credentials (HTTPAuthorizationCredentials): Credenciales de autorización HTTP.
 
     Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que la sesión fue cerrada exitosamente.
+        SuccessResponse: Objeto indicando que la sesión fue cerrada exitosamente.
 
     Raises:
         HTTPException: Si ocurre un error durante el cierre de sesión.

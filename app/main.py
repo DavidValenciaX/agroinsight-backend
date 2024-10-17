@@ -3,6 +3,11 @@ Módulo principal de la aplicación AgroInSight.
 
 Este módulo inicializa la aplicación FastAPI, configura los routers
 y los manejadores de excepciones.
+
+Attributes:
+    app (FastAPI): Instancia principal de la aplicación FastAPI.
+    logger (logging.Logger): Logger configurado para este módulo.
+
 """
 
 from fastapi import FastAPI, HTTPException
@@ -21,11 +26,14 @@ from app.infrastructure.common.exceptions_handler import (
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 import logging
 
+# Configuración del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Creación de la instancia de FastAPI
 app = FastAPI()
 
+# Inclusión de routers
 app.include_router(user_router)
 app.include_router(farm_router)
 app.include_router(plot_router)
@@ -38,10 +46,11 @@ def root():
 
     Returns:
         dict: Mensaje de bienvenida.
+
     """
     return {"message": "Bienvenido a AgroinSight"}
 
-# Manejadores de excepciones (registrar los más específicos primero)
+# Registro de manejadores de excepciones
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(UserStateException, user_state_exception_handler)
 app.add_exception_handler(DomainException, domain_exception_handler)

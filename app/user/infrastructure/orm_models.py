@@ -11,23 +11,22 @@ class User(Base):
     """
     Representa la tabla 'usuario' en la base de datos.
 
-    Atributos:
-    ----------
-    - **id** (int): Identificador único del usuario.
-    - **nombre** (str): Nombre del usuario.
-    - **apellido** (str): Apellido del usuario.
-    - **email** (str): Correo electrónico único del usuario.
-    - **password** (str): Contraseña del usuario.
-    - **failed_attempts** (int): Número de intentos fallidos de inicio de sesión.
-    - **locked_until** (datetime): Fecha y hora hasta la cual el usuario está bloqueado.
-    - **state_id** (int): Identificador del estado del usuario.
-    - **estado** (UserState): Estado actual del usuario.
-    - **confirmacion** (UserConfirmation): Información de confirmación del usuario.
-    - **verificacion_dos_pasos** (TwoStepVerification): Información de verificación de dos pasos.
-    - **recuperacion_contrasena** (PasswordRecovery): Información de recuperación de contraseña.
-    - **blacklisted_tokens** (List[BlacklistedToken]): Lista de tokens en lista negra.
-    - **fincas** (List[Farm]): Lista de fincas asociadas al usuario.
-    - **asignaciones** (List[Assignment]): Lista de asignaciones del usuario.
+    Attributes:
+        id (int): Identificador único del usuario.
+        nombre (str): Nombre del usuario.
+        apellido (str): Apellido del usuario.
+        email (str): Correo electrónico único del usuario.
+        password (str): Contraseña del usuario.
+        failed_attempts (int): Número de intentos fallidos de inicio de sesión.
+        locked_until (datetime): Fecha y hora hasta la cual el usuario está bloqueado.
+        state_id (int): Identificador del estado del usuario.
+        estado (UserState): Estado actual del usuario.
+        confirmacion (UserConfirmation): Información de confirmación del usuario.
+        verificacion_dos_pasos (TwoStepVerification): Información de verificación de dos pasos.
+        recuperacion_contrasena (PasswordRecovery): Información de recuperación de contraseña.
+        blacklisted_tokens (List[BlacklistedToken]): Lista de tokens en lista negra.
+        asignaciones (List[Assignment]): Lista de asignaciones del usuario.
+        roles_fincas (List[UserFarmRole]): Lista de roles del usuario en diferentes fincas.
     """
     __tablename__ = "usuario"
     
@@ -49,6 +48,18 @@ class User(Base):
     roles_fincas = relationship("UserFarmRole", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
 
 class UserFarmRole(Base):
+    """
+    Representa la tabla 'usuario_finca_rol' en la base de datos.
+
+    Attributes:
+        id (int): Identificador único de la relación usuario-finca-rol.
+        usuario_id (int): Identificador del usuario.
+        finca_id (int): Identificador de la finca.
+        rol_id (int): Identificador del rol.
+        usuario (User): Usuario asociado.
+        finca (Farm): Finca asociada.
+        rol (Role): Rol asociado.
+    """
     __tablename__ = "usuario_finca_rol"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -64,12 +75,11 @@ class Role(Base):
     """
     Representa la tabla 'rol' en la base de datos.
 
-    Atributos:
-    ----------
-    - **id** (int): Identificador único del rol.
-    - **nombre** (str): Nombre único del rol.
-    - **descripcion** (str): Descripción del rol.
-    - **users** (List[User]): Lista de usuarios asociados al rol.
+    Attributes:
+        id (int): Identificador único del rol.
+        nombre (str): Nombre único del rol.
+        descripcion (str): Descripción del rol.
+        usuario_fincas (List[UserFarmRole]): Lista de relaciones usuario-finca-rol asociadas a este rol.
     """
     __tablename__ = "rol"
     
@@ -83,11 +93,10 @@ class UserState(Base):
     """
     Representa la tabla 'estado_usuario' en la base de datos.
 
-    Atributos:
-    ----------
-    - **id** (int): Identificador único del estado.
-    - **nombre** (str): Nombre único del estado.
-    - **descripcion** (str): Descripción del estado.
+    Attributes:
+        id (int): Identificador único del estado.
+        nombre (str): Nombre único del estado.
+        descripcion (str): Descripción del estado.
     """
     __tablename__ = "estado_usuario"
     
@@ -99,14 +108,15 @@ class UserConfirmation(Base):
     """
     Representa la tabla 'confirmacion_usuario' en la base de datos.
 
-    Atributos:
-    ----------
-    - **id** (int): Identificador único de la confirmación.
-    - **usuario_id** (int): Identificador del usuario asociado.
-    - **pin** (str): PIN único de confirmación.
-    - **expiracion** (datetime): Fecha y hora de expiración del PIN.
-    - **intentos** (int): Número de intentos de confirmación.
-    - **usuario** (User): Usuario asociado a la confirmación.
+    Attributes:
+        id (int): Identificador único de la confirmación.
+        usuario_id (int): Identificador del usuario asociado.
+        pin (str): PIN único de confirmación.
+        expiracion (datetime): Fecha y hora de expiración del PIN.
+        intentos (int): Número de intentos de confirmación.
+        created_at (datetime): Fecha y hora de creación del registro.
+        resends (int): Número de reenvíos del PIN.
+        usuario (User): Usuario asociado a la confirmación.
     """
     __tablename__ = "confirmacion_usuario"
     
@@ -124,14 +134,15 @@ class TwoStepVerification(Base):
     """
     Representa la tabla 'verificacion_dos_pasos' en la base de datos.
 
-    Atributos:
-    ----------
-    - **id** (int): Identificador único de la verificación.
-    - **usuario_id** (int): Identificador del usuario asociado.
-    - **pin** (str): PIN único de verificación.
-    - **expiracion** (datetime): Fecha y hora de expiración del PIN.
-    - **intentos** (int): Número de intentos de verificación.
-    - **usuario** (User): Usuario asociado a la verificación.
+    Attributes:
+        id (int): Identificador único de la verificación.
+        usuario_id (int): Identificador del usuario asociado.
+        pin (str): PIN único de verificación.
+        expiracion (datetime): Fecha y hora de expiración del PIN.
+        intentos (int): Número de intentos de verificación.
+        created_at (datetime): Fecha y hora de creación del registro.
+        resends (int): Número de reenvíos del PIN.
+        usuario (User): Usuario asociado a la verificación.
     """
     __tablename__ = "verificacion_dos_pasos"
     
@@ -149,15 +160,16 @@ class PasswordRecovery(Base):
     """
     Representa la tabla 'recuperacion_contrasena' en la base de datos.
 
-    Atributos:
-    ----------
-    - **id** (int): Identificador único de la recuperación.
-    - **usuario_id** (int): Identificador del usuario asociado.
-    - **pin** (str): PIN único de recuperación.
-    - **expiracion** (datetime): Fecha y hora de expiración del PIN.
-    - **intentos** (int): Número de intentos de recuperación.
-    - **pin_confirmado** (bool): Indica si el PIN ha sido confirmado.
-    - **usuario** (User): Usuario asociado a la recuperación.
+    Attributes:
+        id (int): Identificador único de la recuperación.
+        usuario_id (int): Identificador del usuario asociado.
+        pin (str): PIN único de recuperación.
+        expiracion (datetime): Fecha y hora de expiración del PIN.
+        intentos (int): Número de intentos de recuperación.
+        pin_confirmado (bool): Indica si el PIN ha sido confirmado.
+        created_at (datetime): Fecha y hora de creación del registro.
+        resends (int): Número de reenvíos del PIN.
+        usuario (User): Usuario asociado a la recuperación.
     """
     __tablename__ = "recuperacion_contrasena"
     
@@ -176,13 +188,12 @@ class BlacklistedToken(Base):
     """
     Representa la tabla 'blacklisted_tokens' en la base de datos.
 
-    Atributos:
-    ----------
-    - **id** (int): Identificador único del token en lista negra.
-    - **token** (str): Token único en lista negra.
-    - **blacklisted_at** (datetime): Fecha y hora en que el token fue añadido a la lista negra.
-    - **usuario_id** (int): Identificador del usuario asociado.
-    - **usuario** (User): Usuario asociado al token en lista negra.
+    Attributes:
+        id (int): Identificador único del token en lista negra.
+        token (str): Token único en lista negra.
+        blacklisted_at (datetime): Fecha y hora en que el token fue añadido a la lista negra.
+        usuario_id (int): Identificador del usuario asociado.
+        usuario (User): Usuario asociado al token en lista negra.
     """
     __tablename__ = "blacklisted_tokens"
     

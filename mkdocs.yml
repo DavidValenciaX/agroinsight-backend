@@ -28,6 +28,7 @@ nav:
       - Modelos de datos: user/models.md
       - Esquemas: user/schemas.md
       - Casos de uso: user/use_cases.md
+      - Repositorio: user/repository.md
   - Módulo de Fincas:
       - Descripción: farm/overview.md
       - Endpoints: farm/endpoints.md
@@ -47,7 +48,6 @@ nav:
   - Desarrollo:
       - Guía para contribuir al proyecto: development/contributing.md
       - Estándares de codificación: development/coding_standards.md
-      - Guía de pruebas: development/testing.md
 
   - Acerca de: about.md
 

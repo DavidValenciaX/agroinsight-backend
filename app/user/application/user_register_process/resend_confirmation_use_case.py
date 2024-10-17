@@ -1,3 +1,10 @@
+"""
+Este módulo contiene la implementación del caso de uso para reenviar la confirmación de registro de usuarios.
+
+Incluye la clase ResendConfirmationUseCase que maneja la lógica de negocio para reenviar PINs de confirmación
+a usuarios que están en proceso de registro.
+"""
+
 from datetime import timedelta, datetime, timezone
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -12,12 +19,53 @@ from app.infrastructure.services.email_service import send_email
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 
 class ResendConfirmationUseCase:
+    """
+    Caso de uso para reenviar la confirmación de registro a un usuario.
+
+    Esta clase maneja la lógica de negocio para reenviar PINs de confirmación,
+    incluyendo la validación del estado del usuario, la generación de nuevos PINs,
+    y el envío de correos electrónicos de confirmación.
+
+    Attributes:
+        db (Session): La sesión de base de datos para realizar operaciones.
+        user_repository (UserRepository): Repositorio para operaciones de usuario.
+        state_validator (UserStateValidator): Validador de estados de usuario.
+    """
+
     def __init__(self, db: Session):
+        """
+        Inicializa una nueva instancia de ResendConfirmationUseCase.
+
+        Args:
+            db (Session): La sesión de base de datos a utilizar.
+        """
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
 
     def resend_confirmation(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
+        """
+        Reenvía la confirmación de registro a un usuario.
+
+        Este método realiza las siguientes operaciones:
+        1. Verifica si el usuario existe.
+        2. Valida el estado del usuario.
+        3. Obtiene la última confirmación del usuario.
+        4. Verifica si se puede reenviar la confirmación (tiempo de espera).
+        5. Genera un nuevo PIN y actualiza la confirmación.
+        6. Envía un nuevo correo electrónico con el PIN.
+
+        Args:
+            email (str): Correo electrónico del usuario.
+            background_tasks (BackgroundTasks): Tareas en segundo plano para enviar el correo.
+
+        Returns:
+            SuccessResponse: Respuesta indicando el éxito de la operación.
+
+        Raises:
+            UserNotRegisteredException: Si el usuario no está registrado.
+            DomainException: Si ocurre un error durante el proceso de reenvío.
+        """
         user = self.user_repository.get_user_with_confirmation(email)
         if not user:
             raise UserNotRegisteredException()
@@ -81,6 +129,16 @@ class ResendConfirmationUseCase:
         )
 
     def resend_confirmation_email(self, email: str, pin: str) -> bool:
+        """
+        Envía un correo electrónico con el PIN de confirmación reenviado.
+
+        Args:
+            email (str): Dirección de correo electrónico del usuario.
+            pin (str): Nuevo PIN de confirmación generado.
+
+        Returns:
+            bool: True si el correo se envió correctamente, False en caso contrario.
+        """
         subject = "Confirma tu registro en AgroInSight"
         text_content = f"Reenvío: Tu PIN de confirmación es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""
@@ -94,11 +152,28 @@ class ResendConfirmationUseCase:
         return send_email(email, subject, text_content, html_content)
     
     def was_recently_requested(self, confirmation: UserConfirmation, minutes: int = 3) -> bool:
-        """Verifica si la verificación de confirmación se solicitó hace menos de x minutos."""
+        """
+        Verifica si la confirmación se solicitó recientemente.
+
+        Args:
+            confirmation (UserConfirmation): Objeto de confirmación del usuario.
+            minutes (int, optional): Número de minutos para considerar como reciente. Por defecto es 3.
+
+        Returns:
+            bool: True si la confirmación se solicitó hace menos de los minutos especificados, False en caso contrario.
+        """
         return (datetime_utc_time() - ensure_utc(confirmation.created_at)).total_seconds() < minutes * 60
     
     def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
-        """Obtiene la última confirmación del usuario."""
+        """
+        Obtiene la última confirmación del usuario y elimina las anteriores.
+
+        Args:
+            confirmation (UserConfirmation): Lista de confirmaciones del usuario.
+
+        Returns:
+            Optional[UserConfirmation]: La última confirmación del usuario o None si no hay confirmaciones.
+        """
         if isinstance(confirmation, list) and confirmation:
             # Ordenar las confirmaciones por fecha de creación de forma ascendente
             confirmation.sort(key=lambda c: c.created_at)

@@ -13,17 +13,51 @@ from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 
 class PasswordRecoveryUseCase:
+    """
+    Caso de uso para el proceso de recuperación de contraseña.
+
+    Esta clase maneja el proceso de recuperación de contraseña, incluyendo la generación
+    y envío de PIN, validación del estado del usuario y gestión de solicitudes recientes.
+
+    Attributes:
+        db (Session): Sesión de base de datos para operaciones de persistencia.
+        user_repository (UserRepository): Repositorio para operaciones relacionadas con usuarios.
+        state_validator (UserStateValidator): Validador del estado del usuario.
+    """
+
     def __init__(self, db: Session):
+        """
+        Inicializa una nueva instancia de PasswordRecoveryUseCase.
+
+        Args:
+            db (Session): Sesión de base de datos para operaciones de persistencia.
+        """
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
 
     def recovery_password(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
+        """
+        Inicia el proceso de recuperación de contraseña para un usuario.
+
+        Este método valida el estado del usuario, verifica si se ha solicitado recientemente
+        un PIN, genera un nuevo PIN y lo envía por correo electrónico.
+
+        Args:
+            email (str): Correo electrónico del usuario que solicita la recuperación.
+            background_tasks (BackgroundTasks): Tareas en segundo plano para enviar el correo.
+
+        Returns:
+            SuccessResponse: Respuesta indicando que se ha enviado el PIN de recuperación.
+
+        Raises:
+            UserNotRegisteredException: Si el usuario no está registrado.
+            DomainException: Si se ha solicitado un PIN recientemente o hay otros errores.
+        """
         user = self.user_repository.get_user_with_password_recovery(email)
         if not user:
             raise UserNotRegisteredException()
         
-        # Validar el estado del usuario
         state_validation_result = self.state_validator.validate_user_state(
             user,
             allowed_states=[UserState.ACTIVE],
@@ -32,10 +66,7 @@ class PasswordRecoveryUseCase:
         if state_validation_result:
             return state_validation_result
         
-        # Definimos el tiempo de espera en minutos
         warning_time = 3
-            
-        # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
         recovery = self.get_last_password_recovery(user.recuperacion_contrasena)
         if recovery and self.was_recently_requested(recovery, warning_time):
             raise DomainException(
@@ -47,7 +78,7 @@ class PasswordRecoveryUseCase:
 
         pin, pin_hash = generate_pin()
         
-        expiration_time = 10  # minutos
+        expiration_time = 10
         expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_time)
 
         recovery = PasswordRecovery(
@@ -65,8 +96,17 @@ class PasswordRecoveryUseCase:
             message="Se ha enviado un PIN de recuperación a tu correo electrónico."
         )
 
-    
     def send_password_recovery_email(self, email: str, pin: str) -> bool:
+        """
+        Envía un correo electrónico con el PIN de recuperación de contraseña.
+
+        Args:
+            email (str): Dirección de correo electrónico del destinatario.
+            pin (str): PIN de recuperación generado.
+
+        Returns:
+            bool: True si el correo se envió exitosamente, False en caso contrario.
+        """
         subject = "Recuperación de contraseña - AgroInSight"
         text_content = f"Tu PIN de recuperación de contraseña es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"<html><body><p><strong>Tu PIN de recuperación de contraseña es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
@@ -74,20 +114,34 @@ class PasswordRecoveryUseCase:
         return send_email(email, subject, text_content, html_content)
     
     def was_recently_requested(self, recovery: PasswordRecovery, minutes: int = 3) -> bool:
-        """Verifica si la recuperación de contraseña se solicitó hace menos de x minutos."""
+        """
+        Verifica si la recuperación de contraseña se solicitó recientemente.
+
+        Args:
+            recovery (PasswordRecovery): Objeto de recuperación de contraseña.
+            minutes (int, optional): Número de minutos para considerar una solicitud reciente. Por defecto es 3.
+
+        Returns:
+            bool: True si la solicitud fue reciente, False en caso contrario.
+        """
         return (datetime_utc_time() - ensure_utc(recovery.created_at)).total_seconds() < minutes * 60
     
     def get_last_password_recovery(self, recovery: PasswordRecovery) -> Optional[PasswordRecovery]:
-        """Obtiene la última recuperación de contraseña del usuario."""
+        """
+        Obtiene la última recuperación de contraseña del usuario.
+
+        Esta función también elimina todas las recuperaciones anteriores a la última.
+
+        Args:
+            recovery (PasswordRecovery): Objeto o lista de objetos de recuperación de contraseña.
+
+        Returns:
+            Optional[PasswordRecovery]: La última recuperación de contraseña, o None si no hay ninguna.
+        """
         if isinstance(recovery, list) and recovery:
-            # Ordenar las recuperaciones por fecha de creación de forma ascendente
             recovery.sort(key=lambda r: r.created_at)
-            # Tomar el último registro
             latest_recovery = recovery[-1]
-            # Eliminar todas las recuperaciones anteriores a la última
             for old_recovery in recovery[:-1]:
                 self.user_repository.delete_password_recovery(old_recovery)
-            # Actualizar la variable recovery para solo trabajar con la última
             return latest_recovery
-        # Si no hay recuperaciones, retornar None
         return None

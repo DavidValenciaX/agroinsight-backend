@@ -12,17 +12,53 @@ from app.infrastructure.common.common_exceptions import DomainException, UserNot
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 
 class ResendRecoveryUseCase:
+    """
+    Caso de uso para reenviar el PIN de recuperación de contraseña.
+
+    Esta clase maneja el proceso de reenvío del PIN de recuperación, incluyendo
+    la validación del estado del usuario, la verificación de solicitudes recientes,
+    y la generación y envío de un nuevo PIN.
+
+    Attributes:
+        db (Session): Sesión de base de datos para operaciones de persistencia.
+        user_repository (UserRepository): Repositorio para operaciones relacionadas con usuarios.
+        state_validator (UserStateValidator): Validador del estado del usuario.
+    """
+
     def __init__(self, db: Session):
+        """
+        Inicializa una nueva instancia de ResendRecoveryUseCase.
+
+        Args:
+            db (Session): Sesión de base de datos para operaciones de persistencia.
+        """
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
 
     def resend_recovery(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
+        """
+        Reenvía el PIN de recuperación de contraseña.
+
+        Este método valida el estado del usuario, verifica si se ha solicitado recientemente
+        un reenvío, genera un nuevo PIN y lo envía por correo electrónico.
+
+        Args:
+            email (str): Correo electrónico del usuario que solicita el reenvío.
+            background_tasks (BackgroundTasks): Tareas en segundo plano para enviar el correo.
+
+        Returns:
+            SuccessResponse: Respuesta indicando que se ha reenviado el PIN de recuperación.
+
+        Raises:
+            UserNotRegisteredException: Si el usuario no está registrado.
+            DomainException: Si no hay un registro de recuperación pendiente, se ha solicitado
+                             un reenvío recientemente, o hay otros errores.
+        """
         user = self.user_repository.get_user_with_password_recovery(email)
         if not user:
             raise UserNotRegisteredException()
         
-        # Validar el estado del usuario
         state_validation_result = self.state_validator.validate_user_state(
             user,
             allowed_states=[UserState.ACTIVE],
@@ -39,19 +75,15 @@ class ResendRecoveryUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        # Definimos el tiempo de espera en minutos
         warning_time = 3
 
-        # Si es el primer reenvío (resends == 0), permitir sin restricción
         if recovery.resends > 0:
-            # Verificar si ya se ha enviado un PIN en los últimos 3 minutos
             if self.was_recently_requested(recovery, warning_time):
                 raise DomainException(
                     message=f"Ya has solicitado un PIN de recuperación recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
                 )
 
-        # Generar un nuevo PIN y su hash
         pin, pin_hash = generate_pin()
 
         background_tasks.add_task(self.send_password_recovery_email, email, pin)
@@ -65,8 +97,17 @@ class ResendRecoveryUseCase:
             message="Se ha reenviado el PIN de recuperación a tu correo electrónico."
         )
 
-
     def send_password_recovery_email(self, email: str, pin: str) -> bool:
+        """
+        Envía un correo electrónico con el PIN de recuperación de contraseña reenviado.
+
+        Args:
+            email (str): Dirección de correo electrónico del destinatario.
+            pin (str): PIN de recuperación generado.
+
+        Returns:
+            bool: True si el correo se envió exitosamente, False en caso contrario.
+        """
         subject = "Reenvío: Recuperación de contraseña - AgroInSight"
         text_content = f"Reenvío: Tu PIN de recuperación de contraseña es: {pin}\nEste PIN expirará en 10 minutos."
         html_content = f"""
@@ -81,20 +122,34 @@ class ResendRecoveryUseCase:
         return send_email(email, subject, text_content, html_content)
     
     def was_recently_requested(self, recovery: PasswordRecovery, minutes: int = 3) -> bool:
-        """Verifica si la recuperación de contraseña se solicitó hace menos de x minutos."""
+        """
+        Verifica si la recuperación de contraseña se solicitó recientemente.
+
+        Args:
+            recovery (PasswordRecovery): Objeto de recuperación de contraseña.
+            minutes (int, optional): Número de minutos para considerar una solicitud reciente. Por defecto es 3.
+
+        Returns:
+            bool: True si la solicitud fue reciente, False en caso contrario.
+        """
         return (datetime_utc_time() - ensure_utc(recovery.created_at)).total_seconds() < minutes * 60
     
     def get_last_password_recovery(self, recovery: PasswordRecovery) -> Optional[PasswordRecovery]:
-        """Obtiene la última recuperación de contraseña del usuario."""
+        """
+        Obtiene la última recuperación de contraseña del usuario.
+
+        Esta función también elimina todas las recuperaciones anteriores a la última.
+
+        Args:
+            recovery (PasswordRecovery): Objeto o lista de objetos de recuperación de contraseña.
+
+        Returns:
+            Optional[PasswordRecovery]: La última recuperación de contraseña, o None si no hay ninguna.
+        """
         if isinstance(recovery, list) and recovery:
-            # Ordenar las recuperaciones por fecha de creación de forma ascendente
             recovery.sort(key=lambda r: r.created_at)
-            # Tomar el último registro
             latest_recovery = recovery[-1]
-            # Eliminar todas las recuperaciones anteriores a la última
             for old_recovery in recovery[:-1]:
                 self.user_repository.delete_password_recovery(old_recovery)
-            # Actualizar la variable recovery para solo trabajar con la última
             return latest_recovery
-        # Si no hay recuperaciones, retornar None
         return None

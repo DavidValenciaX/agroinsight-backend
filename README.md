@@ -16,7 +16,7 @@ AgroInsight es una aplicación innovadora diseñada para optimizar el cultivo de
 ## Tecnologías Utilizadas
 
 - **Backend:** FastAPI 0.112.1, Python 3.12
-- **Base de Datos:** MySQL 8.0
+- **Base de Datos:** PostgreSQL 16.2
 - **ORM:** SQLAlchemy 2.0.32
 - **Contenedorización:** Docker
 - **IA y Procesamiento de Imágenes:** TensorFlow 2.16.1, OpenCV 4.10.0
