@@ -91,7 +91,7 @@ def list_farms(
 @router.post("/assign-users-by-email", 
              response_model=MultipleResponse,
              responses={
-                 200: {"description": "Usuarios asignados exitosamente"},
+                 200: {"description": "Todos los usuarios asignados exitosamente"},
                  207: {"description": "Algunos usuarios asignados, otros fallaron"},
                  400: {"description": "No se pudo asignar ningún usuario"}
              }
@@ -110,7 +110,7 @@ def assign_users_to_farm_by_email(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno al asignar usuario a una finca: {str(e)}"
+            detail=f"Error interno al asignar usuarios a una finca: {str(e)}"
         )
 
         

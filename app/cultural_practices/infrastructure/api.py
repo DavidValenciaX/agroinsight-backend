@@ -4,6 +4,7 @@ Este módulo define las rutas de la API para la gestión de prácticas culturale
 Incluye endpoints para la creación de tareas y asignaciones, así como para listar asignaciones.
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.cultural_practices.domain.schemas import AssignmentCreate, CulturalTaskCreate, PaginatedTaskListResponse
 from app.cultural_practices.application.create_assignment_use_case import CreateAssignmentUseCase
@@ -49,7 +50,13 @@ def create_task(
             detail=f"Error interno al crear la tarea: {str(e)}"
         )
 
-@router.post("/assignment/create", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
+@router.post("/assignment/create", response_model=MultipleResponse, 
+             responses={
+                 200: {"description": "Todas las tareas asignadas exitosamente"},
+                 207: {"description": "Algunas tareas asignadas, otras fallaron"},
+                 400: {"description": "No se pudo asignar ninguna tarea"}
+             }
+)
 def create_assignment(
     assignment: AssignmentCreate,
     db: Session = Depends(getDb),
@@ -71,7 +78,8 @@ def create_assignment(
     """
     create_assignment_use_case = CreateAssignmentUseCase(db)
     try:
-        return create_assignment_use_case.create_assignment(assignment, current_user)
+        response = create_assignment_use_case.create_assignment(assignment, current_user)
+        return JSONResponse(content=response.model_dump(), status_code=response.status_code)
     except DomainException as e:
         raise e
     except Exception as e:

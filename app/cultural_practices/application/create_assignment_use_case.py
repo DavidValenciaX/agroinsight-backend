@@ -18,7 +18,7 @@ class CreateAssignmentUseCase:
         self.farm_repository = FarmRepository(db)
         self.plot_repository = PlotRepository(db)
 
-    def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> MultipleResponse:
         
         # Validar que la tarea existe
         if not self.cultural_practice_repository.task_exists(assignment_data.tarea_labor_cultural_id):
@@ -51,18 +51,16 @@ class CreateAssignmentUseCase:
             )
         
         messages = []
+        success_count = 0
+        failure_count = 0
 
         # Iterar sobre cada usuario_id en usuario_ids
         for usuario_id in assignment_data.usuario_ids:
-            # Validar que el usuario existe
-            if not self.user_repository.user_exists(usuario_id):
-                messages.append(f"El usuario con ID {usuario_id} especificado no existe.")
-                continue
-            
             # obtener el nombre del usuario
             user = self.user_repository.get_user_by_id(usuario_id)
             if not user:
                 messages.append(f"El usuario con ID {usuario_id} especificado no existe.")
+                failure_count += 1
                 continue
             
             user_name = user.nombre + " " + user.apellido
@@ -70,11 +68,13 @@ class CreateAssignmentUseCase:
             # validar que el usuario es trabajador de la finca
             if not self.farm_repository.user_is_farm_worker(usuario_id, finca_id):
                 messages.append(f"El usuario {user_name} no es trabajador de la finca.")
+                failure_count += 1
                 continue
             
             # validar que el usuario no tenga ya asignada esa tarea
             if self.cultural_practice_repository.user_has_assignment(usuario_id, assignment_data.tarea_labor_cultural_id):
                 messages.append(f"El usuario {user_name} ya tiene asignada la tarea con ID {assignment_data.tarea_labor_cultural_id}.")
+                failure_count += 1
                 continue
             
             # Crear la asignación
@@ -84,7 +84,17 @@ class CreateAssignmentUseCase:
             )
             if not self.cultural_practice_repository.create_assignment(assignment_data_single):
                 messages.append(f"No se pudo crear la asignación para el usuario {user_name}.")
+                failure_count += 1
+                continue
                 
             messages.append(f"Asignación creada exitosamente para el usuario {user_name}.")
-        
-        return MultipleResponse(messages=messages)
+            success_count += 1
+
+        if success_count > 0 and failure_count > 0:
+            status_code = status.HTTP_207_MULTI_STATUS
+        elif success_count == 0:
+            status_code = status.HTTP_400_BAD_REQUEST
+        else:
+            status_code = status.HTTP_200_OK
+
+        return MultipleResponse(messages=messages, status_code=status_code)
