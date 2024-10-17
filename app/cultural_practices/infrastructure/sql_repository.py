@@ -39,6 +39,9 @@ class CulturalPracticesRepository:
     def get_task_state_name(self, estado_id: int) -> str:
         estado = self.db.query(CulturalTaskState).filter(CulturalTaskState.id == estado_id).first()
         return estado.nombre if estado else None
+    
+    def get_states(self) -> List[CulturalTaskState]:
+        return self.db.query(CulturalTaskState).all()
 
     def create_task(self, tarea_data: TaskCreate) -> CulturalTask:
         try:

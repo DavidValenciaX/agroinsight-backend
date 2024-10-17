@@ -3,10 +3,11 @@ Este módulo define las rutas de la API para la gestión de prácticas culturale
 
 Incluye endpoints para la creación de tareas y asignaciones, así como para listar asignaciones.
 """
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse
+from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskStateListResponse, TaskStateResponse
 from app.cultural_practices.application.create_assignment_use_case import CreateAssignmentUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
@@ -16,6 +17,7 @@ from app.infrastructure.common.response_models import MultipleResponse, SuccessR
 from app.user.domain.schemas import UserInDB
 from app.cultural_practices.application.list_tasks_by_user_and_farm_use_case import ListTasksByUserAndFarmUseCase
 from app.cultural_practices.application.change_task_state_use_case import ChangeTaskStateUseCase
+from app.cultural_practices.application.list_task_states_use_case import ListTaskStatesUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -122,6 +124,35 @@ def list_tasks_by_user_and_farm(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar las tareas: {str(e)}"
+        )
+        
+@router.get("/tasks/states", response_model=TaskStateListResponse, status_code=status.HTTP_200_OK)
+def list_task_states(
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Lista todos los estados de las tareas de prácticas culturales.
+
+    Parameters:
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        List[TaskStateResponse]: Una lista de estados de tareas.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de los estados de las tareas.
+    """
+    list_task_states_use_case = ListTaskStatesUseCase(db)
+    try:
+        return list_task_states_use_case.list_task_states(current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar los estados de las tareas: {str(e)}"
         )
 
 @router.put("/tasks/{task_id}/states/{state_id}", response_model=SuccessResponse, status_code=status.HTTP_200_OK)

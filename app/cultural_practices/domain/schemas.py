@@ -44,3 +44,11 @@ class AssignmentCreate(BaseModel):
 class AssignmentCreateSingle(BaseModel):
     usuario_id: int
     tarea_labor_cultural_id: int
+
+class TaskStateResponse(BaseModel):
+    id: int
+    nombre: str
+    descripcion: Optional[str] = None
+    
+class TaskStateListResponse(BaseModel):
+    states: List[TaskStateResponse]
