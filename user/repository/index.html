@@ -1,0 +1,5280 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentación para el desarrollador backend del proyecto AgroInSight">
+      
+      
+      
+      
+        <link rel="prev" href="../use_cases/">
+      
+      
+        <link rel="next" href="../../farm/overview/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+    
+    
+      
+        <title>Repositorio - AgroInsight Backend Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#documentacion-del-repositorio-de-usuarios" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="AgroInsight Backend Documentation" class="md-header__button md-logo" aria-label="AgroInsight Backend Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AgroInsight Backend Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Repositorio
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AgroInsight Backend Documentation" class="md-nav__button md-logo" aria-label="AgroInsight Backend Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AgroInsight Backend Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Documentación complementaria
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Documentación complementaria
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../complement-docs/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://agroinsight-backend-production.up.railway.app/docs" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FastAPI Swagger
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://agroinsight-backend-production.up.railway.app/redoc" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ReDoc
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://dbdocs.io/davidvalencia0526/AgroInsight" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.figma.com/design/PwBFnVysZISNgO8UIoOHL1/Agroinsight?node-id=0-1&node-type=CANVAS&t=s9L7qvi4CEiMX9ad-0" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Diseño de interfaz UI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/DavidValenciaX/agroinsight-backend" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio backend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Alejandroo04/AgroInsight_Front" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio frontend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://usco-team-y6acsy2v.atlassian.net/jira/software/projects/AGROINSHT/boards/1/backlog" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Jira
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://drive.google.com/drive/folders/1Nt50sTun-_FQMulYEXsy5aUcIJ7TXKpZ" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sharepoint
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://join.slack.com/t/agroinsight/shared_invite/zt-2rnhell7b-3~ziopW1zaod0ZD8QP6QFw" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Slack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Guías
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guías
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Instalación
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía de inicio rápido
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/faq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Preguntas frecuentes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de usuarios
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de usuarios
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../schemas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Esquemas
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Repositorio
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vision-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visión General
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clase-userrepository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clase: UserRepository
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Clase: UserRepository">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="__init__">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Usuario
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Usuario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-por-email" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario por Email
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_by_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_by_email
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_by_email">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-por-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario por ID
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_by_id
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_by_id">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-con-confirmacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario con Confirmación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_with_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_with_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_with_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-con-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario con Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_with_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_with_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_with_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-con-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario con Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_with_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_with_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_with_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-todos-los-usuarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Todos los Usuarios
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_all_users" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_all_users
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_all_users">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_user
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_user">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_user
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_user">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_user
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_user">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Confirmación de Usuario
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Confirmación de Usuario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Confirmación de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_user_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_user_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_user_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Confirmación de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_user_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_user_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_user_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Confirmación de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_user_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_user_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_user_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Verificación de Dos Pasos
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Verificación de Dos Pasos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Recuperación de Contraseña
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Recuperación de Contraseña">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-gestion-de-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Gestión de Tokens
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Gestión de Tokens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-token-a-lista-negra" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Token a Lista Negra
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.blacklist_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      blacklist_token
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="blacklist_token">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verificar-si-un-token-esta-en-lista-negra" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verificar si un Token está en Lista Negra
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.is_token_blacklisted" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_token_blacklisted
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="is_token_blacklisted">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-estado-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Estado de Usuario
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Estado de Usuario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-estado-por-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Estado por ID
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_state_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_state_by_id
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_state_by_id">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-estado-por-nombre" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Estado por Nombre
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_state_by_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_state_by_name
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_state_by_name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-rol" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Rol
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Rol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-rol-por-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Rol por ID
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_role_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_role_by_id
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_role_by_id">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-rol-por-nombre" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Rol por Nombre
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_role_by_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_role_by_name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constantes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manejo-de-errores" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manejo de Errores
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mejores-practicas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mejores Prácticas
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Fincas
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Fincas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de lotes
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de lotes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de labores culturales
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de labores culturales
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Desarrollo
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Desarrollo
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía para contribuir al proyecto
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/coding_standards/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Estándares de codificación
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acerca de
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vision-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visión General
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clase-userrepository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clase: UserRepository
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Clase: UserRepository">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="__init__">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Usuario
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Usuario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-por-email" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario por Email
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_by_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_by_email
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_by_email">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-por-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario por ID
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_by_id
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_by_id">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-con-confirmacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario con Confirmación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_with_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_with_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_with_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-con-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario con Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_with_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_with_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_with_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-usuario-con-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Usuario con Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_user_with_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_user_with_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_user_with_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-todos-los-usuarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Todos los Usuarios
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_all_users" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_all_users
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_all_users">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_user
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_user">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_user
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_user">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_user
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_user">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Confirmación de Usuario
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Confirmación de Usuario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Confirmación de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_user_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_user_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_user_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Confirmación de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_user_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_user_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_user_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-confirmacion-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Confirmación de Usuario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_user_confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_user_confirmation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_user_confirmation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Verificación de Dos Pasos
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Verificación de Dos Pasos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-verificacion-de-dos-pasos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Verificación de Dos Pasos
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_two_factor_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_two_factor_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_two_factor_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Recuperación de Contraseña
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Recuperación de Contraseña">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.add_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="add_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actualizar-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Actualizar Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.update_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="update_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eliminar-recuperacion-de-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eliminar Recuperación de Contraseña
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.delete_password_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_password_recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="delete_password_recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-gestion-de-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Gestión de Tokens
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Gestión de Tokens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agregar-token-a-lista-negra" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agregar Token a Lista Negra
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.blacklist_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      blacklist_token
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="blacklist_token">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verificar-si-un-token-esta-en-lista-negra" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verificar si un Token está en Lista Negra
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.is_token_blacklisted" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_token_blacklisted
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="is_token_blacklisted">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-estado-de-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Estado de Usuario
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Estado de Usuario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-estado-por-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Estado por ID
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_state_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_state_by_id
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_state_by_id">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-estado-por-nombre" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Estado por Nombre
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_state_by_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_state_by_name
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_state_by_name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metodos-de-rol" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos de Rol
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos de Rol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-rol-por-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Rol por ID
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_role_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_role_by_id
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_role_by_id">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#obtener-rol-por-nombre" class="md-nav__link">
+    <span class="md-ellipsis">
+      Obtener Rol por Nombre
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.user.infrastructure.sql_repository.UserRepository.get_role_by_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_role_by_name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constantes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manejo-de-errores" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manejo de Errores
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mejores-practicas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mejores Prácticas
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="documentacion-del-repositorio-de-usuarios">Documentación del Repositorio de Usuarios</h1>
+<h2 id="vision-general">Visión General</h2>
+<p>El módulo <code>UserRepository</code> proporciona una interfaz para interactuar con la base de datos en relación con los usuarios y entidades relacionadas. Esta clase encapsula todas las operaciones de base de datos relacionadas con usuarios, incluyendo creación, lectura, actualización y eliminación (CRUD), así como operaciones específicas para la gestión de usuarios como confirmaciones, verificación de dos pasos y recuperación de contraseñas.</p>
+<h2 id="clase-userrepository">Clase: UserRepository</h2>
+<h3 id="constructor">Constructor</h3>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.__init__"></a>
+    <div class="doc doc-contents first">
+
+        <p>Inicializa el repositorio de usuarios.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>db</code></td>
+            <td>
+                  <code><span title="sqlalchemy.orm.Session">Session</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sesión de base de datos SQLAlchemy.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inicializa el repositorio de usuarios.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db (Session): Sesión de base de datos SQLAlchemy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h3 id="metodos-de-usuario">Métodos de Usuario</h3>
+<h4 id="obtener-usuario-por-email">Obtener Usuario por Email</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_user_by_email"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un usuario por su dirección de correo electrónico.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>email</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dirección de correo electrónico del usuario.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[User]: El usuario si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_user_by_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un usuario por su dirección de correo electrónico.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        email (str): Dirección de correo electrónico del usuario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[User]: El usuario si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="obtener-usuario-por-id">Obtener Usuario por ID</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_user_by_id"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un usuario por su ID.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>user_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>ID del usuario.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[User]: El usuario si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_user_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un usuario por su ID.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): ID del usuario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[User]: El usuario si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="obtener-usuario-con-confirmacion">Obtener Usuario con Confirmación</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_user_with_confirmation"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un usuario con su información de confirmación por correo electrónico.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>email</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dirección de correo electrónico del usuario.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[User]: El usuario con información de confirmación si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_user_with_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un usuario con su información de confirmación por correo electrónico.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        email (str): Dirección de correo electrónico del usuario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[User]: El usuario con información de confirmación si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">joinedload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">confirmacion</span><span class="p">))</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="obtener-usuario-con-verificacion-de-dos-pasos">Obtener Usuario con Verificación de Dos Pasos</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_user_with_two_factor_verification"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un usuario con su información de verificación de dos pasos por correo electrónico.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>email</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dirección de correo electrónico del usuario.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[User]: El usuario con información de verificación de dos pasos si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_user_with_two_factor_verification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un usuario con su información de verificación de dos pasos por correo electrónico.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        email (str): Dirección de correo electrónico del usuario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[User]: El usuario con información de verificación de dos pasos si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">joinedload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">verificacion_dos_pasos</span><span class="p">))</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="obtener-usuario-con-recuperacion-de-contrasena">Obtener Usuario con Recuperación de Contraseña</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_user_with_password_recovery"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un usuario con su información de recuperación de contraseña por correo electrónico.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>email</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dirección de correo electrónico del usuario.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[User]: El usuario con información de recuperación de contraseña si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_user_with_password_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un usuario con su información de recuperación de contraseña por correo electrónico.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        email (str): Dirección de correo electrónico del usuario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[User]: El usuario con información de recuperación de contraseña si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">joinedload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">recuperacion_contrasena</span><span class="p">))</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="obtener-todos-los-usuarios">Obtener Todos los Usuarios</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_all_users"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene todos los usuarios con su información de estado.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[User]: Lista de todos los usuarios con su estado.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_all_users</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene todos los usuarios con su información de estado.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[User]: Lista de todos los usuarios con su estado.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">joinedload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">estado</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="agregar-usuario">Agregar Usuario</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.add_user"></a>
+    <div class="doc doc-contents first">
+
+        <p>Agrega un nuevo usuario a la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>user</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de usuario a agregar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[User]: El usuario agregado si tiene éxito, None en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Agrega un nuevo usuario a la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): Objeto de usuario a agregar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[User]: El usuario agregado si tiene éxito, None en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">user</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al crear el usuario: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="actualizar-usuario">Actualizar Usuario</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.update_user"></a>
+    <div class="doc doc-contents first">
+
+        <p>Actualiza un usuario existente en la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>user</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de usuario con los datos actualizados.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[User]: El usuario actualizado si tiene éxito, None en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Actualiza un usuario existente en la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): Objeto de usuario con los datos actualizados.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[User]: El usuario actualizado si tiene éxito, None en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">user</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al actualizar el usuario: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="eliminar-usuario">Eliminar Usuario</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.delete_user"></a>
+    <div class="doc doc-contents first">
+
+        <p>Elimina un usuario de la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>user</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de usuario a eliminar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se eliminó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Elimina un usuario de la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): Objeto de usuario a eliminar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se eliminó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al eliminar el usuario: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h3 id="metodos-de-confirmacion-de-usuario">Métodos de Confirmación de Usuario</h3>
+<h4 id="agregar-confirmacion-de-usuario">Agregar Confirmación de Usuario</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.add_user_confirmation"></a>
+    <div class="doc doc-contents first">
+
+        <p>Agrega una confirmación de usuario a la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>confirmation</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.UserConfirmation" href="../models/#app.user.infrastructure.orm_models.UserConfirmation">UserConfirmation</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de confirmación de usuario a agregar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se agregó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_user_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Agrega una confirmación de usuario a la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        confirmation (UserConfirmation): Objeto de confirmación de usuario a agregar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se agregó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">confirmation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al agregar la confirmación del usuario: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="actualizar-confirmacion-de-usuario">Actualizar Confirmación de Usuario</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.update_user_confirmation"></a>
+    <div class="doc doc-contents first">
+
+        <p>Actualiza una confirmación de usuario existente en la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>confirmation</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.UserConfirmation" href="../models/#app.user.infrastructure.orm_models.UserConfirmation">UserConfirmation</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de confirmación de usuario con los datos actualizados.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se actualizó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_user_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Actualiza una confirmación de usuario existente en la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        confirmation (UserConfirmation): Objeto de confirmación de usuario con los datos actualizados.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se actualizó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">confirmation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al actualizar la confirmación del usuario: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="eliminar-confirmacion-de-usuario">Eliminar Confirmación de Usuario</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.delete_user_confirmation"></a>
+    <div class="doc doc-contents first">
+
+        <p>Elimina una confirmación de usuario de la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>confirmation</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.UserConfirmation" href="../models/#app.user.infrastructure.orm_models.UserConfirmation">UserConfirmation</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de confirmación de usuario a eliminar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se eliminó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">delete_user_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Elimina una confirmación de usuario de la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        confirmation (UserConfirmation): Objeto de confirmación de usuario a eliminar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se eliminó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">confirmation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al eliminar la confirmación del usuario: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h3 id="metodos-de-verificacion-de-dos-pasos">Métodos de Verificación de Dos Pasos</h3>
+<h4 id="agregar-verificacion-de-dos-pasos">Agregar Verificación de Dos Pasos</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.add_two_factor_verification"></a>
+    <div class="doc doc-contents first">
+
+        <p>Agrega una verificación de dos pasos a la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>verification</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.TwoStepVerification" href="../models/#app.user.infrastructure.orm_models.TwoStepVerification">TwoStepVerification</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de verificación de dos pasos a agregar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se agregó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_two_factor_verification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verification</span><span class="p">:</span> <span class="n">TwoStepVerification</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Agrega una verificación de dos pasos a la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        verification (TwoStepVerification): Objeto de verificación de dos pasos a agregar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se agregó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">verification</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al agregar la verificación de dos pasos: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="actualizar-verificacion-de-dos-pasos">Actualizar Verificación de Dos Pasos</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.update_two_factor_verification"></a>
+    <div class="doc doc-contents first">
+
+        <p>Actualiza una verificación de dos pasos existente en la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>verification</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.TwoStepVerification" href="../models/#app.user.infrastructure.orm_models.TwoStepVerification">TwoStepVerification</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de verificación de dos pasos con los datos actualizados.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se actualizó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_two_factor_verification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verification</span><span class="p">:</span> <span class="n">TwoStepVerification</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Actualiza una verificación de dos pasos existente en la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        verification (TwoStepVerification): Objeto de verificación de dos pasos con los datos actualizados.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se actualizó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">verification</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al actualizar la verificacion en dos pasos: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="eliminar-verificacion-de-dos-pasos">Eliminar Verificación de Dos Pasos</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.delete_two_factor_verification"></a>
+    <div class="doc doc-contents first">
+
+        <p>Elimina una verificación de dos pasos de la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>verification</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.TwoStepVerification" href="../models/#app.user.infrastructure.orm_models.TwoStepVerification">TwoStepVerification</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de verificación de dos pasos a eliminar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se eliminó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">delete_two_factor_verification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verification</span><span class="p">:</span> <span class="n">TwoStepVerification</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Elimina una verificación de dos pasos de la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        verification (TwoStepVerification): Objeto de verificación de dos pasos a eliminar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se eliminó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">verification</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al eliminar la verificación de dos pasos: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h3 id="metodos-de-recuperacion-de-contrasena">Métodos de Recuperación de Contraseña</h3>
+<h4 id="agregar-recuperacion-de-contrasena">Agregar Recuperación de Contraseña</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.add_password_recovery"></a>
+    <div class="doc doc-contents first">
+
+        <p>Agrega una recuperación de contraseña a la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>recovery</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.PasswordRecovery" href="../models/#app.user.infrastructure.orm_models.PasswordRecovery">PasswordRecovery</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de recuperación de contraseña a agregar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se agregó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_password_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recovery</span><span class="p">:</span> <span class="n">PasswordRecovery</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Agrega una recuperación de contraseña a la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        recovery (PasswordRecovery): Objeto de recuperación de contraseña a agregar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se agregó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">recovery</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al agregar la recuperación de contraseña: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="actualizar-recuperacion-de-contrasena">Actualizar Recuperación de Contraseña</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.update_password_recovery"></a>
+    <div class="doc doc-contents first">
+
+        <p>Actualiza una recuperación de contraseña existente en la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>recovery</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.PasswordRecovery" href="../models/#app.user.infrastructure.orm_models.PasswordRecovery">PasswordRecovery</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de recuperación de contraseña con los datos actualizados.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se actualizó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_password_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recovery</span><span class="p">:</span> <span class="n">PasswordRecovery</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Actualiza una recuperación de contraseña existente en la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        recovery (PasswordRecovery): Objeto de recuperación de contraseña con los datos actualizados.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se actualizó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">recovery</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al actualizar la recuperación de contraseña: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="eliminar-recuperacion-de-contrasena">Eliminar Recuperación de Contraseña</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.delete_password_recovery"></a>
+    <div class="doc doc-contents first">
+
+        <p>Elimina una recuperación de contraseña de la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>recovery</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.PasswordRecovery" href="../models/#app.user.infrastructure.orm_models.PasswordRecovery">PasswordRecovery</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de recuperación de contraseña a eliminar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se eliminó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">delete_password_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recovery</span><span class="p">:</span> <span class="n">PasswordRecovery</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Elimina una recuperación de contraseña de la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        recovery (PasswordRecovery): Objeto de recuperación de contraseña a eliminar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se eliminó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">recovery</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al eliminar la recuperación: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h3 id="metodos-de-gestion-de-tokens">Métodos de Gestión de Tokens</h3>
+<h4 id="agregar-token-a-lista-negra">Agregar Token a Lista Negra</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.blacklist_token"></a>
+    <div class="doc doc-contents first">
+
+        <p>Agrega un token a la lista negra en la base de datos.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>blacklisted</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.BlacklistedToken" href="../models/#app.user.infrastructure.orm_models.BlacklistedToken">BlacklistedToken</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objeto de token en lista negra a agregar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si se agregó con éxito, False en caso de error.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">blacklist_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blacklisted</span><span class="p">:</span> <span class="n">BlacklistedToken</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Agrega un token a la lista negra en la base de datos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        blacklisted (BlacklistedToken): Objeto de token en lista negra a agregar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si se agregó con éxito, False en caso de error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">blacklisted</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error al blacklistear el token: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="verificar-si-un-token-esta-en-lista-negra">Verificar si un Token está en Lista Negra</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.is_token_blacklisted"></a>
+    <div class="doc doc-contents first">
+
+        <p>Verifica si un token está en la lista negra.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>token</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Token a verificar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True si el token está en la lista negra, False en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">is_token_blacklisted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verifica si un token está en la lista negra.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        token (str): Token a verificar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True si el token está en la lista negra, False en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">BlacklistedToken</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">BlacklistedToken</span><span class="o">.</span><span class="n">token</span> <span class="o">==</span> <span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h3 id="metodos-de-estado-de-usuario">Métodos de Estado de Usuario</h3>
+<h4 id="obtener-estado-por-id">Obtener Estado por ID</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_state_by_id"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un estado de usuario por su ID.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>state_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>ID del estado de usuario.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.UserState" href="../models/#app.user.infrastructure.orm_models.UserState">UserState</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[UserState]: El estado de usuario si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_state_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserState</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un estado de usuario por su ID.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state_id (int): ID del estado de usuario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[UserState]: El estado de usuario si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">UserState</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">UserState</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">state_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="obtener-estado-por-nombre">Obtener Estado por Nombre</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_state_by_name"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un estado de usuario por su nombre.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>state_name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Nombre del estado de usuario.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.UserState" href="../models/#app.user.infrastructure.orm_models.UserState">UserState</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[UserState]: El estado de usuario si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_state_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserState</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un estado de usuario por su nombre.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state_name (str): Nombre del estado de usuario.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[UserState]: El estado de usuario si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">UserState</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">UserState</span><span class="o">.</span><span class="n">nombre</span> <span class="o">==</span> <span class="n">state_name</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h3 id="metodos-de-rol">Métodos de Rol</h3>
+<h4 id="obtener-rol-por-id">Obtener Rol por ID</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_role_by_id"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un rol por su ID.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>role_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>ID del rol.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.Role" href="../models/#app.user.infrastructure.orm_models.Role">Role</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[Role]: El rol si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_role_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Role</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un rol por su ID.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        role_id (int): ID del rol.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[Role]: El rol si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Role</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Role</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">role_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h4 id="obtener-rol-por-nombre">Obtener Rol por Nombre</h4>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="app.user.infrastructure.sql_repository.UserRepository.get_role_by_name"></a>
+    <div class="doc doc-contents first">
+
+        <p>Obtiene un rol por su nombre.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>role_name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Nombre del rol.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.Role" href="../models/#app.user.infrastructure.orm_models.Role">Role</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional[Role]: El rol si se encuentra, None en caso contrario.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app\user\infrastructure\sql_repository.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_role_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Role</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene un rol por su nombre.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        role_name (str): Nombre del rol.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[Role]: El rol si se encuentra, None en caso contrario.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Role</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Role</span><span class="o">.</span><span class="n">nombre</span> <span class="o">==</span> <span class="n">role_name</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h2 id="constantes">Constantes</h2>
+<p>El módulo define las siguientes constantes:</p>
+<ul>
+<li><code>ADMIN_ROLE_NAME</code>: Nombre del rol de administrador de finca.</li>
+<li><code>WORKER_ROLE_NAME</code>: Nombre del rol de trabajador agrícola.</li>
+<li><code>ACTIVE_STATE_NAME</code>: Nombre del estado activo de usuario.</li>
+<li><code>LOCKED_STATE_NAME</code>: Nombre del estado bloqueado de usuario.</li>
+<li><code>PENDING_STATE_NAME</code>: Nombre del estado pendiente de usuario.</li>
+<li><code>INACTIVE_STATE_NAME</code>: Nombre del estado inactivo de usuario.</li>
+</ul>
+<h2 id="manejo-de-errores">Manejo de Errores</h2>
+<p>Todos los métodos que interactúan con la base de datos están envueltos en bloques try-except para manejar posibles errores. En caso de error, se realiza un rollback de la transacción y se imprime un mensaje de error. Los métodos que devuelven un valor booleano retornan <code>False</code> en caso de error, mientras que los métodos que devuelven un objeto retornan <code>None</code>.</p>
+<h2 id="mejores-practicas">Mejores Prácticas</h2>
+<ol>
+<li><strong>Uso de Sesiones</strong>: Siempre use la sesión de base de datos proporcionada al constructor para realizar operaciones de base de datos.</li>
+<li><strong>Manejo de Transacciones</strong>: Use <code>self.db.commit()</code> para confirmar cambios y <code>self.db.rollback()</code> en caso de error.</li>
+<li><strong>Logging</strong>: Considere reemplazar los <code>print</code> statements con un sistema de logging apropiado para un mejor seguimiento de errores en producción.</li>
+<li><strong>Tipado</strong>: El uso de type hints mejora la legibilidad y permite un mejor análisis estático del código.</li>
+<li><strong>Documentación</strong>: Mantenga los docstrings actualizados y detallados para facilitar el uso y mantenimiento del código.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
+      
+    
+  </body>
+</html>

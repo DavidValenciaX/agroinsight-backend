@@ -990,6 +990,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/repository/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1452,27 +1473,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/testing/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Guía de pruebas
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1910,7 +1910,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <li>Crea un Pull Request en GitHub para revisión.</li>
 </ol>
 <h2 id="trabajando-con-la-base-de-datos">Trabajando con la Base de Datos</h2>
-<p>AgroInsight utiliza MySQL como sistema de gestión de base de datos. La estructura de la base de datos se administra a través de MySQL Workbench utilizando lenguaje SQL. La estructura está documentada en <a href="https://dbdocs.io/davidvalencia0526/AgroInsight">https://dbdocs.io/davidvalencia0526/AgroInsight</a>.</p>
+<p>AgroInsight utiliza Postgresql 16.2 como sistema de gestión de base de datos. La estructura de la base de datos se administra a través de PgAdmin utilizando lenguaje SQL. La estructura está documentada en <a href="https://dbdocs.io/davidvalencia0526/AgroInsight">https://dbdocs.io/davidvalencia0526/AgroInsight</a>.</p>
 <h2 id="integracion-con-servicios-externos">Integración con Servicios Externos</h2>
 <p>AgroInsight integra varios servicios externos. Asegúrate de tener las credenciales necesarias en tu archivo <code>.env</code>:</p>
 <ul>
@@ -2045,7 +2045,7 @@ pytest<span class="w"> </span>tests/e2e
         <span class="k">return</span> <span class="n">SoilAnalysisResponse</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">soil_analysis</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">user_can_create_soil_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="n">allowed_roles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Superusuario&quot;</span><span class="p">,</span> <span class="s2">&quot;Administrador de Finca&quot;</span><span class="p">,</span> <span class="s2">&quot;Agrónomo&quot;</span><span class="p">]</span>
+        <span class="n">allowed_roles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Administrador de Finca&quot;</span><span class="p">,</span> <span class="s2">&quot;Agrónomo&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">nombre</span> <span class="ow">in</span> <span class="n">allowed_roles</span> <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">roles</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="6-definicion-de-la-api-infrastructureapipy">6. Definición de la API (infrastructure/api.py)</h3>

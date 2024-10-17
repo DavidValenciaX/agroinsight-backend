@@ -681,15 +681,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#como-se-gestionan-las-pruebas-en-agroinsight" class="md-nav__link">
-    <span class="md-ellipsis">
-      ¿Cómo se gestionan las pruebas en AgroInsight?
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -837,6 +828,27 @@
   
   <span class="md-ellipsis">
     Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/repository/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio
   </span>
   
 
@@ -1308,27 +1320,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/testing/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Guía de pruebas
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1472,15 +1463,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#como-se-gestionan-las-pruebas-en-agroinsight" class="md-nav__link">
-    <span class="md-ellipsis">
-      ¿Cómo se gestionan las pruebas en AgroInsight?
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1511,12 +1493,12 @@
 <ul>
 <li>Python 3.12 o superior</li>
 <li>Docker</li>
-<li>MySQL 8.0</li>
+<li>PostgreSQL 16.2</li>
 <li>Poetry para la gestión de dependencias</li>
 </ul>
 <p>Para más detalles, consulta la sección de <a href="/README.md">Requisitos del Sistema</a>.</p>
 <h2 id="como-se-maneja-la-autenticacion-en-agroinsight">¿Cómo se maneja la autenticación en AgroInsight?</h2>
-<p>AgroInsight utiliza autenticación de dos factores (2FA) para mejorar la seguridad. Los usuarios deben verificar su identidad mediante un PIN enviado a su correo electrónico. Para más detalles, revisa el endpoint <code>/login/verify</code> en la <a href="../fast-api-docs/overview.md">documentación de la API</a>.</p>
+<p>AgroInsight utiliza autenticación de dos factores (2FA) para mejorar la seguridad. Los usuarios deben verificar su identidad mediante un PIN enviado a su correo electrónico. Para más detalles, revisa el endpoint <code>/login/verify</code> en la <a href="https://agroinsight-backend-production.up.railway.app/docs">documentación de la API</a>.</p>
 <h2 id="que-debo-hacer-si-encuentro-un-error-durante-la-instalacion">¿Qué debo hacer si encuentro un error durante la instalación?</h2>
 <p>Si encuentras problemas durante la instalación, verifica lo siguiente:</p>
 <ul>
@@ -1533,13 +1515,11 @@
 <li>ReDoc: <code>http://localhost:8000/redoc</code></li>
 </ul>
 <h2 id="como-se-despliega-agroinsight">¿Cómo se despliega AgroInsight?</h2>
-<p>El despliegue se realiza automáticamente en la plataforma Railway al fusionar cambios en la rama <code>main</code>. Asegúrate de que todas las pruebas pasen antes de fusionar tus cambios. Para más detalles, consulta la sección de <a href="../README.md">Despliegue</a>.</p>
+<p>El despliegue se realiza automáticamente en la plataforma Railway al fusionar cambios en la rama <code>main</code>. Asegúrate de que todas las pruebas pasen antes de fusionar tus cambios. Para más detalles, consulta la sección de <a href="/README.md">Despliegue</a>.</p>
 <h2 id="como-puedo-reportar-un-problema-o-sugerir-una-mejora">¿Cómo puedo reportar un problema o sugerir una mejora?</h2>
 <p>Puedes reportar problemas o sugerir mejoras creando un issue en el <a href="https://github.com/DavidValenciaX/agroinsight-backend">repositorio de GitHub</a>. Asegúrate de proporcionar una descripción detallada y, si es posible, pasos para reproducir el problema.</p>
 <h2 id="donde-puedo-encontrar-mas-informacion-sobre-las-practicas-de-codificacion">¿Dónde puedo encontrar más información sobre las prácticas de codificación?</h2>
 <p>Revisa la <a href="../../development/coding_standards/">Guía de Estándares de Codificación</a> para conocer las convenciones y prácticas recomendadas en el proyecto.</p>
-<h2 id="como-se-gestionan-las-pruebas-en-agroinsight">¿Cómo se gestionan las pruebas en AgroInsight?</h2>
-<p>Las pruebas se ejecutan utilizando <code>pytest</code>. Puedes ejecutar todas las pruebas con el comando <code>pytest</code> o pruebas específicas según sea necesario. Para más detalles, consulta la <a href="../../development/testing/">Guía de Pruebas</a>.</p>
 
 
 

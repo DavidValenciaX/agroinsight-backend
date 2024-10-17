@@ -843,6 +843,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/repository/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1305,27 +1326,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/testing/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Guía de pruebas
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1497,8 +1497,8 @@
 <ol>
 <li><strong>Python 3.12 o superior</strong>: Descarga e instala desde <a href="https://www.python.org/downloads/">python.org</a>.</li>
 <li><strong>VS Code</strong>: Descarga e instala desde <a href="https://code.visualstudio.com/">code.visualstudio.com</a>.</li>
-<li><strong>MySQL 8.0</strong>: Descarga e instala desde <a href="https://dev.mysql.com/downloads/mysql/">dev.mysql.com</a>.</li>
-<li><strong>MySQL Workbench</strong>: Descarga e instala desde <a href="https://dev.mysql.com/downloads/workbench/">dev.mysql.com</a>.</li>
+<li><strong>PostgreSQL 16.2</strong>: Descarga e instala desde <a href="https://www.postgresql.org/download/">postgresql.org</a>.</li>
+<li><strong>PgAdmin</strong>: Descarga e instala desde <a href="https://www.pgadmin.org/download/">pgadmin.org</a>.</li>
 <li><strong>pip</strong>: Generalmente se instala con Python. Verifica con <code>pip --version</code>.</li>
 <li><strong>Poetry</strong>: Instala ejecutando <code>pip install poetry</code>.</li>
 <li><strong>Git</strong>: Descarga e instala desde <a href="https://git-scm.com/">git-scm.com</a>.</li>
@@ -1519,7 +1519,7 @@ poetry<span class="w"> </span>install
 </code></pre></div>
 <h3 id="4-configurar-variables-de-entorno">4. Configurar Variables de Entorno</h3>
 <p>Crea un archivo <code>.env</code> en la raíz del proyecto backend y añade las siguientes variables:</p>
-<div class="highlight"><pre><span></span><code>MYSQL_PUBLIC_URL=mysql://user:password@host:port/database
+<div class="highlight"><pre><span></span><code>DATABASE_URL=&quot;postgresql://user:password@host:port/database&quot;
 SECRET_KEY=tu_clave_secreta
 GMAIL_USER=tu_correo@gmail.com
 GMAIL_APP_PASSWORD=tu_contraseña_de_aplicacion
@@ -1535,7 +1535,7 @@ GMAIL_APP_PASSWORD=tu_contraseña_de_aplicacion
 <h2 id="solucion-de-problemas-comunes">Solución de Problemas Comunes</h2>
 <ul>
 <li><strong>Problemas con dependencias de Python</strong>: Asegúrate de usar Python 3.12 y que el entorno virtual esté activado.</li>
-<li><strong>Errores de base de datos</strong>: Verifica que el contenedor Docker de MySQL esté corriendo y las credenciales en <code>.env</code> sean correctas.</li>
+<li><strong>Errores de base de datos</strong>: Verifica que el contenedor Docker de Postgresql esté corriendo y las credenciales en <code>.env</code> sean correctas.</li>
 <li><strong>Problemas con TensorFlow o OpenCV</strong>: Asegúrate de que tu sistema cumple con los requisitos de hardware para IA.</li>
 </ul>
 <h2 id="proximos-pasos">Próximos Pasos</h2>
