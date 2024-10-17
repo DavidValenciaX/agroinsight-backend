@@ -18,8 +18,8 @@ class CulturalTask(Base):
     nombre = Column(String(255), nullable=False)
     tipo_labor_id = Column(Integer, ForeignKey("tipo_labor_cultural.id"), nullable=False)
     fecha_inicio_estimada = Column(Date, nullable=False)
-    fecha_finalizacion = Column(Date)
-    descripcion = Column(Text)
+    fecha_finalizacion = Column(Date, nullable=True)
+    descripcion = Column(Text, nullable=True)
     estado_id = Column(Integer, ForeignKey("estado_tarea_labor_cultural.id"), nullable=False)
     lote_id = Column(Integer, ForeignKey('lote.id'), nullable=False)
 

@@ -8,7 +8,6 @@ class TaskBase(BaseModel):
     fecha_inicio_estimada: date
     descripcion: Optional[str] = Field(None, max_length=500)
     estado_id: int
-    fecha_finalizacion: Optional[date] = None
     nombre: str = Field(..., max_length=255)
 
 class TaskCreate(TaskBase):

@@ -85,10 +85,3 @@ class CreateTaskUseCase:
                 message="La fecha programada no puede ser anterior a la fecha actual.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Validar que si hay fecha completada, no sea anterior a la fecha programada
-        if tarea_data.fecha_finalizacion and tarea_data.fecha_finalizacion < tarea_data.fecha_inicio_estimada:
-            raise DomainException(
-                message="La fecha de completado no puede ser anterior a la fecha programada.",
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
