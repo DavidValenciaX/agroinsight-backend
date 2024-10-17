@@ -195,6 +195,3 @@ class UserRepository:
     
     def get_role_by_name(self, role_name: str) -> Optional[Role]:
         return self.db.query(Role).filter(Role.nombre == role_name).first()
-        
-    def user_exists(self, user_id: int) -> bool:
-        return self.db.query(User).filter(User.id == user_id).first() is not None

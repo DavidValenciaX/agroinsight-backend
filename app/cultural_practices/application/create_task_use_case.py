@@ -37,28 +37,28 @@ class CreateTaskUseCase:
         self.validate_tarea_data(tarea_data)
         
         #validar que el lote existe
-        if not self.plot_repository.plot_exists(tarea_data.lote_id):
+        if not self.plot_repository.get_plot_by_id(tarea_data.lote_id):
             raise DomainException(
                 message="El lote especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
         # Verificar si el tipo de labor cultural existe
-        if not self.cultural_practice_repository.tipo_labor_cultural_exists(tarea_data.tipo_labor_id):
+        if not self.cultural_practice_repository.get_task_type_by_id(tarea_data.tipo_labor_id):
             raise DomainException(
                 message="El tipo de labor cultural especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
         # Verificar si el estado de tarea existe
-        if not self.cultural_practice_repository.estado_tarea_exists(tarea_data.estado_id):
+        if not self.cultural_practice_repository.get_task_state_by_id(tarea_data.estado_id):
             raise DomainException(
                 message="El estado de tarea especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
         # Obtener el nombre del estado de tarea
-        estado_nombre = self.cultural_practice_repository.get_estado_tarea_nombre(tarea_data.estado_id)
+        estado_nombre = self.cultural_practice_repository.get_task_state_name(tarea_data.estado_id)
         if estado_nombre == self.COMPLETED_STATE_NAME:
             raise DomainException(
                 message=f"No se puede crear una tarea directamente en estado '{self.COMPLETED_STATE_NAME}'.",

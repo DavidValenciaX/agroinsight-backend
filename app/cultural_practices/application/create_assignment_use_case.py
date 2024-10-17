@@ -21,14 +21,14 @@ class CreateAssignmentUseCase:
     def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> MultipleResponse:
         
         # Validar que la tarea existe
-        if not self.cultural_practice_repository.task_exists(assignment_data.tarea_labor_cultural_id):
+        if not self.cultural_practice_repository.get_task_by_id(assignment_data.tarea_labor_cultural_id):
             raise DomainException(
                 message="La tarea especificada no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
         # obtener el id del lote por medio del id de la tarea
-        lote_id = self.cultural_practice_repository.get_lote_id_by_tarea_id(assignment_data.tarea_labor_cultural_id)
+        lote_id = self.cultural_practice_repository.get_plot_id_by_task_id(assignment_data.tarea_labor_cultural_id)
         if not lote_id:
             raise DomainException(
                 message="No se pudo obtener el id del lote.",

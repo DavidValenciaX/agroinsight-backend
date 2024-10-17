@@ -3,7 +3,7 @@ from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import FarmCreate
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
+from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 class CreateFarmUseCase:

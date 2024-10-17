@@ -5,17 +5,38 @@ from app.cultural_practices.infrastructure.orm_models import Assignment, Cultura
 from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.plot.infrastructure.orm_models import Plot
 
+PROGRAMADA = 'Programada'
+EN_PROGRESO = 'En Progreso'
+COMPLETADA = 'Completada'
+CANCELADA = 'Cancelada'
+PENDIENTE = 'Pendiente'
+RETRASADA = 'Retrasada'
+FALLIDA = 'Fallida'
+REVISADA = 'Revisada'
+APROBADA = 'Aprobada'
+POSTERGADA = 'Postergada'
+FINALIZADA = 'Finalizada'
+
 class CulturalPracticesRepository:
     def __init__(self, db: Session):
         self.db = db
-        
-    def tipo_labor_cultural_exists(self, tipo_labor_id: int) -> bool:
-        return self.db.query(CulturalTaskType).filter(CulturalTaskType.id == tipo_labor_id).first() is not None
+    
+    def get_task_type_by_id(self, tipo_labor_id: int) -> CulturalTaskType:
+        return self.db.query(CulturalTaskType).filter(CulturalTaskType.id == tipo_labor_id).first()
+    
+    def get_task_type_by_name(self, tipo_labor_nombre: str) -> CulturalTaskType:
+        return self.db.query(CulturalTaskType).filter(CulturalTaskType.nombre == tipo_labor_nombre).first()
+    
+    def get_task_state_by_id(self, estado_id: int) -> CulturalTaskState:
+        return self.db.query(CulturalTaskState).filter(CulturalTaskState.id == estado_id).first()
+    
+    def get_task_state_by_name(self, estado_nombre: str) -> CulturalTaskState:
+        return self.db.query(CulturalTaskState).filter(CulturalTaskState.nombre == estado_nombre).first()
+    
+    def get_task_by_id(self, task_id: int) -> CulturalTask:
+        return self.db.query(CulturalTask).filter(CulturalTask.id == task_id).first()
 
-    def estado_tarea_exists(self, estado_id: int) -> bool:
-        return self.db.query(CulturalTaskState).filter(CulturalTaskState.id == estado_id).first() is not None
-
-    def get_estado_tarea_nombre(self, estado_id: int) -> str:
+    def get_task_state_name(self, estado_id: int) -> str:
         estado = self.db.query(CulturalTaskState).filter(CulturalTaskState.id == estado_id).first()
         return estado.nombre if estado else None
 
@@ -42,9 +63,6 @@ class CulturalPracticesRepository:
             self.db.rollback()
             print(f"Error al crear la asignación: {e}")
             return None
-
-    def task_exists(self, task_id: int) -> bool:
-        return self.db.query(CulturalTask).filter(CulturalTask.id == task_id).first() is not None
     
     def list_assignments_by_user_paginated(self, user_id: int, page: int, per_page: int, admin_farm_ids: List[int]) -> tuple[int, List[Assignment]]:
         try:
@@ -61,7 +79,7 @@ class CulturalPracticesRepository:
             print(f"Error al listar las asignaciones: {e}")
             return 0, []
     
-    def get_lote_id_by_tarea_id(self, tarea_id: int) -> int:
+    def get_plot_id_by_task_id(self, tarea_id: int) -> int:
         result = self.db.query(CulturalTask.lote_id).filter(CulturalTask.id == tarea_id).first()
         return result[0] if result else None
     

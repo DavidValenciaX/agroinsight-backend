@@ -31,7 +31,7 @@ class ListTasksByUserAndFarmUseCase:
             )
             
         # validar que el usuario existe
-        if not self.user_repository.user_exists(user_id):
+        if not self.user_repository.get_user_by_id(user_id):
             raise DomainException(
                 message="El usuario especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND

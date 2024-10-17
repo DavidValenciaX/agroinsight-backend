@@ -75,7 +75,7 @@ class FarmRepository:
             UserFarmRole.finca_id == farm_id
         ).first()
 
-    def get_farm_by_id(self, farm_id: int) -> Farm:
+    def get_farm_by_id(self, farm_id: int) -> Optional[Farm]:
         return self.db.query(Farm).filter(Farm.id == farm_id).first()
     
     def list_farm_users_by_role_paginated(self, farm_id: int, role_id: int, page: int, per_page: int):

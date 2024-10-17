@@ -33,6 +33,9 @@ class PlotRepository:
     def list_plots(self, user_id: int) -> List[Plot]:
             return self.db.query(Plot).join(UserFarmRole, Plot.finca_id == UserFarmRole.finca_id).filter(UserFarmRole.usuario_id == user_id).all()
         
+    def get_plot_by_id(self, plot_id: int) -> Optional[Plot]:
+        return self.db.query(Plot).filter(Plot.id == plot_id).first()
+        
     def list_plots_by_farm(self, finca_id: int) -> List[Plot]:
         return self.db.query(Plot).filter(Plot.finca_id == finca_id).all()
     
@@ -43,9 +46,6 @@ class PlotRepository:
         plots = query.offset((page - 1) * per_page).limit(per_page).all()
         
         return total, plots
-    
-    def get_farm_by_id(self, finca_id: int) -> Optional[Farm]:
-        return self.db.query(Farm).filter(Farm.id == finca_id).first()
 
     def check_user_farm_access(self, user_id: int, finca_id: int) -> bool:
         access = self.db.query(UserFarmRole).filter(
@@ -59,9 +59,6 @@ class PlotRepository:
             Plot.nombre == nombre,
             Plot.finca_id == finca_id
         ).first()
-        
-    def plot_exists(self, plot_id: int) -> bool:
-        return self.db.query(Plot).filter(Plot.id == plot_id).first() is not None
 
     def get_farm_id_by_plot_id(self, plot_id: int) -> int:
         result = self.db.query(Plot.finca_id).filter(Plot.id == plot_id).first()

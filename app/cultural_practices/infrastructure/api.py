@@ -12,9 +12,10 @@ from app.cultural_practices.application.create_task_use_case import CreateTaskUs
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.infrastructure.common.response_models import MultipleResponse
+from app.infrastructure.common.response_models import MultipleResponse, SuccessResponse
 from app.user.domain.schemas import UserInDB
 from app.cultural_practices.application.list_tasks_by_user_and_farm_use_case import ListTasksByUserAndFarmUseCase
+from app.cultural_practices.application.change_task_state_use_case import ChangeTaskStateUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -121,4 +122,37 @@ def list_tasks_by_user_and_farm(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar las tareas: {str(e)}"
+        )
+
+@router.put("/tasks/{task_id}/states/{state_id}", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
+def change_task_state(
+    task_id: int,
+    state_id: int,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Cambia el estado de una tarea de labor cultural.
+
+    Parameters:
+        task_id (int): ID de la tarea a cambiar el estado.
+        state_id (int): ID del estado al que se cambiará la tarea.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        SuccessResponse: Un objeto SuccessResponse indicando que el estado de la tarea fue cambiado exitosamente.
+
+    Raises:
+        HTTPException: Si ocurre un error durante el cambio de estado de la tarea.
+    """
+    change_task_state_use_case = ChangeTaskStateUseCase(db)
+    try:
+        return change_task_state_use_case.change_task_state(task_id, state_id, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al cambiar de estado la tarea: {str(e)}"
         )
