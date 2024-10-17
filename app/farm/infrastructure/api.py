@@ -7,6 +7,7 @@ listado de fincas y usuarios de una finca específica.
 
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.infrastructure.db.connection import getDb
@@ -87,29 +88,23 @@ def list_farms(
             detail=f"Error interno al listar las fincas: {str(e)}"
         )
         
-@router.post("/assign-users-by-email", response_model=MultipleResponse, status_code=status.HTTP_200_OK)
+@router.post("/assign-users-by-email", 
+             response_model=MultipleResponse,
+             responses={
+                 200: {"description": "Usuarios asignados exitosamente"},
+                 207: {"description": "Algunos usuarios asignados, otros fallaron"},
+                 400: {"description": "No se pudo asignar ningún usuario"}
+             }
+)
 def assign_users_to_farm_by_email(
     assignment_data: FarmUserAssignmentByEmail,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
-    """
-    Asigna usuarios a una finca del administrador utilizando los correos electrónicos dados
-
-    Parameters:
-        assignment_data (FarmUserAssignmentByEmail): Datos de asignación de usuarios.
-        db (Session): Sesión de base de datos.
-        current_user (UserInDB): Usuario actual autenticado.
-
-    Returns:
-        SuccessResponse: Un objeto SuccessResponse indicando que los usuarios fueron asignados exitosamente.
-
-    Raises:
-        HTTPException: Si ocurre un error durante la asignación de usuarios.
-    """
     assign_users_use_case = AssignUsersToFarmUseCase(db)
     try:
-        return assign_users_use_case.assign_users_by_emails(assignment_data, current_user)
+        response = assign_users_use_case.assign_users_by_emails(assignment_data, current_user)
+        return JSONResponse(content=response.model_dump(), status_code=response.status_code)
     except DomainException as e:
         raise e
     except Exception as e:
@@ -117,6 +112,7 @@ def assign_users_to_farm_by_email(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al asignar usuario a una finca: {str(e)}"
         )
+
         
 @router.get("/{farm_id}/users", response_model=PaginatedFarmUserListResponse, status_code=status.HTTP_200_OK)
 def list_farm_users(

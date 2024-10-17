@@ -6,3 +6,4 @@ class SuccessResponse(BaseModel):
     
 class MultipleResponse(BaseModel):
     messages: List[str]
+    status_code: int
