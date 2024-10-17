@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import date
 from typing import List, Optional
         
-class CulturalTaskBase(BaseModel):
+class TaskBase(BaseModel):
     tipo_labor_id: int
     lote_id: int
     fecha_inicio_estimada: date
@@ -11,30 +11,12 @@ class CulturalTaskBase(BaseModel):
     fecha_finalizacion: Optional[date] = None
     nombre: str = Field(..., max_length=255)
 
-class CulturalTaskCreate(CulturalTaskBase):
+class TaskCreate(TaskBase):
     pass
 
-class AssignmentCreate(BaseModel):
-    usuario_ids: List[int]
-    tarea_labor_cultural_id: int
-    
-class AssignmentCreateSingle(BaseModel):
-    usuario_id: int
-    tarea_labor_cultural_id: int
-
-class AssignmentResponse(BaseModel):
-    usuario_id: int
-    tarea_labor_cultural_id: int
-
-    class Config:
-        from_attributes = True
-        
-class PaginatedAssignmentListResponse(BaseModel):
-    assignments: List[AssignmentResponse]
-    total_assignments: int
-    page: int
-    per_page: int
-    total_pages: int
+class SuccessTaskCreateResponse(BaseModel):
+    message: str
+    task_id: int
 
 class TaskResponse(BaseModel):
     id: int
@@ -55,3 +37,11 @@ class PaginatedTaskListResponse(BaseModel):
     page: int
     per_page: int
     total_pages: int
+
+class AssignmentCreate(BaseModel):
+    usuario_ids: List[int]
+    tarea_labor_cultural_id: int
+    
+class AssignmentCreateSingle(BaseModel):
+    usuario_id: int
+    tarea_labor_cultural_id: int

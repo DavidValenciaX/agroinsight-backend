@@ -6,22 +6,21 @@ Incluye endpoints para la creación de tareas y asignaciones, así como para lis
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreate, CulturalTaskCreate, PaginatedTaskListResponse
+from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse
 from app.cultural_practices.application.create_assignment_use_case import CreateAssignmentUseCase
-from app.cultural_practices.domain.schemas import PaginatedAssignmentListResponse
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.infrastructure.common.response_models import SuccessResponse, MultipleResponse
+from app.infrastructure.common.response_models import MultipleResponse
 from app.user.domain.schemas import UserInDB
 from app.cultural_practices.application.list_tasks_by_user_and_farm_use_case import ListTasksByUserAndFarmUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
-@router.post("/task/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/task/create", response_model=SuccessTaskCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_task(
-    task: CulturalTaskCreate,
+    task: TaskCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
@@ -29,7 +28,7 @@ def create_task(
     Crea una nueva tarea de práctica cultural en el sistema.
 
     Parameters:
-        task (CulturalTaskCreate): Datos de la tarea a crear.
+        task (TaskCreate): Datos de la tarea a crear.
         db (Session): Sesión de base de datos.
         current_user (UserInDB): Usuario actual autenticado.
 

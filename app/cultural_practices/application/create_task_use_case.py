@@ -1,12 +1,11 @@
 from sqlalchemy.orm import Session
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
-from app.cultural_practices.domain.schemas import CulturalTaskCreate
+from app.cultural_practices.domain.schemas import TaskCreate, SuccessTaskCreateResponse
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.infrastructure.common.datetime_utils import get_current_date
-from app.infrastructure.common.response_models import SuccessResponse
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
+from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 class CreateTaskUseCase:
@@ -17,7 +16,7 @@ class CreateTaskUseCase:
         self.farm_repository = FarmRepository(db)
         self.plot_repository = PlotRepository(db)
 
-    def create_task(self, tarea_data: CulturalTaskCreate, current_user: UserInDB) -> SuccessResponse:
+    def create_task(self, tarea_data: TaskCreate, current_user: UserInDB) -> SuccessTaskCreateResponse:
         
         # buscar el id de la finca por medio del id del lote
         finca_id = self.plot_repository.get_farm_id_by_plot_id(tarea_data.lote_id)
@@ -74,9 +73,9 @@ class CreateTaskUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        return SuccessResponse(message="Tarea creada exitosamente")
+        return SuccessTaskCreateResponse(message="Tarea creada exitosamente", task_id=tarea.id)
 
-    def validate_tarea_data(self, tarea_data: CulturalTaskCreate):
+    def validate_tarea_data(self, tarea_data: TaskCreate):
         # Obtener la fecha actual
         current_date = get_current_date()
 

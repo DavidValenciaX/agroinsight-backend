@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreate, CulturalTaskCreate
+from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate
 from app.cultural_practices.infrastructure.orm_models import Assignment, CulturalTaskState, CulturalTaskType
 from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.plot.infrastructure.orm_models import Plot
@@ -19,7 +19,7 @@ class CulturalPracticesRepository:
         estado = self.db.query(CulturalTaskState).filter(CulturalTaskState.id == estado_id).first()
         return estado.nombre if estado else None
 
-    def create_task(self, tarea_data: CulturalTaskCreate) -> CulturalTask:
+    def create_task(self, tarea_data: TaskCreate) -> CulturalTask:
         try:
             db_tarea = CulturalTask(**tarea_data.model_dump())
             self.db.add(db_tarea)
