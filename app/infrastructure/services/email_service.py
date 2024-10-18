@@ -24,6 +24,7 @@ def send_email(to_email: str, subject: str, text_content: str, html_content: str
         # Adjuntar las partes de texto plano y HTML
         part1 = MIMEText(text_content, "plain")
         part2 = MIMEText(html_content, "html")
+
         message.attach(part1)
         message.attach(part2)
 
