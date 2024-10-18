@@ -1,36 +1,39 @@
 import os
-import smtplib
-import ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from pysendpulse.pysendpulse import PySendPulse
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-SENDPULSE_USER = os.getenv('SENDPULSE_CLIENT_ID')
-SENDPULSE_PASSWORD = os.getenv('SENDPULSE_CLIENT_SECRET')
-SMTP_SERVER = os.getenv('SENDPULSE_SMTP_SERVER')
-SMTP_PORT = int(os.getenv('SENDPULSE_SMTP_PORT', 587))  # Default to 587 if not set
+REST_API_ID = os.getenv('SENDPULSE_CLIENT_ID')
+REST_API_SECRET = os.getenv('SENDPULSE_CLIENT_SECRET')
+TOKEN_STORAGE = 'file'  # Puedes usar 'file' o 'memcached'
+TOKEN_STORAGE_PATH = 'C:/Users/David/Downloads/Programacion/Python/agroinsight-backend/tmp' # Ruta donde se almacenará el token si usas 'file'
 
-def send_email(to_email: str, subject: str, text_content: str, html_content: str):
-    try:
-        message = MIMEMultipart("alternative")
-        message["Subject"] = subject
-        message["From"] = SENDPULSE_USER
-        message["To"] = to_email
+SPApiProxy = PySendPulse(REST_API_ID, REST_API_SECRET, TOKEN_STORAGE, token_file_path=TOKEN_STORAGE_PATH)
 
-        part1 = MIMEText(text_content, "plain")
-        part2 = MIMEText(html_content, "html")
 
-        message.attach(part1)
-        message.attach(part2)
+def send_email_sendpulse(to_email: str, subject: str, text_content: str, html_content: str):
+    email = {
+        'subject': subject,
+        'html': html_content,
+        'text': text_content,
+        'from': {
+            'name': 'AgroInsight',  # Reemplaza con tu nombre o el de tu empresa
+            'email': 'oscarvalencia@agroinsight.cloud-ip.biz'  # Debe ser un correo electrónico verificado en SendPulse
+        },
+        'to': [
+            {
+                'name': '',  # Puedes agregar el nombre del destinatario si lo deseas
+                'email': to_email
+            }
+        ]
+    }
 
-        context = ssl.create_default_context()
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls(context=context)
-            server.login(SENDPULSE_USER, SENDPULSE_PASSWORD)
-            server.sendmail(SENDPULSE_USER, to_email, message.as_string())
+    response = SPApiProxy.smtp_send_mail(email)
+    
+    if response.get('result'):
+        print(f"Correo enviado exitosamente a {to_email}")
         return True
-    except Exception as e:
-        print(f"Error al enviar el correo electrónico: {e}")
+    else:
+        print(f"Error al enviar el correo electrónico: {response}")
         return False
