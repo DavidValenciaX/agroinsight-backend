@@ -4330,8 +4330,7 @@ y el envío de correos de confirmación.</p>
 
               <details class="quote">
                 <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 36</span>
-<span class="normal"> 37</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 37</span>
 <span class="normal"> 38</span>
 <span class="normal"> 39</span>
 <span class="normal"> 40</span>
@@ -4516,7 +4515,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
-<span class="normal">222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserRegisterUseCase</span><span class="p">:</span>
+<span class="normal">222</span>
+<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserRegisterUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Caso de uso para la creación de un nuevo usuario en el sistema.</span>
 
@@ -4648,7 +4648,7 @@ y el envío de correos de confirmación.</p>
 <span class="s2">            &lt;/body&gt;</span>
 <span class="s2">        &lt;/html&gt;</span>
 <span class="s2">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">send_email</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">html_content</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">send_email_sendpulse</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">html_content</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_confirmation_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4762,8 +4762,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">50</span>
-<span class="normal">51</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
 <span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
@@ -4771,7 +4770,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
-<span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
+<span class="normal">59</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Inicializa una nueva instancia de UserRegisterUseCase.</span>
 
@@ -4854,8 +4854,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">182</span>
-<span class="normal">183</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
@@ -4875,7 +4874,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">200</span>
 <span class="normal">201</span>
 <span class="normal">202</span>
-<span class="normal">203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_last_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserConfirmation</span><span class="p">]:</span>
+<span class="normal">203</span>
+<span class="normal">204</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_last_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserConfirmation</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Obtiene la última confirmación del usuario y elimina las anteriores.</span>
 
@@ -4964,8 +4964,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">205</span>
-<span class="normal">206</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
 <span class="normal">209</span>
@@ -4981,7 +4980,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
-<span class="normal">222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_pending_user_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserStateModel</span><span class="p">]:</span>
+<span class="normal">222</span>
+<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_pending_user_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserStateModel</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Obtiene el estado &#39;pendiente&#39; del usuario.</span>
 
@@ -5072,8 +5072,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
-<span class="normal">171</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
 <span class="normal">174</span>
@@ -5082,7 +5081,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">177</span>
 <span class="normal">178</span>
 <span class="normal">179</span>
-<span class="normal">180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">is_confirmation_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">180</span>
+<span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">is_confirmation_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confirmation</span><span class="p">:</span> <span class="n">UserConfirmation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Verifica si la confirmación del usuario ha expirado.</span>
 
@@ -5219,8 +5219,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 61</span>
-<span class="normal"> 62</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 62</span>
 <span class="normal"> 63</span>
 <span class="normal"> 64</span>
 <span class="normal"> 65</span>
@@ -5303,7 +5302,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span>
-<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">register_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_data</span><span class="p">:</span> <span class="n">UserCreate</span><span class="p">,</span> <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">register_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_data</span><span class="p">:</span> <span class="n">UserCreate</span><span class="p">,</span> <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Crea un nuevo usuario en el sistema.</span>
 
@@ -5475,8 +5475,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">147</span>
-<span class="normal">148</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
 <span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
@@ -5496,7 +5495,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">165</span>
 <span class="normal">166</span>
 <span class="normal">167</span>
-<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">send_confirmation_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pin</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">168</span>
+<span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">send_confirmation_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pin</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Envía un correo electrónico de confirmación al usuario.</span>
 
@@ -5517,7 +5517,7 @@ y el envío de correos de confirmación.</p>
 <span class="s2">        &lt;/body&gt;</span>
 <span class="s2">    &lt;/html&gt;</span>
 <span class="s2">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">send_email</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">html_content</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_email_sendpulse</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">html_content</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5651,8 +5651,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 61</span>
-<span class="normal"> 62</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 62</span>
 <span class="normal"> 63</span>
 <span class="normal"> 64</span>
 <span class="normal"> 65</span>
@@ -5735,7 +5734,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span>
-<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">register_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_data</span><span class="p">:</span> <span class="n">UserCreate</span><span class="p">,</span> <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">register_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_data</span><span class="p">:</span> <span class="n">UserCreate</span><span class="p">,</span> <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Crea un nuevo usuario en el sistema.</span>
 
@@ -5904,8 +5904,7 @@ y el envío de correos de confirmación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\user\application\user_register_process\user_register_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">147</span>
-<span class="normal">148</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
 <span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
@@ -5925,7 +5924,8 @@ y el envío de correos de confirmación.</p>
 <span class="normal">165</span>
 <span class="normal">166</span>
 <span class="normal">167</span>
-<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">send_confirmation_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pin</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">168</span>
+<span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">send_confirmation_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pin</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Envía un correo electrónico de confirmación al usuario.</span>
 
@@ -5946,7 +5946,7 @@ y el envío de correos de confirmación.</p>
 <span class="s2">        &lt;/body&gt;</span>
 <span class="s2">    &lt;/html&gt;</span>
 <span class="s2">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">send_email</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">html_content</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_email_sendpulse</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">html_content</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
