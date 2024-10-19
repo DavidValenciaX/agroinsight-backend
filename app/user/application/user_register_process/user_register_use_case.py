@@ -12,7 +12,6 @@ from app.infrastructure.security.security_utils import hash_password
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
-from app.infrastructure.services.zoho_email_service import send_email_zoho
 from datetime import datetime, timezone, timedelta
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.infrastructure.orm_models import UserState as UserStateModel
@@ -166,7 +165,7 @@ class UserRegisterUseCase:
             </body>
         </html>
         """
-        return send_email_zoho(email, subject, text_content, html_content)
+        return send_email(email, subject, text_content, html_content)
     
     def is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
         """

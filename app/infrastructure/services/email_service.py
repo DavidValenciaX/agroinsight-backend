@@ -1,3 +1,4 @@
+import logging
 import os
 import smtplib
 import ssl
@@ -5,50 +6,87 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
-# Cargar las variables de entorno
+# Configuración del logger
+logging.basicConfig(
+    level=logging.INFO,  # Nivel de log (puedes cambiar a DEBUG para más detalle)
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",  # Formato de log
+    handlers=[
+        logging.FileHandler("email_logs.log"),  # Archivo donde se guardarán los logs
+        logging.StreamHandler()  # Mostrar los logs también en consola
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+# Cargar variables de entorno desde .env
 load_dotenv(override=True)
 
-GMAIL_USER = os.getenv('GMAIL_USER')
-GMAIL_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
-SMTP_SERVER = "smtp.gmail.com"
+# Definir las credenciales y configuración del servidor SMTP de Zoho
+ZOHO_USER = os.getenv('ZOHO_USER')
+ZOHO_PASSWORD = os.getenv('ZOHO_APP_PASSWORD')
+SMTP_SERVER = "smtp.zoho.com"
 SMTP_PORT = 465
 
 def send_email(to_email: str, subject: str, text_content: str, html_content: str):
     try:
-        # Crear el mensaje MIME
+        logger.info("Iniciando proceso de envío de correo...")
+
+        # Verificar que las variables de entorno están cargadas correctamente
+        if not ZOHO_USER or not ZOHO_PASSWORD:
+            logger.error("Credenciales no encontradas en las variables de entorno.")
+            return False
+        else:
+            logger.info(f"Usuario Zoho: {ZOHO_USER}")
+
+        # Crear el mensaje con múltiples partes (plain text y HTML)
         message = MIMEMultipart("alternative")
         message["Subject"] = subject
-        message["From"] = GMAIL_USER
+        message["From"] = ZOHO_USER
         message["To"] = to_email
 
-        # Adjuntar las partes de texto plano y HTML
+        # Crear las partes de texto y HTML del mensaje
         part1 = MIMEText(text_content, "plain")
         part2 = MIMEText(html_content, "html")
 
+        # Adjuntar las partes al mensaje
         message.attach(part1)
         message.attach(part2)
 
-        # Agregar cabeceras para solicitar confirmación de entrega o lectura
-        message["Disposition-Notification-To"] = GMAIL_USER
-        message["Return-Receipt-To"] = GMAIL_USER
+        logger.info("Mensaje construido correctamente.")
 
-        # Configurar el contexto SSL
+        # Crear un contexto SSL para la conexión segura
         context = ssl.create_default_context()
 
-        # Conectarse al servidor SMTP y enviar el correo
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
-            server.login(GMAIL_USER, GMAIL_PASSWORD)
-            # Enviar el correo y obtener la respuesta del servidor
-            response = server.sendmail(GMAIL_USER, to_email, message.as_string())
-            
-            # Verificar la respuesta del servidor SMTP
-            if response == {}:
-                print("Correo enviado exitosamente.")
-                return True
-            else:
-                print(f"Error en algunos destinatarios: {response}")
-                return False
+        # Conectar al servidor SMTP de Zoho y enviar el correo
+        logger.info(f"Conectando al servidor SMTP: {SMTP_SERVER}:{SMTP_PORT}...")
 
+        # Habilitar el modo de depuración en el servidor SMTP
+        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
+            server.set_debuglevel(0)  # Desactivar depuración detallada en el servidor SMTP (la salida sería demasiado extensa)
+
+            logger.info("Iniciando sesión en Zoho SMTP...")
+            server.login(ZOHO_USER, ZOHO_PASSWORD)
+            logger.info("Sesión iniciada correctamente.")
+
+            logger.info(f"Enviando correo a {to_email}...")
+            server.sendmail(ZOHO_USER, to_email, message.as_string())
+            logger.info(f"Correo enviado correctamente a {to_email}.")
+
+        return True
+
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"Error de autenticación SMTP: {e}")
+        return {"status": "failed", "error": "SMTPAuthenticationError", "details": str(e)}
+    except smtplib.SMTPRecipientsRefused as e:
+        logger.error(f"Error: Destinatarios rechazados: {e.recipients}")
+        return {"status": "failed", "error": "SMTPRecipientsRefused", "details": str(e)}
+    except smtplib.SMTPSenderRefused as e:
+        logger.error(f"Error: Remitente rechazado: {e.sender}")
+        return {"status": "failed", "error": "SMTPSenderRefused", "details": str(e)}
+    except smtplib.SMTPException as e:
+        logger.error(f"Error general de SMTP: {e}")
+        return {"status": "failed", "error": "SMTPException", "details": str(e)}
     except Exception as e:
-        print(f"Error al enviar el correo electrónico: {e}")
-        return False
+        # Capturar cualquier otra excepción y mostrar el error
+        logger.error(f"Error al enviar el correo electrónico: {e}")
+        return {"status": "failed", "error": "GeneralException", "details": str(e)}
