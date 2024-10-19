@@ -14,12 +14,6 @@ from app.infrastructure.common.response_models import MultipleResponse
 ADMIN_ROLE_NAME = "Administrador de Finca"
 WORKER_ROLE_NAME = "Trabajador Agrícola"
 
-# Constantes para estados
-ACTIVE_STATE_NAME = "active"
-LOCKED_STATE_NAME = "locked"
-PENDING_STATE_NAME = "pending"
-INACTIVE_STATE_NAME = "inactive"
-
 class AssignUsersToFarmUseCase:
     def __init__(self, db: Session):
         self.db = db

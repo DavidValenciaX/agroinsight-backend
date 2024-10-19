@@ -14,12 +14,6 @@ from fastapi import status
 ADMIN_ROLE_NAME = "Administrador de Finca"
 WORKER_ROLE_NAME = "Trabajador Agrícola"
 
-# Constantes para estados
-ACTIVE_STATE_NAME = "active"
-LOCKED_STATE_NAME = "locked"
-PENDING_STATE_NAME = "pending"
-INACTIVE_STATE_NAME = "inactive"
-
 class UserRepository:
     """
     Repositorio para manejar operaciones relacionadas con usuarios en la base de datos.

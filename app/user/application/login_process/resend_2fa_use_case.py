@@ -10,6 +10,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.infrastructure.common.response_models import SuccessResponse
+from app.user.services.user_service import UserService
 from app.user.infrastructure.orm_models import TwoStepVerification
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
@@ -42,6 +43,7 @@ class Resend2faUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
+        self.user_service = UserService(db)
         
     def resend_2fa(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
         """
@@ -74,7 +76,7 @@ class Resend2faUseCase:
         if state_validation_result:
             return state_validation_result
         
-        verification = self.get_last_verification(user.verificacion_dos_pasos)
+        verification = self.user_service.get_last(user.verificacion_dos_pasos)
         if not verification:
             raise DomainException(
                 message="No hay una verificación de doble factor de autenticación pendiente para reenviar el PIN.",
@@ -84,7 +86,7 @@ class Resend2faUseCase:
         warning_time = 3
         
         if verification.resends > 0:
-            if self.was_recently_requested(verification, warning_time):
+            if self.user_service.is_recently_requested(verification, warning_time):
                 raise DomainException(
                     message=f"Ya has solicitado un PIN de autenticación recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
@@ -136,36 +138,3 @@ class Resend2faUseCase:
         """
         
         return send_email(email, subject, text_content, html_content)
-    
-    def was_recently_requested(self, verification: TwoStepVerification, minutes: int = 3) -> bool:
-        """
-        Verifica si la verificación de dos pasos se solicitó recientemente.
-
-        Args:
-            verification (TwoStepVerification): Objeto de verificación de dos pasos.
-            minutes (int, optional): Número de minutos para considerar una solicitud reciente. Por defecto es 3.
-
-        Returns:
-            bool: True si la solicitud fue reciente, False en caso contrario.
-        """
-        return (datetime_utc_time() - ensure_utc(verification.created_at)).total_seconds() < minutes * 60
-    
-    def get_last_verification(self, verification: TwoStepVerification) -> Optional[TwoStepVerification]:
-        """
-        Obtiene la última verificación de dos pasos del usuario.
-
-        Esta función también elimina todas las verificaciones anteriores a la última.
-
-        Args:
-            verification (TwoStepVerification): Objeto o lista de objetos de verificación de dos pasos.
-
-        Returns:
-            Optional[TwoStepVerification]: La última verificación de dos pasos, o None si no hay ninguna.
-        """
-        if isinstance(verification, list) and verification:
-            verification.sort(key=lambda v: v.created_at)
-            latest_verification = verification[-1]
-            for old_verification in verification[:-1]:
-                self.user_repository.delete_two_factor_verification(old_verification)
-            return latest_verification
-        return None

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.common.response_models import SuccessResponse
+from app.user.services.user_service import UserService
 from app.user.infrastructure.orm_models import User, UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException, UserStateException
@@ -20,12 +21,6 @@ from app.user.infrastructure.orm_models import UserState as UserStateModel
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
 WORKER_ROLE_NAME = "Trabajador Agrícola"
-
-# Constantes para estados
-ACTIVE_STATE_NAME = "active"
-LOCKED_STATE_NAME = "locked"
-PENDING_STATE_NAME = "pending"
-INACTIVE_STATE_NAME = "inactive"
 
 class ConfirmationUseCase:
     """
@@ -50,6 +45,7 @@ class ConfirmationUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
+        self.user_service = UserService(db)
         
     def confirm_user(self, email: str, pin: str) -> SuccessResponse:
         """
@@ -91,7 +87,7 @@ class ConfirmationUseCase:
             return state_validation_result
         
         # Verificar si hay una confirmación pendiente
-        confirmation = self.get_last_confirmation(user.confirmacion)
+        confirmation = self.user_service.get_last(user.confirmacion)
         if not confirmation:
             raise DomainException(
                 message="No hay un registro de confirmación para este usuario.",
@@ -99,7 +95,7 @@ class ConfirmationUseCase:
             )
             
         # Verificar si la confirmación está expirada
-        if self.is_confirmation_expired(confirmation):
+        if self.user_service.is_expired(confirmation):
             # Eliminar usuario y con el se elimina su confirmación
             self.user_repository.delete_user(user)
             raise DomainException(
@@ -115,7 +111,7 @@ class ConfirmationUseCase:
         
         if not confirm_pin:
             # Manejar intentos fallidos de confirmación
-            intentos = self.increment_confirmation_attempts(confirmation)
+            intentos = self.user_service.increment_attempts(confirmation)
             if intentos >= 3:
                 # Eliminar usuario y con el se elimina su confirmación
                 self.user_repository.delete_user(user)
@@ -137,32 +133,6 @@ class ConfirmationUseCase:
         return SuccessResponse(
                 message="Usuario confirmado exitosamente."
             )
-        
-    def is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
-        """
-        Verifica si la confirmación ha expirado.
-
-        Args:
-            confirmation (UserConfirmation): Objeto de confirmación del usuario.
-
-        Returns:
-            bool: True si la confirmación ha expirado, False en caso contrario.
-        """
-        return confirmation.expiracion < datetime_utc_time()
-    
-    def increment_confirmation_attempts(self, confirmation: UserConfirmation) -> int:
-        """
-        Incrementa los intentos de confirmación.
-
-        Args:
-            confirmation (UserConfirmation): Objeto de confirmación del usuario.
-
-        Returns:
-            int: El número actualizado de intentos de confirmación.
-        """
-        confirmation.intentos += 1
-        self.user_repository.update_user_confirmation(confirmation)
-        return confirmation.intentos
 
     def activate_user(self, user: User) -> None:
         """
@@ -174,7 +144,7 @@ class ConfirmationUseCase:
         Raises:
             UserStateException: Si no se puede encontrar el estado de usuario activo.
         """
-        active_state = self.get_active_user_state()
+        active_state = self.user_service.get_user_state(self.user_service.ACTIVE_STATE_NAME)
         if not active_state:
             raise UserStateException(
                 message="No se pudo encontrar el estado de usuario activo.",
@@ -183,40 +153,3 @@ class ConfirmationUseCase:
             )
         user.state_id = active_state.id
         self.user_repository.update_user(user)
-
-    def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
-        """
-        Obtiene la última confirmación del usuario y elimina las anteriores.
-
-        Args:
-            confirmation (UserConfirmation): Lista de confirmaciones del usuario.
-
-        Returns:
-            Optional[UserConfirmation]: La última confirmación del usuario o None si no hay confirmaciones.
-        """
-        if isinstance(confirmation, list) and confirmation:
-            confirmation.sort(key=lambda c: c.created_at)
-            latest_confirmation = confirmation[-1]
-            for old_confirmation in confirmation[:-1]:
-                self.user_repository.delete_user_confirmation(old_confirmation)
-            return latest_confirmation
-        return None
-    
-    def get_active_user_state(self) -> Optional[UserStateModel]:
-        """
-        Obtiene el estado activo del usuario.
-
-        Returns:
-            Optional[UserStateModel]: El estado activo del usuario.
-
-        Raises:
-            UserStateException: Si no se puede encontrar el estado de usuario activo.
-        """
-        active_state = self.user_repository.get_state_by_name(ACTIVE_STATE_NAME)
-        if not active_state:
-            raise UserStateException(
-                message="No se pudo encontrar el estado de usuario activo.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user_state="unknown"
-            )
-        return active_state

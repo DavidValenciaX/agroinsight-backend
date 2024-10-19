@@ -5,6 +5,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserSta
 from enum import Enum, auto
 from sqlalchemy.orm import Session
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
+from app.user.services.user_service import UserService
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.infrastructure.orm_models import UserState as UserStateModel
@@ -12,12 +13,6 @@ from app.user.infrastructure.orm_models import UserState as UserStateModel
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
 WORKER_ROLE_NAME = "Trabajador Agrícola"
-
-# Constantes para estados
-ACTIVE_STATE_NAME = "active"
-LOCKED_STATE_NAME = "locked"
-PENDING_STATE_NAME = "pending"
-INACTIVE_STATE_NAME = "inactive"
 
 class UserState(Enum):
     ACTIVE = auto()
@@ -28,7 +23,8 @@ class UserState(Enum):
 class UserStateValidator:
     def __init__(self, db: Session):
         self.user_repository = UserRepository(db)
-
+        self.user_service = UserService(db)
+        
     def validate_user_state(self, user, allowed_states=None, disallowed_states=None):
         self.allowed_states = allowed_states
         self.disallowed_states = disallowed_states
@@ -49,10 +45,10 @@ class UserStateValidator:
         return None
 
     def get_user_state(self, user):
-        active_state = self.get_active_user_state()
-        inactive_state = self.get_inactive_user_state()
-        locked_state = self.get_locked_user_state()
-        pending_state = self.get_pending_user_state()
+        active_state = self.user_service.get_user_state(self.user_service.ACTIVE_STATE_NAME)
+        inactive_state = self.user_service.get_user_state(self.user_service.INACTIVE_STATE_NAME)
+        locked_state = self.user_service.get_user_state(self.user_service.LOCKED_STATE_NAME)
+        pending_state = self.user_service.get_user_state(self.user_service.PENDING_STATE_NAME)
         if active_state and user.state_id == active_state.id:
             return UserState.ACTIVE
         elif inactive_state and user.state_id == inactive_state.id:
@@ -120,13 +116,13 @@ class UserStateValidator:
         
     def is_user_unlocked(self, user: UserInDB) -> bool:
         """Verifica si el usuario está desbloqueado revisando que `locked_until` sea None y tenga el estado de 'activo'."""
-        return user.locked_until is None and user.state_id == self.get_active_user_state().id
+        return user.locked_until is None and user.state_id == self.user_service.get_user_state(self.user_service.ACTIVE_STATE_NAME).id
 
     def unlock_user(self, user: UserInDB) -> bool:
         """Desbloquea al usuario."""
         user.failed_attempts = 0
         user.locked_until = None
-        user.state_id = self.get_active_user_state().id
+        user.state_id = self.user_service.get_user_state(self.user_service.ACTIVE_STATE_NAME).id
         
         # Actualiza el usuario en la base de datos
         updated_user = self.user_repository.update_user(user)
@@ -139,43 +135,3 @@ class UserStateValidator:
             )
         
         return True  # Usuario desbloqueado exitosamente
-    
-    def get_active_user_state(self) -> Optional[UserStateModel]:
-        active_state = self.user_repository.get_state_by_name(ACTIVE_STATE_NAME)
-        if not active_state:
-            raise UserStateException(
-                message="No se pudo encontrar el estado de usuario activo.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user_state="unknown"
-            )
-        return active_state
-    
-    def get_locked_user_state(self) -> Optional[UserStateModel]:
-        locked_state = self.user_repository.get_state_by_name(LOCKED_STATE_NAME)
-        if not locked_state:
-            raise UserStateException(
-                message="No se pudo encontrar el estado de usuario bloqueado.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user_state="unknown"
-            )
-        return locked_state
-    
-    def get_pending_user_state(self) -> Optional[UserStateModel]:
-        pending_state = self.user_repository.get_state_by_name(PENDING_STATE_NAME)
-        if not pending_state:
-            raise UserStateException(
-                message="No se pudo encontrar el estado de usuario pendiente.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user_state="unknown"
-            )
-        return pending_state
-    
-    def get_inactive_user_state(self) -> Optional[UserStateModel]:
-        inactive_state = self.user_repository.get_state_by_name(INACTIVE_STATE_NAME)
-        if not inactive_state:
-            raise UserStateException(
-                message="No se pudo encontrar el estado de usuario inactivo.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user_state="unknown"
-            )
-        return inactive_state

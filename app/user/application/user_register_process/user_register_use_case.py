@@ -3,6 +3,7 @@ import pytz
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
+from app.user.services.user_service import UserService
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.orm_models import User, UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
@@ -26,12 +27,6 @@ validar sus estados, y enviar correos de confirmación.
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
 WORKER_ROLE_NAME = "Trabajador Agrícola"
-
-# Constantes para estados
-ACTIVE_STATE_NAME = "active"
-LOCKED_STATE_NAME = "locked"
-PENDING_STATE_NAME = "pending"
-INACTIVE_STATE_NAME = "inactive"
 
 class UserRegisterUseCase:
     """
@@ -57,6 +52,7 @@ class UserRegisterUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
+        self.user_service = UserService(db)
 
     def register_user(self, user_data: UserCreate, background_tasks: BackgroundTasks) -> SuccessResponse:
         """
@@ -83,8 +79,8 @@ class UserRegisterUseCase:
         user = self.user_repository.get_user_with_confirmation(user_data.email)
         
         if user:
-            confirmations = self.get_last_confirmation(user.confirmacion)
-            expired_confirmation = confirmations if confirmations and self.is_confirmation_expired(confirmations) else None
+            confirmations = self.user_service.get_last(user.confirmacion)
+            expired_confirmation = confirmations if confirmations and self.user_service.is_expired(confirmations) else None
             if expired_confirmation:
                 self.user_repository.delete_user(user)
             else:
@@ -96,7 +92,7 @@ class UserRegisterUseCase:
                     return state_validation_result
 
         # Obtener estado "pendiente" del usuario (caché o consulta única)
-        pending_state_id = self.get_pending_user_state().id
+        pending_state_id = self.user_service.get_user_state(self.user_service.PENDING_STATE_NAME).id
         if not pending_state_id:
             raise UserStateException(
                 message="No se pudo encontrar el estado de usuario pendiente.",
@@ -166,57 +162,3 @@ class UserRegisterUseCase:
         </html>
         """
         return send_email(email, subject, text_content, html_content)
-    
-    def is_confirmation_expired(self, confirmation: UserConfirmation) -> bool:
-        """
-        Verifica si la confirmación del usuario ha expirado.
-
-        Args:
-            confirmation (UserConfirmation): Objeto de confirmación del usuario.
-
-        Returns:
-            bool: True si la confirmación ha expirado, False en caso contrario.
-        """
-        return confirmation.expiracion < datetime_utc_time()
-    
-    def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
-        """
-        Obtiene la última confirmación del usuario y elimina las anteriores.
-
-        Args:
-            confirmation (UserConfirmation): Lista de confirmaciones del usuario.
-
-        Returns:
-            Optional[UserConfirmation]: La última confirmación del usuario o None si no hay confirmaciones.
-        """
-        if isinstance(confirmation, list) and confirmation:
-            # Ordenar las confirmaciones por fecha de creación de forma ascendente
-            confirmation.sort(key=lambda c: c.created_at)
-            # Tomar el último registro
-            latest_confirmation = confirmation[-1]
-            # Eliminar todas las confirmaciones anteriores a la última
-            for old_confirmation in confirmation[:-1]:
-                self.user_repository.delete_user_confirmation(old_confirmation)
-            # Actualizar la variable confirmation para solo trabajar con la última
-            return latest_confirmation
-        # Si no hay confirmaciones, retornar None
-        return None
-    
-    def get_pending_user_state(self) -> Optional[UserStateModel]:
-        """
-        Obtiene el estado 'pendiente' del usuario.
-
-        Returns:
-            Optional[UserStateModel]: El estado 'pendiente' del usuario.
-
-        Raises:
-            UserStateException: Si no se puede encontrar el estado 'pendiente'.
-        """
-        pending_state = self.user_repository.get_state_by_name(PENDING_STATE_NAME)
-        if not pending_state:
-            raise UserStateException(
-                message="No se pudo encontrar el estado de usuario pendiente.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user_state="unknown"
-            )
-        return pending_state

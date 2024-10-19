@@ -13,15 +13,10 @@ from app.infrastructure.common.common_exceptions import DomainException, UserHas
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
 from app.user.infrastructure.orm_models import UserState as UserStateModel
+from app.user.services.user_service import UserService
 # Constantes para roles
 ADMIN_ROLE_NAME = "Administrador de Finca"
 WORKER_ROLE_NAME = "Trabajador Agrícola"
-
-# Constantes para estados
-ACTIVE_STATE_NAME = "active"
-LOCKED_STATE_NAME = "locked"
-PENDING_STATE_NAME = "pending"
-INACTIVE_STATE_NAME = "inactive"
 
 class LoginUseCase:
     """
@@ -47,6 +42,7 @@ class LoginUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
+        self.user_service = UserService(db)
         
     def login_user(self, email: str, password: str, background_tasks: BackgroundTasks) -> SuccessResponse:
         """
@@ -86,13 +82,13 @@ class LoginUseCase:
             return state_validation_result
         
         # Verificar si verification trajo una lista de varias verificaciones,
-        verification = self.get_last_verification(user.verificacion_dos_pasos)
+        verification = self.user_service.get_last(user.verificacion_dos_pasos)
             
         # Verificar si ya se ha enviado un PIN en los ltimos 3 minutos
         warning_time = 3
 
         if verification:
-            if self.was_recently_requested(verification, warning_time):
+            if self.user_service.is_recently_requested(verification, warning_time):
                 raise DomainException(
                     message=f"Ya has solicitado un PIN de autenticación recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
@@ -153,7 +149,7 @@ class LoginUseCase:
         self.user_repository.update_user(user)
 
         if user.failed_attempts >= max_failed_attempts:
-            self.block_user(user, timedelta(minutes=block_time))
+            self.user_service.block_user(user, timedelta(minutes=block_time))
             raise UserHasBeenBlockedException(block_time)
 
         raise DomainException(
@@ -177,108 +173,3 @@ class LoginUseCase:
         html_content = f"<html><body><p><strong>Tu PIN de verificación en dos pasos es: {pin}</strong></p><p>Este PIN expirará en 10 minutos.</p></body></html>"
         
         return send_email(email, subject, text_content, html_content)
-    
-    def was_recently_requested(self, verification: TwoStepVerification, minutes: int = 3) -> bool:
-        """
-        Verifica si la verificación de dos pasos se solicitó recientemente.
-
-        Args:
-            verification (TwoStepVerification): Objeto de verificación de dos pasos.
-            minutes (int, optional): Número de minutos para considerar como reciente. Por defecto es 3.
-
-        Returns:
-            bool: True si la verificación se solicitó hace menos de los minutos especificados, False en caso contrario.
-        """
-        """Verifica si la verificación de dos pasos se solicitó hace menos de x minutos."""
-        return (datetime_utc_time() - ensure_utc(verification.created_at)).total_seconds() < minutes * 60
-    
-    def get_last_verification(self, verification: TwoStepVerification) -> Optional[TwoStepVerification]:
-        """
-        Obtiene la última verificación de dos pasos si existe.
-
-        Args:
-            verification (TwoStepVerification): Lista de verificaciones de dos pasos.
-
-        Returns:
-            Optional[TwoStepVerification]: La última verificación de dos pasos o None si no hay verificaciones.
-        """
-        """Obtiene la última verificación de dos pasos si existe."""
-        if isinstance(verification, list) and verification:
-            # Ordenar las verificaciones por fecha de creación de forma ascendente
-            verification.sort(key=lambda v: v.created_at)
-            # Tomar el último registro
-            latest_verification = verification[-1]
-            # Eliminar todas las verificaciones anteriores a la última
-            for old_verification in verification[:-1]:
-                self.user_repository.delete_two_factor_verification(old_verification)
-            # Actualizar la variable verification para solo trabajar con la última
-            return latest_verification
-        # Si no hay verificaciones, retornar None
-        return None
-    
-    def is_user_blocked(self, user: User) -> bool:
-        """
-        Verifica si un usuario está bloqueado.
-
-        Args:
-            user (User): El usuario a verificar.
-
-        Returns:
-            bool: True si el usuario está bloqueado, False en caso contrario.
-        """
-        return user.locked_until and datetime_utc_time() < user.locked_until and user.state_id == self.get_locked_user_state().id
-
-    def block_user(self, user: User, lock_duration: timedelta) -> bool:
-        """
-        Bloquea a un usuario por un período de tiempo específico.
-
-        Args:
-            user (User): El usuario a bloquear.
-            lock_duration (timedelta): Duración del bloqueo.
-
-        Returns:
-            bool: True si el usuario fue bloqueado exitosamente, False en caso contrario.
-
-        Raises:
-            DomainException: Si ocurre un error al bloquear al usuario.
-        """
-        try:
-            user.locked_until = datetime_utc_time() + lock_duration
-            user.state_id = self.get_locked_user_state().id
-            if not self.user_repository.update_user(user):
-                raise DomainException(
-                    message="No se pudo actualizar el estado del usuario.",
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-            
-            # Verificación adicional
-            if not self.is_user_blocked(user):
-                raise DomainException(
-                    message="No se pudo bloquear el usuario.",
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-            
-            return True
-        except Exception as e:
-            raise DomainException(
-                message=f"Error al bloquear el usuario: {str(e)}",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    
-    def get_locked_user_state(self) -> Optional[UserStateModel]:
-        """
-        Obtiene el estado de usuario 'bloqueado'.
-
-        Returns:
-            Optional[UserStateModel]: El estado de usuario 'bloqueado'.
-
-        Raises:
-            DomainException: Si no se puede obtener el estado de usuario bloqueado.
-        """
-        locked_state = self.user_repository.get_state_by_name(LOCKED_STATE_NAME)
-        if not locked_state:
-            raise DomainException(
-                message="No se pudo obtener el estado de usuario bloqueado.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        return locked_state

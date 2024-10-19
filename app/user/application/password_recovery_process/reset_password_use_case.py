@@ -1,12 +1,11 @@
-from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.security.security_utils import hash_password, verify_password
-from app.user.infrastructure.orm_models import PasswordRecovery
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
+from app.user.services.user_service import UserService
 
 class ResetPasswordUseCase:
     """
@@ -32,6 +31,7 @@ class ResetPasswordUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
+        self.user_service = UserService(db)
 
     def reset_password(self, email: str, new_password: str) -> SuccessResponse:
         """
@@ -64,7 +64,7 @@ class ResetPasswordUseCase:
         if state_validation_result:
             return state_validation_result
 
-        recovery = self.get_last_password_recovery(user.recuperacion_contrasena)
+        recovery = self.user_service.get_last(user.recuperacion_contrasena)
 
         if not recovery:
             raise DomainException(
@@ -100,23 +100,3 @@ class ResetPasswordUseCase:
         return SuccessResponse(
             message= "Contraseña restablecida correctamente."
         )
-        
-    def get_last_password_recovery(self, recovery: PasswordRecovery) -> Optional[PasswordRecovery]:
-        """
-        Obtiene la última recuperación de contraseña del usuario.
-
-        Esta función también elimina todas las recuperaciones anteriores a la última.
-
-        Args:
-            recovery (PasswordRecovery): Objeto o lista de objetos de recuperación de contraseña.
-
-        Returns:
-            Optional[PasswordRecovery]: La última recuperación de contraseña, o None si no hay ninguna.
-        """
-        if isinstance(recovery, list) and recovery:
-            recovery.sort(key=lambda r: r.created_at)
-            latest_recovery = recovery[-1]
-            for old_recovery in recovery[:-1]:
-                self.user_repository.delete_password_recovery(old_recovery)
-            return latest_recovery
-        return None

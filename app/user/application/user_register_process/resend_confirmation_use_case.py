@@ -13,6 +13,7 @@ from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.orm_models import UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
+from app.user.services.user_service import UserService
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
@@ -42,6 +43,7 @@ class ResendConfirmationUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         self.state_validator = UserStateValidator(db)
+        self.user_service = UserService(db)
 
     def resend_confirmation(self, email: str, background_tasks: BackgroundTasks) -> SuccessResponse:
         """
@@ -80,7 +82,7 @@ class ResendConfirmationUseCase:
             return state_validation_result
 
         # Obtener confirmación del usuario
-        confirmation = self.get_last_confirmation(user.confirmacion)
+        confirmation = self.user_service.get_last(user.confirmacion)
 
         # Verificar si hay una confirmación pendiente
         if not confirmation:
@@ -95,7 +97,7 @@ class ResendConfirmationUseCase:
         # Si es el primer reenvío (resends == 0), permitir sin restricción
         if confirmation.resends > 0:
             # Si ya ha reenviado al menos una vez, verificar si han pasado 3 minutos
-            if self.was_recently_requested(confirmation, warning_time):
+            if self.user_service.is_recently_requested(confirmation, warning_time):
                 raise DomainException(
                     message=f"Ya has solicitado un PIN recientemente. Por favor, espera {warning_time} minutos antes de solicitar uno nuevo.",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS
@@ -150,39 +152,3 @@ class ResendConfirmationUseCase:
         </html>
         """
         return send_email(email, subject, text_content, html_content)
-    
-    def was_recently_requested(self, confirmation: UserConfirmation, minutes: int = 3) -> bool:
-        """
-        Verifica si la confirmación se solicitó recientemente.
-
-        Args:
-            confirmation (UserConfirmation): Objeto de confirmación del usuario.
-            minutes (int, optional): Número de minutos para considerar como reciente. Por defecto es 3.
-
-        Returns:
-            bool: True si la confirmación se solicitó hace menos de los minutos especificados, False en caso contrario.
-        """
-        return (datetime_utc_time() - ensure_utc(confirmation.created_at)).total_seconds() < minutes * 60
-    
-    def get_last_confirmation(self, confirmation: UserConfirmation) -> Optional[UserConfirmation]:
-        """
-        Obtiene la última confirmación del usuario y elimina las anteriores.
-
-        Args:
-            confirmation (UserConfirmation): Lista de confirmaciones del usuario.
-
-        Returns:
-            Optional[UserConfirmation]: La última confirmación del usuario o None si no hay confirmaciones.
-        """
-        if isinstance(confirmation, list) and confirmation:
-            # Ordenar las confirmaciones por fecha de creación de forma ascendente
-            confirmation.sort(key=lambda c: c.created_at)
-            # Tomar el último registro
-            latest_confirmation = confirmation[-1]
-            # Eliminar todas las confirmaciones anteriores a la última
-            for old_confirmation in confirmation[:-1]:
-                self.user_repository.delete_user_confirmation(old_confirmation)
-            # Actualizar la variable confirmation para solo trabajar con la última
-            return latest_confirmation
-        # Si no hay confirmaciones, retornar None
-        return None
