@@ -6,16 +6,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
-# Configuración del logger
-logging.basicConfig(
-    level=logging.INFO,  # Nivel de log (puedes cambiar a DEBUG para más detalle)
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",  # Formato de log
-    handlers=[
-        logging.FileHandler("email_logs.log"),  # Archivo donde se guardarán los logs
-        logging.StreamHandler()  # Mostrar los logs también en consola
-    ]
-)
-
 logger = logging.getLogger(__name__)
 
 # Cargar variables de entorno desde .env
