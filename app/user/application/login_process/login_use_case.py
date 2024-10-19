@@ -1,22 +1,16 @@
-from datetime import timedelta, datetime, timezone
-from typing import Optional
+from datetime import timedelta
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.user.infrastructure.orm_models import TwoStepVerification, User
 from app.infrastructure.common.response_models import SuccessResponse
-from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.security.security_utils import verify_password
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
-from app.user.infrastructure.orm_models import UserState as UserStateModel
+from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.services.user_service import UserService
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 class LoginUseCase:
     """

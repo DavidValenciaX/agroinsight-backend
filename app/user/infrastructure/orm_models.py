@@ -1,6 +1,5 @@
-from sqlalchemy import TIMESTAMP, Column, Integer, String, DateTime, ForeignKey, Text, Boolean, func
+from sqlalchemy import TIMESTAMP, Column, Integer, String, ForeignKey, Text, Boolean, func
 from sqlalchemy.orm import relationship
-from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.db.connection import Base
 
 # Definir constantes para evitar la duplicación de literales

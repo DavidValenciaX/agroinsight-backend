@@ -5,23 +5,14 @@ Este módulo contiene la clase ConfirmRecoveryPinUseCase que maneja la lógica
 para confirmar el PIN de recuperación de contraseña enviado al usuario.
 """
 
-from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import timedelta
-from app.infrastructure.common.datetime_utils import datetime_utc_time
-from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.user.infrastructure.orm_models import PasswordRecovery, User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
-from app.user.infrastructure.orm_models import UserState as UserStateModel
 from app.user.services.user_service import UserService
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 class ConfirmRecoveryPinUseCase:
     """

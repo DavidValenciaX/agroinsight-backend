@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-from typing import Optional
 from fastapi import status
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from enum import Enum, auto
@@ -8,11 +6,6 @@ from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_ti
 from app.user.services.user_service import UserService
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.infrastructure.orm_models import UserState as UserStateModel
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 class UserState(Enum):
     ACTIVE = auto()

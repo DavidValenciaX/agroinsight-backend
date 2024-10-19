@@ -6,23 +6,14 @@ el PIN de autenticación de dos factores proporcionado por el usuario.
 """
 
 from datetime import timedelta
-from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import status
-from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.domain.schemas import TokenResponse
-from app.user.infrastructure.orm_models import TwoStepVerification, User
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.security.security_utils import create_access_token
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.user.infrastructure.orm_models import UserState as UserStateModel
 from app.user.services.user_service import UserService
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 class VerifyUseCase:
     """

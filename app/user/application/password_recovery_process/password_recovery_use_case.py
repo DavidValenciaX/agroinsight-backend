@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
-from datetime import timedelta
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.user_state_validator import UserState

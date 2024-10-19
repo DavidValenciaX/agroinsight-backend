@@ -1,6 +1,3 @@
-from typing import Optional
-import pytz
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.user.services.user_service import UserService
@@ -13,9 +10,7 @@ from app.infrastructure.security.security_utils import hash_password
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
-from datetime import datetime, timezone, timedelta
 from app.infrastructure.common.datetime_utils import datetime_utc_time
-from app.user.infrastructure.orm_models import UserState as UserStateModel
 
 """
 Este módulo contiene la implementación del caso de uso para el registro de usuarios.
@@ -23,10 +18,6 @@ Este módulo contiene la implementación del caso de uso para el registro de usu
 Incluye la clase UserRegisterUseCase que maneja la lógica de negocio para crear nuevos usuarios,
 validar sus estados, y enviar correos de confirmación.
 """
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 class UserRegisterUseCase:
     """

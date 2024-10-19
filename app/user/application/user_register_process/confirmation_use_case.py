@@ -5,22 +5,14 @@ Incluye la clase ConfirmationUseCase que maneja la lógica de negocio para confi
 el registro de usuarios mediante un PIN.
 """
 
-from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import status
-from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.services.user_service import UserService
-from app.user.infrastructure.orm_models import User, UserConfirmation
+from app.user.infrastructure.orm_models import User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException, UserStateException
-from app.infrastructure.services.pin_service import hash_pin
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.user.infrastructure.orm_models import UserState as UserStateModel
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 class ConfirmationUseCase:
     """

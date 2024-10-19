@@ -11,15 +11,14 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException
 from fastapi import status
 
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
+from app.user.services.user_service import UserService
 
 class ListFarmsUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
+        self.user_service = UserService(db)
         
     def list_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
         if not current_user:
@@ -45,7 +44,7 @@ class ListFarmsUseCase:
         )
         
     def get_admin_role(self) -> Optional[Role]:
-        rol_administrador_finca = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
+        rol_administrador_finca = self.user_repository.get_role_by_name(self.user_service.ADMIN_ROLE_NAME)
         if not rol_administrador_finca:
             raise DomainException(
                 message="No se pudo obtener el rol de Administrador de Finca.",

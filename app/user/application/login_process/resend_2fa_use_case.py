@@ -5,19 +5,16 @@ Este módulo contiene la clase Resend2faUseCase que maneja la lógica para reenv
 el PIN de verificación en dos pasos a un usuario.
 """
 
-from datetime import timedelta, datetime, timezone
-from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.services.user_service import UserService
-from app.user.infrastructure.orm_models import TwoStepVerification
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
+from app.infrastructure.common.datetime_utils import datetime_utc_time
 
 class Resend2faUseCase:
     """

@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time, ensure_utc
 from app.infrastructure.services.pin_service import hash_pin
-from app.infrastructure.services.email_service import send_email
 from app.user.infrastructure.orm_models import User, UserConfirmation, TwoStepVerification, PasswordRecovery, UserState
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
@@ -20,6 +19,13 @@ class UserService:
     # Constantes para roles
     ADMIN_ROLE_NAME = "Administrador de Finca"
     WORKER_ROLE_NAME = "Trabajador Agrícola"
+    
+    # Constantes para estadosS
+    ACTIVE_STATE_NAME = "active"
+    LOCKED_STATE_NAME = "locked"
+    PENDING_STATE_NAME = "pending"
+    INACTIVE_STATE_NAME = "inactive"
+    
     DEFAULT_EXPIRATION_MINUTES = DEFAULT_EXPIRATION_TIME
 
     def __init__(self, db: Session):

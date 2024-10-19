@@ -1,18 +1,9 @@
 from sqlalchemy.orm import Session, joinedload
-from app.farm.infrastructure.orm_models import Farm
-from app.infrastructure.common.common_exceptions import DomainException
-from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.infrastructure.orm_models import (
-    User, UserState, Role, UserFarmRole, PasswordRecovery,
+    User, UserState, Role, PasswordRecovery,
     TwoStepVerification, UserConfirmation, BlacklistedToken
 )
-from datetime import datetime, timezone, timedelta
 from typing import Optional, List
-from fastapi import status
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
 
 class UserRepository:
     """

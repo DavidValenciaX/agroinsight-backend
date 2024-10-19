@@ -26,7 +26,6 @@ from app.infrastructure.security.jwt_middleware import get_current_user
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserCreate, ResendPinConfirmRequest, ConfirmationRequest, LoginRequest, Resend2FARequest, TwoFactorAuthRequest, TokenResponse, UserResponse, UserUpdate, PasswordRecoveryRequest, PinConfirmationRequest, PasswordResetRequest, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
-from typing import List
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()

@@ -4,21 +4,18 @@ from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.infrastructure.orm_models import Role
 from app.user.infrastructure.sql_repository import UserRepository
 from app.farm.domain.schemas import FarmUserAssignmentByEmail
-from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, MissingTokenException
+from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException
 from fastapi import status
 from app.infrastructure.common.response_models import MultipleResponse
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
+from app.user.services.user_service import UserService
 
 class AssignUsersToFarmUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
+        self.user_service = UserService(db)
     
     def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> MultipleResponse:
 
@@ -75,7 +72,7 @@ class AssignUsersToFarmUseCase:
         return MultipleResponse(messages=messages, status_code=status_code)
 
     def get_worker_role(self) -> Optional[Role]:
-        rol_trabajador_agricola = self.user_repository.get_role_by_name(WORKER_ROLE_NAME) 
+        rol_trabajador_agricola = self.user_repository.get_role_by_name(self.user_service.WORKER_ROLE_NAME) 
         if not rol_trabajador_agricola:
             raise DomainException(
                 message="No se pudo asignar el rol de Trabajador Agrícola.",

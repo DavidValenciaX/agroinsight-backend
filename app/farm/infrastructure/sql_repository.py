@@ -7,15 +7,13 @@ from fastapi import status
 from app.infrastructure.common.common_exceptions import DomainException
 from app.user.infrastructure.orm_models import Role, User, UserFarmRole
 from app.user.infrastructure.sql_repository import UserRepository
-
-# Constantes para roles
-ADMIN_ROLE_NAME = "Administrador de Finca"
-WORKER_ROLE_NAME = "Trabajador Agrícola"
+from app.user.services.user_service import UserService
 
 class FarmRepository:
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
+        self.user_service = UserService(db)
         
     def create_farm(self, farm_data: FarmCreate, user_id: int) -> Optional[Farm]:
         try:
@@ -131,7 +129,7 @@ class FarmRepository:
             )
 
     def get_worker_role(self) -> Optional[Role]:
-        rol_trabajador_agricola = self.user_repository.get_role_by_name(WORKER_ROLE_NAME) 
+        rol_trabajador_agricola = self.user_repository.get_role_by_name(self.user_service.WORKER_ROLE_NAME) 
         if not rol_trabajador_agricola:
             raise DomainException(
                 message="No se pudo asignar el rol de Trabajador Agrícola.",
@@ -140,7 +138,7 @@ class FarmRepository:
         return rol_trabajador_agricola
     
     def get_admin_role(self) -> Optional[Role]:
-        rol_administrador_finca = self.user_repository.get_role_by_name(ADMIN_ROLE_NAME)
+        rol_administrador_finca = self.user_repository.get_role_by_name(self.user_service.ADMIN_ROLE_NAME)
         if not rol_administrador_finca:
             raise DomainException(
                 message="No se pudo obtener el rol de Administrador de Finca.",
