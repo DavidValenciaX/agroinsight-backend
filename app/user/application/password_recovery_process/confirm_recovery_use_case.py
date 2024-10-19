@@ -96,9 +96,7 @@ class ConfirmRecoveryPinUseCase:
                 status_code=status.HTTP_400_BAD_REQUEST
             )
 
-        pin_hash = hash_pin(pin)
-        
-        recovery_pin = recovery.pin == pin_hash 
+        recovery_pin = self.user_service.verify_pin(recovery, pin)
         
         if not recovery_pin:
             attempts = self.user_service.increment_attempts(recovery)

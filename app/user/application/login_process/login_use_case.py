@@ -108,8 +108,7 @@ class LoginUseCase:
         # Generar el PIN y su hash
         pin, pin_hash = generate_pin()
         
-        expiration_time = 10  # minutos
-        expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_time)
+        expiration_datetime = self.user_service.expiration_time()
         
         # Crear un nuevo registro de verificación
         verification = TwoStepVerification(

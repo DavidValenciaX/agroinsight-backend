@@ -1,34 +1,57 @@
-from datetime import timedelta
-from typing import Optional, Tuple
+from datetime import datetime, timedelta
+from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time, ensure_utc
-from app.infrastructure.services.pin_service import generate_pin, hash_pin
+from app.infrastructure.services.pin_service import hash_pin
 from app.infrastructure.services.email_service import send_email
 from app.user.infrastructure.orm_models import User, UserConfirmation, TwoStepVerification, PasswordRecovery, UserState
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
+DEFAULT_EXPIRATION_TIME = int(os.getenv('DEFAULT_EXPIRATION_TIME', 10))
+
 
 class UserService:
     # Constantes para roles
     ADMIN_ROLE_NAME = "Administrador de Finca"
     WORKER_ROLE_NAME = "Trabajador Agrícola"
+    DEFAULT_EXPIRATION_MINUTES = DEFAULT_EXPIRATION_TIME
 
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)
-
-    def generate_pin_and_expiration(self, expiration_minutes: int = 10) -> Tuple[str, str, timedelta]:
-        pin, pin_hash = generate_pin()
-        expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_minutes)
-        return pin, pin_hash, expiration_datetime
-
-    def send_email_with_pin(self, email: str, pin: str, subject: str, text_content: str, html_content: str) -> bool:
-        return send_email(email, subject, text_content, html_content)
     
     def verify_pin(self, entity, pin: str) -> bool:
+        """
+        Verifies if the provided PIN matches the hashed PIN stored in the entity.
+
+        Args:
+            entity: The entity containing the hashed PIN. This can be an instance of UserConfirmation, TwoStepVerification, or PasswordRecovery.
+            pin (str): The plain text PIN provided by the user.
+
+        Returns:
+            bool: True if the provided PIN matches the hashed PIN stored in the entity, False otherwise.
+        """
         pin_hash = hash_pin(pin)
         return entity.pin == pin_hash
+    
+    def expiration_time(self, expiration_minutes: int = DEFAULT_EXPIRATION_MINUTES) -> datetime:
+        """
+        Calculate the expiration time based on the current UTC time and the given expiration minutes.
+
+        Args:
+            expiration_minutes (int): The number of minutes until expiration. Defaults to DEFAULT_EXPIRATION_MINUTES.
+
+        Returns:
+            datetime: The calculated expiration datetime in UTC.
+        """
+        expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_minutes)
+        return expiration_datetime
 
     def is_recently_requested(self, entity, minutes: int = 3) -> bool:
         """

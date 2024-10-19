@@ -94,8 +94,7 @@ class Resend2faUseCase:
         
         pin, pin_hash = generate_pin()
         
-        expiration_time = 10  # minutos
-        expiration_datetime = datetime_utc_time() + timedelta(minutes=expiration_time)
+        expiration_datetime = self.user_service.expiration_time()
         
         verification.pin = pin_hash
         verification.expiracion = expiration_datetime

@@ -97,8 +97,7 @@ class VerifyUseCase:
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         
-        pin_hash = hash_pin(pin)
-        verify_pin = verification.pin == pin_hash
+        verify_pin = self.user_service.verify_pin(verification, pin)
         
         if not verify_pin:
             attempts = self.user_service.increment_attempts(verification)

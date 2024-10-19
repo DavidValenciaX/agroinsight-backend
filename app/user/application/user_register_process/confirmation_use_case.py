@@ -104,10 +104,7 @@ class ConfirmationUseCase:
             )
             
         # Hashear el PIN proporcionado
-        pin_hash = hash_pin(pin)
-        
-        # Obtener el registro de confirmación
-        confirm_pin = confirmation.pin == pin_hash
+        confirm_pin = self.user_service.verify_pin(confirmation, pin)
         
         if not confirm_pin:
             # Manejar intentos fallidos de confirmación

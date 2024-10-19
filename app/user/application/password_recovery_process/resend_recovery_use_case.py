@@ -85,11 +85,13 @@ class ResendRecoveryUseCase:
                 )
 
         pin, pin_hash = generate_pin()
+        
+        expiration_datetime = self.user_service.expiration_time()
 
         background_tasks.add_task(self.send_password_recovery_email, email, pin)
         
         recovery.pin = pin_hash
-        recovery.expiracion = datetime_utc_time() + timedelta(minutes=10)
+        recovery.expiracion = expiration_datetime
         recovery.intentos = 0
         recovery.resends += 1
         self.user_repository.update_password_recovery(recovery)
