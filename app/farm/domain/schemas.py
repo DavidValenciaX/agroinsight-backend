@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from decimal import Decimal
 from typing import List
 
@@ -19,8 +19,7 @@ class FarmResponse(BaseModel):
     unidad_area: str
     usuarios: List[UserResponse]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
     
 class PaginatedFarmListResponse(BaseModel):
     farms: List[FarmResponse]
