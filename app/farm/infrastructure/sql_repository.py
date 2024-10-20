@@ -7,7 +7,7 @@ from fastapi import status
 from app.infrastructure.common.common_exceptions import DomainException
 from app.user.infrastructure.orm_models import Role, User, UserFarmRole
 from app.user.infrastructure.sql_repository import UserRepository
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 
 class FarmRepository:
     def __init__(self, db: Session):

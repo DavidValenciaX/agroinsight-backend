@@ -3,7 +3,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserSta
 from enum import Enum, auto
 from sqlalchemy.orm import Session
 from app.infrastructure.common.datetime_utils import ensure_utc, datetime_utc_time
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
 

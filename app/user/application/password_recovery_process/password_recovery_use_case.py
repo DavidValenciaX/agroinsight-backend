@@ -2,14 +2,14 @@ from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.common.response_models import SuccessResponse
-from app.user.domain.user_state_validator import UserState
+from app.user.application.services.user_state_validator import UserState
 from app.user.infrastructure.orm_models import PasswordRecovery
 from app.infrastructure.services.email_service import send_email
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
-from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.user.application.services.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.common.datetime_utils import datetime_utc_time
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 
 class PasswordRecoveryUseCase:
     """

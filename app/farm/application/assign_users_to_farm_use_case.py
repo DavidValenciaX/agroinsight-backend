@@ -8,7 +8,7 @@ from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException
 from fastapi import status
 from app.infrastructure.common.response_models import MultipleResponse
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 
 class AssignUsersToFarmUseCase:
     def __init__(self, db: Session):

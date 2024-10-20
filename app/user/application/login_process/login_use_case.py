@@ -8,9 +8,9 @@ from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.security.security_utils import verify_password
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
-from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.user.application.services.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.common.datetime_utils import datetime_utc_time
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 
 class LoginUseCase:
     """

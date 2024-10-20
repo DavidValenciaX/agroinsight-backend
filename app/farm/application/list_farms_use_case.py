@@ -11,7 +11,7 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException
 from fastapi import status
 
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 
 class ListFarmsUseCase:
     def __init__(self, db: Session):

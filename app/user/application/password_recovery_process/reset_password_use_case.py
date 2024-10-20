@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.response_models import SuccessResponse
-from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.user.application.services.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.security.security_utils import hash_password, verify_password
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 
 class ResetPasswordUseCase:
     """

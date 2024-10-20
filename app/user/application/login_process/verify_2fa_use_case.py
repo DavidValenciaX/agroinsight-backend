@@ -12,8 +12,8 @@ from app.user.domain.schemas import TokenResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.security.security_utils import create_access_token
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
-from app.user.domain.user_state_validator import UserState, UserStateValidator
-from app.user.services.user_service import UserService
+from app.user.application.services.user_state_validator import UserState, UserStateValidator
+from app.user.application.services.user_service import UserService
 
 class VerifyUseCase:
     """

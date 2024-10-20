@@ -9,10 +9,10 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from datetime import timedelta
 from app.infrastructure.common.response_models import SuccessResponse
-from app.user.domain.user_state_validator import UserState, UserStateValidator
+from app.user.application.services.user_state_validator import UserState, UserStateValidator
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserHasBeenBlockedException, UserNotRegisteredException
-from app.user.services.user_service import UserService
+from app.user.application.services.user_service import UserService
 
 class ConfirmRecoveryPinUseCase:
     """
