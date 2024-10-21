@@ -28,7 +28,3 @@ class UserAlreadyRegisteredException(DomainException):
 class UserHasBeenBlockedException(DomainException):
     def __init__(self, block_time: int):
         super().__init__(f"La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Intente nuevamente en {block_time} minutos.", status.HTTP_429_TOO_MANY_REQUESTS)
-        
-class MissingTokenException(DomainException):
-    def __init__(self):
-        super().__init__("Se requiere un token deautenticación", status.HTTP_401_UNAUTHORIZED)

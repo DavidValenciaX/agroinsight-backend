@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.infrastructure.mappers.response_mappers import map_user_to_response
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserResponse, UserInDB
-from app.infrastructure.common.common_exceptions import MissingTokenException, UserStateException
+from app.infrastructure.common.common_exceptions import UserStateException
 from fastapi import status
 
 class GetCurrentUserUseCase:
@@ -44,11 +44,8 @@ class GetCurrentUserUseCase:
             UserResponse: La información del usuario mapeada a la respuesta.
 
         Raises:
-            MissingTokenException: Si no se proporciona un usuario actual.
             UserStateException: Si el estado del usuario no es reconocido.
         """
-        if not current_user:
-            raise MissingTokenException()
             
         # Obtener el estado del usuario
         estado = self.user_repository.get_state_by_id(current_user.state_id)

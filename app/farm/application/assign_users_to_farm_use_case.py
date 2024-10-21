@@ -5,7 +5,7 @@ from app.user.infrastructure.orm_models import Role
 from app.user.infrastructure.sql_repository import UserRepository
 from app.farm.domain.schemas import FarmUserAssignmentByEmail
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException
+from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.infrastructure.common.response_models import MultipleResponse
 from app.user.application.services.user_service import UserService
@@ -18,9 +18,6 @@ class AssignUsersToFarmUseCase:
         self.user_service = UserService(db)
     
     def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> MultipleResponse:
-
-        if not current_user:
-            raise MissingTokenException()
         
         farm = self.farm_repository.get_farm_by_id(assignment_data.farm_id)
         if not farm:

@@ -8,7 +8,7 @@ from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from math import ceil
 from app.user.infrastructure.orm_models import Role
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException, MissingTokenException
+from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 from app.user.application.services.user_service import UserService
@@ -21,8 +21,6 @@ class ListFarmsUseCase:
         self.user_service = UserService(db)
         
     def list_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
-        if not current_user:
-            raise MissingTokenException()
         
         # Obtener id del rol de administrador de finca
         rol_administrador_finca = self.get_admin_role()

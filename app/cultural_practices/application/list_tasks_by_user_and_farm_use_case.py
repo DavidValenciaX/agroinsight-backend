@@ -17,11 +17,6 @@ class ListTasksByUserAndFarmUseCase:
         self.farm_repository = FarmRepository(db)
         
     def list_tasks_by_user_and_farm(self, farm_id: int, user_id: int, page: int, per_page: int, current_user: UserInDB) -> PaginatedTaskListResponse:
-        if not current_user:
-            raise DomainException(
-                message="No se pudo obtener el usuario autenticado.",
-                status_code=status.HTTP_401_UNAUTHORIZED
-            )
             
         # validar que el usuario es administrador de la finca
         if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):

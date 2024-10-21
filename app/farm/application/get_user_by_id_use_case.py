@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.domain.schemas import UserResponse
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException, MissingTokenException, UserNotRegisteredException
+from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.infrastructure.mappers.response_mappers import map_user_to_response
 from fastapi import status
 
@@ -13,8 +13,6 @@ class AdminGetUserByIdUseCase:
         self.farm_repository = FarmRepository(db)
         
     def admin_get_user_by_id(self, user_id: int, farm_id: int, current_user) -> UserResponse:
-        if not current_user:
-            raise MissingTokenException()
         
         user = self.user_repository.get_user_by_id(user_id)
         if not user:

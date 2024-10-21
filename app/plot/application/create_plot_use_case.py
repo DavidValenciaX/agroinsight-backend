@@ -4,8 +4,7 @@ from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PlotCreate
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
-from app.infrastructure.common.common_exceptions import MissingTokenException
+from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 class CreatePlotUseCase:
@@ -15,8 +14,6 @@ class CreatePlotUseCase:
         self.farm_repository = FarmRepository(db)
         
     def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
-        if not current_user:
-            raise MissingTokenException()
             
         #Validar si el usuario tiene permiso para crear lotes en la finca
         if not self.farm_repository.user_is_farm_admin(current_user.id, plot_data.finca_id):
