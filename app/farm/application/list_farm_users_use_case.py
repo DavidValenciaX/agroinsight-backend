@@ -8,7 +8,6 @@ from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.mappers.response_mappers import map_user_for_farm_to_response
 from fastapi import status
 from math import ceil
-from typing import Optional
 
 class ListFarmUsersUseCase:
     def __init__(self, db: Session):
@@ -17,8 +16,7 @@ class ListFarmUsersUseCase:
         self.user_repository = UserRepository(db)
         self.farm_service = FarmService(db)
     
-    def list_farm_users(self, farm_id: int, current_user: UserInDB, page: Optional[int], per_page: Optional[int]) -> PaginatedFarmUserListResponse:
-        self.validate_params(page, per_page)
+    def list_farm_users(self, farm_id: int, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmUserListResponse:
         
         farm = self.farm_repository.get_farm_by_id(farm_id)
         if not farm:
@@ -47,15 +45,3 @@ class ListFarmUsersUseCase:
             per_page=per_page,
             total_pages=total_pages
         )
-
-    def validate_params(self, page: int, per_page: int):
-        if page < 1:
-            raise DomainException(
-                message="El número de página debe ser mayor o igual a 1.",
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        if per_page < 1 or per_page > 100:
-            raise DomainException(
-                message="El número de elementos por página debe estar entre 1 y 100.",
-                status_code=status.HTTP_400_BAD_REQUEST
-            )

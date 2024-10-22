@@ -24,8 +24,8 @@ class FarmResponse(BaseModel):
 class PaginatedFarmListResponse(BaseModel):
     farms: List[FarmResponse]
     total_farms: int
-    page: int
-    per_page: int
+    page: int = Field(..., ge=1)
+    per_page: int = Field(..., ge=1, le=100)
     total_pages: int
     
 class FarmUserAssignmentByEmail(BaseModel):
@@ -35,6 +35,6 @@ class FarmUserAssignmentByEmail(BaseModel):
 class PaginatedFarmUserListResponse(BaseModel):
     users: List[UserForFarmResponse]
     total_users: int
-    page: int
-    per_page: int
+    page: int = Field(..., ge=1)
+    per_page: int = Field(..., ge=1, le=100)
     total_pages: int

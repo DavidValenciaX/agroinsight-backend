@@ -5,7 +5,6 @@ Incluye endpoints para la creación de fincas, asignación de usuarios,
 listado de fincas y usuarios de una finca específica.
 """
 
-from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -18,9 +17,8 @@ from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
 from app.infrastructure.common.response_models import MultipleResponse, SuccessResponse
 from app.farm.application.get_user_by_id_use_case import AdminGetUserByIdUseCase
-from app.user.domain.schemas import UserForFarmResponse, UserInDB, UserResponse
+from app.user.domain.schemas import UserForFarmResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
-from app.user.infrastructure.orm_models import User
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
@@ -117,9 +115,9 @@ def assign_users_to_farm_by_email(
 @router.get("/{farm_id}/users", response_model=PaginatedFarmUserListResponse, status_code=status.HTTP_200_OK)
 def list_farm_users(
     farm_id: int,
-    page: Optional[int] = Query(1, ge=1),
-    per_page: Optional[int] = Query(10, ge=1, le=100),
-    current_user: User = Depends(get_current_user),
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    current_user: UserInDB = Depends(get_current_user),
     db: Session = Depends(getDb)
 ):
     """

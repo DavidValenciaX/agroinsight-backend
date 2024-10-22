@@ -17,7 +17,7 @@ class FarmRepository:
         
     def create_farm(self, farm_data: FarmCreate) -> Optional[Farm]:
         try:
-            # Crear el modelo ORM dentro del repositorio
+            # Crear el modelo ORM
             new_farm = Farm(
                 nombre=farm_data.nombre,
                 ubicacion=farm_data.ubicacion,
@@ -36,7 +36,6 @@ class FarmRepository:
             return None
         
     def list_farms_by_role_paginated(self, user_id: int, rol_id: int, page: int, per_page: int) -> Tuple[int, List[Farm]]:
-        # Filtrar las fincas donde el usuario tiene el rol de "Administrador de Finca"
         query = self.db.query(Farm).join(UserFarmRole).filter(
             UserFarmRole.usuario_id == user_id,
             UserFarmRole.rol_id == rol_id
