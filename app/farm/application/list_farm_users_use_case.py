@@ -4,8 +4,8 @@ from app.user.infrastructure.sql_repository import UserRepository
 from app.farm.application.services.farm_service import FarmService
 from app.farm.domain.schemas import PaginatedFarmUserListResponse
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
-from app.infrastructure.mappers.response_mappers import map_user_to_response
+from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.mappers.response_mappers import map_user_for_farm_to_response
 from fastapi import status
 from math import ceil
 from typing import Optional
@@ -36,7 +36,7 @@ class ListFarmUsersUseCase:
 
         total_users, users = self.farm_repository.list_farm_users_paginated(farm_id, page, per_page)
 
-        user_responses = [map_user_to_response(user) for user in users]
+        user_responses = [map_user_for_farm_to_response(user) for user in users]
 
         total_pages = ceil(total_users / per_page)
 

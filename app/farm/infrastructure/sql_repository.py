@@ -34,9 +34,6 @@ class FarmRepository:
             self.db.rollback()
             print(f"Error al crear la finca: {e}")
             return None
-    
-    def list_farms(self, user_id: int) -> List[Farm]:
-        return self.db.query(Farm).join(UserFarmRole).filter(UserFarmRole.usuario_id == user_id).all()
         
     def list_farms_by_role_paginated(self, user_id: int, rol_id: int, page: int, per_page: int) -> Tuple[int, List[Farm]]:
         # Filtrar las fincas donde el usuario tiene el rol de "Administrador de Finca"
@@ -62,30 +59,12 @@ class FarmRepository:
     def get_farm_by_name(self, farm_name: str) -> Optional[Farm]:
         return self.db.query(Farm).filter(Farm.nombre == farm_name).first()
     
-    def list_farm_users_by_role_paginated(self, farm_id: int, role_id: int, page: int, per_page: int):
-        offset = (page - 1) * per_page
-        query = (
-            self.db.query(User)
-            .join(UserFarmRole, UserFarmRole.usuario_id == User.id)
-            .filter(UserFarmRole.finca_id == farm_id)
-            .filter(UserFarmRole.rol_id == role_id)
-        )
-        total = query.count()
-        users = query.offset(offset).limit(per_page).all()
-        return total, users
-    
     def list_farm_users_paginated(self, farm_id: int, page: int, per_page: int):
         offset = (page - 1) * per_page
         query = self.db.query(User).join(UserFarmRole).filter(UserFarmRole.finca_id == farm_id)
         total = query.count()
         users = query.offset(offset).limit(per_page).all()
         return total, users
-    
-    def user_has_access_to_farm(self, user_id: int, farm_id: int) -> bool:
-        return self.db.query(UserFarmRole).filter(
-            UserFarmRole.usuario_id == user_id,
-            UserFarmRole.finca_id == farm_id
-        ).first() is not None
         
     def get_user_farm_role(self, user_id: int, farm_id: int, role_id: int) -> Optional[UserFarmRole]:
         return self.db.query(UserFarmRole).filter(
@@ -93,12 +72,6 @@ class FarmRepository:
             UserFarmRole.finca_id == farm_id,
             UserFarmRole.rol_id == role_id
         ).first()
-        
-    def get_farms_by_user_role(self, user_id: int, role_id: int) -> List[int]:
-        return [finca_id for finca_id, in self.db.query(UserFarmRole.finca_id).filter(
-            UserFarmRole.usuario_id == user_id,
-            UserFarmRole.rol_id == role_id
-        ).all()]
 
     def add_user_to_farm_with_role(self, user_id: int, farm_id: int, role_id: int):
         try:

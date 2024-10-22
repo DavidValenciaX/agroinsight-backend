@@ -18,7 +18,7 @@ from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
 from app.infrastructure.common.response_models import MultipleResponse, SuccessResponse
 from app.farm.application.get_user_by_id_use_case import AdminGetUserByIdUseCase
-from app.user.domain.schemas import UserInDB, UserResponse
+from app.user.domain.schemas import UserForFarmResponse, UserInDB, UserResponse
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.user.infrastructure.orm_models import User
 
@@ -151,7 +151,7 @@ def list_farm_users(
             detail=f"Error al listar los usuarios de una finca: {str(e)}"
         )
         
-@router.get("/{farm_id}/user/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+@router.get("/{farm_id}/user/{user_id}", response_model=UserForFarmResponse, status_code=status.HTTP_200_OK)
 def get_user_by_id(
     farm_id: int,
     user_id: int,
@@ -168,7 +168,7 @@ def get_user_by_id(
         current_user (UserInDB): Usuario actual autenticado.
 
     Returns:
-        UserResponse: Un objeto UserResponse con la información del usuario.
+        UserForFarmResponse: Un objeto UserForFarmResponse con la información del usuario.
 
     Raises:
         HTTPException: Si ocurre un error durante la obtención del usuario.

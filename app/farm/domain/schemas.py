@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from decimal import Decimal
 from typing import List
 
-from app.user.domain.schemas import UserResponse
+from app.user.domain.schemas import UserForFarmResponse
 
 class FarmCreate(BaseModel):
     nombre: str = Field(..., min_length=1, max_length=100)
@@ -17,7 +17,7 @@ class FarmResponse(BaseModel):
     ubicacion: str
     area_total: float
     unidad_area: str
-    usuarios: List[UserResponse]
+    usuarios: List[UserForFarmResponse]
 
     model_config = ConfigDict(from_attributes=True)
     
@@ -33,7 +33,7 @@ class FarmUserAssignmentByEmail(BaseModel):
     user_emails: List[str]
 
 class PaginatedFarmUserListResponse(BaseModel):
-    users: List[UserResponse]
+    users: List[UserForFarmResponse]
     total_users: int
     page: int
     per_page: int

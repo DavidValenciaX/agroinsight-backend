@@ -1,4 +1,3 @@
-# app/farm/application/list_farms_use_case.py
 from sqlalchemy.orm import Session
 from app.farm.application.services.farm_service import FarmService
 from app.farm.infrastructure.sql_repository import FarmRepository
@@ -6,10 +5,7 @@ from app.farm.domain.schemas import PaginatedFarmListResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.mappers.response_mappers import map_farm_to_response
 from math import ceil
-from app.user.infrastructure.orm_models import Role
 from app.user.infrastructure.sql_repository import UserRepository
-from app.infrastructure.common.common_exceptions import DomainException
-from fastapi import status
 
 from app.user.application.services.user_service import UserService
 

@@ -1,7 +1,7 @@
 import re
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 from pydantic_core import PydanticCustomError
 
 def validate_email(v: str) -> str:
@@ -184,13 +184,22 @@ class UserResponse(BaseModel):
     id: int
     nombre: str
     apellido: str
-    email: str
+    email: EmailStr
     estado: str
-    roles_fincas: List[RoleFarm]  # Updated to include farm names
+    roles_fincas: List[RoleFarm]
 
     model_config = ConfigDict(from_attributes=True)
-
-    _validate_email = field_validator('email')(validate_email)
+    
+    
+class UserForFarmResponse(BaseModel):
+    id: int
+    nombre: str
+    apellido: str
+    email: EmailStr
+    estado: str
+    rol: str
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class LoginRequest(BaseModel):
     """
