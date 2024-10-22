@@ -87,20 +87,6 @@ class FarmRepository:
             UserFarmRole.finca_id == farm_id
         ).first() is not None
         
-    def user_is_farm_admin(self, user_id: int, farm_id: int) -> bool:
-        return self.db.query(UserFarmRole).filter(
-            UserFarmRole.usuario_id == user_id,
-            UserFarmRole.finca_id == farm_id,
-            UserFarmRole.rol_id == self.get_admin_role().id
-        ).first() is not None
-    
-    def user_is_farm_worker(self, user_id: int, farm_id: int) -> bool:
-        return self.db.query(UserFarmRole).filter(
-            UserFarmRole.usuario_id == user_id,
-            UserFarmRole.finca_id == farm_id,
-            UserFarmRole.rol_id == self.get_worker_role().id
-        ).first() is not None
-        
     def get_user_farm_role(self, user_id: int, farm_id: int, role_id: int) -> Optional[UserFarmRole]:
         return self.db.query(UserFarmRole).filter(
             UserFarmRole.usuario_id == user_id,
@@ -124,12 +110,3 @@ class FarmRepository:
             self.db.rollback()
             print(f"Error al crear al asignar rol a usuario en finca: {e}")
             return False
-        
-    def get_worker_role(self) -> Optional[Role]:
-        rol_trabajador_agricola = self.user_repository.get_role_by_name(self.user_service.WORKER_ROLE_NAME) 
-        if not rol_trabajador_agricola:
-            raise DomainException(
-                message="No se pudo asignar el rol de Trabajador Agrícola.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        return rol_trabajador_agricola

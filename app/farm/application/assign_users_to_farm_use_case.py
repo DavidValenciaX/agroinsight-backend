@@ -9,12 +9,14 @@ from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.infrastructure.common.response_models import MultipleResponse
 from app.user.application.services.user_service import UserService
+from app.farm.application.services.farm_service import FarmService
 
 class AssignUsersToFarmUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
+        self.farm_service = FarmService(db)
         self.user_service = UserService(db)
     
     def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> MultipleResponse:
@@ -26,13 +28,13 @@ class AssignUsersToFarmUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        if not self.farm_repository.user_is_farm_admin(current_user.id, assignment_data.farm_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, farm.id):
             raise DomainException(
                 message="No tienes permisos para asignar usuarios a esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
         
-        rol_trabajador_agricola = self.get_worker_role()
+        worker_role = self.farm_service.get_worker_role()
             
         messages = []
         success_count = 0
@@ -55,7 +57,7 @@ class AssignUsersToFarmUseCase:
                 failure_count += 1
                 continue
             
-            self.farm_repository.assign_user_to_farm_with_role(user.id, assignment_data.farm_id,  rol_trabajador_agricola.id)
+            self.farm_repository.add_user_to_farm_with_role(user.id, assignment_data.farm_id, worker_role.id)
             messages.append(f"El usuario {user_name} ha sido asignado exitosamente a la finca.")
             success_count += 1
 
@@ -67,12 +69,3 @@ class AssignUsersToFarmUseCase:
             status_code = status.HTTP_200_OK
 
         return MultipleResponse(messages=messages, status_code=status_code)
-
-    def get_worker_role(self) -> Optional[Role]:
-        rol_trabajador_agricola = self.user_repository.get_role_by_name(self.user_service.WORKER_ROLE_NAME) 
-        if not rol_trabajador_agricola:
-            raise DomainException(
-                message="No se pudo asignar el rol de Trabajador Agrícola.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        return rol_trabajador_agricola

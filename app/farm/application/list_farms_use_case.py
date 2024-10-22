@@ -1,6 +1,6 @@
 # app/farm/application/list_farms_use_case.py
-from typing import Optional
 from sqlalchemy.orm import Session
+from app.farm.application.services.farm_service import FarmService
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import PaginatedFarmListResponse
 from app.user.domain.schemas import UserInDB
@@ -19,14 +19,15 @@ class ListFarmsUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
         self.user_service = UserService(db)
+        self.farm_service = FarmService(db)
         
     def list_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
         
         # Obtener id del rol de administrador de finca
-        rol_administrador_finca = self.get_admin_role()
+        admin_role = self.farm_service.get_admin_role()
 
         # Filtrar las fincas donde el usuario es administrador
-        total_farms, farms = self.farm_repository.list_farms_by_role_paginated(current_user.id, rol_administrador_finca.id, page, per_page)
+        total_farms, farms = self.farm_repository.list_farms_by_role_paginated(current_user.id, admin_role.id, page, per_page)
 
         # Usar la función de mapeo para construir FarmResponse para cada finca
         farm_responses = [map_farm_to_response(farm) for farm in farms]
@@ -40,12 +41,3 @@ class ListFarmsUseCase:
             per_page=per_page,
             total_pages=total_pages
         )
-        
-    def get_admin_role(self) -> Optional[Role]:
-        rol_administrador_finca = self.user_repository.get_role_by_name(self.user_service.ADMIN_ROLE_NAME)
-        if not rol_administrador_finca:
-            raise DomainException(
-                message="No se pudo obtener el rol de Administrador de Finca.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        return rol_administrador_finca

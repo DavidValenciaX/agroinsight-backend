@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.infrastructure.sql_repository import UserRepository
+from app.farm.application.services.farm_service import FarmService
 from app.farm.domain.schemas import PaginatedFarmUserListResponse
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
@@ -14,7 +15,8 @@ class ListFarmUsersUseCase:
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
-
+        self.farm_service = FarmService(db)
+    
     def list_farm_users(self, farm_id: int, current_user: UserInDB, page: Optional[int], per_page: Optional[int]) -> PaginatedFarmUserListResponse:
         self.validate_params(page, per_page)
         
@@ -26,7 +28,7 @@ class ListFarmUsersUseCase:
             )
             
         # Verificar si current_user es administrador de la finca
-        if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, farm_id):
             raise DomainException(
                 message="No tienes permisos para obtener información de los usuarios de esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
