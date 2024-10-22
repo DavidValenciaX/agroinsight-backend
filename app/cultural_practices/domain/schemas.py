@@ -1,17 +1,21 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import date
 from typing import List, Optional
         
-class TaskBase(BaseModel):
+class TaskCreate(BaseModel):
+    nombre: str = Field(..., max_length=255)
     tipo_labor_id: int
-    lote_id: int
     fecha_inicio_estimada: date
+    fecha_finalizacion: Optional[date] = None
     descripcion: Optional[str] = Field(None, max_length=500)
     estado_id: int
-    nombre: str = Field(..., max_length=255)
-
-class TaskCreate(TaskBase):
-    pass
+    lote_id: int
+    
+    @field_validator('fecha_inicio_estimada')
+    def validar_fecha_inicio_estimada(cls, value):
+        if value < date.today():
+            raise ValueError('La fecha de inicio estimada no puede ser anterior a la fecha actual.')
+        return value
 
 class SuccessTaskCreateResponse(BaseModel):
     message: str

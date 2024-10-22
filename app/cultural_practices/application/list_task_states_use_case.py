@@ -14,15 +14,11 @@ class ListTaskStatesUseCase:
             # Assuming the repository method returns a list of task state objects
             task_states = self.cultural_practice_repository.get_states()
             
-            # Debugging: print the task states to check their structure
-            for state in task_states:
-                print(state)
-            
             # Convert each task state to a dictionary if necessary
-            task_state_dicts = [state.__dict__ for state in task_states]  # or use a method if available
+            task_state_dicts = [state.__dict__ for state in task_states]
             
             # Create TaskStateResponse objects
-            task_state_responses = [TaskStateResponse.model_validate(state_dict) for state_dict in task_state_dicts]
+            task_state_responses = [TaskStateResponse(**state) for state in task_state_dicts]
             
             # Return a TaskStateListResponse object
             return TaskStateListResponse(states=task_state_responses)

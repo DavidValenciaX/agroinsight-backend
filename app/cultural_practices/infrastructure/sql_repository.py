@@ -5,18 +5,6 @@ from app.cultural_practices.infrastructure.orm_models import Assignment, Cultura
 from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.plot.infrastructure.orm_models import Plot
 
-PROGRAMADA = 'Programada'
-EN_PROGRESO = 'En Progreso'
-COMPLETADA = 'Completada'
-CANCELADA = 'Cancelada'
-PENDIENTE = 'Pendiente'
-RETRASADA = 'Retrasada'
-FALLIDA = 'Fallida'
-REVISADA = 'Revisada'
-APROBADA = 'Aprobada'
-POSTERGADA = 'Postergada'
-FINALIZADA = 'Finalizada'
-
 class CulturalPracticesRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -35,21 +23,25 @@ class CulturalPracticesRepository:
     
     def get_task_by_id(self, task_id: int) -> CulturalTask:
         return self.db.query(CulturalTask).filter(CulturalTask.id == task_id).first()
-
-    def get_task_state_name(self, estado_id: int) -> str:
-        estado = self.db.query(CulturalTaskState).filter(CulturalTaskState.id == estado_id).first()
-        return estado.nombre if estado else None
     
     def get_states(self) -> List[CulturalTaskState]:
         return self.db.query(CulturalTaskState).all()
 
-    def create_task(self, tarea_data: TaskCreate) -> CulturalTask:
+    def create_task(self, task_data: TaskCreate) -> CulturalTask:
         try:
-            db_tarea = CulturalTask(**tarea_data.model_dump())
-            self.db.add(db_tarea)
+            new_task = CulturalTask(
+                nombre=task_data.nombre,
+                tipo_labor_id=task_data.tipo_labor_id,
+                fecha_inicio_estimada=task_data.fecha_inicio_estimada,
+                fecha_finalizacion=task_data.fecha_finalizacion,
+                descripcion=task_data.descripcion,
+                estado_id=task_data.estado_id,
+                lote_id=task_data.lote_id
+            )
+            self.db.add(new_task)
             self.db.commit()
-            self.db.refresh(db_tarea)
-            return db_tarea
+            self.db.refresh(new_task)
+            return new_task
         except Exception as e:
             self.db.rollback()
             print(f"Error al crear la tarea: {e}")
@@ -67,21 +59,6 @@ class CulturalPracticesRepository:
             print(f"Error al crear la asignación: {e}")
             return None
     
-    def list_assignments_by_user_paginated(self, user_id: int, page: int, per_page: int, admin_farm_ids: List[int]) -> tuple[int, List[Assignment]]:
-        try:
-            query = self.db.query(Assignment).join(CulturalTask).filter(
-                Assignment.usuario_id == user_id,
-                CulturalTask.lote_id.in_(
-                    self.db.query(Plot.id).filter(Plot.finca_id.in_(admin_farm_ids))
-                )
-            )
-            total_assignments = query.count()
-            assignments = query.offset((page - 1) * per_page).limit(per_page).all()
-            return total_assignments, assignments
-        except Exception as e:
-            print(f"Error al listar las asignaciones: {e}")
-            return 0, []
-    
     def get_plot_id_by_task_id(self, tarea_id: int) -> int:
         result = self.db.query(CulturalTask.lote_id).filter(CulturalTask.id == tarea_id).first()
         return result[0] if result else None
@@ -91,28 +68,12 @@ class CulturalPracticesRepository:
             Assignment.usuario_id == user_id, 
             Assignment.tarea_labor_cultural_id == tarea_id
         ).first() is not None
-
-    def list_tasks_by_user_paginated(self, user_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
-        try:
-            query = self.db.query(CulturalTask).join(Assignment).filter(
-                Assignment.usuario_id == user_id
-            )
-            total_tasks = query.count()
-            tasks = query.offset((page - 1) * per_page).limit(per_page).all()
-            return total_tasks, tasks
-        except Exception as e:
-            print(f"Error al listar las tareas: {e}")
-            return 0, []
         
     def list_tasks_by_user_and_farm_paginated(self, user_id: int, farm_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
-        try:
-            query = self.db.query(CulturalTask).join(Assignment).filter(
-                Assignment.usuario_id == user_id,
-                CulturalTask.lote_id.in_(self.db.query(Plot.id).filter(Plot.finca_id == farm_id))
-            )
-            total_tasks = query.count()
-            tasks = query.offset((page - 1) * per_page).limit(per_page).all()
-            return total_tasks, tasks
-        except Exception as e:
-            print(f"Error al listar las tareas: {e}")
-            return 0, []
+        query = self.db.query(CulturalTask).join(Assignment).filter(
+            Assignment.usuario_id == user_id,
+            CulturalTask.lote_id.in_(self.db.query(Plot.id).filter(Plot.finca_id == farm_id))
+        )
+        total_tasks = query.count()
+        tasks = query.offset((page - 1) * per_page).limit(per_page).all()
+        return total_tasks, tasks
