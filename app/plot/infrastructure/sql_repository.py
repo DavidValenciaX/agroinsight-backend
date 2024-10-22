@@ -2,8 +2,6 @@ from sqlalchemy.orm import Session
 from app.plot.infrastructure.orm_models import Plot
 from app.plot.domain.schemas import PlotCreate
 from typing import Optional
-from app.user.infrastructure.orm_models import UserFarmRole
-from app.farm.infrastructure.orm_models import Farm
 from typing import List, Tuple
 from sqlalchemy import func
 
@@ -30,14 +28,8 @@ class PlotRepository:
             print(f"Error al crear el lote: {e}")
             return None
         
-    def list_plots(self, user_id: int) -> List[Plot]:
-            return self.db.query(Plot).join(UserFarmRole, Plot.finca_id == UserFarmRole.finca_id).filter(UserFarmRole.usuario_id == user_id).all()
-        
     def get_plot_by_id(self, plot_id: int) -> Optional[Plot]:
         return self.db.query(Plot).filter(Plot.id == plot_id).first()
-        
-    def list_plots_by_farm(self, finca_id: int) -> List[Plot]:
-        return self.db.query(Plot).filter(Plot.finca_id == finca_id).all()
     
     def list_plots_by_farm_paginated(self, finca_id: int, page: int, per_page: int) -> Tuple[int, List[Plot]]:
         query = self.db.query(Plot).filter(Plot.finca_id == finca_id)
@@ -46,13 +38,6 @@ class PlotRepository:
         plots = query.offset((page - 1) * per_page).limit(per_page).all()
         
         return total, plots
-
-    def check_user_farm_access(self, user_id: int, finca_id: int) -> bool:
-        access = self.db.query(UserFarmRole).filter(
-            UserFarmRole.usuario_id == user_id,
-            UserFarmRole.finca_id == finca_id
-        ).first()
-        return access is not None
     
     def get_plot_by_name_and_farm(self, nombre: str, finca_id: int) -> Optional[Plot]:
         return self.db.query(Plot).filter(
