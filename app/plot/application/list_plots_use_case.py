@@ -1,6 +1,7 @@
 # app/plot/application/list_plots_use_case.py
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
+from app.farm.application.services.farm_service import FarmService
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PaginatedPlotListResponse
 from app.user.domain.schemas import UserInDB
@@ -14,6 +15,7 @@ class ListPlotsUseCase:
         self.db = db
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
+        self.farm_service = FarmService(db)
 
     def list_plots(self, current_user: UserInDB, farm_id: int, page: int, per_page: int) -> PaginatedPlotListResponse:
         farm = self.farm_repository.get_farm_by_id(farm_id)
@@ -23,7 +25,7 @@ class ListPlotsUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
-        if not self.farm_repository.user_is_farm_admin(current_user.id, farm_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, farm_id):
             raise DomainException(
                 message="No tienes permisos para obtener información de los lotes de esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN

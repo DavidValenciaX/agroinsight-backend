@@ -4,6 +4,7 @@ from app.plot.infrastructure.sql_repository import PlotRepository
 from app.plot.domain.schemas import PlotCreate
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
+from app.farm.application.services.farm_service import FarmService
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
@@ -12,11 +13,12 @@ class CreatePlotUseCase:
         self.db = db
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
+        self.farm_service = FarmService(db)
         
     def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
             
         #Validar si el usuario tiene permiso para crear lotes en la finca
-        if not self.farm_repository.user_is_farm_admin(current_user.id, plot_data.finca_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, plot_data.finca_id):
             raise DomainException(
                 message="No tienes permisos para crear lotes en esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
