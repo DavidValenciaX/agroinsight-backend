@@ -3,9 +3,7 @@ from app.farm.domain.schemas import FarmCreate
 from app.farm.infrastructure.orm_models import Farm
 from typing import Optional, List, Tuple
 from typing import List
-from fastapi import status
-from app.infrastructure.common.common_exceptions import DomainException
-from app.user.infrastructure.orm_models import Role, User, UserFarmRole
+from app.user.infrastructure.orm_models import User, UserFarmRole
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.application.services.user_service import UserService
 
@@ -59,10 +57,9 @@ class FarmRepository:
         return self.db.query(Farm).filter(Farm.nombre == farm_name).first()
     
     def list_farm_users_paginated(self, farm_id: int, page: int, per_page: int):
-        offset = (page - 1) * per_page
         query = self.db.query(User).join(UserFarmRole).filter(UserFarmRole.finca_id == farm_id)
         total = query.count()
-        users = query.offset(offset).limit(per_page).all()
+        users = query.offset((page - 1) * per_page).limit(per_page).all()
         return total, users
         
     def get_user_farm_role(self, user_id: int, farm_id: int, role_id: int) -> Optional[UserFarmRole]:

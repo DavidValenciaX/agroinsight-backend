@@ -19,6 +19,3 @@ class TaskService:
     def __init__(self, db: Session):
         self.db = db
         self.cultural_practices_repository = CulturalPracticesRepository(db)
-        
-    def get_task_state_by_name(self, estado_nombre: str) -> CulturalTaskState:
-        return self.cultural_practices_repository.get_task_state_by_name(estado_nombre)

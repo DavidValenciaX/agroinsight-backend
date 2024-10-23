@@ -78,9 +78,9 @@ class CulturalPracticesRepository:
         ).first()
         
     def list_tasks_by_user_and_farm_paginated(self, user_id: int, farm_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
-        query = self.db.query(CulturalTask).join(Assignment).filter(
+        query = self.db.query(CulturalTask).join(Assignment).join(Plot).filter(
             Assignment.usuario_id == user_id,
-            CulturalTask.lote_id.in_(self.db.query(Plot.id).filter(Plot.finca_id == farm_id))
+            Plot.finca_id == farm_id
         )
         total_tasks = query.count()
         tasks = query.offset((page - 1) * per_page).limit(per_page).all()
