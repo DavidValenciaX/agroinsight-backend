@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.farm.domain.schemas import FarmCreate
-from app.farm.infrastructure.orm_models import Farm
+from app.farm.infrastructure.orm_models import Farm, UnitCategory, UnitOfMeasure
 from typing import Optional, List, Tuple
 from typing import List
 from app.user.infrastructure.orm_models import User, UserFarmRole
@@ -79,3 +79,9 @@ class FarmRepository:
             self.db.rollback()
             print(f"Error al crear al asignar rol a usuario en finca: {e}")
             return False
+        
+    def get_unit_of_measure_by_id(self, unit_of_measure_id: int) -> Optional[UnitOfMeasure]:
+        return self.db.query(UnitOfMeasure).filter(UnitOfMeasure.id == unit_of_measure_id).first()
+    
+    def get_unit_category_by_id(self, unit_category_id: int) -> Optional[UnitCategory]:
+        return self.db.query(UnitCategory).filter(UnitCategory.id == unit_category_id).first()

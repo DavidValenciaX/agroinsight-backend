@@ -16,6 +16,28 @@ class CreatePlotUseCase:
         self.farm_service = FarmService(db)
         
     def create_plot(self, plot_data: PlotCreate, current_user: UserInDB) -> SuccessResponse:
+        
+        # Validar que la unidad de area exista
+        unit_of_measure = self.farm_repository.get_unit_of_measure_by_id(plot_data.unidad_area_id)
+        if not unit_of_measure:
+            raise DomainException(
+                message="La unidad de medida no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        # validar que la unidad de medida sea de area
+        if self.farm_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != "Área":
+            raise DomainException(
+                message="La unidad de medida no es de área.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # validar que la finca exista
+        if not self.farm_repository.get_farm_by_id(plot_data.finca_id):
+            raise DomainException(
+                message="La finca no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
             
         #Validar si el usuario tiene permiso para crear lotes en la finca
         if not self.farm_service.user_is_farm_admin(current_user.id, plot_data.finca_id):
