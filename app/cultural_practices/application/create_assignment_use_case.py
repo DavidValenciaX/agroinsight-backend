@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.domain.schemas import AssignmentCreate, AssignmentCreateSingle
-from app.farm.infrastructure.sql_repository import FarmRepository
-from app.infrastructure.common.response_models import MultipleResponse, SuccessResponse
+from app.farm.application.services.farm_service import FarmService
+from app.infrastructure.common.response_models import MultipleResponse
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.user.domain.schemas import UserInDB
-from app.infrastructure.common.common_exceptions import DomainException, InsufficientPermissionsException
+from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 from app.user.infrastructure.sql_repository import UserRepository
@@ -15,8 +15,8 @@ class CreateAssignmentUseCase:
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
         self.user_repository = UserRepository(db)
-        self.farm_repository = FarmRepository(db)
         self.plot_repository = PlotRepository(db)
+        self.farm_service = FarmService(db)
 
     def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> MultipleResponse:
         
@@ -44,7 +44,7 @@ class CreateAssignmentUseCase:
             )
         
         # validar que el usuario sea administrador de la finca
-        if not self.farm_repository.user_is_farm_admin(current_user.id, finca_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, finca_id):
             raise DomainException(
                 message="No tienes permisos para asignar tareas en esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
@@ -65,23 +65,28 @@ class CreateAssignmentUseCase:
             
             user_name = user.nombre + " " + user.apellido
             
+            if current_user.id == usuario_id:
+                messages.append(f"El usuario {user_name} es el administrador de la finca.")
+                failure_count += 1
+                continue
+            
             # validar que el usuario es trabajador de la finca
-            if not self.farm_repository.user_is_farm_worker(usuario_id, finca_id):
+            if not self.farm_service.user_is_farm_worker(usuario_id, finca_id):
                 messages.append(f"El usuario {user_name} no es trabajador de la finca.")
                 failure_count += 1
                 continue
             
             # validar que el usuario no tenga ya asignada esa tarea
-            if self.cultural_practice_repository.user_has_assignment(usuario_id, assignment_data.tarea_labor_cultural_id):
+            if self.cultural_practice_repository.get_user_task_assignment(usuario_id, assignment_data.tarea_labor_cultural_id):
                 messages.append(f"El usuario {user_name} ya tiene asignada la tarea con ID {assignment_data.tarea_labor_cultural_id}.")
                 failure_count += 1
                 continue
             
-            # Crear la asignación
             assignment_data_single = AssignmentCreateSingle(
                 usuario_id=usuario_id,
                 tarea_labor_cultural_id=assignment_data.tarea_labor_cultural_id
             )
+            
             if not self.cultural_practice_repository.create_assignment(assignment_data_single):
                 messages.append(f"No se pudo crear la asignación para el usuario {user_name}.")
                 failure_count += 1

@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate
+from app.cultural_practices.domain.schemas import AssignmentCreateSingle, TaskCreate
 from app.cultural_practices.infrastructure.orm_models import Assignment, CulturalTaskState, CulturalTaskType
 from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.plot.infrastructure.orm_models import Plot
@@ -47,9 +47,12 @@ class CulturalPracticesRepository:
             print(f"Error al crear la tarea: {e}")
             return None
 
-    def create_assignment(self, assignment_data: AssignmentCreate) -> Assignment:
+    def create_assignment(self, assignment_data_single: AssignmentCreateSingle) -> Assignment:
         try:
-            new_assignment = Assignment(**assignment_data.model_dump())
+            new_assignment = Assignment(
+                usuario_id=assignment_data_single.usuario_id,
+                tarea_labor_cultural_id=assignment_data_single.tarea_labor_cultural_id
+            )
             self.db.add(new_assignment)
             self.db.commit()
             self.db.refresh(new_assignment)
@@ -63,11 +66,11 @@ class CulturalPracticesRepository:
         result = self.db.query(CulturalTask.lote_id).filter(CulturalTask.id == tarea_id).first()
         return result[0] if result else None
     
-    def user_has_assignment(self, user_id: int, tarea_id: int) -> bool:
+    def get_user_task_assignment(self, user_id: int, tarea_id: int) -> Assignment:
         return self.db.query(Assignment).filter(
             Assignment.usuario_id == user_id, 
             Assignment.tarea_labor_cultural_id == tarea_id
-        ).first() is not None
+        ).first()
         
     def list_tasks_by_user_and_farm_paginated(self, user_id: int, farm_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
         query = self.db.query(CulturalTask).join(Assignment).filter(
