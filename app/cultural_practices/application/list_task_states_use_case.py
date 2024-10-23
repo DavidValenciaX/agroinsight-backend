@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.cultural_practices.domain.schemas import TaskStateResponse, TaskStateListResponse
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository 
 from app.infrastructure.common.common_exceptions import DomainException
+from app.infrastructure.mappers.response_mappers import map_task_state_to_response
 from app.user.domain.schemas import UserInDB
 
 class ListTaskStatesUseCase:
@@ -14,11 +15,8 @@ class ListTaskStatesUseCase:
             # Assuming the repository method returns a list of task state objects
             task_states = self.cultural_practice_repository.get_states()
             
-            # Convert each task state to a dictionary if necessary
-            task_state_dicts = [state.__dict__ for state in task_states]
-            
             # Create TaskStateResponse objects
-            task_state_responses = [TaskStateResponse(**state) for state in task_state_dicts]
+            task_state_responses = [map_task_state_to_response(state) for state in task_states]
             
             # Return a TaskStateListResponse object
             return TaskStateListResponse(states=task_state_responses)

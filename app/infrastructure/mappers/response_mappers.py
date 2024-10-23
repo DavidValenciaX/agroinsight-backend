@@ -1,4 +1,4 @@
-from app.cultural_practices.domain.schemas import TaskResponse
+from app.cultural_practices.domain.schemas import TaskResponse, TaskStateResponse
 from app.user.domain.schemas import UserForFarmResponse, UserResponse
 from app.farm.domain.schemas import FarmResponse
 from app.plot.domain.schemas import PlotResponse
@@ -71,3 +71,11 @@ def map_task_to_response(task) -> TaskResponse:
         estado_id=task.estado_id,
         lote_id=task.lote_id
     )
+    
+def map_task_state_to_response(task_state) -> TaskStateResponse:
+    return TaskStateResponse(
+        id=task_state.id,
+        nombre=task_state.nombre,
+        descripcion=task_state.descripcion
+    )
+
