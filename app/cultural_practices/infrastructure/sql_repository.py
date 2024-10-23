@@ -71,10 +71,6 @@ class CulturalPracticesRepository:
             print(f"Error al crear la asignación: {e}")
             return None
     
-    def get_plot_id_by_task_id(self, tarea_id: int) -> int:
-        result = self.db.query(CulturalTask.lote_id).filter(CulturalTask.id == tarea_id).first()
-        return result[0] if result else None
-    
     def get_user_task_assignment(self, user_id: int, tarea_id: int) -> Assignment:
         return self.db.query(Assignment).filter(
             Assignment.usuario_id == user_id, 

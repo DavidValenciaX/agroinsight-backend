@@ -4,6 +4,7 @@ from app.cultural_practices.domain.schemas import AssignmentCreate, AssignmentCr
 from app.farm.application.services.farm_service import FarmService
 from app.infrastructure.common.response_models import MultipleResponse
 from app.plot.infrastructure.sql_repository import PlotRepository
+from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
@@ -16,35 +17,37 @@ class CreateAssignmentUseCase:
         self.cultural_practice_repository = CulturalPracticesRepository(db)
         self.user_repository = UserRepository(db)
         self.plot_repository = PlotRepository(db)
+        self.farm_repository = FarmRepository(db)
         self.farm_service = FarmService(db)
 
     def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> MultipleResponse:
         
         # Validar que la tarea existe
-        if not self.cultural_practice_repository.get_task_by_id(assignment_data.tarea_labor_cultural_id):
+        task = self.cultural_practice_repository.get_task_by_id(assignment_data.tarea_labor_cultural_id)
+        if not task:
             raise DomainException(
-                message="La tarea especificada no existe.",
+                message="No se pudo obtener la tarea.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        # obtener el id del lote por medio del id de la tarea
-        lote_id = self.cultural_practice_repository.get_plot_id_by_task_id(assignment_data.tarea_labor_cultural_id)
-        if not lote_id:
+        # get plot by id
+        plot = self.plot_repository.get_plot_by_id(task.lote_id)
+        if not plot:
             raise DomainException(
-                message="No se pudo obtener el id del lote.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                message="No se pudo obtener el lote.",
+                status_code=status.HTTP_404_NOT_FOUND
             )
         
-        # obtener el id de la finca por medio del id del lote
-        finca_id = self.plot_repository.get_farm_id_by_plot_id(lote_id)
-        if not finca_id:
+        # get farm by id
+        farm = self.farm_repository.get_farm_by_id(plot.finca_id)
+        if not farm:
             raise DomainException(
-                message="No se pudo obtener el id de la finca.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                message="No se pudo obtener la finca.",
+                status_code=status.HTTP_404_NOT_FOUND
             )
         
         # validar que el usuario sea administrador de la finca
-        if not self.farm_service.user_is_farm_admin(current_user.id, finca_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, farm.id):
             raise DomainException(
                 message="No tienes permisos para asignar tareas en esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
@@ -71,7 +74,7 @@ class CreateAssignmentUseCase:
                 continue
             
             # validar que el usuario es trabajador de la finca
-            if not self.farm_service.user_is_farm_worker(usuario_id, finca_id):
+            if not self.farm_service.user_is_farm_worker(usuario_id, farm.id):
                 messages.append(f"El usuario {user_name} no es trabajador de la finca.")
                 failure_count += 1
                 continue
