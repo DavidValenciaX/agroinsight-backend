@@ -142,12 +142,12 @@ class UserRepository:
             print(f"Error al actualizar el usuario: {e}")
             return None
         
-    def delete_user(self, user: User) -> bool:
+    def delete_user(self, user: UserInDB) -> bool:
         """
         Elimina un usuario de la base de datos.
 
         Args:
-            user (User): Objeto de usuario a eliminar.
+            user (UserInDB): Objeto de usuario a eliminar.
 
         Returns:
             bool: True si se eliminó con éxito, False en caso de error.
@@ -161,7 +161,7 @@ class UserRepository:
             print(f"Error al eliminar el usuario: {str(e)}")
             return False
     
-    def add_user_confirmation(self, user_id: int, pin_hash: str, expiration_datetime: datetime, resends: int, created_at: datetime) -> bool:
+    def add_user_confirmation(self, user_id: int, pin_hash: str, expiration_datetime: datetime, created_at: datetime) -> bool:
         """
         Agrega una confirmación de usuario a la base de datos.
 
@@ -169,7 +169,6 @@ class UserRepository:
             user_id (int): ID del usuario.
             pin_hash (str): Hash del PIN.
             expiration_datetime (datetime): Fecha y hora de expiración del PIN.
-            resends (int): Número de reenvíos del PIN.
             created_at (datetime): Fecha y hora de creación del registro.
 
         Returns:
@@ -180,7 +179,6 @@ class UserRepository:
                 usuario_id=user_id,
                 pin=pin_hash,
                 expiracion=expiration_datetime,
-                resends=resends,
                 created_at=created_at
             )
             self.db.add(confirmation)
@@ -229,7 +227,7 @@ class UserRepository:
             print(f"Error al eliminar la confirmación del usuario: {e}")
             return False
     
-    def add_two_factor_verification(self, verification: TwoStepVerification) -> bool:
+    def add_two_factor_verification(self, user_id: int, pin_hash: str, expiration_datetime: datetime, created_at: datetime) -> bool:
         """
         Agrega una verificación de dos pasos a la base de datos.
 
@@ -240,6 +238,12 @@ class UserRepository:
             bool: True si se agregó con éxito, False en caso de error.
         """
         try:
+            verification = TwoStepVerification(
+                usuario_id=user_id,
+                pin=pin_hash,
+                expiracion=expiration_datetime,
+                created_at=created_at
+            )
             self.db.add(verification)
             self.db.commit()
             return True
@@ -286,7 +290,7 @@ class UserRepository:
             print(f"Error al eliminar la verificación de dos pasos: {e}")
             return False
 
-    def add_password_recovery(self, recovery: PasswordRecovery) -> bool:
+    def add_password_recovery(self, user_id: int, pin: str, expiration_datetime: datetime, created_at: datetime) -> bool:
         """
         Agrega una recuperación de contraseña a la base de datos.
 
@@ -297,6 +301,12 @@ class UserRepository:
             bool: True si se agregó con éxito, False en caso de error.
         """
         try:
+            recovery = PasswordRecovery(
+                usuario_id=user_id,
+                pin=pin,
+                expiracion=expiration_datetime,
+                created_at=created_at
+            )
             self.db.add(recovery)
             self.db.commit()
             return True

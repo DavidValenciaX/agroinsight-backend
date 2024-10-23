@@ -79,18 +79,10 @@ class PasswordRecoveryUseCase:
         pin, pin_hash = generate_pin()
         
         expiration_datetime = self.user_service.expiration_time()
-
-        recovery = PasswordRecovery(
-            usuario_id=user.id,
-            pin=pin_hash,
-            expiracion=expiration_datetime,
-            resends=0,
-            created_at=datetime_utc_time()
-        )
         
         background_tasks.add_task(self.send_password_recovery_email, email, pin)
         
-        self.user_repository.add_password_recovery(recovery)
+        self.user_repository.add_password_recovery(user_id=user.id, pin=pin_hash, expiration_datetime=expiration_datetime, created_at=datetime_utc_time())
         
         return SuccessResponse(
             message="Se ha enviado un PIN de recuperación a tu correo electrónico."

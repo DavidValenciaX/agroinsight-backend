@@ -103,7 +103,7 @@ class UserRegisterUseCase:
         
         expiration_datetime = self.user_service.expiration_time()
         
-        if not self.user_repository.add_user_confirmation(user_id=created_user.id, pin_hash=pin_hash, expiration_datetime=expiration_datetime, resends=0, created_at=datetime_utc_time()):
+        if not self.user_repository.add_user_confirmation(user_id=created_user.id, pin_hash=pin_hash, expiration_datetime=expiration_datetime, created_at=datetime_utc_time()):
             raise DomainException(
                 message="Error al agregar la confirmación del usuario.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR

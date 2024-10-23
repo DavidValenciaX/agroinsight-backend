@@ -2,7 +2,6 @@ from datetime import timedelta
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.user.domain.schemas import UserInDB
-from app.user.infrastructure.orm_models import TwoStepVerification
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
@@ -105,16 +104,7 @@ class LoginUseCase:
         
         expiration_datetime = self.user_service.expiration_time()
         
-        # Crear un nuevo registro de verificación
-        verification = TwoStepVerification(
-            usuario_id=user.id,
-            pin=pin_hash,
-            expiracion=expiration_datetime,
-            resends=0,
-            created_at=datetime_utc_time()
-        )
-        
-        self.user_repository.add_two_factor_verification(verification)
+        self.user_repository.add_two_factor_verification(user_id=user.id, pin_hash=pin_hash, expiration_datetime=expiration_datetime, created_at=datetime_utc_time())
         
         # Enviar el PIN al correo electrónico del usuario
         background_tasks.add_task(self.send_two_factor_verification_email, user.email, pin)
