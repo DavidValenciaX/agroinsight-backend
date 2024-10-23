@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
+from app.user.domain.schemas import UserCreate
 from app.user.infrastructure.orm_models import (
     User, UserState, Role, PasswordRecovery,
     TwoStepVerification, UserConfirmation, BlacklistedToken
@@ -94,7 +95,7 @@ class UserRepository:
         """
         return self.db.query(User).options(joinedload(User.estado)).all()
     
-    def add_user(self, user: User) -> Optional[User]:
+    def add_user(self, user: UserCreate, state_id: int) -> Optional[User]:
         """
         Agrega un nuevo usuario a la base de datos.
 
@@ -105,10 +106,17 @@ class UserRepository:
             Optional[User]: El usuario agregado si tiene éxito, None en caso de error.
         """
         try:
-            self.db.add(user)
+            new_user = User(
+                nombre=user.nombre,
+                apellido=user.apellido,
+                email=user.email,
+                password=user.password,
+                state_id=state_id
+            )
+            self.db.add(new_user)
             self.db.commit()
-            self.db.refresh(user)
-            return user
+            self.db.refresh(new_user)
+            return new_user
         except Exception as e:
             self.db.rollback()
             print(f"Error al crear el usuario: {e}")

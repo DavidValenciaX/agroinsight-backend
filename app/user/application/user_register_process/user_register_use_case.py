@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.user.application.services.user_service import UserService
 from app.user.application.services.user_state_validator import UserState, UserStateValidator
-from app.user.infrastructure.orm_models import User, UserConfirmation
+from app.user.infrastructure.orm_models import UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserCreate
@@ -94,15 +94,10 @@ class UserRegisterUseCase:
         # Hash del password
         hashed_password = hash_password(user_data.password)
 
+        user_data.password = hashed_password
+
         # Crear nuevo usuario
-        new_user = User(
-            nombre=user_data.nombre,
-            apellido=user_data.apellido,
-            email=user_data.email,
-            password=hashed_password,
-            state_id=pending_state_id
-        )
-        created_user = self.user_repository.add_user(new_user)
+        created_user = self.user_repository.add_user(user_data, pending_state_id)
         
         # Generar PIN y su hash
         pin, pin_hash = generate_pin()
