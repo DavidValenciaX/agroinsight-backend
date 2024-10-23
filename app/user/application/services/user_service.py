@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time, ensure_utc
 from app.infrastructure.services.pin_service import hash_pin
-from app.user.infrastructure.orm_models import User, UserConfirmation, TwoStepVerification, PasswordRecovery, UserState
+from app.user.domain.schemas import UserInDB
+from app.user.infrastructure.orm_models import UserConfirmation, TwoStepVerification, PasswordRecovery, UserState
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 import os
@@ -103,7 +104,7 @@ class UserService:
         """
         return entity.expiracion < datetime_utc_time()
 
-    def block_user(self, user: User, lock_duration: timedelta) -> bool:
+    def block_user(self, user: UserInDB, lock_duration: timedelta) -> bool:
         """
         Bloquea al usuario por un período de tiempo específico.
 
@@ -139,7 +140,7 @@ class UserService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    def is_user_blocked(self, user: User) -> bool:
+    def is_user_blocked(self, user: UserInDB) -> bool:
         """
         Verifica si el usuario está bloqueado.
 

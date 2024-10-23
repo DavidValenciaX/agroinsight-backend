@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.orm import Session, joinedload
-from app.user.domain.schemas import UserCreate
+from app.user.domain.schemas import UserCreate, UserInDB
 from app.user.infrastructure.orm_models import (
     User, UserState, Role, PasswordRecovery,
     TwoStepVerification, UserConfirmation, BlacklistedToken
@@ -123,7 +123,7 @@ class UserRepository:
             print(f"Error al crear el usuario: {e}")
             return None
         
-    def update_user(self, user: User) -> Optional[User]:
+    def update_user(self, user: UserInDB) -> Optional[User]:
         """
         Actualiza un usuario existente en la base de datos.
 

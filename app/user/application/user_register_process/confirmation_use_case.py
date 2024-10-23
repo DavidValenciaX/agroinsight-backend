@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from fastapi import status
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.application.services.user_service import UserService
-from app.user.infrastructure.orm_models import User
+from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException, UserStateException
 from app.user.application.services.user_state_validator import UserState, UserStateValidator
@@ -123,7 +123,7 @@ class ConfirmationUseCase:
                 message="Usuario confirmado exitosamente."
             )
 
-    def activate_user(self, user: User) -> None:
+    def activate_user(self, user: UserInDB) -> None:
         """
         Activa el usuario cambiando su estado a activo.
 

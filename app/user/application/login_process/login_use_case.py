@@ -1,7 +1,8 @@
 from datetime import timedelta
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
-from app.user.infrastructure.orm_models import TwoStepVerification, User
+from app.user.domain.schemas import UserInDB
+from app.user.infrastructure.orm_models import TwoStepVerification
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.services.pin_service import generate_pin
@@ -122,7 +123,7 @@ class LoginUseCase:
             message="Verificación en dos pasos iniciada. Por favor, revisa tu correo electrónico para obtener el PIN."
         )
 
-    def handle_failed_login_attempt(self, user: User) -> None:
+    def handle_failed_login_attempt(self, user: UserInDB) -> None:
         """
         Maneja un intento fallido de inicio de sesión.
 

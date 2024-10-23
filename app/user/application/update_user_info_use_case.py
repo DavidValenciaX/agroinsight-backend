@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
-from app.user.infrastructure.orm_models import User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.response_models import SuccessResponse
-from app.user.domain.schemas import UserUpdate
+from app.user.domain.schemas import UserInDB, UserUpdate
 from app.infrastructure.common.common_exceptions import DomainException, UserAlreadyRegisteredException
 from fastapi import status
 
@@ -28,7 +27,7 @@ class UpdateUserInfoUseCase:
         self.db = db
         self.user_repository = UserRepository(db)
         
-    def update_user_info(self, current_user: User, user_update: UserUpdate) -> SuccessResponse:
+    def update_user_info(self, current_user: UserInDB, user_update: UserUpdate) -> SuccessResponse:
         """
         Actualiza la información del usuario.
 

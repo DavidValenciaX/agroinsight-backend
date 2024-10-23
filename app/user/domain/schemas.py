@@ -213,7 +213,6 @@ class LoginRequest(BaseModel):
     password: str
     
     _validate_email = field_validator('email')(validate_email)
-    _validate_password = field_validator('password')(validate_password)
     
 class TwoFactorAuthRequest(BaseModel):
     """
