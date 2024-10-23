@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.orm import Session, joinedload
 from app.user.domain.schemas import UserCreate
 from app.user.infrastructure.orm_models import (
@@ -160,17 +161,28 @@ class UserRepository:
             print(f"Error al eliminar el usuario: {str(e)}")
             return False
     
-    def add_user_confirmation(self, confirmation: UserConfirmation) -> bool:
+    def add_user_confirmation(self, user_id: int, pin_hash: str, expiration_datetime: datetime, resends: int, created_at: datetime) -> bool:
         """
         Agrega una confirmación de usuario a la base de datos.
 
         Args:
-            confirmation (UserConfirmation): Objeto de confirmación de usuario a agregar.
+            user_id (int): ID del usuario.
+            pin_hash (str): Hash del PIN.
+            expiration_datetime (datetime): Fecha y hora de expiración del PIN.
+            resends (int): Número de reenvíos del PIN.
+            created_at (datetime): Fecha y hora de creación del registro.
 
         Returns:
             bool: True si se agregó con éxito, False en caso de error.
         """
         try:
+            confirmation = UserConfirmation(
+                usuario_id=user_id,
+                pin=pin_hash,
+                expiracion=expiration_datetime,
+                resends=resends,
+                created_at=created_at
+            )
             self.db.add(confirmation)
             self.db.commit()
             return True

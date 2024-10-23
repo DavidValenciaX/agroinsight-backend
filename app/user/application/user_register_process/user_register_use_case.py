@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, status
 from app.user.application.services.user_service import UserService
 from app.user.application.services.user_state_validator import UserState, UserStateValidator
-from app.user.infrastructure.orm_models import UserConfirmation
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserCreate
@@ -103,16 +102,8 @@ class UserRegisterUseCase:
         pin, pin_hash = generate_pin()
         
         expiration_datetime = self.user_service.expiration_time()
-
-        confirmation = UserConfirmation(
-            usuario_id=created_user.id,
-            pin=pin_hash,
-            expiracion=expiration_datetime,
-            resends=0,
-            created_at=datetime_utc_time()
-        )
         
-        if not self.user_repository.add_user_confirmation(confirmation):
+        if not self.user_repository.add_user_confirmation(user_id=created_user.id, pin_hash=pin_hash, expiration_datetime=expiration_datetime, resends=0, created_at=datetime_utc_time()):
             raise DomainException(
                 message="Error al agregar la confirmación del usuario.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
