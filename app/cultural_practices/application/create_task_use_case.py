@@ -5,6 +5,7 @@ from app.cultural_practices.domain.schemas import TaskCreate, SuccessTaskCreateR
 from app.farm.application.services.farm_service import FarmService
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.plot.infrastructure.sql_repository import PlotRepository
+from app.crop.infrastructure.sql_repository import CropRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
@@ -17,6 +18,7 @@ class CreateTaskUseCase:
         self.plot_repository = PlotRepository(db)
         self.farm_service = FarmService(db)
         self.task_service = TaskService(db)
+        self.crop_repository = CropRepository(db)
         
     def create_task(self, task_data: TaskCreate, current_user: UserInDB) -> SuccessTaskCreateResponse:
         
@@ -25,6 +27,13 @@ class CreateTaskUseCase:
             raise DomainException(
                 message="No se pudo obtener el lote.",
                 status_code=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Validate that the plot has an active crop
+        if not self.crop_repository.has_active_crop(task_data.lote_id):
+            raise DomainException(
+                message="El lote no tiene un cultivo activo. No se pueden crear tareas en lotes sin cultivos activos.",
+                status_code=status.HTTP_409_CONFLICT
             )
         
         # buscar el id de la finca por medio del id del lote
