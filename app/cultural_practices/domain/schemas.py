@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from datetime import date
+from datetime import date, timedelta
 from typing import List, Optional
         
 class TaskCreate(BaseModel):
@@ -12,8 +12,11 @@ class TaskCreate(BaseModel):
     
     @field_validator('fecha_inicio_estimada')
     def validar_fecha_inicio_estimada(cls, value):
-        if value < date.today():
-            raise ValueError('La fecha de inicio estimada no puede ser anterior a la fecha actual.')
+        # Calcular la fecha límite (un mes atrás)
+        fecha_limite = date.today() - timedelta(days=30)
+        
+        if value < fecha_limite:
+            raise ValueError('La fecha de inicio estimada no puede ser anterior a un mes desde la fecha actual.')
         return value
 
 class SuccessTaskCreateResponse(BaseModel):
