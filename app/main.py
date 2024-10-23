@@ -15,6 +15,7 @@ from app.user.infrastructure.api import user_router
 from app.farm.infrastructure.api import router as farm_router
 from app.plot.infrastructure.api import router as plot_router
 from app.cultural_practices.infrastructure.api import router as cultural_practices_router
+from app.crop.infrastructure.api import router as crop_router
 from fastapi.exceptions import RequestValidationError
 from app.infrastructure.common.exceptions_handler import (
     validation_exception_handler, 
@@ -38,7 +39,7 @@ app.include_router(user_router)
 app.include_router(farm_router)
 app.include_router(plot_router)
 app.include_router(cultural_practices_router)
-
+app.include_router(crop_router)
 @app.get("/")
 def root():
     """

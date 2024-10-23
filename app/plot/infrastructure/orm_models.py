@@ -15,5 +15,5 @@ class Plot(Base):
 
     unidad_area = relationship("UnitOfMeasure")
     finca = relationship("Farm", back_populates="lotes")
-    
     tareas = relationship("CulturalTask", back_populates="lote")
+    cultivos = relationship("Crop", back_populates="lote")
