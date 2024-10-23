@@ -33,7 +33,6 @@ class CulturalPracticesRepository:
                 nombre=task_data.nombre,
                 tipo_labor_id=task_data.tipo_labor_id,
                 fecha_inicio_estimada=task_data.fecha_inicio_estimada,
-                fecha_finalizacion=task_data.fecha_finalizacion,
                 descripcion=task_data.descripcion,
                 estado_id=task_data.estado_id,
                 lote_id=task_data.lote_id
