@@ -20,6 +20,21 @@ class CreateFarmUseCase:
 
     def create_farm(self, farm_data: FarmCreate, current_user: UserInDB) -> SuccessResponse:
         
+        # Validar que la unidad de medida exista
+        unit_of_measure = self.farm_repository.get_unit_of_measure_by_id(farm_data.unidad_area_id)
+        if not unit_of_measure:
+            raise DomainException(
+                message="La unidad de medida no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Validar que la unidad de medida sea de area
+        if self.farm_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != "Área":
+            raise DomainException(
+                message="La unidad de medida no es de área.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        
         existing_farm = self.farm_repository.get_farm_by_name(farm_data.nombre)
         
         if existing_farm:

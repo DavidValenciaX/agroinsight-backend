@@ -3,10 +3,9 @@ from datetime import date
 from typing import List, Optional
         
 class TaskCreate(BaseModel):
-    nombre: str = Field(..., max_length=255)
+    nombre: str = Field(..., min_length=3, max_length=255)
     tipo_labor_id: int
     fecha_inicio_estimada: date
-    fecha_finalizacion: Optional[date] = None
     descripcion: Optional[str] = Field(None, max_length=500)
     estado_id: int
     lote_id: int
