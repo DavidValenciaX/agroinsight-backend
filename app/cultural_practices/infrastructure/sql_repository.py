@@ -46,6 +46,15 @@ class CulturalPracticesRepository:
             self.db.rollback()
             print(f"Error al crear la tarea: {e}")
             return None
+        
+    def update_task(self, task: TaskCreate) -> bool:
+        try:
+            self.db.commit()
+            self.db.refresh(task)
+            return True
+        except Exception as e:
+            self.db.rollback()
+            return False
 
     def create_assignment(self, assignment_data_single: AssignmentCreateSingle) -> Assignment:
         try:

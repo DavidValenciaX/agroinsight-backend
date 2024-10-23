@@ -20,26 +20,26 @@ class CreateTaskUseCase:
         
     def create_task(self, task_data: TaskCreate, current_user: UserInDB) -> SuccessTaskCreateResponse:
         
-        # buscar el id de la finca por medio del id del lote
-        farm_id = self.plot_repository.get_farm_id_by_plot_id(task_data.lote_id)
-        if not farm_id:
+        plot = self.plot_repository.get_plot_by_id(task_data.lote_id)
+        if not plot:
             raise DomainException(
-                message="No se pudo obtener el id de la finca.",
+                message="No se pudo obtener el lote.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+        
+        # buscar el id de la finca por medio del id del lote
+        farm = self.farm_repository.get_farm_by_id(plot.finca_id)
+        if not farm:
+            raise DomainException(
+                message="No se pudo obtener la finca.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
         #validar que el usuario sea administrador de la finca
-        if not self.farm_service.user_is_farm_admin(current_user.id, farm_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, farm.id):
             raise DomainException(
                 message="No tienes permisos para crear tareas en esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
-            )
-        
-        #validar que el lote existe
-        if not self.plot_repository.get_plot_by_id(task_data.lote_id):
-            raise DomainException(
-                message="El lote especificado no existe.",
-                status_code=status.HTTP_404_NOT_FOUND
             )
         
         # Verificar si el tipo de labor cultural existe
@@ -55,12 +55,6 @@ class CreateTaskUseCase:
             raise DomainException(
                 message="El estado de tarea especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
-            )
-        
-        if task_state.nombre == self.task_service.COMPLETADA:
-            raise DomainException(
-                message=f"No se puede crear una tarea directamente en estado '{self.task_service.COMPLETADA}'.",
-                status_code=status.HTTP_400_BAD_REQUEST
             )
 
         # Crear la tarea
