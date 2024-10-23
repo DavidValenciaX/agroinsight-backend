@@ -47,6 +47,15 @@ class CropRepository:
             Optional[CornVariety]: La variedad de maíz si se encuentra, None en caso contrario.
         """
         return self.db.query(CornVariety).filter(CornVariety.id == variety_id).first()
+    
+    def get_all_corn_varieties(self) -> List[CornVariety]:
+        """
+        Obtiene todas las variedades de maíz disponibles.
+
+        Returns:
+            List[CornVariety]: Lista de todas las variedades de maíz.
+        """
+        return self.db.query(CornVariety).all()
 
     def get_unit_of_measure_by_id(self, unit_id: int) -> Optional[UnitOfMeasure]:
         """

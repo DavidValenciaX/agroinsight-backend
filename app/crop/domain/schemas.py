@@ -41,3 +41,12 @@ class PaginatedCropListResponse(BaseModel):
     per_page: int = Field(..., ge=1, le=100)
     total_pages: int
 
+class CornVarietyResponse(BaseModel):
+    id: int
+    nombre: str
+    descripcion: Optional[str]
+
+    model_config = ConfigDict(from_attributes=True)
+
+class CornVarietyListResponse(BaseModel):
+    varieties: List[CornVarietyResponse]
