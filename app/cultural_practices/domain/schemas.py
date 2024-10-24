@@ -1,6 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import date, timedelta
 from typing import List, Optional
+
+from app.infrastructure.utils.validators import validate_no_emojis
         
 class TaskCreate(BaseModel):
     nombre: str = Field(..., min_length=3, max_length=255)
@@ -9,6 +11,8 @@ class TaskCreate(BaseModel):
     descripcion: Optional[str] = Field(None, max_length=500)
     estado_id: int
     lote_id: int
+    
+    _validate_no_emojis = field_validator('nombre')(validate_no_emojis)
     
     @field_validator('fecha_inicio_estimada')
     def validar_fecha_inicio_estimada(cls, value):

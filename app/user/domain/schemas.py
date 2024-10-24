@@ -1,9 +1,9 @@
 import re
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from pydantic_core import PydanticCustomError
-from app.infrastructure.utils.validators import validate_email
+from app.infrastructure.utils.validators import validate_email, validate_no_emojis
 from zxcvbn import zxcvbn
 
 def validate_password(v: str) -> str:
@@ -101,48 +101,14 @@ class UserCreate(BaseModel):
         password (str): Contraseña del usuario.
     """
     email: str
-    nombre: str
-    apellido: str
+    nombre: str = Field(..., min_length=2)
+    apellido: str = Field(..., min_length=2)
     password: str
     
     _validate_email = field_validator('email')(validate_email)
     _validate_password = field_validator('password')(validate_password)
-
-    @field_validator('nombre')
-    def validate_nombre(cls, v: str) -> str:
-        """
-        Valida que el nombre tenga al menos 2 caracteres.
-
-        Args:
-            v (str): El nombre a validar.
-
-        Returns:
-            str: El nombre validado.
-
-        Raises:
-            PydanticCustomError: Si el nombre tiene menos de 2 caracteres.
-        """
-        if len(v) < 2:
-            raise PydanticCustomError('nombre_validation','El nombre debe tener al menos 2 caracteres.')
-        return v
-
-    @field_validator('apellido')
-    def validate_apellido(cls, v: str) -> str:
-        """
-        Valida que el apellido tenga al menos 2 caracteres.
-
-        Args:
-            v (str): El apellido a validar.
-
-        Returns:
-            str: El apellido validado.
-
-        Raises:
-            PydanticCustomError: Si el apellido tiene menos de 2 caracteres.
-        """
-        if len(v) < 2:
-            raise PydanticCustomError('apellido_validation','El apellido debe tener al menos 2 caracteres.')
-        return v
+    _validate_name = field_validator('nombre')(validate_no_emojis)
+    _validate_last_name = field_validator('apellido')(validate_no_emojis)
 
 class ResendPinConfirmRequest(BaseModel):
     """
