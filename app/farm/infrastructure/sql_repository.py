@@ -61,6 +61,17 @@ class FarmRepository:
         total = query.count()
         users = query.offset((page - 1) * per_page).limit(per_page).all()
         return total, users
+    
+    def list_farm_users_by_role_paginated(self, farm_id: int, role_id: int, page: int, per_page: int):
+        query = self.db.query(User) \
+            .join(UserFarmRole) \
+            .filter(
+                UserFarmRole.finca_id == farm_id, 
+                UserFarmRole.rol_id == role_id
+            )
+        total = query.count()
+        users = query.offset((page - 1) * per_page).limit(per_page).all()
+        return total, users
         
     def get_user_farm_role(self, user_id: int, farm_id: int, role_id: int) -> Optional[UserFarmRole]:
         return self.db.query(UserFarmRole).filter(

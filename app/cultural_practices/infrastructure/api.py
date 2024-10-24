@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskStateListResponse, TaskStateResponse
-from app.cultural_practices.application.create_assignment_use_case import CreateAssignmentUseCase
+from app.cultural_practices.application.assign_task_use_case import AssignTaskUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
@@ -78,9 +78,9 @@ def create_assignment(
     Raises:
         HTTPException: Si ocurre un error durante la creación de la asignación.
     """
-    create_assignment_use_case = CreateAssignmentUseCase(db)
+    assign_task_use_case = AssignTaskUseCase(db)
     try:
-        response = create_assignment_use_case.create_assignment(assignment, current_user)
+        response = assign_task_use_case.create_assignment(assignment, current_user)
         return JSONResponse(content=response.model_dump(), status_code=response.status_code)
     except DomainException as e:
         raise e

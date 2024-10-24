@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
+from app.user.application.services.user_service import UserService
 from app.user.infrastructure.sql_repository import UserRepository
 from app.farm.application.services.farm_service import FarmService
 from app.farm.domain.schemas import PaginatedFarmUserListResponse
@@ -15,7 +16,8 @@ class ListFarmUsersUseCase:
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
         self.farm_service = FarmService(db)
-    
+        self.user_service = UserService(db)
+        
     def list_farm_users(self, farm_id: int, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmUserListResponse:
         
         farm = self.farm_repository.get_farm_by_id(farm_id)
@@ -31,8 +33,10 @@ class ListFarmUsersUseCase:
                 message="No tienes permisos para obtener información de los usuarios de esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
+            
+        worker_role = self.user_repository.get_role_by_name(self.user_service.WORKER_ROLE_NAME)
 
-        total_users, users = self.farm_repository.list_farm_users_paginated(farm_id, page, per_page)
+        total_users, users = self.farm_repository.list_farm_users_by_role_paginated(farm_id, worker_role.id, page, per_page)
 
         user_responses = [map_user_for_farm_to_response(user) for user in users]
 

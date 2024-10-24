@@ -11,7 +11,7 @@ from fastapi import status
 
 from app.user.infrastructure.sql_repository import UserRepository
 
-class CreateAssignmentUseCase:
+class AssignTaskUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
