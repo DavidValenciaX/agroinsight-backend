@@ -34,24 +34,60 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
     errors = convert_errors(errors, CUSTOM_MESSAGES)
     error_details = []
+    
+    logger.info(f"Raw validation errors: {errors}")
+    
     for error in errors:
+        logger.info(f"Processing error: {error}")
+        logger.info(f"Error type: {error.get('type')}")
+        logger.info(f"Error message: {error.get('msg')}")
+        
+        # Procesamiento especial para errores de validación de email
+        if error.get("type") == "value_error" and isinstance(error.get("msg"), str):
+            try:
+                error_msg = error['msg']
+                # Remover el prefijo "Value error, " si existe
+                if error_msg.startswith("Value error, "):
+                    error_msg = error_msg[len("Value error, "):]
+                
+                logger.info(f"Cleaned error message: {error_msg}")
+                
+                # Verificar si es una lista de errores
+                if error_msg.startswith('[') and error_msg.endswith(']'):
+                    # Convertir string a lista usando ast.literal_eval (más seguro que eval)
+                    import ast
+                    error_list = ast.literal_eval(error_msg)
+                    logger.info(f"Parsed error list: {error_list}")
+                    
+                    for email_error in error_list:
+                        error_details.append({
+                            "field": "user_emails",
+                            "type": "email_validation",
+                            "message": [email_error]
+                        })
+                    continue
+            except Exception as e:
+                logger.error(f"Error parsing message: {str(e)}")
+                logger.error(f"Original message: {error['msg']}")
+                
+        # Procesamiento normal para otros tipos de errores
         error_detail = {
-            "field": error.get("loc", [""])[0],
+            "field": error.get("loc", [""])[1] if len(error.get("loc", [])) > 1 else error.get("loc", [""])[0],
             "type": error.get("type", ""),
-            "message": error["msg"].split('\n')
+            "message": [error["msg"]] if isinstance(error["msg"], str) else error["msg"]
         }
         error_details.append(error_detail)
 
     error_response = {
-            "error": {
-                "route": str(request.url),
-                "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY,
-                "message": "Error en la validación de los datos de entrada",
-                "details": error_details
-            }
+        "error": {
+            "route": str(request.url),
+            "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "message": "Error en la validación de los datos de entrada",
+            "details": error_details
+        }
     }
     
-    logger.error(f"Validation error: {error_response}")
+    logger.info(f"Final error response: {error_response}")
 
     return JSONResponse(
         status_code=422,

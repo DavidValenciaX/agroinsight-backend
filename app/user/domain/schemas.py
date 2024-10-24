@@ -3,24 +3,7 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 from pydantic_core import PydanticCustomError
-
-def validate_email(v: str) -> str:
-    """
-    Valida el formato de una dirección de correo electrónico.
-
-    Args:
-        v (str): La dirección de correo electrónico a validar.
-
-    Returns:
-        str: La dirección de correo electrónico validada.
-
-    Raises:
-        PydanticCustomError: Si la dirección de correo electrónico no es válida.
-    """
-    email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    if not re.match(email_regex, v):
-        raise PydanticCustomError('email_validation', 'El correo electrónico no es válido. Debe contener un @ y un dominio válido.')
-    return v
+from app.infrastructure.utils.validators import validate_email
 
 def validate_password(v: str) -> str:
     """

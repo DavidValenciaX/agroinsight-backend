@@ -1,7 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, ValidationError
 from decimal import Decimal
 from typing import List
-
+from app.infrastructure.utils.validators import validate_email_format
 from app.user.domain.schemas import UserForFarmResponse
 
 class FarmCreate(BaseModel):
@@ -31,6 +31,19 @@ class PaginatedFarmListResponse(BaseModel):
 class FarmUserAssignmentByEmail(BaseModel):
     farm_id: int
     user_emails: List[str]
+    
+    @field_validator('user_emails')
+    def validate_emails(cls, emails):
+        validation_errors = []
+        for email in emails:
+            try:
+                validate_email_format(email)
+            except ValueError as e:
+                validation_errors.append(f"Email '{email}': {str(e)}")
+        
+        if validation_errors:
+            raise ValueError(validation_errors)
+        return emails
 
 class PaginatedFarmUserListResponse(BaseModel):
     users: List[UserForFarmResponse]
