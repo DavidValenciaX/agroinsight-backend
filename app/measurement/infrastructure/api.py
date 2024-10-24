@@ -4,7 +4,7 @@ from typing import List
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.measurement.domain.schemas import UnitOfMeasureResponse, UnitsListResponse
+from app.measurement.domain.schemas import UnitsListResponse
 from app.measurement.application.list_units_use_case import ListUnitsUseCase
 from app.user.domain.schemas import UserInDB
 

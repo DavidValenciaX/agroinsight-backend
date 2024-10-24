@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
-from app.measurement.domain.schemas import UnitsListResponse, UnitOfMeasureResponse
+from app.measurement.domain.schemas import UnitsListResponse
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
-from typing import List
 
 class ListUnitsUseCase:
     """
