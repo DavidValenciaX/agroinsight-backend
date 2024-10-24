@@ -9,6 +9,7 @@ from zxcvbn import zxcvbn
 def validate_password(v: str) -> str:
     """
     Valida la fortaleza de una contraseña con criterios avanzados.
+    Acepta caracteres ASCII imprimibles [RFC20] y Unicode [ISO/ISC 10646].
 
     Args:
         v (str): La contraseña a validar.
@@ -21,7 +22,12 @@ def validate_password(v: str) -> str:
     """
     errors = []
     
-    # Validaciones básicas de longitud
+    # Validación de caracteres permitidos
+    ascii_printable = set(range(32, 127))  # Caracteres ASCII imprimibles incluyendo espacio
+    if not all(ord(char) in ascii_printable or ord(char) > 127 for char in v):
+        errors.append('La contraseña solo puede contener caracteres ASCII imprimibles o Unicode válidos.')
+
+    # Validaciones básicas de longitud (contando cada carácter Unicode como uno solo)
     if len(v) < 12:
         errors.append('La contraseña debe tener al menos 12 caracteres.')
     if len(v) > 64:
