@@ -55,6 +55,13 @@ class CreateCropUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
+        # verificar que la unidad de medida para densidad de siembra sea de densidad de siembra
+        if self.farm_repository.get_unit_category_by_id(crop_data.densidad_siembra_unidad_id).nombre != self.farm_service.UNIT_CATEGORY_PLANTING_DENSITY_NAME:
+            raise DomainException(
+                message="La unidad de medida elegida no es de densidad de siembra.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+            
         # Verificar si el estado del cultivo existe
         if not self.crop_repository.get_crop_state_by_id(crop_data.estado_id):
             raise DomainException(
