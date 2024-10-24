@@ -21,8 +21,12 @@ def validate_password(v: str) -> str:
     errors = []
     if len(v) < 12:
         errors.append('La contraseña debe tener al menos 12 caracteres.')
+    if len(v) > 64:
+        errors.append('La contraseña no debe exceder los 64 caracteres.')
     if not re.search(r'\d', v):
         errors.append('La contraseña debe contener al menos un número.')
+    if not re.search(r'[A-Z]', v):
+        errors.append('La contraseña debe contener al menos una letra mayúscula.')
     if not re.search(r'[a-zA-Z]', v):
         errors.append('La contraseña debe contener al menos una letra.')
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
