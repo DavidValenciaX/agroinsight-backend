@@ -9,6 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 CUSTOM_MESSAGES = {
+    # Errores existentes
     'missing': 'El campo es requerido',
     'value_error.missing': 'El campo es requerido',
     'int_parsing': 'La entrada debe ser un número entero válido',
@@ -17,6 +18,68 @@ CUSTOM_MESSAGES = {
     'less_than': 'La entrada debe ser menor a {lt}',
     'greater_than_equal': 'La entrada debe ser mayor o igual a {ge}',
     'greater_than': 'La entrada debe ser mayor a {gt}',
+    'min_length': 'La entrada debe tener al menos {min_length} caracteres',
+    'max_length': 'La entrada debe tener como máximo {max_length} caracteres',
+    'decimal_parsing': 'La entrada debe ser un número decimal válido',
+    'string_type': 'El valor debe ser una cadena de texto',
+    
+    # Validaciones de tipos básicos
+    'type_error': 'Tipo de dato inválido',
+    'type_error.integer': 'El valor debe ser un número entero',
+    'type_error.float': 'El valor debe ser un número decimal',
+    'type_error.str': 'El valor debe ser una cadena de texto',
+    'type_error.bool': 'El valor debe ser verdadero o falso',
+    'type_error.list': 'El valor debe ser una lista',
+    'type_error.dict': 'El valor debe ser un objeto',
+    
+    # Validaciones de strings
+    'string_pattern_mismatch': 'El valor no coincide con el patrón requerido',
+    'string_too_short': 'La cadena debe tener al menos {min_length} caracteres',
+    'string_too_long': 'La cadena no debe tener más de {max_length} caracteres',
+    'string_contains': 'La cadena debe contener "{pattern}"',
+    'string_starts_with': 'La cadena debe comenzar con "{pattern}"',
+    'string_ends_with': 'La cadena debe terminar con "{pattern}"',
+    
+    # Validaciones numéricas
+    'number.not_gt': 'El número debe ser mayor que {gt}',
+    'number.not_ge': 'El número debe ser mayor o igual que {ge}',
+    'number.not_lt': 'El número debe ser menor que {lt}',
+    'number.not_le': 'El número debe ser menor o igual que {le}',
+    'number.multiple_of': 'El número debe ser múltiplo de {multiple_of}',
+    
+    # Validaciones de fecha/hora
+    'date_parsing': 'Formato de fecha inválido',
+    'time_parsing': 'Formato de hora inválido',
+    'datetime_parsing': 'Formato de fecha y hora inválido',
+    
+    # Validaciones de email
+    'value_error.email': 'Email inválido',
+    
+    # Validaciones de URL
+    'value_error.url': 'URL inválida',
+    'value_error.url.scheme': 'La URL debe comenzar con {scheme}',
+    
+    # Validaciones de lista
+    'list.min_items': 'La lista debe tener al menos {min_items} elementos',
+    'list.max_items': 'La lista no debe tener más de {max_items} elementos',
+    'list.unique_items': 'La lista debe contener elementos únicos',
+    
+    # Validaciones de conjunto
+    'set.min_items': 'El conjunto debe tener al menos {min_items} elementos',
+    'set.max_items': 'El conjunto no debe tener más de {max_items} elementos',
+    
+    # Validaciones de diccionario
+    'dict.min_items': 'El diccionario debe tener al menos {min_items} elementos',
+    'dict.max_items': 'El diccionario no debe tener más de {max_items} elementos',
+    
+    # Otros errores comunes
+    'value_error.const': 'Valor no permitido',
+    'value_error.regex': 'El valor no coincide con el patrón requerido',
+    'value_error.number.not_finite': 'El número debe ser finito',
+    'value_error.number.not_multiple_of': 'El número debe ser múltiplo de {multiple_of}',
+    'value_error.uuid': 'UUID inválido',
+    'value_error.ip_v4': 'Dirección IPv4 inválida',
+    'value_error.ip_v6': 'Dirección IPv6 inválida',
 }
 
 def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[Dict]:

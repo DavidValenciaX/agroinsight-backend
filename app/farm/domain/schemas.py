@@ -5,8 +5,8 @@ from app.infrastructure.utils.validators import validate_email_format
 from app.user.domain.schemas import UserForFarmResponse
 
 class FarmCreate(BaseModel):
-    nombre: str = Field(..., min_length=1, max_length=100)
-    ubicacion: str = Field(..., min_length=1, max_length=255)
+    nombre: str = Field(..., min_length=2, max_length=100)
+    ubicacion: str = Field(..., min_length=2, max_length=255)
     area_total: Decimal = Field(..., gt=0)
     unidad_area_id: int
 
