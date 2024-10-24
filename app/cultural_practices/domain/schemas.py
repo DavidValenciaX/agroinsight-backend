@@ -12,7 +12,9 @@ class TaskCreate(BaseModel):
     estado_id: int
     lote_id: int
     
-    _validate_no_emojis = field_validator('nombre')(validate_no_emojis)
+    @field_validator('nombre')
+    def validate_no_emojis_nombre(cls, value):
+        return validate_no_emojis(value)
     
     @field_validator('fecha_inicio_estimada')
     def validar_fecha_inicio_estimada(cls, value):
