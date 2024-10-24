@@ -105,10 +105,21 @@ class UserCreate(BaseModel):
     apellido: str = Field(..., min_length=2)
     password: str
     
-    _validate_email = field_validator('email')(validate_email)
-    _validate_password = field_validator('password')(validate_password)
-    _validate_name = field_validator('nombre')(validate_no_emojis)
-    _validate_last_name = field_validator('apellido')(validate_no_emojis)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
+    
+    @field_validator('password')
+    def validate_password(cls, v):
+        return validate_password(v)
+    
+    @field_validator('nombre')
+    def validate_no_emojis_nombre(cls, v):
+        return validate_no_emojis(v)
+    
+    @field_validator('apellido')
+    def validate_no_emojis_apellido(cls, v):
+        return validate_no_emojis(v)
 
 class ResendPinConfirmRequest(BaseModel):
     """
@@ -119,7 +130,9 @@ class ResendPinConfirmRequest(BaseModel):
     """
     email: str
     
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
 
 class ConfirmationRequest(BaseModel):
     """
@@ -132,7 +145,9 @@ class ConfirmationRequest(BaseModel):
     email: str
     pin: str
     
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
     
 class RoleFarm(BaseModel):
     """
@@ -172,8 +187,13 @@ class UserInDB(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
         
-    _validate_email = field_validator('email')(validate_email)
-    _validate_password = field_validator('password')(validate_password)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
+    
+    @field_validator('password')
+    def validate_password(cls, v):
+        return validate_password(v)
 
 class UserResponse(BaseModel):
     """
@@ -218,7 +238,9 @@ class LoginRequest(BaseModel):
     email: str
     password: str
     
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
     
 class TwoFactorAuthRequest(BaseModel):
     """
@@ -231,7 +253,9 @@ class TwoFactorAuthRequest(BaseModel):
     email: str
     pin: str
     
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
     
 class Resend2FARequest(BaseModel):
     """
@@ -242,7 +266,9 @@ class Resend2FARequest(BaseModel):
     """
     email: str
     
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
     
 class TokenResponse(BaseModel):
     """
@@ -270,7 +296,9 @@ class UserUpdate(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
         
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
 
 class PasswordRecoveryRequest(BaseModel):
     """
@@ -281,7 +309,9 @@ class PasswordRecoveryRequest(BaseModel):
     """
     email: str
     
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
 
 class PinConfirmationRequest(BaseModel):
     """
@@ -294,7 +324,9 @@ class PinConfirmationRequest(BaseModel):
     email: str
     pin: str
     
-    _validate_email = field_validator('email')(validate_email)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
 
 class PasswordResetRequest(BaseModel):
     """
@@ -307,6 +339,11 @@ class PasswordResetRequest(BaseModel):
     email: str
     new_password: str
     
-    _validate_email = field_validator('email')(validate_email)
-    _validate_password = field_validator('new_password')(validate_password)
+    @field_validator('email')
+    def validate_email(cls, v):
+        return validate_email(v)
+    
+    @field_validator('new_password')
+    def validate_password(cls, v):
+        return validate_password(v)
 

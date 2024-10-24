@@ -11,7 +11,9 @@ class PlotCreate(BaseModel):
     longitud: Decimal = Field(..., ge=-180, le=180)
     finca_id: int
     
-    _validate_no_emojis = field_validator('nombre')(validate_no_emojis)
+    @field_validator('nombre')
+    def validate_no_emojis_nombre(cls, v):
+        return validate_no_emojis(v)
 
 class PlotResponse(BaseModel):
     id: int

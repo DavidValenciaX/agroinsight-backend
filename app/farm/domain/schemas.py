@@ -10,8 +10,13 @@ class FarmCreate(BaseModel):
     area_total: Decimal = Field(..., gt=0)
     unidad_area_id: int
     
-    _validate_no_emojis = field_validator('nombre')(validate_no_emojis)
-    _validate_no_emojis = field_validator('ubicacion')(validate_no_emojis)
+    @field_validator('nombre')
+    def validate_no_emojis_nombre(cls, v):
+        return validate_no_emojis(v)
+    
+    @field_validator('ubicacion')
+    def validate_no_emojis_ubicacion(cls, v):
+        return validate_no_emojis(v)
 
 class FarmResponse(BaseModel):
     id: int
