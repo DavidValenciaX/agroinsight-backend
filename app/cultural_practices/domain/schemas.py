@@ -57,3 +57,11 @@ class TaskStateResponse(BaseModel):
     
 class TaskStateListResponse(BaseModel):
     states: List[TaskStateResponse]
+
+class TaskTypeResponse(BaseModel):
+    id: int
+    nombre: str
+    descripcion: Optional[str] = None
+    
+class TaskTypeListResponse(BaseModel):
+    task_types: List[TaskTypeResponse]

@@ -84,3 +84,6 @@ class CulturalPracticesRepository:
         total_tasks = query.count()
         tasks = query.offset((page - 1) * per_page).limit(per_page).all()
         return total_tasks, tasks
+
+    def get_task_types(self) -> List[CulturalTaskType]:
+        return self.db.query(CulturalTaskType).all()

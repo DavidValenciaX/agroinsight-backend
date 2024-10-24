@@ -7,7 +7,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskStateListResponse, TaskStateResponse
+from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskStateListResponse, TaskTypeListResponse
 from app.cultural_practices.application.assign_task_use_case import AssignTaskUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
@@ -18,6 +18,7 @@ from app.user.domain.schemas import UserInDB
 from app.cultural_practices.application.list_tasks_by_user_and_farm_use_case import ListTasksByUserAndFarmUseCase
 from app.cultural_practices.application.change_task_state_use_case import ChangeTaskStateUseCase
 from app.cultural_practices.application.list_task_states_use_case import ListTaskStatesUseCase
+from app.cultural_practices.application.list_task_types_use_case import ListTaskTypesUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -186,4 +187,33 @@ def change_task_state(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al cambiar de estado la tarea: {str(e)}"
+        )
+
+@router.get("/tasks/types", response_model=TaskTypeListResponse, status_code=status.HTTP_200_OK)
+def list_task_types(
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Lista todos los tipos de labor cultural disponibles.
+
+    Parameters:
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        TaskTypeListResponse: Una lista de tipos de labor cultural.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de los tipos de labor cultural.
+    """
+    list_task_types_use_case = ListTaskTypesUseCase(db)
+    try:
+        return list_task_types_use_case.list_task_types(current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar los tipos de labor cultural: {str(e)}"
         )
