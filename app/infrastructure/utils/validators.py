@@ -55,3 +55,21 @@ def validate_no_emojis(text: str) -> str:
     if emoji_pattern.search(text):
         raise ValueError("El texto no puede contener emojis, símbolos o pictogramas.")
     return text
+
+def validate_no_special_chars(text: str) -> str:
+    """
+    Valida que el texto no contenga caracteres especiales.
+    
+    Args:
+        text (str): Texto a validar
+        
+    Returns:
+        str: El texto validado
+        
+    Raises:
+        ValueError: Si el texto contiene caracteres especiales
+    """
+    special_chars_pattern = r'[!@#$%^&*(),.?":{}|<>\[\];\'`~]'
+    if re.search(special_chars_pattern, text):
+        raise ValueError("El texto no puede contener caracteres especiales como puntos, comas, asteriscos, etc.")
+    return text

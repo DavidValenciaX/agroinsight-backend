@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator, ValidationError
 from decimal import Decimal
 from typing import List
-from app.infrastructure.utils.validators import validate_email_format, validate_no_emojis
+from app.infrastructure.utils.validators import validate_email_format, validate_no_emojis, validate_no_special_chars
 from app.user.domain.schemas import UserForFarmResponse
 
 class FarmCreate(BaseModel):
@@ -14,9 +14,17 @@ class FarmCreate(BaseModel):
     def validate_no_emojis_nombre(cls, v):
         return validate_no_emojis(v)
     
+    @field_validator('nombre')
+    def validate_no_special_chars_nombre(cls, v):
+        return validate_no_special_chars(v)
+    
     @field_validator('ubicacion')
     def validate_no_emojis_ubicacion(cls, v):
         return validate_no_emojis(v)
+    
+    @field_validator('ubicacion')
+    def validate_no_special_chars_ubicacion(cls, v):
+        return validate_no_special_chars(v)
 
 class FarmResponse(BaseModel):
     id: int

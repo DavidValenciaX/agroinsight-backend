@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from decimal import Decimal
 from typing import List
-from app.infrastructure.utils.validators import validate_no_emojis
+from app.infrastructure.utils.validators import validate_no_emojis, validate_no_special_chars
 
 class PlotCreate(BaseModel):
     nombre: str = Field(..., min_length=1, max_length=100)
@@ -14,6 +14,10 @@ class PlotCreate(BaseModel):
     @field_validator('nombre')
     def validate_no_emojis_nombre(cls, v):
         return validate_no_emojis(v)
+    
+    @field_validator('nombre')
+    def validate_no_special_chars_nombre(cls, v):
+        return validate_no_special_chars(v)
 
 class PlotResponse(BaseModel):
     id: int
