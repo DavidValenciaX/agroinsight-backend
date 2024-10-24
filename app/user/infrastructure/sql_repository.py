@@ -232,7 +232,10 @@ class UserRepository:
         Agrega una verificación de dos pasos a la base de datos.
 
         Args:
-            verification (TwoStepVerification): Objeto de verificación de dos pasos a agregar.
+            user_id (int): ID del usuario.
+            pin_hash (str): Hash del PIN de verificación.
+            expiration_datetime (datetime): Fecha y hora de expiración.
+            created_at (datetime): Fecha y hora de creación.
 
         Returns:
             bool: True si se agregó con éxito, False en caso de error.
@@ -295,7 +298,10 @@ class UserRepository:
         Agrega una recuperación de contraseña a la base de datos.
 
         Args:
-            recovery (PasswordRecovery): Objeto de recuperación de contraseña a agregar.
+            user_id (int): ID del usuario.
+            pin (str): PIN de recuperación.
+            expiration_datetime (datetime): Fecha y hora de expiración.
+            created_at (datetime): Fecha y hora de creación.
 
         Returns:
             bool: True si se agregó con éxito, False en caso de error.

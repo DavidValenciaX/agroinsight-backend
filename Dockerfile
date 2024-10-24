@@ -1,5 +1,5 @@
 # Usa una imagen base de Python
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
 # Establece el directorio de trabajo
 WORKDIR /code
