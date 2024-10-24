@@ -137,7 +137,7 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
         error_detail = {
             "field": error.get("loc", [""])[1] if len(error.get("loc", [])) > 1 else error.get("loc", [""])[0],
             "type": error.get("type", ""),
-            "message": [error["msg"]] if isinstance(error["msg"], str) else error["msg"]
+            "message": [error["msg"].split('\n')] if isinstance(error["msg"], str) else error["msg"]
         }
         error_details.append(error_detail)
 

@@ -7,7 +7,7 @@ from app.infrastructure.utils.validators import validate_email
 
 def validate_password(v: str) -> str:
     """
-    Valida la fortaleza de una contraseña.
+    Valida la fortaleza de una contraseña con criterios avanzados.
 
     Args:
         v (str): La contraseña a validar.
@@ -19,19 +19,61 @@ def validate_password(v: str) -> str:
         PydanticCustomError: Si la contraseña no cumple con los requisitos de seguridad.
     """
     errors = []
+    
+    # Validaciones básicas de longitud
     if len(v) < 12:
         errors.append('La contraseña debe tener al menos 12 caracteres.')
     if len(v) > 64:
         errors.append('La contraseña no debe exceder los 64 caracteres.')
+
+    # Validaciones de caracteres requeridos
     if not re.search(r'\d', v):
         errors.append('La contraseña debe contener al menos un número.')
     if not re.search(r'[A-Z]', v):
         errors.append('La contraseña debe contener al menos una letra mayúscula.')
-    if not re.search(r'[a-zA-Z]', v):
-        errors.append('La contraseña debe contener al menos una letra.')
+    if not re.search(r'[a-z]', v):
+        errors.append('La contraseña debe contener al menos una letra minúscula.')
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
         errors.append('La contraseña debe contener al menos un carácter especial.')
+
+    # Validación de patrones repetitivos
+    if re.search(r'(.)\1{2,}', v):
+        errors.append('La contraseña no debe contener caracteres repetidos más de 2 veces seguidas.')
     
+    # Validación de secuencias comunes
+    secuencias_comunes = [
+        'qwerty', 'asdfgh', '123456', 'abcdef',
+        'password', 'contraseña', 'admin123', '123abc'
+    ]
+    v_lower = v.lower()
+    for secuencia in secuencias_comunes:
+        if secuencia in v_lower:
+            errors.append('La contraseña no debe contener secuencias comunes o predecibles.')
+            break
+
+    # Validación de patrones de teclado
+    patrones_teclado = [
+        'qwerty', 'asdfgh', 'zxcvbn', 'qazwsx',
+        '123456', '098765'
+    ]
+    for patron in patrones_teclado:
+        if patron in v_lower:
+            errors.append('La contraseña no debe contener patrones de teclado.')
+            break
+
+    # Validación de entropía
+    def calcular_entropia(password: str) -> float:
+        # Calcula la entropía basada en la variedad de caracteres y su distribución
+        char_count = {}
+        for char in password:
+            char_count[char] = char_count.get(char, 0) + 1
+        
+        entropia = len(set(password)) * len(password) / max(char_count.values())
+        return entropia
+
+    if calcular_entropia(v) < 30:  # El valor 30 es un ejemplo, ajustar según necesidades
+        errors.append('La contraseña debe tener mayor variedad de caracteres y mejor distribución.')
+
     if errors:
         message = '\n'.join(errors)
         raise PydanticCustomError('password_validation', message)
