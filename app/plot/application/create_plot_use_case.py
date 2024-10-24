@@ -26,32 +26,40 @@ class CreatePlotUseCase:
             )
             
         # validar que la unidad de medida sea de area
-        if self.farm_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != "Área":
+        if self.farm_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != self.farm_service.UNIT_CATEGORY_AREA_NAME:
             raise DomainException(
                 message="La unidad de medida no es de área.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
             
         # validar que la finca exista
-        if not self.farm_repository.get_farm_by_id(plot_data.finca_id):
+        farm = self.farm_repository.get_farm_by_id(plot_data.finca_id)
+        if not farm:
             raise DomainException(
                 message="La finca no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
         #Validar si el usuario tiene permiso para crear lotes en la finca
-        if not self.farm_service.user_is_farm_admin(current_user.id, plot_data.finca_id):
+        if not self.farm_service.user_is_farm_admin(current_user.id, farm.id):
             raise DomainException(
                 message="No tienes permisos para crear lotes en esta finca.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
         
         # Verificar si ya existe un lote con el mismo nombre en la misma finca
-        existing_plot = self.plot_repository.get_plot_by_name_and_farm(plot_data.nombre, plot_data.finca_id)
+        existing_plot = self.plot_repository.get_plot_by_name_and_farm(plot_data.nombre, farm.id)
         if existing_plot:
             raise DomainException(
                 message="Ya existe un lote con este nombre en la finca.",
                 status_code=status.HTTP_409_CONFLICT
+            )
+            
+        # validar que el area del lote que se quiere crear no exceda el area de la finca
+        if plot_data.area > farm.area_total:
+            raise DomainException(
+                message="El área del lote que se quiere crear no puede ser mayor al área de la finca.",
+                status_code=status.HTTP_400_BAD_REQUEST
             )
 
         # Crear el lote

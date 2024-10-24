@@ -29,7 +29,7 @@ class CreateFarmUseCase:
             )
             
         # Validar que la unidad de medida sea de area
-        if self.farm_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != "Área":
+        if self.farm_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != self.farm_service.UNIT_CATEGORY_AREA_NAME:
             raise DomainException(
                 message="La unidad de medida no es de área.",
                 status_code=status.HTTP_400_BAD_REQUEST
