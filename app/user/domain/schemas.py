@@ -4,6 +4,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 from pydantic_core import PydanticCustomError
 from app.infrastructure.utils.validators import validate_email
+from zxcvbn import zxcvbn
 
 def validate_password(v: str) -> str:
     """
@@ -73,6 +74,10 @@ def validate_password(v: str) -> str:
 
     if calcular_entropia(v) < 30:  # El valor 30 es un ejemplo, ajustar según necesidades
         errors.append('La contraseña debe tener mayor variedad de caracteres y mejor distribución.')
+
+    result = zxcvbn(v)
+    if result['score'] < 3:  # scores van de 0 a 4
+        errors.append(f'La contraseña es demasiado débil: {result["feedback"]["warning"]}')
 
     if errors:
         message = '\n'.join(errors)
@@ -332,3 +337,4 @@ class PasswordResetRequest(BaseModel):
     
     _validate_email = field_validator('email')(validate_email)
     _validate_password = field_validator('new_password')(validate_password)
+
