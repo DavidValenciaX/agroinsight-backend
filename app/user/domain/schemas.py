@@ -3,7 +3,7 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from pydantic_core import PydanticCustomError
-from app.infrastructure.utils.validators import validate_email, validate_no_emojis, validate_no_special_chars
+from app.infrastructure.utils.validators import validate_email, validate_no_emojis, validate_no_special_chars, validate_no_xss
 from zxcvbn import zxcvbn
 
 def validate_password(v: str) -> str:
@@ -121,6 +121,10 @@ class UserCreate(BaseModel):
     def validate_no_special_chars_nombre(cls, v):
         return validate_no_special_chars(v)
     
+    @field_validator('nombre')
+    def validate_no_xss_nombre(cls, v):
+        return validate_no_xss(v)
+    
     @field_validator('apellido')
     def validate_no_emojis_apellido(cls, v):
         return validate_no_emojis(v)
@@ -128,6 +132,10 @@ class UserCreate(BaseModel):
     @field_validator('apellido')
     def validate_no_special_chars_apellido(cls, v):
         return validate_no_special_chars(v)
+    
+    @field_validator('apellido')
+    def validate_no_xss_apellido(cls, v):
+        return validate_no_xss(v)
 
 class ResendPinConfirmRequest(BaseModel):
     """

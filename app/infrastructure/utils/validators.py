@@ -73,3 +73,35 @@ def validate_no_special_chars(text: str) -> str:
     if re.search(special_chars_pattern, text):
         raise ValueError("El texto no puede contener caracteres especiales como puntos, comas, asteriscos, etc.")
     return text
+
+def validate_no_xss(text: str) -> str:
+    """
+    Valida que el texto no contenga potenciales ataques XSS.
+    
+    Args:
+        text (str): Texto a validar
+        
+    Returns:
+        str: El texto validado
+        
+    Raises:
+        ValueError: Si el texto contiene patrones de XSS
+    """
+    xss_patterns = [
+        r'<[^>]*script',          # Etiquetas script
+        r'javascript:',           # javascript: URLs
+        r'on\w+\s*=',             # Eventos inline (onclick, onload, etc.)
+        r'data:',                 # Detecta data: URLs
+        r'expression\s*\(',       # expression()
+        r'vbscript:',             # vbscript: URLs
+        r'@import\s+',            # @import CSS
+        r'<\s*iframe',            # iframes
+        r'document\s*\.',         # Acceso al objeto document
+        r'window\s*\.',           # Acceso al objeto window
+        r'<[^>]*>',               # Detecta cualquier etiqueta HTML
+    ]
+    
+    for pattern in xss_patterns:
+        if re.search(pattern, text, re.IGNORECASE):
+            raise ValueError("El texto contiene patrones potencialmente peligrosos de XSS.")
+    return text
