@@ -29,8 +29,6 @@ class CropResponse(BaseModel):
     costo_produccion: Optional[Decimal]
     moneda_id: Optional[int]
     fecha_venta: Optional[date]
-    fecha_creacion: date
-    fecha_modificacion: Optional[date]
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -116,3 +116,20 @@ class CropRepository:
             Crop.lote_id == plot_id,
             Crop.estado_id.in_(active_state_ids)
         ).first() is not None
+
+    def get_crops_by_plot_id_paginated(self, plot_id: int, page: int, per_page: int) -> tuple[int, List[Crop]]:
+        """
+        Obtiene todos los cultivos asociados a un lote específico con paginación.
+
+        Args:
+            plot_id (int): ID del lote.
+            page (int): Número de página.
+            per_page (int): Cantidad de elementos por página.
+
+        Returns:
+            tuple[List[Crop], int]: Lista de cultivos y total de cultivos.
+        """
+        query = self.db.query(Crop).filter(Crop.lote_id == plot_id)
+        total_crops = query.count()
+        crops = query.offset((page - 1) * per_page).limit(per_page).all()
+        return total_crops, crops

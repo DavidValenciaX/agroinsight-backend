@@ -46,8 +46,6 @@ class Crop(Base):
     costo_produccion = Column(DECIMAL(15, 2))
     moneda_id = Column(Integer, ForeignKey('moneda.id'))
     fecha_venta = Column(Date)
-    fecha_creacion = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.timezone('UTC', func.current_timestamp()))
-    fecha_modificacion = Column(TIMESTAMP(timezone=True))
 
     # Relaciones
     lote = relationship("Plot", back_populates="cultivos")
