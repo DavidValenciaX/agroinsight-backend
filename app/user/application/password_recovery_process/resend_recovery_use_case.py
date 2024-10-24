@@ -7,6 +7,7 @@ from app.user.application.services.user_state_validator import UserState, UserSt
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.application.services.user_service import UserService
+from app.infrastructure.config.settings import WARNING_TIME
 
 class ResendRecoveryUseCase:
     """
@@ -73,7 +74,7 @@ class ResendRecoveryUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        warning_time = 3
+        warning_time = WARNING_TIME
 
         if recovery.resends > 0:
             if self.user_service.is_recently_requested(recovery, warning_time):

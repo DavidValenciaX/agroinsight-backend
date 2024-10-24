@@ -9,6 +9,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserNot
 from app.user.application.services.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.application.services.user_service import UserService
+from app.infrastructure.config.settings import WARNING_TIME
 
 class PasswordRecoveryUseCase:
     """
@@ -65,7 +66,7 @@ class PasswordRecoveryUseCase:
         if state_validation_result:
             return state_validation_result
         
-        warning_time = 3
+        warning_time = WARNING_TIME
         recovery = self.user_service.get_last(user.recuperacion_contrasena)
         if recovery and self.user_service.is_recently_requested(recovery, warning_time):
             raise DomainException(

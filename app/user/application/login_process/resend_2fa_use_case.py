@@ -15,6 +15,7 @@ from app.infrastructure.services.email_service import send_email
 from app.infrastructure.common.common_exceptions import DomainException, UserNotRegisteredException
 from app.user.application.services.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.common.datetime_utils import datetime_utc_time
+from app.infrastructure.config.settings import WARNING_TIME
 
 class Resend2faUseCase:
     """
@@ -80,7 +81,7 @@ class Resend2faUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
-        warning_time = 3
+        warning_time = WARNING_TIME
         
         if verification.resends > 0:
             if self.user_service.is_recently_requested(verification, warning_time):

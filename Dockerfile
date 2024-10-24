@@ -18,14 +18,6 @@ RUN poetry config virtualenvs.create false && \
 # Segunda etapa: imagen final
 FROM python:3.12-slim
 
-# Declara los Parameters para las variables de entorno que necesitas
-ARG DATABASE_URL
-ARG SECRET_KEY
-
-# Establece las variables de entorno usando los Parameters, con valores por defecto
-ENV DATABASE_URL=$DATABASE_URL \
-    SECRET_KEY=$SECRET_KEY
-    
 WORKDIR /code
 
 # Copia las dependencias instaladas desde la etapa del builder

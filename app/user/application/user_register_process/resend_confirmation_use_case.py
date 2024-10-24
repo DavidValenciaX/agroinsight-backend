@@ -15,6 +15,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserNot
 from app.infrastructure.services.pin_service import generate_pin
 from app.infrastructure.services.email_service import send_email
 from app.infrastructure.common.datetime_utils import datetime_utc_time
+from app.infrastructure.config.settings import WARNING_TIME
 
 class ResendConfirmationUseCase:
     """
@@ -89,7 +90,7 @@ class ResendConfirmationUseCase:
             )
             
         # Definimos el tiempo de espera en minutos
-        warning_time = 3
+        warning_time = WARNING_TIME
 
         # Si es el primer reenvío (resends == 0), permitir sin restricción
         if confirmation.resends > 0:

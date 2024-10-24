@@ -11,6 +11,7 @@ from app.infrastructure.common.common_exceptions import DomainException, UserHas
 from app.user.application.services.user_state_validator import UserState, UserStateValidator
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.user.application.services.user_service import UserService
+from app.infrastructure.config.settings import WARNING_TIME
 
 class LoginUseCase:
     """
@@ -79,7 +80,7 @@ class LoginUseCase:
         verification = self.user_service.get_last(user.verificacion_dos_pasos)
             
         # Verificar si ya se ha enviado un PIN en los ltimos 3 minutos
-        warning_time = 3
+        warning_time = WARNING_TIME
 
         if verification:
             if self.user_service.is_recently_requested(verification, warning_time):

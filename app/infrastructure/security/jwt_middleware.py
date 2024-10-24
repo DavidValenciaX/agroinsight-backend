@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Security, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials 
+from fastapi.security import HTTPAuthorizationCredentials 
 from jose import jwt, JWTError
 from fastapi import status
 from datetime import datetime, timezone

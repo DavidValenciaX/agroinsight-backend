@@ -8,13 +8,7 @@ from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.orm_models import UserConfirmation, TwoStepVerification, PasswordRecovery, UserState
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
-import os
-from dotenv import load_dotenv
-
-load_dotenv(override=True)
-
-DEFAULT_EXPIRATION_TIME = int(os.getenv('DEFAULT_EXPIRATION_TIME', 10))
-
+from app.infrastructure.config.settings import DEFAULT_EXPIRATION_TIME
 
 class UserService:
     # Constantes para roles
