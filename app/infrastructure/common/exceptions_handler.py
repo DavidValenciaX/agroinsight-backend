@@ -14,7 +14,9 @@ CUSTOM_MESSAGES = {
     'int_parsing': 'La entrada debe ser un número entero válido',
     'json_invalid': 'Error de decodificación de json',
     'less_than_equal': 'La entrada debe ser menor o igual a {le}',
+    'less_than': 'La entrada debe ser menor a {lt}',
     'greater_than_equal': 'La entrada debe ser mayor o igual a {ge}',
+    'greater_than': 'La entrada debe ser mayor a {gt}',
 }
 
 def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[Dict]:

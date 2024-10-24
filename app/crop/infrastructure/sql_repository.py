@@ -1,7 +1,6 @@
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.crop.infrastructure.orm_models import Crop, CropState, CornVariety
-from app.farm.infrastructure.orm_models import UnitOfMeasure
 from app.crop.domain.schemas import CropCreate
 
 class CropRepository:
@@ -56,18 +55,6 @@ class CropRepository:
             List[CornVariety]: Lista de todas las variedades de maíz.
         """
         return self.db.query(CornVariety).all()
-
-    def get_unit_of_measure_by_id(self, unit_id: int) -> Optional[UnitOfMeasure]:
-        """
-        Obtiene una unidad de medida por su ID.
-
-        Args:
-            unit_id (int): ID de la unidad de medida.
-
-        Returns:
-            Optional[UnitOfMeasure]: La unidad de medida si se encuentra, None en caso contrario.
-        """
-        return self.db.query(UnitOfMeasure).filter(UnitOfMeasure.id == unit_id).first()
 
     def get_crop_state_by_id(self, state_id: int) -> Optional[CropState]:
         """

@@ -3,6 +3,8 @@ from app.farm.application.services.farm_service import FarmService
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.domain.schemas import FarmCreate
 from app.infrastructure.common.response_models import SuccessResponse
+from app.measurement.application.services.measurement_service import MeasurementService
+from app.measurement.infrastructure.sql_repository import MeasurementRepository
 from app.user.application.services.user_service import UserService
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
@@ -17,11 +19,13 @@ class CreateFarmUseCase:
         self.user_repository = UserRepository(db)
         self.user_service = UserService(db)
         self.farm_service = FarmService(db)
+        self.measurement_service = MeasurementService(db)
+        self.measurement_repository = MeasurementRepository(db)
 
     def create_farm(self, farm_data: FarmCreate, current_user: UserInDB) -> SuccessResponse:
         
         # Validar que la unidad de medida exista
-        unit_of_measure = self.farm_repository.get_unit_of_measure_by_id(farm_data.unidad_area_id)
+        unit_of_measure = self.measurement_repository.get_unit_of_measure_by_id(farm_data.unidad_area_id)
         if not unit_of_measure:
             raise DomainException(
                 message="La unidad de medida no existe.",
@@ -29,7 +33,7 @@ class CreateFarmUseCase:
             )
             
         # Validar que la unidad de medida sea de area
-        if self.farm_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != self.farm_service.UNIT_CATEGORY_AREA_NAME:
+        if self.measurement_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != self.measurement_service.UNIT_CATEGORY_AREA_NAME:
             raise DomainException(
                 message="La unidad de medida no es de área.",
                 status_code=status.HTTP_400_BAD_REQUEST

@@ -9,17 +9,6 @@ from fastapi import status
 
 class FarmService:
     
-    # constantes de categorias de unidades de medida
-    UNIT_CATEGORY_LENGTH_NAME = "Longitud"
-    UNIT_CATEGORY_AREA_NAME = "Área"
-    UNIT_CATEGORY_VOLUME_NAME = "Volumen"
-    UNIT_CATEGORY_MASS_NAME = "Masa"
-    UNIT_CATEGORY_TIME_NAME = "Tiempo"
-    UNIT_CATEGORY_TEMPERATURE_NAME = "Temperatura"
-    UNIT_CATEGORY_PLANTING_DENSITY_NAME = "Densidad de siembra"
-    UNIT_CATEGORY_CURRENCY_NAME = "Moneda"
-    UNIT_CATEGORY_YIELD_NAME = "Rendimiento"
-    
     def __init__(self, db: Session):
         self.db = db
         self.user_repository = UserRepository(db)

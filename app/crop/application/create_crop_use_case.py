@@ -3,6 +3,8 @@ from app.crop.infrastructure.sql_repository import CropRepository
 from app.crop.domain.schemas import CropCreate
 from app.farm.application.services.farm_service import FarmService
 from app.infrastructure.common.response_models import SuccessResponse
+from app.measurement.application.services.measurement_service import MeasurementService
+from app.measurement.infrastructure.sql_repository import MeasurementRepository
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.domain.schemas import UserInDB
@@ -16,6 +18,8 @@ class CreateCropUseCase:
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
         self.farm_service = FarmService(db)
+        self.measurement_service = MeasurementService(db)
+        self.measurement_repository = MeasurementRepository(db)
         
     def create_crop(self, crop_data: CropCreate, current_user: UserInDB) -> SuccessResponse:
         # Obtener el lote
@@ -49,14 +53,22 @@ class CreateCropUseCase:
             )
             
         # Verificar si la unidad de medida para densidad de siembra existe
-        if not self.crop_repository.get_unit_of_measure_by_id(crop_data.densidad_siembra_unidad_id):
+        unit_of_measure = self.measurement_repository.get_unit_of_measure_by_id(crop_data.densidad_siembra_unidad_id)
+        if not unit_of_measure:
             raise DomainException(
                 message="La unidad de medida para densidad de siembra especificada no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
         # verificar que la unidad de medida para densidad de siembra sea de densidad de siembra
-        if self.farm_repository.get_unit_category_by_id(crop_data.densidad_siembra_unidad_id).nombre != self.farm_service.UNIT_CATEGORY_PLANTING_DENSITY_NAME:
+        unit_category = self.measurement_repository.get_unit_category_by_id(unit_of_measure.categoria_id)
+        if not unit_category:
+            raise DomainException(
+                message="No se pudo obtener la categoría de la unidad de medida para densidad de siembra.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+        
+        if unit_category.nombre != self.measurement_service.UNIT_CATEGORY_PLANTING_DENSITY_NAME:
             raise DomainException(
                 message="La unidad de medida elegida no es de densidad de siembra.",
                 status_code=status.HTTP_400_BAD_REQUEST
