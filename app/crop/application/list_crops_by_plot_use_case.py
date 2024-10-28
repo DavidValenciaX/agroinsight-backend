@@ -9,6 +9,8 @@ from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
+from app.user.infrastructure.sql_repository import UserRepository
+
 class ListCropsByPlotUseCase:
     def __init__(self, db: Session):
         self.db = db
@@ -16,7 +18,7 @@ class ListCropsByPlotUseCase:
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
         self.farm_service = FarmService(db)
-
+        self.user_repository = UserRepository(db)
     def list_crops(self, plot_id: int, page: int, per_page: int, current_user: UserInDB) -> PaginatedCropListResponse:
         # Verificar si el lote existe
         plot = self.plot_repository.get_plot_by_id(plot_id)
@@ -35,9 +37,17 @@ class ListCropsByPlotUseCase:
             )
 
         # Verificar que el usuario tenga acceso a la finca
-        if not self.farm_service.user_is_farm_admin(current_user.id, farm.id):
+        user = self.user_repository.get_user_by_id(current_user.id)
+        if not user:
             raise DomainException(
-                message="No tienes permisos para ver los cultivos de este lote.",
+                message="No se pudo obtener el usuario.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        nombre_usuario = user.nombre + " " + user.apellido
+        if not self.farm_service.user_is_farm_admin(user.id, farm.id):
+            raise DomainException(
+                message=f"El usuario {nombre_usuario} con email {user.email} no tiene permisos para ver los cultivos de este lote.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
 

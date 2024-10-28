@@ -32,7 +32,7 @@ def user_create_data():
         nombre="Juan",
         apellido="Perez",
         email="juan.perez@example.com",
-        password="contrasenalarga123!"
+        password="Contrasenalarga123!"
     )
 
 @patch("app.user.application.user_register_process.user_register_use_case.UserRegisterUseCase.register_user")
