@@ -3,6 +3,7 @@ from app.user.domain.schemas import UserForFarmResponse, UserResponse
 from app.farm.domain.schemas import FarmResponse
 from app.plot.domain.schemas import PlotResponse
 from app.cultural_practices.domain.schemas import TaskTypeResponse
+from app.user.infrastructure.orm_models import User
 
 def map_user_to_response(user) -> UserResponse:
     farm_roles = [
@@ -25,19 +26,30 @@ def map_user_to_response(user) -> UserResponse:
         roles_fincas=farm_roles
     )
     
-def map_user_for_farm_to_response(user) -> UserForFarmResponse:
+def map_user_for_farm_to_response(user: User, role_name: str) -> UserForFarmResponse:
+    """
+    Mapea un usuario a UserForFarmResponse con su rol específico en una finca.
+
+    Args:
+        user (User): Usuario a mapear
+        farm_id (int): ID de la finca
+        role_name (str): Nombre del rol del usuario en la finca específica
+
+    Returns:
+        UserForFarmResponse: Respuesta formateada con la información del usuario y su rol en la finca
+    """
     return UserForFarmResponse(
         id=user.id,
         nombre=user.nombre,
         apellido=user.apellido,
         email=user.email,
-        estado=user.estado.nombre if user.estado else "Desconocido",
-        rol=user.roles_fincas[0].rol.nombre if user.roles_fincas else "Desconocido"
+        estado=user.estado.nombre,
+        rol=role_name
     )
 
 def map_farm_to_response(farm) -> FarmResponse:
     usuarios = [
-        map_user_for_farm_to_response(ufr.usuario)
+        map_user_for_farm_to_response(ufr.usuario, ufr.rol.nombre)
         for ufr in farm.usuario_roles
     ]
     

@@ -8,6 +8,7 @@ from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
+from app.infrastructure.common.datetime_utils import datetime_utc_time
 
 class ChangeTaskStateUseCase:
     def __init__(self, db: Session):
@@ -49,6 +50,14 @@ class ChangeTaskStateUseCase:
             )
             
         task.estado_id = state_id
+        
+        target_state_name = target_state.nombre
+        
+        if target_state_name == TaskService.COMPLETADA:
+            task.fecha_finalizacion = datetime_utc_time()
+        else:
+            task.fecha_finalizacion = None
+        
         if not self.cultural_practice_repository.update_task(task):
             raise DomainException(
                 message="No se pudo actualizar el estado de la tarea.",

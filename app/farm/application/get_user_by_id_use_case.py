@@ -15,7 +15,6 @@ class AdminGetUserByIdUseCase:
         self.farm_service = FarmService(db)
         
     def admin_get_user_by_id(self, user_id: int, farm_id: int, current_user) -> UserForFarmResponse:
-        
         user = self.user_repository.get_user_by_id(user_id)
         if not user:
             raise UserNotRegisteredException()
@@ -34,4 +33,7 @@ class AdminGetUserByIdUseCase:
                 status_code=status.HTTP_403_FORBIDDEN
             )
         
-        return map_user_for_farm_to_response(user)
+        # Obtener el rol específico del usuario en esta finca
+        user_farm_role = self.farm_repository.get_user_farm(user_id, farm_id)
+        
+        return map_user_for_farm_to_response(user, user_farm_role.rol.nombre)
