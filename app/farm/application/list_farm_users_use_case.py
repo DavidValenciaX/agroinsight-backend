@@ -38,7 +38,15 @@ class ListFarmUsersUseCase:
 
         total_users, users = self.farm_repository.list_farm_users_by_role_paginated(farm_id, worker_role.id, page, per_page)
         
-        user_responses = [map_user_for_farm_to_response(user, self.farm_repository.get_user_farm(user.id, farm_id).rol.nombre) for user in users]
+        user_responses = []
+        for user in users:
+            # Obtener la relación usuario-finca
+            user_farm = self.farm_repository.get_user_farm(user.id, farm_id)
+            # Obtener el nombre del rol
+            role_name = user_farm.rol.nombre
+            # Mapear el usuario con su rol a la respuesta
+            user_response = map_user_for_farm_to_response(user, role_name)
+            user_responses.append(user_response)
 
         total_pages = ceil(total_users / per_page)
 
