@@ -7,7 +7,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskStateListResponse, TaskTypeListResponse
+from app.cultural_practices.application.get_task_by_id_use_case import GetTaskByIdUseCase
+from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskResponse, TaskStateListResponse, TaskTypeListResponse
 from app.cultural_practices.application.assign_task_use_case import AssignTaskUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
@@ -51,7 +52,7 @@ def create_task(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al crear la tarea: {str(e)}"
-        )
+        ) from e
 
 @router.post("/assignment/create", response_model=MultipleResponse, 
              responses={
@@ -89,7 +90,7 @@ def create_assignment(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al asignar la tarea: {str(e)}"
-        )
+        ) from e
 
 @router.get("/farm/{farm_id}/user/{user_id}/tasks/list", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
 def list_tasks_by_user_and_farm(
@@ -125,8 +126,26 @@ def list_tasks_by_user_and_farm(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar las tareas: {str(e)}"
-        )
+        ) from e
         
+@router.get("/farm/{farm_id}/tasks/{task_id}", response_model=TaskResponse, status_code=status.HTTP_200_OK)
+def get_task_by_id(
+    farm_id: int,
+    task_id: int,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    get_task_by_id_use_case = GetTaskByIdUseCase(db)
+    try:
+        return get_task_by_id_use_case.get_task_by_id(farm_id, task_id, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener la tarea: {str(e)}"
+        ) from e
+
 @router.get("/tasks/states", response_model=TaskStateListResponse, status_code=status.HTTP_200_OK)
 def list_task_states(
     db: Session = Depends(getDb),
@@ -154,7 +173,7 @@ def list_task_states(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar los estados de las tareas: {str(e)}"
-        )
+        ) from e
 
 @router.put("/tasks/{task_id}/states/{state_id}", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def change_task_state(
@@ -187,7 +206,7 @@ def change_task_state(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al cambiar de estado la tarea: {str(e)}"
-        )
+        ) from e
 
 @router.get("/tasks/types", response_model=TaskTypeListResponse, status_code=status.HTTP_200_OK)
 def list_task_types(
@@ -216,4 +235,4 @@ def list_task_types(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar los tipos de labor cultural: {str(e)}"
-        )
+        ) from e

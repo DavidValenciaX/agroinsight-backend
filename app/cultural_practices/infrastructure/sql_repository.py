@@ -70,10 +70,10 @@ class CulturalPracticesRepository:
             print(f"Error al crear la asignación: {e}")
             return None
     
-    def get_user_task_assignment(self, user_id: int, tarea_id: int) -> Assignment:
+    def get_user_task_assignment(self, user_id: int, task_id: int) -> Assignment:
         return self.db.query(Assignment).filter(
             Assignment.usuario_id == user_id, 
-            Assignment.tarea_labor_cultural_id == tarea_id
+            Assignment.tarea_labor_cultural_id == task_id
         ).first()
         
     def list_tasks_by_user_and_farm_paginated(self, user_id: int, farm_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
