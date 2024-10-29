@@ -104,6 +104,13 @@ class UserCreate(BaseModel):
     nombre: str = Field(..., min_length=2)
     apellido: str = Field(..., min_length=2)
     password: str
+    acepta_terminos: bool = False
+    
+    @field_validator('acepta_terminos')
+    def validate_terms_acceptance(cls, v):
+        if not v:
+            raise ValueError("Debes aceptar los términos y condiciones para registrarte")
+        return v
     
     @field_validator('email')
     def validate_email(cls, v):

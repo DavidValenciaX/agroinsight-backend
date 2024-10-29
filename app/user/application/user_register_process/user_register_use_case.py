@@ -80,6 +80,12 @@ class UserRegisterUseCase:
                 )
                 if state_validation_result:
                     return state_validation_result
+        
+        if not user_data.acepta_terminos:
+            raise DomainException(
+                message="Debes aceptar los términos y condiciones para registrarte.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
 
         # Obtener estado "pendiente" del usuario (caché o consulta única)
         pending_state_id = self.user_service.get_user_state(self.user_service.PENDING_STATE_NAME).id

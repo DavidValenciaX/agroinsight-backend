@@ -112,6 +112,7 @@ class UserRepository:
                 apellido=user.apellido,
                 email=user.email,
                 password=user.password,
+                acepta_terminos=user.acepta_terminos,
                 state_id=state_id
             )
             self.db.add(new_user)

@@ -37,6 +37,7 @@ class User(Base):
     failed_attempts = Column(Integer, default=0, nullable=False)
     locked_until = Column(TIMESTAMP(timezone=True), nullable=True)  # Actualizado a TIMESTAMP
     state_id = Column(Integer, ForeignKey('estado_usuario.id'), nullable=False)
+    acepta_terminos = Column(Boolean, nullable=False, default=False)
 
     estado = relationship("UserState")
     confirmacion = relationship("UserConfirmation", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
