@@ -11,7 +11,27 @@ from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 class CreateTaskUseCase:
+    """Caso de uso para crear tareas de labor cultural.
+
+    Este caso de uso gestiona la lógica de negocio para la creación de tareas, asegurando que se cumplan
+    las validaciones necesarias antes de realizar la creación.
+
+    Attributes:
+        db (Session): Sesión de base de datos SQLAlchemy.
+        cultural_practice_repository (CulturalPracticesRepository): Repositorio para operaciones de prácticas culturales.
+        farm_repository (FarmRepository): Repositorio para operaciones de fincas.
+        plot_repository (PlotRepository): Repositorio para operaciones de lotes.
+        farm_service (FarmService): Servicio para lógica de negocio de fincas.
+        task_service (TaskService): Servicio para lógica de negocio de tareas.
+        crop_repository (CropRepository): Repositorio para operaciones de cultivos.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el caso de uso con las dependencias necesarias.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
         self.farm_repository = FarmRepository(db)
@@ -21,7 +41,22 @@ class CreateTaskUseCase:
         self.crop_repository = CropRepository(db)
         
     def create_task(self, task_data: TaskCreate, current_user: UserInDB) -> SuccessTaskCreateResponse:
-        
+        """Crea una nueva tarea de labor cultural.
+
+        Este método valida la existencia del lote, el cultivo activo en el lote, la finca asociada,
+        y los permisos del usuario que intenta crear la tarea. Si todas las validaciones son exitosas,
+        se crea la tarea.
+
+        Args:
+            task_data (TaskCreate): Datos de la tarea a crear.
+            current_user (UserInDB): Usuario actual autenticado que intenta crear la tarea.
+
+        Returns:
+            SuccessTaskCreateResponse: Respuesta que indica que la tarea fue creada exitosamente.
+
+        Raises:
+            DomainException: Si el lote, la finca, el cultivo activo, el tipo de labor cultural o el estado de tarea no son válidos.
+        """
         plot = self.plot_repository.get_plot_by_id(task_data.lote_id)
         if not plot:
             raise DomainException(
@@ -29,14 +64,14 @@ class CreateTaskUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        # Validate that the plot has an active crop
+        # Validar que el lote tiene un cultivo activo
         if not self.crop_repository.has_active_crop(task_data.lote_id):
             raise DomainException(
                 message="El lote no tiene un cultivo activo. No se pueden crear tareas en lotes sin cultivos activos.",
                 status_code=status.HTTP_409_CONFLICT
             )
         
-        # buscar el id de la finca por medio del id del lote
+        # Buscar el id de la finca por medio del id del lote
         farm = self.farm_repository.get_farm_by_id(plot.finca_id)
         if not farm:
             raise DomainException(
@@ -44,7 +79,7 @@ class CreateTaskUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-        #validar que el usuario sea administrador de la finca
+        # Validar que el usuario sea administrador de la finca
         if not self.farm_service.user_is_farm_admin(current_user.id, farm.id):
             raise DomainException(
                 message="No tienes permisos para crear tareas en esta finca.",

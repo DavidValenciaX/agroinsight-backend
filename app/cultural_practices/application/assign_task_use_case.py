@@ -8,11 +8,29 @@ from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
-
 from app.user.infrastructure.sql_repository import UserRepository
 
 class AssignTaskUseCase:
+    """Caso de uso para asignar tareas de labor cultural a usuarios.
+
+    Este caso de uso gestiona la lógica de negocio para la creación de asignaciones de tareas,
+    asegurando que se cumplan las validaciones necesarias antes de realizar la asignación.
+
+    Attributes:
+        db (Session): Sesión de base de datos SQLAlchemy.
+        cultural_practice_repository (CulturalPracticesRepository): Repositorio para operaciones de prácticas culturales.
+        user_repository (UserRepository): Repositorio para operaciones de usuarios.
+        plot_repository (PlotRepository): Repositorio para operaciones de lotes.
+        farm_repository (FarmRepository): Repositorio para operaciones de fincas.
+        farm_service (FarmService): Servicio para lógica de negocio de fincas.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el caso de uso con las dependencias necesarias.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
         self.user_repository = UserRepository(db)
@@ -21,7 +39,22 @@ class AssignTaskUseCase:
         self.farm_service = FarmService(db)
 
     def create_assignment(self, assignment_data: AssignmentCreate, current_user: UserInDB) -> MultipleResponse:
-        
+        """Crea asignaciones de tareas para los usuarios especificados.
+
+        Este método valida la existencia de la tarea, el lote y la finca, así como los permisos del usuario
+        que intenta realizar la asignación. Luego, itera sobre los IDs de los usuarios y crea las asignaciones
+        correspondientes, registrando los mensajes de éxito o error.
+
+        Args:
+            assignment_data (AssignmentCreate): Datos de la asignación a crear.
+            current_user (UserInDB): Usuario actual autenticado que intenta realizar la asignación.
+
+        Returns:
+            MultipleResponse: Respuesta que incluye mensajes sobre el resultado de las asignaciones y el código de estado.
+
+        Raises:
+            DomainException: Si la tarea, lote o finca no existen, o si el usuario no tiene permisos.
+        """
         # Validar que la tarea existe
         task = self.cultural_practice_repository.get_task_by_id(assignment_data.tarea_labor_cultural_id)
         if not task:
@@ -30,7 +63,7 @@ class AssignTaskUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        # get plot by id
+        # Obtener lote por ID
         plot = self.plot_repository.get_plot_by_id(task.lote_id)
         if not plot:
             raise DomainException(
@@ -38,7 +71,7 @@ class AssignTaskUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        # get farm by id
+        # Obtener finca por ID
         farm = self.farm_repository.get_farm_by_id(plot.finca_id)
         if not farm:
             raise DomainException(
@@ -46,7 +79,7 @@ class AssignTaskUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        # validar que el usuario sea administrador de la finca
+        # Validar que el usuario sea administrador de la finca
         if not self.farm_service.user_is_farm_admin(current_user.id, farm.id):
             raise DomainException(
                 message="No tienes permisos para asignar tareas en esta finca.",
@@ -59,7 +92,7 @@ class AssignTaskUseCase:
 
         # Iterar sobre cada usuario_id en usuario_ids
         for usuario_id in assignment_data.usuario_ids:
-            # obtener el nombre del usuario
+            # Obtener el nombre del usuario
             user = self.user_repository.get_user_by_id(usuario_id)
             if not user:
                 messages.append(f"El usuario con ID {usuario_id} especificado no existe.")
@@ -73,13 +106,13 @@ class AssignTaskUseCase:
                 failure_count += 1
                 continue
             
-            # validar que el usuario es trabajador de la finca
+            # Validar que el usuario es trabajador de la finca
             if not self.farm_service.user_is_farm_worker(usuario_id, farm.id):
                 messages.append(f"El usuario {user_name} no es trabajador de la finca.")
                 failure_count += 1
                 continue
             
-            # validar que el usuario no tenga ya asignada esa tarea
+            # Validar que el usuario no tenga ya asignada esa tarea
             if self.cultural_practice_repository.get_user_task_assignment(usuario_id, assignment_data.tarea_labor_cultural_id):
                 messages.append(f"El usuario {user_name} ya tiene asignada la tarea con ID {assignment_data.tarea_labor_cultural_id}.")
                 failure_count += 1

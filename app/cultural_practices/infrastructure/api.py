@@ -135,6 +135,21 @@ def get_task_by_id(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
+    """
+    Obtiene una tarea específica por su ID.
+
+    Parameters:
+        farm_id (int): ID de la finca.
+        task_id (int): ID de la tarea.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        TaskResponse: Detalles de la tarea solicitada.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la tarea.
+    """
     get_task_by_id_use_case = GetTaskByIdUseCase(db)
     try:
         return get_task_by_id_use_case.get_task_by_id(farm_id, task_id, current_user)
