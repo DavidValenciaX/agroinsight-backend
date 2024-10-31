@@ -8,18 +8,64 @@ from app.farm.application.services.farm_service import FarmService
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
-
 from app.user.infrastructure.sql_repository import UserRepository
 
 class ListCropsByPlotUseCase:
+    """Caso de uso para listar los cultivos de un lote específico.
+
+    Esta clase maneja la lógica de negocio necesaria para obtener una lista paginada
+    de los cultivos que pertenecen a un lote específico, asegurando que el usuario
+    tenga los permisos adecuados.
+
+    Attributes:
+        db (Session): Sesión de base de datos SQLAlchemy.
+        crop_repository (CropRepository): Repositorio para operaciones con cultivos.
+        plot_repository (PlotRepository): Repositorio para operaciones con lotes.
+        farm_repository (FarmRepository): Repositorio para operaciones con fincas.
+        farm_service (FarmService): Servicio para lógica de negocio de fincas.
+        user_repository (UserRepository): Repositorio para operaciones con usuarios.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el caso de uso con las dependencias necesarias.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         self.crop_repository = CropRepository(db)
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
         self.farm_service = FarmService(db)
         self.user_repository = UserRepository(db)
+        
     def list_crops(self, plot_id: int, page: int, per_page: int, current_user: UserInDB) -> PaginatedCropListResponse:
+        """Lista los cultivos de un lote específico de forma paginada.
+
+        Este método realiza las siguientes validaciones:
+        1. Verifica si el lote especificado existe.
+        2. Obtiene la finca asociada al lote y verifica su existencia.
+        3. Verifica que el usuario tenga acceso a la finca.
+
+        Args:
+            plot_id (int): ID del lote del cual se quieren listar los cultivos.
+            page (int): Número de página actual para la paginación.
+            per_page (int): Cantidad de cultivos por página.
+            current_user (UserInDB): Usuario que está solicitando la lista de cultivos.
+
+        Returns:
+            PaginatedCropListResponse: Respuesta paginada que incluye:
+                - Lista de cultivos para la página actual.
+                - Total de cultivos.
+                - Número de página actual.
+                - Cantidad de elementos por página.
+                - Total de páginas.
+
+        Raises:
+            DomainException: Si ocurre algún error de validación:
+                - 404: El lote o la finca no existen.
+                - 403: El usuario no tiene permisos para ver los cultivos de este lote.
+        """
         # Verificar si el lote existe
         plot = self.plot_repository.get_plot_by_id(plot_id)
         if not plot:

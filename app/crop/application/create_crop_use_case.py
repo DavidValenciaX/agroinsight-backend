@@ -12,7 +12,27 @@ from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 class CreateCropUseCase:
+    """Caso de uso para crear un nuevo cultivo.
+
+    Esta clase maneja la lógica de negocio necesaria para crear un cultivo en un lote,
+    incluyendo validaciones de permisos y existencia de recursos.
+
+    Attributes:
+        db (Session): Sesión de base de datos SQLAlchemy.
+        crop_repository (CropRepository): Repositorio para operaciones con cultivos.
+        plot_repository (PlotRepository): Repositorio para operaciones con lotes.
+        farm_repository (FarmRepository): Repositorio para operaciones con fincas.
+        farm_service (FarmService): Servicio para lógica de negocio de fincas.
+        measurement_service (MeasurementService): Servicio para lógica de negocio de medidas.
+        measurement_repository (MeasurementRepository): Repositorio para operaciones con medidas.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el caso de uso con las dependencias necesarias.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         self.crop_repository = CropRepository(db)
         self.plot_repository = PlotRepository(db)
@@ -22,6 +42,31 @@ class CreateCropUseCase:
         self.measurement_repository = MeasurementRepository(db)
         
     def create_crop(self, crop_data: CropCreate, current_user: UserInDB) -> SuccessResponse:
+        """Crea un nuevo cultivo en la base de datos.
+
+        Este método realiza las siguientes validaciones antes de crear el cultivo:
+        1. Verifica que el lote especificado exista.
+        2. Obtiene la finca asociada al lote y verifica su existencia.
+        3. Valida que el usuario tenga permisos para crear cultivos en la finca.
+        4. Verifica que la variedad de maíz especificada exista.
+        5. Verifica que la unidad de medida para la densidad de siembra exista y sea válida.
+        6. Verifica que el estado del cultivo especificado exista.
+        7. Verifica que no exista un cultivo activo en el lote.
+
+        Args:
+            crop_data (CropCreate): Datos del cultivo a crear.
+            current_user (UserInDB): Usuario que está creando el cultivo.
+
+        Returns:
+            SuccessResponse: Respuesta exitosa con un mensaje de confirmación.
+
+        Raises:
+            DomainException: Si ocurre algún error de validación:
+                - 404: El lote, la finca, la variedad de maíz, la unidad de medida o el estado del cultivo no existen.
+                - 403: El usuario no tiene permisos para crear cultivos en la finca.
+                - 409: Ya existe un cultivo activo en el lote.
+                - 500: Error al crear el cultivo.
+        """
         # Obtener el lote
         plot = self.plot_repository.get_plot_by_id(crop_data.lote_id)
         if not plot:

@@ -4,12 +4,24 @@ from app.crop.infrastructure.orm_models import Crop, CropState, CornVariety
 from app.crop.domain.schemas import CropCreate
 
 class CropRepository:
+    """Repositorio para gestionar las operaciones de base de datos relacionadas con cultivos.
+
+    Esta clase proporciona métodos para crear, obtener y listar cultivos y variedades de maíz.
+
+    Attributes:
+        db (Session): Sesión de base de datos SQLAlchemy.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el repositorio de cultivos con la sesión de base de datos.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         
     def create_crop(self, crop_data: CropCreate) -> Optional[Crop]:
-        """
-        Crea un nuevo cultivo en la base de datos.
+        """Crea un nuevo cultivo en la base de datos.
 
         Args:
             crop_data (CropCreate): Datos del cultivo a crear.
@@ -36,8 +48,7 @@ class CropRepository:
             return None
 
     def get_corn_variety_by_id(self, variety_id: int) -> Optional[CornVariety]:
-        """
-        Obtiene una variedad de maíz por su ID.
+        """Obtiene una variedad de maíz por su ID.
 
         Args:
             variety_id (int): ID de la variedad de maíz.
@@ -48,8 +59,7 @@ class CropRepository:
         return self.db.query(CornVariety).filter(CornVariety.id == variety_id).first()
     
     def get_all_corn_varieties(self) -> List[CornVariety]:
-        """
-        Obtiene todas las variedades de maíz disponibles.
+        """Obtiene todas las variedades de maíz disponibles.
 
         Returns:
             List[CornVariety]: Lista de todas las variedades de maíz.
@@ -57,8 +67,7 @@ class CropRepository:
         return self.db.query(CornVariety).all()
 
     def get_crop_state_by_id(self, state_id: int) -> Optional[CropState]:
-        """
-        Obtiene un estado de cultivo por su ID.
+        """Obtiene un estado de cultivo por su ID.
 
         Args:
             state_id (int): ID del estado de cultivo.
@@ -69,8 +78,7 @@ class CropRepository:
         return self.db.query(CropState).filter(CropState.id == state_id).first()
 
     def get_active_crop_states(self) -> List[CropState]:
-        """
-        Obtiene los estados que se consideran como cultivos activos.
+        """Obtiene los estados que se consideran como cultivos activos.
 
         Returns:
             List[CropState]: Lista de estados que representan cultivos activos.
@@ -87,8 +95,7 @@ class CropRepository:
         ).all()
 
     def has_active_crop(self, plot_id: int) -> bool:
-        """
-        Verifica si un lote tiene un cultivo activo.
+        """Verifica si un lote tiene un cultivo activo.
 
         Args:
             plot_id (int): ID del lote.
@@ -105,8 +112,7 @@ class CropRepository:
         ).first() is not None
 
     def get_crops_by_plot_id_paginated(self, plot_id: int, page: int, per_page: int) -> tuple[int, List[Crop]]:
-        """
-        Obtiene todos los cultivos asociados a un lote específico con paginación.
+        """Obtiene todos los cultivos asociados a un lote específico con paginación.
 
         Args:
             plot_id (int): ID del lote.
@@ -114,7 +120,7 @@ class CropRepository:
             per_page (int): Cantidad de elementos por página.
 
         Returns:
-            tuple[List[Crop], int]: Lista de cultivos y total de cultivos.
+            tuple[int, List[Crop]]: Tupla con el total de cultivos y la lista de cultivos para la página actual.
         """
         query = self.db.query(Crop).filter(Crop.lote_id == plot_id)
         total_crops = query.count()
