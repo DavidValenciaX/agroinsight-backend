@@ -2,6 +2,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.crop.infrastructure.orm_models import Crop, CropState, CornVariety
 from app.crop.domain.schemas import CropCreate
+from sqlalchemy.orm import joinedload
 
 class CropRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con cultivos.
@@ -122,7 +123,14 @@ class CropRepository:
         Returns:
             tuple[int, List[Crop]]: Tupla con el total de cultivos y la lista de cultivos para la página actual.
         """
-        query = self.db.query(Crop).filter(Crop.lote_id == plot_id)
+        query = self.db.query(Crop).join(
+            CornVariety, Crop.variedad_maiz_id == CornVariety.id
+        ).filter(Crop.lote_id == plot_id)
+        
         total_crops = query.count()
-        crops = query.offset((page - 1) * per_page).limit(per_page).all()
+        
+        crops = query.options(
+            joinedload(Crop.variedad_maiz)
+        ).offset((page - 1) * per_page).limit(per_page).all()
+        
         return total_crops, crops

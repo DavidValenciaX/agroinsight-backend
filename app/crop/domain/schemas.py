@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from datetime import date
 from typing import List, Optional
 from decimal import Decimal
@@ -32,6 +32,7 @@ class CropResponse(BaseModel):
         id (int): Identificador único del cultivo.
         lote_id (int): ID del lote al que pertenece el cultivo.
         variedad_maiz_id (int): ID de la variedad de maíz.
+        variedad_maiz_nombre (str): Nombre de la variedad de maíz.
         fecha_siembra (date): Fecha en la que se siembra el cultivo.
         densidad_siembra (int): Densidad de siembra del cultivo.
         densidad_siembra_unidad_id (int): ID de la unidad de medida de la densidad de siembra.
@@ -50,6 +51,7 @@ class CropResponse(BaseModel):
     id: int
     lote_id: int
     variedad_maiz_id: int
+    variedad_maiz_nombre: str
     fecha_siembra: date
     densidad_siembra: int
     densidad_siembra_unidad_id: int
@@ -66,6 +68,16 @@ class CropResponse(BaseModel):
     fecha_venta: Optional[date]
 
     model_config = ConfigDict(from_attributes=True)
+
+    @model_validator(mode='before')
+    @classmethod
+    def extract_corn_variety_name(cls, data):
+        if hasattr(data, '__dict__'):
+            # Extract the corn variety name from the relationship
+            if hasattr(data, 'variedad_maiz') and data.variedad_maiz:
+                data = data.__dict__
+                data['variedad_maiz_nombre'] = data['variedad_maiz'].nombre
+        return data
 
 class PaginatedCropListResponse(BaseModel):
     """Schema para la respuesta paginada de la lista de cultivos.
