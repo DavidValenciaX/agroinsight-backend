@@ -24,7 +24,7 @@ def create_crop(
     crop: CropCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> SuccessResponse:
     """
     Crea un nuevo cultivo en el sistema.
 
@@ -56,7 +56,7 @@ def create_crop(
 def list_corn_varieties(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> CornVarietyListResponse:
     """
     Lista todas las variedades de maíz disponibles.
 
@@ -88,7 +88,7 @@ def list_crops_by_plot(
     per_page: int = Query(10, ge=1, le=100),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> PaginatedCropListResponse:
     """
     Lista todos los cultivos asociados a un lote específico.
 

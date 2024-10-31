@@ -3,7 +3,6 @@ Este módulo define las rutas de la API para la gestión de prácticas culturale
 
 Incluye endpoints para la creación de tareas y asignaciones, así como para listar asignaciones.
 """
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -28,7 +27,7 @@ def create_task(
     task: TaskCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> SuccessTaskCreateResponse:
     """
     Crea una nueva tarea de práctica cultural en el sistema.
 
@@ -65,7 +64,7 @@ def create_assignment(
     assignment: AssignmentCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> JSONResponse:
     """
     Crea una nueva asignación de práctica cultural en el sistema.
 
@@ -100,7 +99,7 @@ def list_tasks_by_user_and_farm(
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> PaginatedTaskListResponse:
     """
     Lista todas las tareas asignadas a un usuario específico.
 
@@ -134,7 +133,7 @@ def get_task_by_id(
     task_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> TaskResponse:
     """
     Obtiene una tarea específica por su ID.
 
@@ -165,7 +164,7 @@ def get_task_by_id(
 def list_task_states(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> TaskStateListResponse:
     """
     Lista todos los estados de las tareas de prácticas culturales.
 
@@ -196,7 +195,7 @@ def change_task_state(
     state_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> SuccessResponse:
     """
     Cambia el estado de una tarea de labor cultural.
 
@@ -227,7 +226,7 @@ def change_task_state(
 def list_task_types(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> TaskTypeListResponse:
     """
     Lista todos los tipos de labor cultural disponibles.
 

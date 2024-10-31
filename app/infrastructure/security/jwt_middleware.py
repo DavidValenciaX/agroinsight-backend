@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.config.settings import SECRET_KEY, ALGORITHM
 from app.infrastructure.security.custom_http_bearer import CustomHTTPBearer
+from app.user.infrastructure.orm_models import User
 from app.user.infrastructure.sql_repository import UserRepository
 from app.infrastructure.db.connection import getDb
 from typing import Optional
@@ -17,7 +18,7 @@ security_scheme = CustomHTTPBearer()
 def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Security(security_scheme),
     db: Session = Depends(getDb)
-):
+) -> User:
     """
     Obtiene el usuario actual autenticado a partir de las credenciales JWT.
 
