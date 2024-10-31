@@ -83,6 +83,16 @@ CUSTOM_MESSAGES = {
 }
 
 def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[Dict]:
+    """
+    Convierte una lista de errores utilizando mensajes personalizados.
+
+    Args:
+        errors (List[Dict]): Lista de errores a convertir.
+        custom_messages (Dict[str, str]): Diccionario de mensajes personalizados.
+
+    Returns:
+        List[Dict]: Lista de errores convertidos con mensajes personalizados.
+    """
     new_errors = []
     for error in errors:
         error_type = error['type']
@@ -94,6 +104,16 @@ def convert_errors(errors: List[Dict], custom_messages: Dict[str, str]) -> List[
     return new_errors
 
 def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Maneja excepciones de validación y devuelve una respuesta JSON.
+
+    Args:
+        request (Request): Objeto de solicitud de FastAPI.
+        exc (RequestValidationError): Excepción de validación.
+
+    Returns:
+        JSONResponse: Respuesta JSON con detalles de los errores de validación.
+    """
     errors = exc.errors()
     errors = convert_errors(errors, CUSTOM_MESSAGES)
     error_details = []
@@ -158,6 +178,16 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
     )
 
 def custom_exception_handler(request: Request, exc: Exception):
+    """
+    Maneja excepciones personalizadas y devuelve una respuesta JSON.
+
+    Args:
+        request (Request): Objeto de solicitud de FastAPI.
+        exc (Exception): Excepción que se ha producido.
+
+    Returns:
+        JSONResponse: Respuesta JSON con detalles de la excepción.
+    """
     error_details = {
         "message": str(exc),
         "type": type(exc).__name__,
@@ -177,6 +207,16 @@ def custom_exception_handler(request: Request, exc: Exception):
     )
 
 def custom_http_exception_handler(request: Request, exc: HTTPException):
+    """
+    Maneja excepciones HTTP y devuelve una respuesta JSON.
+
+    Args:
+        request (Request): Objeto de solicitud de FastAPI.
+        exc (HTTPException): Excepción HTTP que se ha producido.
+
+    Returns:
+        JSONResponse: Respuesta JSON con detalles de la excepción HTTP.
+    """
     logger.warning(f"HTTPException en {request.url}: status_code={exc.status_code}, message='{exc.detail}'")
     
     return JSONResponse(
@@ -191,6 +231,16 @@ def custom_http_exception_handler(request: Request, exc: HTTPException):
     )
     
 def domain_exception_handler(request: Request, exc: DomainException):
+    """
+    Maneja excepciones de dominio y devuelve una respuesta JSON.
+
+    Args:
+        request (Request): Objeto de solicitud de FastAPI.
+        exc (DomainException): Excepción de dominio que se ha producido.
+
+    Returns:
+        JSONResponse: Respuesta JSON con detalles de la excepción de dominio.
+    """
     error_response = {
         "error": {
             "route": str(request.url),
@@ -202,6 +252,16 @@ def domain_exception_handler(request: Request, exc: DomainException):
     return JSONResponse(status_code=exc.status_code, content=error_response)
     
 def user_state_exception_handler(request: Request, exc: UserStateException):
+    """
+    Maneja excepciones relacionadas con el estado del usuario y devuelve una respuesta JSON.
+
+    Args:
+        request (Request): Objeto de solicitud de FastAPI.
+        exc (UserStateException): Excepción relacionada con el estado del usuario.
+
+    Returns:
+        JSONResponse: Respuesta JSON con detalles de la excepción del estado del usuario.
+    """
     logger.warning(f"UserStateException in {request.url}: status_code={exc.status_code}, message='{exc.message}', user_state='{exc.user_state}'")
     return JSONResponse(
         status_code=exc.status_code,

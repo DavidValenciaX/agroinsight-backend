@@ -241,6 +241,17 @@ class UserResponse(BaseModel):
     
     
 class UserForFarmResponse(BaseModel):
+    """
+    Esquema para la respuesta que contiene información de un usuario en el contexto de una finca.
+
+    Attributes:
+        id (int): Identificador único del usuario.
+        nombre (str): Nombre del usuario.
+        apellido (str): Apellido del usuario.
+        email (EmailStr): Correo electrónico del usuario.
+        estado (str): Estado actual del usuario.
+        rol (str): Rol del usuario en la finca específica.
+    """
     id: int
     nombre: str
     apellido: str

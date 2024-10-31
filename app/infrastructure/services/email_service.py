@@ -15,6 +15,18 @@ SMTP_SERVER = "mail.privateemail.com"
 SMTP_PORT = 465  # Puerto SSL para el servidor de salida
 
 def send_email(to_email: str, subject: str, text_content: str, html_content: str):
+    """
+    Envía un correo electrónico usando PrivateEmail SMTP.
+
+    Args:
+        to_email (str): Dirección de correo electrónico del destinatario.
+        subject (str): Asunto del correo electrónico.
+        text_content (str): Contenido del correo en formato texto plano.
+        html_content (str): Contenido del correo en formato HTML.
+
+    Returns:
+        bool: True si el correo se envió exitosamente, False en caso contrario.
+    """
     try:
         # Crear el mensaje MIME
         message = MIMEMultipart("alternative")

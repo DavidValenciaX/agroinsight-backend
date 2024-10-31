@@ -6,6 +6,15 @@ from app.cultural_practices.domain.schemas import TaskTypeResponse
 from app.user.infrastructure.orm_models import User
 
 def map_user_to_response(user) -> UserResponse:
+    """
+    Mapea un objeto de usuario a un esquema de respuesta de usuario.
+
+    Args:
+        user (User): Objeto de usuario a mapear.
+
+    Returns:
+        UserResponse: Esquema de respuesta con la información del usuario.
+    """
     farm_roles = [
         {
             "rol": ufr.rol.nombre,
@@ -31,12 +40,11 @@ def map_user_for_farm_to_response(user: User, role_name: str) -> UserForFarmResp
     Mapea un usuario a UserForFarmResponse con su rol específico en una finca.
 
     Args:
-        user (User): Usuario a mapear
-        farm_id (int): ID de la finca
-        role_name (str): Nombre del rol del usuario en la finca específica
+        user (User): Usuario a mapear.
+        role_name (str): Nombre del rol del usuario en la finca específica.
 
     Returns:
-        UserForFarmResponse: Respuesta formateada con la información del usuario y su rol en la finca
+        UserForFarmResponse: Respuesta formateada con la información del usuario y su rol en la finca.
     """
     return UserForFarmResponse(
         id=user.id,
@@ -48,6 +56,15 @@ def map_user_for_farm_to_response(user: User, role_name: str) -> UserForFarmResp
     )
 
 def map_farm_to_response(farm) -> FarmResponse:
+    """
+    Mapea un objeto de finca a un esquema de respuesta de finca.
+
+    Args:
+        farm: Objeto de finca a mapear.
+
+    Returns:
+        FarmResponse: Esquema de respuesta con la información de la finca.
+    """
     usuarios = [
         map_user_for_farm_to_response(ufr.usuario, ufr.rol.nombre)
         for ufr in farm.usuario_roles
@@ -63,6 +80,15 @@ def map_farm_to_response(farm) -> FarmResponse:
     )
 
 def map_plot_to_response(plot) -> PlotResponse:
+    """
+    Mapea un objeto de parcela a un esquema de respuesta de parcela.
+
+    Args:
+        plot: Objeto de parcela a mapear.
+
+    Returns:
+        PlotResponse: Esquema de respuesta con la información de la parcela.
+    """
     return PlotResponse(
         id=plot.id,
         nombre=plot.nombre,
@@ -74,6 +100,15 @@ def map_plot_to_response(plot) -> PlotResponse:
     )
     
 def map_task_to_response(task) -> TaskResponse:
+    """
+    Mapea un objeto de tarea a un esquema de respuesta de tarea.
+
+    Args:
+        task: Objeto de tarea a mapear.
+
+    Returns:
+        TaskResponse: Esquema de respuesta con la información de la tarea.
+    """
     return TaskResponse(
         id=task.id,
         nombre=task.nombre,
@@ -86,6 +121,15 @@ def map_task_to_response(task) -> TaskResponse:
     )
     
 def map_task_state_to_response(task_state) -> TaskStateResponse:
+    """
+    Mapea un objeto de estado de tarea a un esquema de respuesta de estado de tarea.
+
+    Args:
+        task_state: Objeto de estado de tarea a mapear.
+
+    Returns:
+        TaskStateResponse: Esquema de respuesta con la información del estado de la tarea.
+    """
     return TaskStateResponse(
         id=task_state.id,
         nombre=task_state.nombre,
@@ -93,6 +137,15 @@ def map_task_state_to_response(task_state) -> TaskStateResponse:
     )
 
 def map_task_type_to_response(task_type: TaskTypeResponse) -> TaskTypeResponse:
+    """
+    Mapea un objeto de tipo de tarea a un esquema de respuesta de tipo de tarea.
+
+    Args:
+        task_type (TaskTypeResponse): Objeto de tipo de tarea a mapear.
+
+    Returns:
+        TaskTypeResponse: Esquema de respuesta con la información del tipo de tarea.
+    """
     return TaskTypeResponse(
         id=task_type.id,
         nombre=task_type.nombre,

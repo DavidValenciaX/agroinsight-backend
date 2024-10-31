@@ -20,6 +20,7 @@ nav:
   - Guías:
     - Instalación: guides/installation.md
     - Guía de inicio rápido: guides/getting_started.md
+    - Guía de herramientas útiles: guides/useful_tools.md
     - Preguntas frecuentes: guides/faq.md
 
   - Módulo de usuarios:
@@ -39,6 +40,11 @@ nav:
       - Endpoints: plot/endpoints.md
       - Modelos de datos: plot/models.md
       - Casos de uso: plot/use_cases.md
+  - Módulo de cultivos:
+      - Descripción: crop/overview.md
+      - Endpoints: crop/endpoints.md
+      - Modelos de datos: crop/models.md
+      - Casos de uso: crop/use_cases.md
   - Módulo de labores culturales:
       - Descripción: cultural_practices/overview.md
       - Endpoints: cultural_practices/endpoints.md

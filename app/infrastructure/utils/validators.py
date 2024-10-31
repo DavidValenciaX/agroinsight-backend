@@ -10,7 +10,7 @@ def validate_email_format(email: str) -> Optional[str]:
         email (str): La dirección de correo electrónico a validar.
 
     Returns:
-        str: La dirección de correo electrónico si es válida.
+        Optional[str]: La dirección de correo electrónico si es válida.
 
     Raises:
         ValueError: Si la dirección de correo electrónico no es válida.
@@ -24,6 +24,15 @@ def validate_email_format(email: str) -> Optional[str]:
 def validate_email(v: str) -> str:
     """
     Wrapper para mantener compatibilidad con el código existente.
+
+    Args:
+        v (str): La dirección de correo electrónico a validar.
+
+    Returns:
+        str: La dirección de correo electrónico validada.
+
+    Raises:
+        PydanticCustomError: Si la dirección de correo electrónico no es válida.
     """
     try:
         return validate_email_format(v)
@@ -35,15 +44,15 @@ def validate_no_emojis(text: str) -> str:
     Valida que el texto no contenga emojis.
     
     Args:
-        text (str): Texto a validar
+        text (str): Texto a validar.
         
     Returns:
-        str: El texto validado
+        str: El texto validado.
         
     Raises:
-        ValueError: Si el texto contiene emojis
+        ValueError: Si el texto contiene emojis, símbolos o pictogramas.
     """
-    emoji_pattern = re.compile("["
+    emoji_pattern = re.compile("[" 
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # símbolos & pictogramas
         u"\U0001F680-\U0001F6FF"  # transport & map symbols
@@ -61,13 +70,13 @@ def validate_no_special_chars(text: str) -> str:
     Valida que el texto no contenga caracteres especiales.
     
     Args:
-        text (str): Texto a validar
+        text (str): Texto a validar.
         
     Returns:
-        str: El texto validado
+        str: El texto validado.
         
     Raises:
-        ValueError: Si el texto contiene caracteres especiales
+        ValueError: Si el texto contiene caracteres especiales.
     """
     special_chars_pattern = r'[!@#$%^&*(),.?":{}|<>\[\];\'`~]'
     if re.search(special_chars_pattern, text):
@@ -79,13 +88,13 @@ def validate_no_xss(text: str) -> str:
     Valida que el texto no contenga potenciales ataques XSS.
     
     Args:
-        text (str): Texto a validar
+        text (str): Texto a validar.
         
     Returns:
-        str: El texto validado
+        str: El texto validado.
         
     Raises:
-        ValueError: Si el texto contiene patrones de XSS
+        ValueError: Si el texto contiene patrones de XSS.
     """
     xss_patterns = [
         r'<[^>]*script',          # Etiquetas script

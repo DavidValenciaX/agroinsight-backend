@@ -18,6 +18,19 @@ def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Security(security_scheme),
     db: Session = Depends(getDb)
 ):
+    """
+    Obtiene el usuario actual autenticado a partir de las credenciales JWT.
+
+    Args:
+        credentials (Optional[HTTPAuthorizationCredentials]): Credenciales de autorización HTTP Bearer.
+        db (Session): Sesión de base de datos para realizar consultas.
+
+    Returns:
+        User: El usuario autenticado.
+
+    Raises:
+        HTTPException: Si el token es inválido, ha expirado, o el usuario no está registrado.
+    """
     if credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Se requiere un token de autenticación")
     
