@@ -544,6 +544,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guides/useful_tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía de herramientas útiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guides/faq/" class="md-nav__link">
         
   
@@ -1387,7 +1408,7 @@
             
   
   <span class="md-ellipsis">
-    Módulo de labores culturales
+    Módulo de cultivos
   </span>
   
 
@@ -1396,6 +1417,132 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de cultivos
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de labores culturales
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             Módulo de labores culturales
           </label>
@@ -1506,10 +1653,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
         
           
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1520,8 +1667,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
             <span class="md-nav__icon md-icon"></span>
             Desarrollo
           </label>
@@ -2096,7 +2243,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">35</span>
+<span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
@@ -2127,8 +2275,7 @@
 <span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/register&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/register&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">register_user</span><span class="p">(</span>
     <span class="n">user</span><span class="p">:</span> <span class="n">UserCreate</span><span class="p">,</span>
     <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">,</span>
@@ -2268,7 +2415,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
+<span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
 <span class="normal">104</span>
@@ -2294,8 +2442,7 @@
 <span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/confirm&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">127</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/confirm&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">confirm_user_registration</span><span class="p">(</span>
     <span class="n">confirmation</span><span class="p">:</span> <span class="n">ConfirmationRequest</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">)</span>
@@ -2444,7 +2591,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">69</span>
+<span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
@@ -2472,8 +2620,7 @@
 <span class="normal">95</span>
 <span class="normal">96</span>
 <span class="normal">97</span>
-<span class="normal">98</span>
-<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/resend-confirm-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/resend-confirm-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">resend_confirmation_pin_endpoint</span><span class="p">(</span>
     <span class="n">resend_request</span><span class="p">:</span> <span class="n">ResendPinConfirmRequest</span><span class="p">,</span>
     <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">,</span>
@@ -2624,7 +2771,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">129</span>
+<span class="normal">130</span>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
@@ -2648,8 +2796,7 @@
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">login_for_access_token</span><span class="p">(</span><span class="n">login_request</span><span class="p">:</span> <span class="n">LoginRequest</span><span class="p">,</span> <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Inicia el proceso de doble factor de autenticación.</span>
@@ -2782,7 +2929,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">187</span>
+<span class="normal">188</span>
 <span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
@@ -2805,8 +2953,7 @@
 <span class="normal">208</span>
 <span class="normal">209</span>
 <span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/login/verify&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TokenResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/login/verify&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TokenResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">verify_login</span><span class="p">(</span><span class="n">auth_request</span><span class="p">:</span> <span class="n">TwoFactorAuthRequest</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">TokenResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Verifica el inicio de sesión utilizando el PIN de doble factor de autenticación.</span>
@@ -2952,7 +3099,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
+<span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
@@ -2980,8 +3128,7 @@
 <span class="normal">182</span>
 <span class="normal">183</span>
 <span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/resend-2fa-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/resend-2fa-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">resend_2fa_pin_endpoint</span><span class="p">(</span>
     <span class="n">resend_request</span><span class="p">:</span> <span class="n">Resend2FARequest</span><span class="p">,</span>
     <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">,</span>
@@ -3132,7 +3279,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">391</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">390</span>
+<span class="normal">391</span>
 <span class="normal">392</span>
 <span class="normal">393</span>
 <span class="normal">394</span>
@@ -3159,8 +3307,7 @@
 <span class="normal">415</span>
 <span class="normal">416</span>
 <span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/logout&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">418</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/logout&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span>
     <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">),</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
@@ -3311,7 +3458,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">270</span>
+<span class="normal">271</span>
 <span class="normal">272</span>
 <span class="normal">273</span>
 <span class="normal">274</span>
@@ -3339,8 +3487,7 @@
 <span class="normal">296</span>
 <span class="normal">297</span>
 <span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/password-recovery&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">299</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/password-recovery&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">initiate_password_recovery</span><span class="p">(</span>
     <span class="n">recovery_request</span><span class="p">:</span> <span class="n">PasswordRecoveryRequest</span><span class="p">,</span>
     <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">,</span>
@@ -3477,7 +3624,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">333</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">332</span>
+<span class="normal">333</span>
 <span class="normal">334</span>
 <span class="normal">335</span>
 <span class="normal">336</span>
@@ -3503,8 +3651,7 @@
 <span class="normal">356</span>
 <span class="normal">357</span>
 <span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/confirm-recovery-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">359</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/confirm-recovery-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">confirm_recovery_pin</span><span class="p">(</span>
     <span class="n">pin_confirmation</span><span class="p">:</span> <span class="n">PinConfirmationRequest</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">)</span>
@@ -3653,7 +3800,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">302</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">301</span>
+<span class="normal">302</span>
 <span class="normal">303</span>
 <span class="normal">304</span>
 <span class="normal">305</span>
@@ -3681,8 +3829,7 @@
 <span class="normal">327</span>
 <span class="normal">328</span>
 <span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/resend-recovery-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/resend-recovery-pin&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">resend_recovery_pin</span><span class="p">(</span>
     <span class="n">recovery_request</span><span class="p">:</span> <span class="n">PasswordRecoveryRequest</span><span class="p">,</span>
     <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">,</span>
@@ -3819,7 +3966,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">362</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">361</span>
+<span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
 <span class="normal">365</span>
@@ -3845,8 +3993,7 @@
 <span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/reset-password&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/reset-password&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">reset_password</span><span class="p">(</span>
     <span class="n">reset_request</span><span class="p">:</span> <span class="n">PasswordResetRequest</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">)</span>
@@ -3889,11 +4036,100 @@
 <a id="app.user.infrastructure.api.get_current_user"></a>
     <div class="doc doc-contents first">
 
+        <p>Obtiene el usuario actual autenticado a partir de las credenciales JWT.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>credentials</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="fastapi.security.HTTPAuthorizationCredentials">HTTPAuthorizationCredentials</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Credenciales de autorización HTTP Bearer.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="fastapi.Security">Security</span>(<span title="app.infrastructure.security.jwt_middleware.security_scheme">security_scheme</span>)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>db</code></td>
+            <td>
+                  <code><span title="sqlalchemy.orm.Session">Session</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sesión de base de datos para realizar consultas.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="fastapi.Depends">Depends</span>(<span title="app.infrastructure.db.connection.getDb">getDb</span>)</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>User</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.user.infrastructure.orm_models.User" href="../models/#app.user.infrastructure.orm_models.User">User</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>El usuario autenticado.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="fastapi.HTTPException">HTTPException</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Si el token es inválido, ha expirado, o el usuario no está registrado.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
             <details class="quote">
               <summary>Source code in <code>app\infrastructure\security\jwt_middleware.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
@@ -3932,10 +4168,38 @@
 <span class="normal">54</span>
 <span class="normal">55</span>
 <span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_current_user</span><span class="p">(</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_current_user</span><span class="p">(</span>
     <span class="n">credentials</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HTTPAuthorizationCredentials</span><span class="p">]</span> <span class="o">=</span> <span class="n">Security</span><span class="p">(</span><span class="n">security_scheme</span><span class="p">),</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">)</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtiene el usuario actual autenticado a partir de las credenciales JWT.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        credentials (Optional[HTTPAuthorizationCredentials]): Credenciales de autorización HTTP Bearer.</span>
+<span class="sd">        db (Session): Sesión de base de datos para realizar consultas.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        User: El usuario autenticado.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: Si el token es inválido, ha expirado, o el usuario no está registrado.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">credentials</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Se requiere un token de autenticación&quot;</span><span class="p">)</span>
 
@@ -4095,7 +4359,8 @@
 
             <details class="quote">
               <summary>Source code in <code>app\user\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
+<span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
@@ -4123,8 +4388,7 @@
 <span class="normal">265</span>
 <span class="normal">266</span>
 <span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">&quot;/me/update&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">268</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@user_router</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">&quot;/me/update&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">update_user_info</span><span class="p">(</span>
     <span class="n">user_update</span><span class="p">:</span> <span class="n">UserUpdate</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
