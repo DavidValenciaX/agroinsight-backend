@@ -28,6 +28,9 @@ class ListUnitsUseCase:
         """
         Obtiene todas las unidades de medida del sistema.
 
+        Este método consulta el repositorio para recuperar todas las unidades de medida
+        y devuelve un objeto de respuesta que contiene la lista de unidades.
+
         Returns:
             UnitsListResponse: Objeto de respuesta con la lista de unidades de medida.
         """
