@@ -13,7 +13,27 @@ from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 
 class CreateFarmUseCase:
+    """Caso de uso para la creación de una nueva finca.
+
+    Esta clase maneja la lógica de negocio necesaria para crear una nueva finca,
+    incluyendo las validaciones de unidades de medida y la asignación de roles.
+
+    Attributes:
+        db (Session): Sesión de base de datos.
+        farm_repository (FarmRepository): Repositorio para operaciones con fincas.
+        user_repository (UserRepository): Repositorio para operaciones con usuarios.
+        user_service (UserService): Servicio para lógica de negocio de usuarios.
+        farm_service (FarmService): Servicio para lógica de negocio de fincas.
+        measurement_service (MeasurementService): Servicio para lógica de medidas.
+        measurement_repository (MeasurementRepository): Repositorio para operaciones con medidas.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el caso de uso con las dependencias necesarias.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
@@ -23,6 +43,28 @@ class CreateFarmUseCase:
         self.measurement_repository = MeasurementRepository(db)
 
     def create_farm(self, farm_data: FarmCreate, current_user: UserInDB) -> SuccessResponse:
+        """Crea una nueva finca y asigna al usuario actual como administrador.
+
+        Este método realiza las siguientes validaciones:
+        1. Verifica que la unidad de medida especificada exista
+        2. Confirma que la unidad de medida sea de tipo área
+        3. Valida que el usuario no tenga otra finca con el mismo nombre
+        4. Crea la finca y asigna el rol de administrador al usuario
+
+        Args:
+            farm_data (FarmCreate): Datos de la finca a crear.
+            current_user (UserInDB): Usuario que está creando la finca.
+
+        Returns:
+            SuccessResponse: Respuesta exitosa con mensaje de confirmación.
+
+        Raises:
+            DomainException: Si ocurre algún error de validación:
+                - 404: La unidad de medida no existe
+                - 400: La unidad de medida no es de tipo área
+                - 409: El usuario ya tiene una finca con ese nombre
+                - 500: Error al crear la finca
+        """
         
         # Validar que la unidad de medida exista
         unit_of_measure = self.measurement_repository.get_unit_of_measure_by_id(farm_data.unidad_area_id)

@@ -12,7 +12,26 @@ from app.user.application.services.user_service import UserService
 from app.farm.application.services.farm_service import FarmService
 
 class AssignUsersToFarmUseCase:
+    """Caso de uso para asignar usuarios a una finca.
+
+    Esta clase maneja la lógica de negocio necesaria para asignar usuarios a una finca
+    específica mediante sus correos electrónicos, asegurando que el usuario que realiza
+    la asignación tenga los permisos adecuados.
+
+    Attributes:
+        db (Session): Sesión de base de datos.
+        farm_repository (FarmRepository): Repositorio para operaciones con fincas.
+        user_repository (UserRepository): Repositorio para operaciones con usuarios.
+        farm_service (FarmService): Servicio para lógica de negocio de fincas.
+        user_service (UserService): Servicio para lógica de negocio de usuarios.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el caso de uso con las dependencias necesarias.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
@@ -20,7 +39,27 @@ class AssignUsersToFarmUseCase:
         self.user_service = UserService(db)
     
     def assign_users_by_emails(self, assignment_data: FarmUserAssignmentByEmail, current_user: UserInDB) -> MultipleResponse:
-        
+        """Asigna usuarios a una finca utilizando sus correos electrónicos.
+
+        Este método realiza las siguientes validaciones:
+        1. Verifica que la finca especificada exista.
+        2. Confirma que el usuario actual tenga permisos de administrador en la finca.
+        3. Valida que los usuarios no tengan un rol asignado en la finca antes de asignarlos.
+
+        Args:
+            assignment_data (FarmUserAssignmentByEmail): Datos de asignación que incluyen
+                el ID de la finca y los correos electrónicos de los usuarios a asignar.
+            current_user (UserInDB): Usuario que está realizando la asignación.
+
+        Returns:
+            MultipleResponse: Respuesta que incluye mensajes sobre el resultado de la
+            asignación de usuarios y el código de estado correspondiente.
+
+        Raises:
+            DomainException: Si ocurre algún error de validación:
+                - 404: La finca especificada no existe.
+                - 403: El usuario actual no tiene permisos para asignar usuarios a la finca.
+        """
         farm = self.farm_repository.get_farm_by_id(assignment_data.farm_id)
         if not farm:
             raise DomainException(

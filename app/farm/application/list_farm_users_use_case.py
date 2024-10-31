@@ -11,7 +11,25 @@ from fastapi import status
 from math import ceil
 
 class ListFarmUsersUseCase:
+    """Caso de uso para listar los usuarios de una finca.
+
+    Esta clase maneja la lógica de negocio necesaria para obtener una lista de usuarios
+    que pertenecen a una finca específica, incluyendo la paginación de resultados.
+
+    Attributes:
+        db (Session): Sesión de base de datos.
+        farm_repository (FarmRepository): Repositorio para operaciones con fincas.
+        user_repository (UserRepository): Repositorio para operaciones con usuarios.
+        farm_service (FarmService): Servicio para lógica de negocio de fincas.
+        user_service (UserService): Servicio para lógica de negocio de usuarios.
+    """
+
     def __init__(self, db: Session):
+        """Inicializa el caso de uso con las dependencias necesarias.
+
+        Args:
+            db (Session): Sesión de base de datos SQLAlchemy.
+        """
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.user_repository = UserRepository(db)
@@ -19,6 +37,27 @@ class ListFarmUsersUseCase:
         self.user_service = UserService(db)
         
     def list_farm_users(self, farm_id: int, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmUserListResponse:
+        """Lista los usuarios de una finca de forma paginada.
+
+        Este método realiza las siguientes validaciones:
+        1. Verifica que la finca especificada exista.
+        2. Confirma que el usuario actual tenga permisos de administrador en la finca.
+        3. Obtiene la lista de usuarios que son trabajadores de la finca.
+
+        Args:
+            farm_id (int): ID de la finca de la cual se quieren listar los usuarios.
+            current_user (UserInDB): Usuario que está realizando la consulta.
+            page (int): Número de página actual para la paginación.
+            per_page (int): Cantidad de usuarios por página.
+
+        Returns:
+            PaginatedFarmUserListResponse: Respuesta paginada con la lista de usuarios de la finca.
+
+        Raises:
+            DomainException: Si ocurre algún error de validación:
+                - 404: La finca especificada no existe.
+                - 403: El usuario actual no tiene permisos para acceder a la información de la finca.
+        """
         
         farm = self.farm_repository.get_farm_by_id(farm_id)
         if not farm:
