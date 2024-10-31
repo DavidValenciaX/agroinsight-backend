@@ -27,7 +27,7 @@ def create_farm(
     farm: FarmCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> SuccessResponse:
     """
     Crea una nueva finca en el sistema para un usuario específico.
 
@@ -59,7 +59,7 @@ def list_farms(
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+) -> PaginatedFarmListResponse:
     """
     Lista todas las fincas en el sistema para un usuario específico.
 

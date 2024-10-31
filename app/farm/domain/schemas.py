@@ -19,7 +19,7 @@ class FarmCreate(BaseModel):
     unidad_area_id: int
     
     @field_validator('nombre')
-    def validate_no_emojis_nombre(cls, v):
+    def validate_no_emojis_nombre(cls, v) -> str:
         """Valida que el nombre no contenga emojis.
 
         Args:
@@ -100,7 +100,7 @@ class FarmUserAssignmentByEmail(BaseModel):
     user_emails: List[str]
     
     @field_validator('user_emails')
-    def validate_emails(cls, emails):
+    def validate_emails(cls, emails) -> List[str]:
         """Valida el formato de todos los correos electrónicos en la lista.
 
         Args:
