@@ -73,6 +73,20 @@ class FarmResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
     
+class WorkerFarmResponse(BaseModel):
+    """Schema para la respuesta con información de una finca.
+
+    Attributes:
+        id (int): Identificador único de la finca.
+        nombre (str): Nombre de la finca.
+        ubicacion (str): Ubicación de la finca.
+    """
+    id: int
+    nombre: str
+    ubicacion: str
+
+    model_config = ConfigDict(from_attributes=True)
+    
 class PaginatedFarmListResponse(BaseModel):
     """Schema para la respuesta paginada de lista de fincas.
 
@@ -135,6 +149,22 @@ class PaginatedFarmUserListResponse(BaseModel):
     """
     users: List[UserForFarmResponse]
     total_users: int
+    page: int = Field(..., ge=1)
+    per_page: int = Field(..., ge=1, le=100)
+    total_pages: int
+    
+class PaginatedWorkerFarmListResponse(BaseModel):
+    """Schema para la respuesta paginada de lista de fincas.
+
+    Attributes:
+        farms (List[FarmResponse]): Lista de fincas para la página actual.
+        total_farms (int): Número total de fincas.
+        page (int): Número de página actual (mínimo 1).
+        per_page (int): Cantidad de elementos por página (entre 1 y 100).
+        total_pages (int): Número total de páginas.
+    """
+    farms: List[WorkerFarmResponse]
+    total_farms: int
     page: int = Field(..., ge=1)
     per_page: int = Field(..., ge=1, le=100)
     total_pages: int

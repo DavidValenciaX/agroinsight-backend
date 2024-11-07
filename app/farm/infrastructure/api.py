@@ -12,7 +12,7 @@ from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.farm.application.list_worker_farms_use_case import ListWorkerFarmsUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail
+from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail, PaginatedWorkerFarmListResponse
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
@@ -182,13 +182,13 @@ def get_user_by_id(
             detail=f"Error interno al obtener el usuario: {str(e)}"
         )
 
-@router.get("/worker/farms", response_model=PaginatedFarmListResponse, status_code=status.HTTP_200_OK)
+@router.get("/worker/farms", response_model=PaginatedWorkerFarmListResponse, status_code=status.HTTP_200_OK)
 def list_worker_farms(
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-) -> PaginatedFarmListResponse:
+) -> PaginatedWorkerFarmListResponse:
     """
     Lista todas las fincas donde el usuario actual es trabajador.
 
@@ -199,7 +199,7 @@ def list_worker_farms(
         current_user (UserInDB): Usuario actual autenticado.
 
     Returns:
-        PaginatedFarmListResponse: Una lista paginada de fincas.
+        PaginatedWorkerFarmListResponse: Una lista paginada de fincas.
 
     Raises:
         HTTPException: Si ocurre un error durante la obtención de la lista de fincas.

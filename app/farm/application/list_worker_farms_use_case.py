@@ -3,10 +3,9 @@ from math import ceil
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.domain.schemas import UserInDB
-from app.farm.domain.schemas import PaginatedFarmListResponse
-from app.infrastructure.common.common_exceptions import DomainException
+from app.farm.domain.schemas import PaginatedWorkerFarmListResponse
 from app.farm.application.services.farm_service import FarmService
-from app.infrastructure.mappers.response_mappers import map_farm_to_response
+from app.infrastructure.mappers.response_mappers import map_worker_farm_to_response
 from fastapi import status
 
 class ListWorkerFarmsUseCase:
@@ -33,7 +32,7 @@ class ListWorkerFarmsUseCase:
         self.user_repository = UserRepository(db)
         self.farm_service = FarmService(db)
 
-    def list_worker_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedFarmListResponse:
+    def list_worker_farms(self, current_user: UserInDB, page: int, per_page: int) -> PaginatedWorkerFarmListResponse:
         """Lista las fincas donde el usuario es trabajador de forma paginada.
 
         Este método realiza las siguientes operaciones:
@@ -47,7 +46,7 @@ class ListWorkerFarmsUseCase:
             per_page (int): Cantidad de fincas por página.
 
         Returns:
-            PaginatedFarmListResponse: Respuesta paginada que incluye:
+            PaginatedWorkerFarmListResponse: Respuesta paginada que incluye:
                 - Lista de fincas para la página actual
                 - Total de fincas
                 - Número de página actual
@@ -67,11 +66,11 @@ class ListWorkerFarmsUseCase:
         )
 
         # Usar la función de mapeo para construir FarmResponse para cada finca
-        farm_responses = [map_farm_to_response(farm) for farm in farms]
+        farm_responses = [map_worker_farm_to_response(farm) for farm in farms]
 
         total_pages = ceil(total_farms / per_page)
 
-        return PaginatedFarmListResponse(
+        return PaginatedWorkerFarmListResponse(
             farms=farm_responses,
             total_farms=total_farms,
             page=page,

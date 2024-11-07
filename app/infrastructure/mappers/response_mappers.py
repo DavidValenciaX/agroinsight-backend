@@ -1,6 +1,6 @@
 from app.cultural_practices.domain.schemas import TaskResponse, TaskStateResponse, TaskTypeResponse
 from app.user.domain.schemas import UserForFarmResponse, UserResponse
-from app.farm.domain.schemas import FarmResponse
+from app.farm.domain.schemas import FarmResponse, WorkerFarmResponse
 from app.plot.domain.schemas import PlotResponse
 from app.cultural_practices.domain.schemas import TaskTypeResponse
 from app.user.infrastructure.orm_models import User
@@ -77,6 +77,23 @@ def map_farm_to_response(farm) -> FarmResponse:
         area_total=farm.area_total,
         unidad_area=farm.unidad_area.abreviatura if farm.unidad_area else "Desconocida",
         usuarios=usuarios
+    )
+    
+def map_worker_farm_to_response(farm) -> FarmResponse:
+    """
+    Mapea un objeto de finca a un esquema de respuesta de finca.
+
+    Args:
+        farm: Objeto de finca a mapear.
+
+    Returns:
+        WorkerFarmResponse: Esquema de respuesta con la información de la finca.
+    """
+    
+    return WorkerFarmResponse(
+        id=farm.id,
+        nombre=farm.nombre,
+        ubicacion=farm.ubicacion
     )
 
 def map_plot_to_response(plot) -> PlotResponse:
