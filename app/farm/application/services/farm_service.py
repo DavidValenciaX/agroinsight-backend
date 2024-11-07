@@ -75,18 +75,18 @@ class FarmService:
         return rol_administrador_finca
     
     def get_worker_role(self) -> Optional[Role]:
-        """Obtiene el rol de trabajador agrícola.
+        """Obtiene el rol de trabajador de finca.
 
         Returns:
-            Optional[Role]: Rol de trabajador agrícola.
+            Optional[Role]: Rol de trabajador de finca.
 
         Raises:
-            DomainException: Si no se puede asignar el rol de trabajador agrícola.
+            DomainException: Si no se puede obtener el rol de trabajador.
         """
-        rol_trabajador_agricola = self.user_repository.get_role_by_name(self.user_service.WORKER_ROLE_NAME) 
-        if not rol_trabajador_agricola:
+        worker_role = self.user_repository.get_role_by_name(self.user_service.WORKER_ROLE_NAME)
+        if not worker_role:
             raise DomainException(
-                message="No se pudo asignar el rol de Trabajador Agrícola.",
+                message="No se pudo obtener el rol de Trabajador de Finca.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        return rol_trabajador_agricola
+        return worker_role

@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
+from app.farm.application.list_worker_farms_use_case import ListWorkerFarmsUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail
@@ -125,7 +126,6 @@ def list_farm_users(
 
     Parameters:
         farm_id (int): ID de la finca.
-        role_id (int): ID del rol a filtrar.
         page (int): Número de página.
         per_page (int): Elementos por página.
         current_user (User): Usuario actual autenticado.
@@ -180,4 +180,37 @@ def get_user_by_id(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al obtener el usuario: {str(e)}"
+        )
+
+@router.get("/worker/farms", response_model=PaginatedFarmListResponse, status_code=status.HTTP_200_OK)
+def list_worker_farms(
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> PaginatedFarmListResponse:
+    """
+    Lista todas las fincas donde el usuario actual es trabajador.
+
+    Parameters:
+        page (int): Número de página.
+        per_page (int): Elementos por página.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        PaginatedFarmListResponse: Una lista paginada de fincas.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la lista de fincas.
+    """
+    list_worker_farms_use_case = ListWorkerFarmsUseCase(db)
+    try:
+        return list_worker_farms_use_case.list_worker_farms(current_user, page, per_page)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar las fincas: {str(e)}"
         )
