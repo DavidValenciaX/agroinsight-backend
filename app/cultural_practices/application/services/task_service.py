@@ -37,6 +37,8 @@ class TaskService:
     POSTERGADA = 'Postergada'
     CERRADA = 'Cerrada'
     
+    MONITOREO_FITOSANITARIO = 'Monitoreo fitosanitario'
+    
     def __init__(self, db: Session):
         """Inicializa el servicio de tareas con la sesión de base de datos.
 

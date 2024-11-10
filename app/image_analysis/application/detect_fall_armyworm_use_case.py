@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.image_analysis.infrastructure.orm_models import MonitoreoFitosanitario, FallArmywormDetection, DetectionResultEnum
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
+from app.cultural_practices.application.services.task_service import TaskService
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.farm.application.services.farm_service import FarmService
 from app.user.domain.schemas import UserInDB
@@ -18,6 +19,7 @@ class DetectFallArmywormUseCase:
         self.farm_service = FarmService(db)
         self.plot_repository = PlotRepository(db)
         self.cloudinary_service = CloudinaryService()
+        self.task_service = TaskService(db)
 
     async def process_detection(self, detection_results: dict, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
@@ -39,6 +41,14 @@ class DetectFallArmywormUseCase:
             raise DomainException(
                 message="La tarea especificada no existe",
                 status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Validar que la tarea es de tipo monitoreo fitosanitario
+        task_type = self.cultural_practices_repository.get_task_type_by_id(task.tipo_labor_id)
+        if not task_type or task_type.nombre != TaskService.MONITOREO_FITOSANITARIO:
+            raise DomainException(
+                message="La tarea debe ser de tipo 'Monitoreo fitosanitario'",
+                status_code=status.HTTP_400_BAD_REQUEST
             )
             
         lote = self.plot_repository.get_plot_by_id(task.lote_id)
