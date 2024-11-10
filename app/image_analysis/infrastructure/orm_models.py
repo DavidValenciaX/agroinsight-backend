@@ -9,21 +9,23 @@ class DetectionResultEnum(enum.Enum):
     healthy_leaf = "healthy_leaf"
     damaged_leaf = "damaged_leaf"
 
-class FallArmywormDetectionGroup(Base):
-    """Modelo para grupo de detecciones de gusano cogollero"""
-    __tablename__ = "grupo_deteccion_gusano_cogollero"
+class MonitoreoFitosanitario(Base):
+    """Modelo para monitoreo fitosanitario"""
+    __tablename__ = "monitoreo_fitosanitario"
 
     id = Column(Integer, primary_key=True)
-    lote_id = Column(Integer, ForeignKey("lote.id"), nullable=False)
-    fecha_deteccion = Column(TIMESTAMP(timezone=True), nullable=False)
+    tarea_labor_id = Column(Integer, ForeignKey("tarea_labor_cultural.id"), nullable=False)
+    fecha_monitoreo = Column(TIMESTAMP(timezone=True), nullable=False)
     observaciones = Column(Text)
+    fecha_creacion = Column(TIMESTAMP(timezone=True), server_default=func.current_timestamp())
+    fecha_modificacion = Column(TIMESTAMP(timezone=True), nullable=True)
 
 class FallArmywormDetection(Base):
     """Modelo para detecciones individuales de gusano cogollero"""
     __tablename__ = "deteccion_gusano_cogollero"
 
     id = Column(Integer, primary_key=True)
-    grupo_deteccion_id = Column(Integer, ForeignKey("grupo_deteccion_gusano_cogollero.id"), nullable=False)
+    monitoreo_fitosanitario_id = Column(Integer, ForeignKey("monitoreo_fitosanitario.id"), nullable=False)
     imagen_url = Column(String(255), nullable=False)
     imagen_public_id = Column(String(255), nullable=False)
     resultado_deteccion = Column(

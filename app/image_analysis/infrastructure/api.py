@@ -13,7 +13,7 @@ router = APIRouter(tags=["image analysis"])
 @router.post("/predict")
 async def predict_images(
     files: List[UploadFile] = File(...),
-    plot_id: int = Form(...),
+    task_id: int = Form(...),
     observations: str = Form(None),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -23,7 +23,7 @@ async def predict_images(
     
     Args:
         files: Lista de archivos de imagen
-        plot_id: ID del lote (opcional)
+        task_id: ID de la tarea de monitoreo fitosanitario
         observations: Observaciones generales (opcional)
         db: Sesión de base de datos
         current_user: Usuario autenticado
@@ -71,7 +71,7 @@ async def predict_images(
         result = await use_case.process_detection(
             response.json(),
             files,
-            plot_id,
+            task_id,
             observations,
             current_user
         )
