@@ -8,7 +8,7 @@ from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status, UploadFile
 from app.infrastructure.common.datetime_utils import datetime_utc_time
-from app.fall_armyworm.application.cloudinary_service import CloudinaryService
+from app.infrastructure.services.cloudinary_service import CloudinaryService
 from dotenv import load_dotenv
 import os
 import httpx
