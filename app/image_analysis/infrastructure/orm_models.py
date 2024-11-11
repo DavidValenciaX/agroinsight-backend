@@ -3,11 +3,17 @@ from sqlalchemy.sql import func
 import enum
 from app.infrastructure.db.connection import Base
 
+# Movemos los Enums aquí
 class DetectionResultEnum(enum.Enum):
-    """Enum para los posibles resultados de detección"""
     leaf_with_larva = "leaf_with_larva"
     healthy_leaf = "healthy_leaf"
     damaged_leaf = "damaged_leaf"
+
+class EstadoMonitoreoEnum(enum.Enum):
+    processing = "processing"
+    completed = "completed"
+    failed = "failed"
+    partial = "partial"
 
 class MonitoreoFitosanitario(Base):
     """Modelo para monitoreo fitosanitario"""
@@ -17,8 +23,15 @@ class MonitoreoFitosanitario(Base):
     tarea_labor_id = Column(Integer, ForeignKey("tarea_labor_cultural.id"), nullable=False)
     fecha_monitoreo = Column(TIMESTAMP(timezone=True), nullable=False)
     observaciones = Column(Text)
-    fecha_creacion = Column(TIMESTAMP(timezone=True), server_default=func.current_timestamp())
-    fecha_modificacion = Column(TIMESTAMP(timezone=True), nullable=True)
+    estado = Column(
+        Enum(
+            EstadoMonitoreoEnum,
+            name='estado_monitoreo_enum'
+        ),
+        nullable=False,
+        default=EstadoMonitoreoEnum.processing
+    )
+    cantidad_imagenes = Column(Integer, nullable=False, default=0)
 
 class FallArmywormDetection(Base):
     """Modelo para detecciones individuales de gusano cogollero"""

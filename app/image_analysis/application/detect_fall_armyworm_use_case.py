@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.image_analysis.infrastructure.orm_models import MonitoreoFitosanitario, FallArmywormDetection, DetectionResultEnum
+from app.image_analysis.infrastructure.orm_models import EstadoMonitoreoEnum, MonitoreoFitosanitario, FallArmywormDetection, DetectionResultEnum
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.application.services.task_service import TaskService
 from app.plot.infrastructure.sql_repository import PlotRepository
@@ -184,7 +184,9 @@ class DetectFallArmywormUseCase:
             MonitoreoFitosanitarioCreate(
                 tarea_labor_id=task_id,
                 fecha_monitoreo=datetime_utc_time(),
-                observaciones=observations
+                observaciones=observations,
+                estado=EstadoMonitoreoEnum.processing,
+                cantidad_imagenes=len(files)
             )
         )
 
@@ -253,7 +255,9 @@ class DetectFallArmywormUseCase:
                     MonitoreoFitosanitarioCreate(
                         tarea_labor_id=task_id,
                         fecha_monitoreo=datetime_utc_time(),
-                        observaciones=observations
+                        observaciones=observations,
+                        estado=EstadoMonitoreoEnum.processing,
+                        cantidad_imagenes=len(files_content)
                     )
                 )
 
@@ -302,7 +306,7 @@ class DetectFallArmywormUseCase:
                                     batch_files[index].filename,
                                     image_folder
                                 )
-
+                                
                                 # Crear detección individual
                                 self.fall_armyworm_repository.create_detection(
                                     FallArmywormDetectionCreate(
@@ -326,6 +330,29 @@ class DetectFallArmywormUseCase:
                     except Exception as e:
                         logger.error(f"Error procesando lote {batch_num + 1}/{total_batches}: {str(e)}")
                         continue
+                    
+                # Actualizar estado del monitoreo
+                try:
+                    total_detections = len(self.fall_armyworm_repository.get_detections_by_monitoreo_id(monitoreo.id))
+                    if total_detections == 0:
+                        monitoreo.estado = EstadoMonitoreoEnum.failed
+                    elif total_detections < monitoreo.cantidad_imagenes:
+                        monitoreo.estado = EstadoMonitoreoEnum.partial
+                    else:
+                        monitoreo.estado = EstadoMonitoreoEnum.completed
+                    
+                    self.fall_armyworm_repository.save_changes()
+                except Exception as e:
+                    logger.error(f"Error actualizando estado del monitoreo: {str(e)}")
 
         except Exception as e:
             logger.error(f"Error en proceso background: {str(e)}")
+            try:
+                with SessionLocal() as db:
+                    fall_armyworm_repository = FallArmywormRepository(db)
+                    monitoreo = fall_armyworm_repository.get_monitoreo_by_task_id(task_id)
+                    if monitoreo:
+                        monitoreo.estado = EstadoMonitoreoEnum.failed
+                        fall_armyworm_repository.save_changes()
+            except Exception as e:
+                logger.error(f"Error actualizando estado a failed: {str(e)}")
