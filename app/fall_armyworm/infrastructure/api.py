@@ -3,11 +3,11 @@ from typing import List
 import httpx
 import logging
 from sqlalchemy.orm import Session
-from app.image_analysis.domain.schemas import FileContent
+from app.fall_armyworm.domain.schemas import FileContent
 from app.infrastructure.db.connection import getDb, SessionLocal
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserInDB
-from app.image_analysis.application.detect_fall_armyworm_use_case import DetectFallArmywormUseCase
+from app.fall_armyworm.application.detect_fall_armyworm_use_case import DetectFallArmywormUseCase
 from app.infrastructure.common.common_exceptions import DomainException
 import os
 from dotenv import load_dotenv
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL', 'http://localhost:8080')
 logger.info(f"ARMYWORM_SERVICE_URL configured as: {ARMYWORM_SERVICE_URL}")
 
-router = APIRouter(tags=["image analysis"])
+router = APIRouter(prefix="/fall-armyworm", tags=["fall armyworm analysis"])
 
 @router.post("/predict")
 async def predict_images(

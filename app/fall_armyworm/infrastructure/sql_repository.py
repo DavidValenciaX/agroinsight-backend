@@ -1,9 +1,9 @@
 from typing import List
 from sqlalchemy.orm import Session
-from app.image_analysis.infrastructure.orm_models import MonitoreoFitosanitario, FallArmywormDetection
+from app.fall_armyworm.infrastructure.orm_models import MonitoreoFitosanitario, FallArmywormDetection
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
-from app.image_analysis.domain.schemas import MonitoreoFitosanitarioCreate, FallArmywormDetectionCreate
+from app.fall_armyworm.domain.schemas import MonitoreoFitosanitarioCreate, FallArmywormDetectionCreate
 
 class FallArmywormRepository:
     def __init__(self, db: Session):

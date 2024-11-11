@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.image_analysis.infrastructure.orm_models import EstadoMonitoreoEnum, MonitoreoFitosanitario, FallArmywormDetection, DetectionResultEnum
+from app.fall_armyworm.infrastructure.orm_models import EstadoMonitoreoEnum, MonitoreoFitosanitario, FallArmywormDetection, DetectionResultEnum
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.application.services.task_service import TaskService
 from app.plot.infrastructure.sql_repository import PlotRepository
@@ -8,13 +8,13 @@ from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status, UploadFile
 from app.infrastructure.common.datetime_utils import datetime_utc_time
-from app.image_analysis.application.cloudinary_service import CloudinaryService
+from app.fall_armyworm.application.cloudinary_service import CloudinaryService
 from dotenv import load_dotenv
 import os
 import httpx
 import logging
-from app.image_analysis.infrastructure.sql_repository import FallArmywormRepository
-from app.image_analysis.domain.schemas import (
+from app.fall_armyworm.infrastructure.sql_repository import FallArmywormRepository
+from app.fall_armyworm.domain.schemas import (
     FallArmywormDetectionResult,
     FileContent,
     MonitoreoFitosanitarioCreate,

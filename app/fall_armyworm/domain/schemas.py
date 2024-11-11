@@ -4,7 +4,7 @@ from datetime import datetime
 from typing_extensions import Annotated
 from dataclasses import dataclass
 
-from app.image_analysis.infrastructure.orm_models import DetectionResultEnum, EstadoMonitoreoEnum
+from app.fall_armyworm.infrastructure.orm_models import DetectionResultEnum, EstadoMonitoreoEnum
 
 # Definir tipos personalizados para mayor legibilidad
 Probability = Annotated[float, Field(ge=0, le=1)]
