@@ -10,6 +10,8 @@ from app.image_analysis.application.detect_fall_armyworm_use_case import DetectF
 from app.infrastructure.common.common_exceptions import DomainException
 import os
 from dotenv import load_dotenv
+import socket
+import platform
 
 load_dotenv(override=True)
 
@@ -41,6 +43,16 @@ async def predict_images(
         db: Sesión de base de datos
         current_user: Usuario autenticado
     """
+    
+    # Dentro del endpoint predict, antes de hacer la llamada
+    logger.info(f"System info: {platform.system()} {platform.release()}")
+    logger.info(f"Python version: {platform.python_version()}")
+    try:
+        host = socket.gethostbyname(ARMYWORM_SERVICE_URL.split('//')[1].split('/')[0])
+        logger.info(f"Resolved host IP: {host}")
+    except Exception as e:
+        logger.error(f"Could not resolve host: {str(e)}")
+    
     # Validar número máximo de imágenes
     if len(files) > 15:
         raise HTTPException(
@@ -62,9 +74,11 @@ async def predict_images(
         
         # Configurar el cliente con timeouts más largos y reintentos
         async with httpx.AsyncClient(
-            timeout=60.0,
+            timeout=httpx.Timeout(60.0),
             limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
-            verify=False  # Solo para pruebas, no usar en producción final
+            verify=False, # Solo para pruebas, no usar en producción final
+            follow_redirects=True,
+            transport=httpx.AsyncHTTPTransport(retries=3)
         ) as client:
             try:
                 files_to_upload = [
@@ -120,4 +134,22 @@ async def predict_images(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error procesando las imágenes: {str(e)}"
-        ) 
+        )
+        
+@router.get("/test-armyworm-connection")
+async def test_connection():
+    """Endpoint para probar la conexión con el servicio de análisis"""
+    try:
+        async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
+            response = await client.get(f"{ARMYWORM_SERVICE_URL}/health")
+            return {
+                "status": "success",
+                "service_url": ARMYWORM_SERVICE_URL,
+                "response": response.json()
+            }
+    except Exception as e:
+        return {
+            "status": "error",
+            "service_url": ARMYWORM_SERVICE_URL,
+            "error": str(e)
+        }
