@@ -97,7 +97,7 @@ async def test_connection():
     """Endpoint para probar la conexión con el servicio de análisis"""
     try:
         async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
-            response = await client.get(f"{ARMYWORM_SERVICE_URL}/health")
+            response = await client.get(f"{ARMYWORM_SERVICE_URL}/fall-armyworm/health")
             return {
                 "status": "success",
                 "service_url": ARMYWORM_SERVICE_URL,

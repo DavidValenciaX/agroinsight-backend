@@ -87,7 +87,7 @@ class DetectFallArmywormUseCase:
         """
         Obtiene las predicciones del servicio externo de análisis de imágenes
         """
-        service_url = f"{ARMYWORM_SERVICE_URL}/predict"
+        service_url = f"{ARMYWORM_SERVICE_URL}/fall-armyworm/predict"
         logger.info(f"Making request to: {service_url}")
         
         async with httpx.AsyncClient(
@@ -285,7 +285,7 @@ class DetectFallArmywormUseCase:
                             transport=httpx.AsyncHTTPTransport(retries=3)
                         ) as client:
                             response = await client.post(
-                                f"{ARMYWORM_SERVICE_URL}/predict",
+                                f"{ARMYWORM_SERVICE_URL}/fall-armyworm/predict",
                                 files=files_to_upload
                             )
 
