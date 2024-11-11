@@ -13,8 +13,9 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 # Obtener URL del servicio de análisis de imágenes desde variable de entorno
-ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL')
+ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL', 'http://localhost:8080')
 
+print(f"Environment variables loaded:")
 print(f"ARMYWORM_SERVICE_URL: {ARMYWORM_SERVICE_URL}")
 
 router = APIRouter(tags=["image analysis"])
@@ -53,15 +54,17 @@ async def predict_images(
             )
 
     try:
-        # Llamar al servicio de análisis
-        async with httpx.AsyncClient() as client:
+        service_url = f"{ARMYWORM_SERVICE_URL}/predict"
+        print(f"Attempting to connect to: {service_url}")
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
             files_to_upload = [
                 ("files", (file.filename, await file.read(), file.content_type))
                 for file in files
             ]
             
             response = await client.post(
-                f"{ARMYWORM_SERVICE_URL}/predict",
+                service_url,
                 files=files_to_upload
             )
 
