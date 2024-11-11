@@ -13,6 +13,12 @@ from dotenv import load_dotenv
 import os
 import httpx
 import logging
+from app.image_analysis.infrastructure.sql_repository import FallArmywormRepository
+from app.image_analysis.domain.schemas import (
+    FallArmywormDetectionResult,
+    MonitoreoFitosanitarioCreate,
+    FallArmywormDetectionCreate
+)
 
 load_dotenv(override=True)
 
@@ -30,6 +36,7 @@ class DetectFallArmywormUseCase:
         self.cloudinary_service = CloudinaryService()
         self.task_service = TaskService(db)
         self._environment = os.getenv('RAILWAY_ENVIRONMENT_NAME', 'development')
+        self.fall_armyworm_repository = FallArmywormRepository(db)
 
     async def detect_fall_armyworm(self, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
@@ -121,9 +128,9 @@ class DetectFallArmywormUseCase:
         for file in files:
             await file.seek(0)
             
-        return response.json()
+        return FallArmywormDetectionResult(**response.json())
 
-    async def process_detection(self, detection_results: dict, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
+    async def process_detection(self, detection_results: FallArmywormDetectionResult, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
         Procesa los resultados de la detección y los guarda en la base de datos
         
@@ -135,7 +142,7 @@ class DetectFallArmywormUseCase:
             current_user: Usuario actual
             
         Returns:
-            dict: Resultados procesados
+            FallArmywormDetectionResult: Resultados procesados
         """
         # Validar que la tarea existe y el usuario tiene acceso
         task = self.cultural_practices_repository.get_task_by_id(task_id)
@@ -168,17 +175,17 @@ class DetectFallArmywormUseCase:
             )
 
         # Crear monitoreo fitosanitario
-        monitoreo = MonitoreoFitosanitario(
-            tarea_labor_id=task_id,
-            fecha_monitoreo=datetime_utc_time(),
-            observaciones=observations
+        monitoreo = self.fall_armyworm_repository.create_monitoreo(
+            MonitoreoFitosanitarioCreate(
+                tarea_labor_id=task_id,
+                fecha_monitoreo=datetime_utc_time(),
+                observaciones=observations
+            )
         )
-        self.db.add(monitoreo)
-        self.db.flush()
 
         # Procesar cada detección individual
-        for index, result in enumerate(detection_results["results"]):
-            if result["status"] == "success":
+        for index, result in enumerate(detection_results.results):
+            if result.status == "success":
                 # Generar ruta incluyendo el entorno
                 image_folder = f"{self._environment}/fall_armyworm/task_{task_id}"
                 
@@ -188,24 +195,18 @@ class DetectFallArmywormUseCase:
                     image_folder
                 )
 
-                detection = FallArmywormDetection(
-                    monitoreo_fitosanitario_id=monitoreo.id,
-                    imagen_url=cloudinary_result["url"],
-                    imagen_public_id=cloudinary_result["public_id"],
-                    resultado_deteccion=DetectionResultEnum[result["predicted_class"]],
-                    confianza_deteccion=result["confidence"],
-                    prob_leaf_with_larva=result["probabilities"]["leaf_with_larva"],
-                    prob_healthy_leaf=result["probabilities"]["healthy_leaf"],
-                    prob_damaged_leaf=result["probabilities"]["damaged_leaf"]
+                self.fall_armyworm_repository.create_detection(
+                    FallArmywormDetectionCreate(
+                        monitoreo_fitosanitario_id=monitoreo.id,
+                        imagen_url=cloudinary_result["url"],
+                        imagen_public_id=cloudinary_result["public_id"],
+                        resultado_deteccion=result.predicted_class,
+                        confianza_deteccion=result.confidence,
+                        prob_leaf_with_larva=result.probabilities.leaf_with_larva,
+                        prob_healthy_leaf=result.probabilities.healthy_leaf,
+                        prob_damaged_leaf=result.probabilities.damaged_leaf
+                    )
                 )
-                self.db.add(detection)
 
-        try:
-            self.db.commit()
-            return detection_results
-        except Exception as e:
-            self.db.rollback()
-            raise DomainException(
-                message=f"Error guardando los resultados: {str(e)}",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            ) 
+        self.fall_armyworm_repository.save_changes()
+        return detection_results
