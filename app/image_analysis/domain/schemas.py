@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Optional, List
 from datetime import datetime
 from typing_extensions import Annotated
+from dataclasses import dataclass
 
 # Definir tipos personalizados para mayor legibilidad
 Probability = Annotated[float, Field(ge=0, le=1)]
@@ -41,3 +42,9 @@ class FallArmywormDetectionCreate(BaseModel):
     prob_healthy_leaf: Probability
     prob_damaged_leaf: Probability
     observaciones: Optional[str] = Field(None, max_length=500)
+
+@dataclass
+class FileContent:
+    filename: str
+    content: bytes
+    content_type: str

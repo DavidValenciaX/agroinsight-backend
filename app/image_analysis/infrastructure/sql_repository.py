@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from app.image_analysis.infrastructure.orm_models import MonitoreoFitosanitario, FallArmywormDetection
 from app.infrastructure.common.common_exceptions import DomainException
@@ -28,3 +29,13 @@ class FallArmywormRepository:
                 message=f"Error guardando los resultados: {str(e)}",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+            
+    def get_monitoreo_by_task_id(self, task_id: int) -> MonitoreoFitosanitario:
+        return self.db.query(MonitoreoFitosanitario)\
+            .filter(MonitoreoFitosanitario.tarea_labor_id == task_id)\
+            .first()
+
+    def get_detections_by_monitoreo_id(self, monitoreo_id: int) -> List[FallArmywormDetection]:
+        return self.db.query(FallArmywormDetection)\
+            .filter(FallArmywormDetection.monitoreo_fitosanitario_id == monitoreo_id)\
+            .all()

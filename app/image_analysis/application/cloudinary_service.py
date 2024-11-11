@@ -46,3 +46,24 @@ class CloudinaryService:
             
         except Exception as e:
             raise Exception(f"Error subiendo imagen a Cloudinary: {str(e)}")
+
+    async def upload_bytes(self, content: bytes, filename: str, folder: str) -> dict:
+        """
+        Sube contenido de bytes a Cloudinary
+        """
+        try:
+            result = uploader.upload(
+                content,
+                folder=folder,
+                resource_type="image",
+                format="jpg",
+                quality="auto:good"
+            )
+            
+            return {
+                "url": result["secure_url"],
+                "public_id": result["public_id"]
+            }
+            
+        except Exception as e:
+            raise Exception(f"Error subiendo imagen a Cloudinary: {str(e)}")
