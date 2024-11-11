@@ -23,6 +23,7 @@ from app.image_analysis.domain.schemas import (
 from typing import List, Dict
 import math
 import asyncio
+from app.infrastructure.db.connection import SessionLocal
 
 load_dotenv(override=True)
 
@@ -217,114 +218,114 @@ class DetectFallArmywormUseCase:
 
     async def process_images_in_background(
         self,
-        files: list[UploadFile],
+        files_content: List[FileContent],
         task_id: int,
         observations: str,
-        current_user: UserInDB
+        user_id: int
     ):
         """
         Procesa imágenes en lotes de 15 en segundo plano
         """
         try:
-            # Leer todos los archivos primero
-            file_contents = []
-            for file in files:
-                content = await file.read()
-                file_contents.append(FileContent(
-                    filename=file.filename,
-                    content=content,
-                    content_type=file.content_type
-                ))
+            # Crear una nueva sesión de base de datos
+            with SessionLocal() as db:
+                # Inicializar los repositorios y servicios con la nueva sesión
+                self.db = db
+                self.cultural_practices_repository = CulturalPracticesRepository(db)
+                self.farm_service = FarmService(db)
+                self.plot_repository = PlotRepository(db)
+                self.task_service = TaskService(db)
+                self.fall_armyworm_repository = FallArmywormRepository(db)
 
-            # Validar acceso y existencia de la tarea primero
-            task = self.cultural_practices_repository.get_task_by_id(task_id)
-            if not task:
-                logger.error(f"Tarea {task_id} no encontrada")
-                return
-                
-            lote = self.plot_repository.get_plot_by_id(task.lote_id)
-            if not lote or not self.farm_service.user_is_farm_admin(current_user.id, lote.finca_id):
-                logger.error(f"Usuario {current_user.id} sin acceso a tarea {task_id}")
-                return
+                # Validar acceso y existencia de la tarea
+                task = self.cultural_practices_repository.get_task_by_id(task_id)
+                if not task:
+                    logger.error(f"Tarea {task_id} no encontrada")
+                    return
 
-            # Crear monitoreo fitosanitario principal
-            monitoreo = self.fall_armyworm_repository.create_monitoreo(
-                MonitoreoFitosanitarioCreate(
-                    tarea_labor_id=task_id,
-                    fecha_monitoreo=datetime_utc_time(),
-                    observaciones=observations
+                lote = self.plot_repository.get_plot_by_id(task.lote_id)
+                if not lote or not self.farm_service.user_is_farm_admin(user_id, lote.finca_id):
+                    logger.error(f"Usuario {user_id} sin acceso a tarea {task_id}")
+                    return
+
+                # Crear monitoreo fitosanitario principal
+                monitoreo = self.fall_armyworm_repository.create_monitoreo(
+                    MonitoreoFitosanitarioCreate(
+                        tarea_labor_id=task_id,
+                        fecha_monitoreo=datetime_utc_time(),
+                        observaciones=observations
+                    )
                 )
-            )
 
-            # Procesar imágenes en lotes de 15
-            batch_size = 15
-            total_batches = math.ceil(len(file_contents) / batch_size)
+                # Procesar imágenes en lotes de 15
+                batch_size = 15
+                total_batches = math.ceil(len(files_content) / batch_size)
 
-            for batch_num in range(total_batches):
-                start_idx = batch_num * batch_size
-                end_idx = min((batch_num + 1) * batch_size, len(file_contents))
-                batch_files = file_contents[start_idx:end_idx]
+                for batch_num in range(total_batches):
+                    start_idx = batch_num * batch_size
+                    end_idx = min((batch_num + 1) * batch_size, len(files_content))
+                    batch_files = files_content[start_idx:end_idx]
 
-                try:
-                    # Preparar archivos para el servicio de predicción
-                    files_to_upload = [
-                        ("files", (file.filename, file.content, file.content_type))
-                        for file in batch_files
-                    ]
+                    try:
+                        # Preparar archivos para el servicio de predicción
+                        files_to_upload = [
+                            ("files", (file.filename, file.content, file.content_type))
+                            for file in batch_files
+                        ]
 
-                    # Obtener predicciones para el lote actual
-                    async with httpx.AsyncClient(
-                        timeout=httpx.Timeout(60.0),
-                        verify=False,
-                        follow_redirects=True,
-                        transport=httpx.AsyncHTTPTransport(retries=3)
-                    ) as client:
-                        response = await client.post(
-                            f"{ARMYWORM_SERVICE_URL}/predict",
-                            files=files_to_upload
-                        )
-
-                    if response.status_code not in [200, 207]:
-                        logger.error(f"Error en lote {batch_num + 1}: Status code {response.status_code}")
-                        continue
-
-                    detection_results = FallArmywormDetectionResult(**response.json())
-
-                    # Procesar cada detección del lote
-                    for index, result in enumerate(detection_results.results):
-                        if result.status == "success":
-                            image_folder = f"{self._environment}/fall_armyworm/task_{task_id}"
-                            
-                            # Subir imagen a Cloudinary
-                            cloudinary_result = await self.cloudinary_service.upload_bytes(
-                                batch_files[index].content,
-                                batch_files[index].filename,
-                                image_folder
+                        # Obtener predicciones para el lote actual
+                        async with httpx.AsyncClient(
+                            timeout=httpx.Timeout(60.0),
+                            verify=False,
+                            follow_redirects=True,
+                            transport=httpx.AsyncHTTPTransport(retries=3)
+                        ) as client:
+                            response = await client.post(
+                                f"{ARMYWORM_SERVICE_URL}/predict",
+                                files=files_to_upload
                             )
 
-                            # Crear detección individual
-                            self.fall_armyworm_repository.create_detection(
-                                FallArmywormDetectionCreate(
-                                    monitoreo_fitosanitario_id=monitoreo.id,
-                                    imagen_url=cloudinary_result["url"],
-                                    imagen_public_id=cloudinary_result["public_id"],
-                                    resultado_deteccion=result.predicted_class,
-                                    confianza_deteccion=result.confidence,
-                                    prob_leaf_with_larva=result.probabilities.leaf_with_larva,
-                                    prob_healthy_leaf=result.probabilities.healthy_leaf,
-                                    prob_damaged_leaf=result.probabilities.damaged_leaf
+                        if response.status_code not in [200, 207]:
+                            logger.error(f"Error en lote {batch_num + 1}: Status code {response.status_code}")
+                            continue
+
+                        detection_results = FallArmywormDetectionResult(**response.json())
+
+                        # Procesar cada detección del lote
+                        for index, result in enumerate(detection_results.results):
+                            if result.status == "success":
+                                image_folder = f"{self._environment}/fall_armyworm/task_{task_id}"
+                                
+                                # Subir imagen a Cloudinary
+                                cloudinary_result = await self.cloudinary_service.upload_bytes(
+                                    batch_files[index].content,
+                                    batch_files[index].filename,
+                                    image_folder
                                 )
-                            )
 
-                    # Guardar cambios después de cada lote
-                    self.fall_armyworm_repository.save_changes()
-                    
-                    # Pequeña pausa entre lotes
-                    await asyncio.sleep(1)
+                                # Crear detección individual
+                                self.fall_armyworm_repository.create_detection(
+                                    FallArmywormDetectionCreate(
+                                        monitoreo_fitosanitario_id=monitoreo.id,
+                                        imagen_url=cloudinary_result["url"],
+                                        imagen_public_id=cloudinary_result["public_id"],
+                                        resultado_deteccion=result.predicted_class,
+                                        confianza_deteccion=result.confidence,
+                                        prob_leaf_with_larva=result.probabilities.leaf_with_larva,
+                                        prob_healthy_leaf=result.probabilities.healthy_leaf,
+                                        prob_damaged_leaf=result.probabilities.damaged_leaf
+                                    )
+                                )
 
-                except Exception as e:
-                    logger.error(f"Error procesando lote {batch_num + 1}/{total_batches}: {str(e)}")
-                    continue
+                        # Guardar cambios después de cada lote
+                        self.fall_armyworm_repository.save_changes()
+                        
+                        # Pequeña pausa entre lotes
+                        await asyncio.sleep(1)
+
+                    except Exception as e:
+                        logger.error(f"Error procesando lote {batch_num + 1}/{total_batches}: {str(e)}")
+                        continue
 
         except Exception as e:
             logger.error(f"Error en proceso background: {str(e)}")

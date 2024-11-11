@@ -3,7 +3,8 @@ from typing import List
 import httpx
 import logging
 from sqlalchemy.orm import Session
-from app.infrastructure.db.connection import getDb
+from app.image_analysis.domain.schemas import FileContent
+from app.infrastructure.db.connection import getDb, SessionLocal
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserInDB
 from app.image_analysis.application.detect_fall_armyworm_use_case import DetectFallArmywormUseCase
@@ -31,7 +32,6 @@ async def predict_images(
     files: List[UploadFile] = File(...),
     task_id: int = Form(...),
     observations: str = Form(None),
-    db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
     """
@@ -41,39 +41,51 @@ async def predict_images(
         files: Lista de archivos de imagen
         task_id: ID de la tarea de monitoreo fitosanitario
         observations: Observaciones generales (opcional)
-        db: Sesión de base de datos
         current_user: Usuario autenticado
     """
 
     try:
-        detect_fall_armyworm_use_case = DetectFallArmywormUseCase(db)
-        
+        # Leer el contenido de los archivos antes de que termine la solicitud
+        files_content = []
+        for file in files:
+            content = await file.read()
+            files_content.append(FileContent(
+                filename=file.filename,
+                content=content,
+                content_type=file.content_type
+            ))
+
+        # Obtener user_id en lugar de current_user completo
+        user_id = current_user.id
+
         if len(files) <= 15:
-            # Proceso normal para 15 o menos imágenes
+            # Procesar normalmente
+            detect_fall_armyworm_use_case = DetectFallArmywormUseCase(SessionLocal())
             result = await detect_fall_armyworm_use_case.detect_fall_armyworm(
                 files=files,
                 task_id=task_id,
                 observations=observations,
-                current_user=current_user
+                user_id=user_id
             )
             return result
         else:
-            # Proceso en background para más de 15 imágenes
+            # Procesar en segundo plano
+            detect_fall_armyworm_use_case = DetectFallArmywormUseCase(None)  # Pasamos None, inicializaremos dentro del background task
             background_tasks.add_task(
                 detect_fall_armyworm_use_case.process_images_in_background,
-                files=files,
+                files_content=files_content,
                 task_id=task_id,
                 observations=observations,
-                current_user=current_user
+                user_id=user_id
             )
             return {
                 "status": "processing",
-                "message": f"Procesando {len(files)} imágenes en segundo plano",
-                "total_images": len(files)
+                "message": f"Procesando {len(files_content)} imágenes en segundo plano",
+                "total_images": len(files_content)
             }
             
     except DomainException as e:
-        raise e
+        raise HTTPException(status_code=e.status_code, detail=e.message)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
