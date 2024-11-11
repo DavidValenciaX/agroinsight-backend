@@ -2,6 +2,10 @@ from cloudinary import config, uploader
 from fastapi import UploadFile
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
 class CloudinaryService:
     def __init__(self):
         config(

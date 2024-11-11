@@ -9,6 +9,10 @@ from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status, UploadFile
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.image_analysis.application.cloudinary_service import CloudinaryService
+from dotenv import load_dotenv
+import os
+
+load_dotenv(override=True)
 
 class DetectFallArmywormUseCase:
     """Caso de uso para procesar detecciones de gusano cogollero"""
@@ -20,6 +24,7 @@ class DetectFallArmywormUseCase:
         self.plot_repository = PlotRepository(db)
         self.cloudinary_service = CloudinaryService()
         self.task_service = TaskService(db)
+        self._environment = os.getenv('RAILWAY_ENVIRONMENT_NAME', 'development')
 
     async def process_detection(self, detection_results: dict, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
@@ -77,10 +82,13 @@ class DetectFallArmywormUseCase:
         # Procesar cada detección individual
         for index, result in enumerate(detection_results["results"]):
             if result["status"] == "success":
+                # Generar ruta incluyendo el entorno
+                image_folder = f"{self._environment}/fall_armyworm/task_{task_id}"
+                
                 # Subir imagen a Cloudinary
                 cloudinary_result = await self.cloudinary_service.upload_image(
                     files[index],
-                    f"fall_armyworm/task_{task_id}"
+                    image_folder
                 )
 
                 detection = FallArmywormDetection(
