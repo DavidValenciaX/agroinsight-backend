@@ -15,6 +15,8 @@ load_dotenv(override=True)
 # Obtener URL del servicio de análisis de imágenes desde variable de entorno
 ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL')
 
+print(f"ARMYWORM_SERVICE_URL: {ARMYWORM_SERVICE_URL}")
+
 router = APIRouter(tags=["image analysis"])
 
 @router.post("/predict")
