@@ -8,9 +8,12 @@ from app.user.domain.schemas import UserInDB
 from app.image_analysis.application.detect_fall_armyworm_use_case import DetectFallArmywormUseCase
 from app.infrastructure.common.common_exceptions import DomainException
 import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
 
 # Obtener URL del servicio de análisis de imágenes desde variable de entorno
-ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL', 'http://localhost:8080')
+ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL')
 
 router = APIRouter(tags=["image analysis"])
 
