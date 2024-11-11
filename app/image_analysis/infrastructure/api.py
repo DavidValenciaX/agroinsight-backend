@@ -7,6 +7,10 @@ from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserInDB
 from app.image_analysis.application.detect_fall_armyworm_use_case import DetectFallArmywormUseCase
 from app.infrastructure.common.common_exceptions import DomainException
+import os
+
+# Obtener URL del servicio de análisis de imágenes desde variable de entorno
+ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL', 'http://localhost:8080')
 
 router = APIRouter(tags=["image analysis"])
 
@@ -52,7 +56,7 @@ async def predict_images(
             ]
             
             response = await client.post(
-                "http://localhost:8080/predict",
+                f"{ARMYWORM_SERVICE_URL}/predict",
                 files=files_to_upload
             )
 
