@@ -43,91 +43,17 @@ async def predict_images(
         db: Sesión de base de datos
         current_user: Usuario autenticado
     """
-    
-    # Dentro del endpoint predict, antes de hacer la llamada
-    logger.info(f"System info: {platform.system()} {platform.release()}")
-    logger.info(f"Python version: {platform.python_version()}")
-    try:
-        host = socket.gethostbyname(ARMYWORM_SERVICE_URL.split('//')[1].split('/')[0])
-        logger.info(f"Resolved host IP: {host}")
-    except Exception as e:
-        logger.error(f"Could not resolve host: {str(e)}")
-    
-    # Validar número máximo de imágenes
-    if len(files) > 15:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Se pueden procesar máximo 15 imágenes por llamada"
-        )
-        
-    # Validar tipos de archivo permitidos
-    for file in files:
-        if not file.content_type in ["image/jpeg", "image/png"]:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Archivo {file.filename} no es una imagen válida. Solo se permiten archivos JPG y PNG"
-            )
 
     try:
-        service_url = f"{ARMYWORM_SERVICE_URL}/predict"
-        logger.info(f"Making request to: {service_url}")
-        
-        # Configurar el cliente con timeouts más largos y reintentos
-        async with httpx.AsyncClient(
-            timeout=httpx.Timeout(60.0),
-            limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
-            verify=False, # Solo para pruebas, no usar en producción final
-            follow_redirects=True,
-            transport=httpx.AsyncHTTPTransport(retries=3)
-        ) as client:
-            try:
-                files_to_upload = [
-                    ("files", (file.filename, await file.read(), file.content_type))
-                    for file in files
-                ]
-                
-                logger.info("Sending files to prediction service...")
-                response = await client.post(
-                    service_url,
-                    files=files_to_upload
-                )
-                logger.info(f"Response status code: {response.status_code}")
-                
-            except httpx.ConnectError as e:
-                logger.error(f"Connection error: {str(e)}")
-                raise HTTPException(
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail=f"No se pudo conectar al servicio de análisis: {str(e)}"
-                )
-            except httpx.TimeoutException as e:
-                logger.error(f"Timeout error: {str(e)}")
-                raise HTTPException(
-                    status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-                    detail="El servicio de análisis tardó demasiado en responder"
-                )
-
-        if response.status_code not in [200, 207]:
-            raise HTTPException(
-                status_code=response.status_code,
-                detail="Error al procesar las imágenes"
-            )
-            
-        # Resetear la posición de lectura de los archivos
-        for file in files:
-            await file.seek(0)
-
-        # Procesar resultados y guardar en BD
-        use_case = DetectFallArmywormUseCase(db)
-        result = await use_case.process_detection(
-            response.json(),
-            files,
-            task_id,
-            observations,
-            current_user
+        detect_fall_armyworm_use_case = DetectFallArmywormUseCase(db)
+        result = await detect_fall_armyworm_use_case.detect_fall_armyworm(
+            files=files,
+            task_id=task_id,
+            observations=observations,
+            current_user=current_user
         )
-        
         return result
-
+        
     except DomainException as e:
         raise e
     except Exception as e:
@@ -135,7 +61,7 @@ async def predict_images(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error procesando las imágenes: {str(e)}"
         )
-        
+
 @router.get("/test-armyworm-connection")
 async def test_connection():
     """Endpoint para probar la conexión con el servicio de análisis"""
