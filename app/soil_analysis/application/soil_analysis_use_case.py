@@ -183,7 +183,7 @@ class SoilAnalysisUseCase:
         analysis = self.soil_analysis_repository.create_analysis(
             SoilAnalysisCreate(
                 tarea_labor_id=task_id,
-                fecha_analisis=datetime_utc_time(),
+                fecha_analisis=datetime_utc_time().date(),
                 observaciones=observations,
                 estado=SoilAnalysisStatusEnum.processing,
                 cantidad_imagenes=len(files)
@@ -202,7 +202,7 @@ class SoilAnalysisUseCase:
                     image_folder
                 )
                 
-                predicted_class = self.soil_analysis_repository.get_predicted_class_by_name(result.predicted_class)
+                predicted_class = self.soil_analysis_repository.get_soil_type_by_name(result.predicted_class)
 
                 self.soil_analysis_repository.create_classification(
                     SoilClassificationCreate(
@@ -260,7 +260,7 @@ class SoilAnalysisUseCase:
                 analysis = self.soil_analysis_repository.create_analysis(
                     SoilAnalysisCreate(
                         tarea_labor_id=task_id,
-                        fecha_analisis=datetime_utc_time(),
+                        fecha_analisis=datetime_utc_time().date(),
                         observaciones=observations,
                         estado=SoilAnalysisStatusEnum.processing,
                         cantidad_imagenes=len(files_content)
@@ -313,7 +313,7 @@ class SoilAnalysisUseCase:
                                     image_folder
                                 )
                                 
-                                predicted_class = self.soil_analysis_repository.get_predicted_class_by_name(result.predicted_class)
+                                predicted_class = self.soil_analysis_repository.get_soil_type_by_name(result.predicted_class)
                                 
                                 # Crear detección individual
                                 self.soil_analysis_repository.create_classification(

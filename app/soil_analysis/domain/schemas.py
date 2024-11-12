@@ -10,22 +10,37 @@ from app.soil_analysis.infrastructure.orm_models import SoilAnalysisStatusEnum
 Probability = Annotated[float, Field(ge=0, le=1)]
 
 class SoilProbabilities(BaseModel):
-    alluvial_soil: Probability
-    black_soil: Probability
-    cinder_soil: Probability
-    clay_soil: Probability
-    laterite_soil: Probability
-    peat_soil: Probability
-    yellow_soil: Probability
+    """Soil probabilities with field aliases to match API response"""
+    alluvial_soil: Probability = Field(..., alias="Alluvial Soil")
+    black_soil: Probability = Field(..., alias="Black Soil")
+    cinder_soil: Probability = Field(..., alias="Cinder Soil")
+    clay_soil: Probability = Field(..., alias="Clay Soil")
+    laterite_soil: Probability = Field(..., alias="Laterite Soil")
+    peat_soil: Probability = Field(..., alias="Peat Soil")
+    yellow_soil: Probability = Field(..., alias="Yellow Soil")
+
+    class Config:
+        populate_by_name = True
+        allow_population_by_field_name = True
 
 class SoilClassificationResponse(BaseModel):
+    filename: str
     status: str = Field(..., pattern="^(success|error)$")
     predicted_class: str
     confidence: Probability
     probabilities: SoilProbabilities
 
+    class Config:
+        populate_by_name = True
+        allow_population_by_field_name = True
+
 class SoilAnalysisResult(BaseModel):
+    message: str
     results: List[SoilClassificationResponse]
+
+    class Config:
+        populate_by_name = True
+        allow_population_by_field_name = True
 
 class SoilAnalysisCreate(BaseModel):
     tarea_labor_id: int = Field(gt=0)

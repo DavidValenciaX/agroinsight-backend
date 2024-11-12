@@ -44,3 +44,16 @@ class SoilClassification(Base):
     prob_laterite_soil = Column(Numeric(5,4), nullable=False)
     prob_peat_soil = Column(Numeric(5,4), nullable=False)
     prob_yellow_soil = Column(Numeric(5,4), nullable=False)
+    
+class SoilType(Base):
+    """Modelo para tipos de suelo"""
+    __tablename__ = "tipo_suelo"
+
+    id = Column(Integer, primary_key=True, server_default=func.identity())
+    nombre = Column(String(50), unique=True, nullable=False)
+    descripcion = Column(Text)
+    color_id = Column(Integer, nullable=False)
+    textura_id = Column(Integer, nullable=False)
+    munsell_id = Column(Integer)
+    caracteristicas_generales = Column(Text)
+    recomendaciones_manejo = Column(Text)

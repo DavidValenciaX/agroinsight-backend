@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.orm import Session
 from app.soil_analysis.domain.schemas import SoilAnalysisCreate, SoilClassificationCreate
-from app.soil_analysis.infrastructure.orm_models import SoilAnalysis, SoilClassification
+from app.soil_analysis.infrastructure.orm_models import SoilAnalysis, SoilClassification, SoilType
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
@@ -40,7 +40,7 @@ class SoilAnalysisRepository:
             .filter(SoilClassification.analisis_suelo_id == analysis_id)\
             .all()
             
-    def get_predicted_class_by_name(self, predicted_class: str) -> SoilClassification:
-        return self.db.query(SoilClassification)\
-            .filter(SoilClassification.nombre == predicted_class)\
+    def get_soil_type_by_name(self, predicted_class: str) -> SoilType:
+        return self.db.query(SoilType)\
+            .filter(SoilType.nombre == predicted_class)\
             .first()
