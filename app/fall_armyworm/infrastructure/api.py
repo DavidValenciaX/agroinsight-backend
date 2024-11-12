@@ -55,6 +55,7 @@ async def predict_images(
                 content=content,
                 content_type=file.content_type
             ))
+            await file.seek(0)
 
         # Obtener user_id en lugar de current_user completo
         user_id = current_user.id

@@ -15,12 +15,14 @@ class DetectionProbabilities(BaseModel):
     damaged_leaf: Probability
 
 class DetectionResponse(BaseModel):
+    filename: str
     status: str = Field(..., pattern="^(success|error)$")
     predicted_class: DetectionResultEnum
     confidence: Probability
     probabilities: DetectionProbabilities
 
 class FallArmywormDetectionResult(BaseModel):
+    message: str
     results: List[DetectionResponse]
 
 class MonitoreoFitosanitarioCreate(BaseModel):
@@ -39,7 +41,6 @@ class FallArmywormDetectionCreate(BaseModel):
     prob_leaf_with_larva: Probability
     prob_healthy_leaf: Probability
     prob_damaged_leaf: Probability
-    observaciones: Optional[str] = Field(None, max_length=500)
 
 @dataclass
 class FileContent:
