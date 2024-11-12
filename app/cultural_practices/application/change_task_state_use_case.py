@@ -116,7 +116,7 @@ class ChangeTaskStateUseCase:
         """Verifica si un usuario tiene permisos para cambiar el estado de una tarea.
 
         Este método valida la existencia de la tarea, el lote y la finca asociada, y verifica si el usuario
-        es administrador de la finca.
+        es administrador o trabajador de la finca.
 
         Args:
             user_id (int): ID del usuario que intenta cambiar el estado.
@@ -152,8 +152,6 @@ class ChangeTaskStateUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
-        # Verificar si el usuario es administrador de la finca
-        return self.farm_service.user_is_farm_admin(user_id, farm.id)
-            
-            
-            
+        # Verificar si el usuario es administrador o trabajador de la finca
+        return (self.farm_service.user_is_farm_admin(user_id, farm.id) or 
+                self.farm_service.user_is_farm_worker(user_id, farm.id))
