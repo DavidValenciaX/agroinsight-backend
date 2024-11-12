@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.fall_armyworm.infrastructure.orm_models import EstadoMonitoreoEnum
+from app.soil_analysis.infrastructure.orm_models import SoilAnalysisStatusEnum
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.application.services.task_service import TaskService
 from app.plot.infrastructure.sql_repository import PlotRepository
@@ -13,12 +13,12 @@ from dotenv import load_dotenv
 import os
 import httpx
 import logging
-from app.fall_armyworm.infrastructure.sql_repository import FallArmywormRepository
-from app.fall_armyworm.domain.schemas import (
-    FallArmywormDetectionResult,
+from app.soil_analysis.infrastructure.sql_repository import SoilAnalysisRepository
+from app.soil_analysis.domain.schemas import (
+    SoilAnalysisResult,
     FileContent,
-    MonitoreoFitosanitarioCreate,
-    FallArmywormDetectionCreate
+    SoilAnalysisCreate,
+    SoilClassificationCreate
 )
 from typing import List, Dict
 import math
@@ -28,10 +28,10 @@ from app.infrastructure.db.connection import SessionLocal
 load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
-ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL', 'http://localhost:8080')
+SOIL_ANALYSIS_SERVICE_URL = os.getenv('SOIL_ANALYSIS_SERVICE_URL', 'http://localhost:8080')
 
-class DetectFallArmywormUseCase:
-    """Caso de uso para procesar detecciones de gusano cogollero"""
+class SoilAnalysisUseCase:
+    """Caso de uso para procesar análisis de suelo"""
 
     def __init__(self, db: Session):
         self.db = db
@@ -41,15 +41,15 @@ class DetectFallArmywormUseCase:
         self.cloudinary_service = CloudinaryService()
         self.task_service = TaskService(db)
         self._environment = os.getenv('RAILWAY_ENVIRONMENT_NAME', 'development')
-        self.fall_armyworm_repository = FallArmywormRepository(db)
+        self.soil_analysis_repository = SoilAnalysisRepository(db)
 
-    async def detect_fall_armyworm(self, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
+    async def analyze_soil(self, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
-        Ejecuta el caso de uso completo de detección de gusano cogollero
+        Ejecuta el caso de uso completo de análisis de suelo
         
         Args:
             files: Lista de archivos de imagen
-            task_id: ID de la tarea de monitoreo fitosanitario
+            task_id: ID de la tarea de análisis de suelo
             observations: Observaciones generales
             current_user: Usuario actual
             
@@ -72,11 +72,11 @@ class DetectFallArmywormUseCase:
                 )
 
         # Obtener predicciones del servicio externo
-        detection_results = await self._get_predictions(files)
+        analysis_results = await self._get_predictions(files)
 
         # Procesar resultados y guardar en BD
-        return await self.process_detection(
-            detection_results,
+        return await self.process_analysis(
+            analysis_results,
             files,
             task_id,
             observations,
@@ -87,7 +87,7 @@ class DetectFallArmywormUseCase:
         """
         Obtiene las predicciones del servicio externo de análisis de imágenes
         """
-        service_url = f"{ARMYWORM_SERVICE_URL}/fall-armyworm/predict"
+        service_url = f"{SOIL_ANALYSIS_SERVICE_URL}/soil-analysis/predict"
         logger.info(f"Making request to: {service_url}")
         
         async with httpx.AsyncClient(
@@ -133,21 +133,21 @@ class DetectFallArmywormUseCase:
         for file in files:
             await file.seek(0)
             
-        return FallArmywormDetectionResult(**response.json())
+        return SoilAnalysisResult(**response.json())
 
-    async def process_detection(self, detection_results: FallArmywormDetectionResult, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
+    async def process_analysis(self, analysis_results: SoilAnalysisResult, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
-        Procesa los resultados de la detección y los guarda en la base de datos
+        Procesa los resultados de la análisis y los guarda en la base de datos
         
         Args:
-            detection_results: Resultados del servicio de detección
+            detection_results: Resultados del servicio de análisis
             files: Archivos de imagen subidos
-            task_id: ID de la tarea de monitoreo fitosanitario
+            task_id: ID de la tarea de análisis de suelo
             observations: Observaciones generales
             current_user: Usuario actual
             
         Returns:
-            FallArmywormDetectionResult: Resultados procesados
+            SoilAnalysisResult: Resultados procesados
         """
         # Validar que la tarea existe y el usuario tiene acceso
         task = self.cultural_practices_repository.get_task_by_id(task_id)
@@ -157,11 +157,11 @@ class DetectFallArmywormUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
-        # Validar que la tarea es de tipo monitoreo fitosanitario
+        # Validar que la tarea es de tipo análisis de suelo
         task_type = self.cultural_practices_repository.get_task_type_by_id(task.tipo_labor_id)
-        if not task_type or task_type.nombre != TaskService.MONITOREO_FITOSANITARIO:
+        if not task_type or task_type.nombre != TaskService.ANALISIS_SUELO:
             raise DomainException(
-                message="La tarea debe ser de tipo 'Monitoreo fitosanitario'",
+                message="La tarea debe ser de tipo 'Análisis de suelo'",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
             
@@ -175,48 +175,54 @@ class DetectFallArmywormUseCase:
         # Verificar que el usuario tenga acceso a la tarea
         if not self.farm_service.user_is_farm_admin(current_user.id, lote.finca_id):
             raise DomainException(
-                message="No tienes permisos para realizar detecciones en esta tarea",
+                message="No tienes permisos para realizar análisis de suelo en esta tarea",
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
-        # Crear monitoreo fitosanitario
-        monitoreo = self.fall_armyworm_repository.create_monitoreo(
-            MonitoreoFitosanitarioCreate(
+        # Crear análisis de suelo
+        analysis = self.soil_analysis_repository.create_analysis(
+            SoilAnalysisCreate(
                 tarea_labor_id=task_id,
-                fecha_monitoreo=datetime_utc_time(),
+                fecha_analisis=datetime_utc_time(),
                 observaciones=observations,
-                estado=EstadoMonitoreoEnum.processing,
+                estado=SoilAnalysisStatusEnum.processing,
                 cantidad_imagenes=len(files)
             )
         )
 
         # Procesar cada detección individual
-        for index, result in enumerate(detection_results.results):
+        for index, result in enumerate(analysis_results.results):
             if result.status == "success":
                 # Generar ruta incluyendo el entorno
-                image_folder = f"{self._environment}/fall_armyworm/task_{task_id}"
+                image_folder = f"{self._environment}/soil_analysis/task_{task_id}"
                 
                 # Subir imagen a Cloudinary
                 cloudinary_result = await self.cloudinary_service.upload_image(
                     files[index],
                     image_folder
                 )
+                
+                predicted_class = self.soil_analysis_repository.get_predicted_class_by_name(result.predicted_class)
 
-                self.fall_armyworm_repository.create_detection(
-                    FallArmywormDetectionCreate(
-                        monitoreo_fitosanitario_id=monitoreo.id,
+                self.soil_analysis_repository.create_classification(
+                    SoilClassificationCreate(
+                        analisis_suelo_id=analysis.id,
                         imagen_url=cloudinary_result["url"],
                         imagen_public_id=cloudinary_result["public_id"],
-                        resultado_deteccion=result.predicted_class,
-                        confianza_deteccion=result.confidence,
-                        prob_leaf_with_larva=result.probabilities.leaf_with_larva,
-                        prob_healthy_leaf=result.probabilities.healthy_leaf,
-                        prob_damaged_leaf=result.probabilities.damaged_leaf
+                        resultado_analisis_id=predicted_class.id,
+                        confianza_clasificacion=result.confidence,
+                        prob_laterite_soil=result.probabilities.laterite_soil,
+                        prob_peat_soil=result.probabilities.peat_soil,
+                        prob_yellow_soil=result.probabilities.yellow_soil,
+                        prob_cinder_soil=result.probabilities.cinder_soil,
+                        prob_clay_soil=result.probabilities.clay_soil,
+                        prob_black_soil=result.probabilities.black_soil,
+                        prob_alluvial_soil=result.probabilities.alluvial_soil
                     )
                 )
 
-        self.fall_armyworm_repository.save_changes()
-        return detection_results
+        self.soil_analysis_repository.save_changes()
+        return analysis_results
 
     async def process_images_in_background(
         self,
@@ -237,7 +243,7 @@ class DetectFallArmywormUseCase:
                 self.farm_service = FarmService(db)
                 self.plot_repository = PlotRepository(db)
                 self.task_service = TaskService(db)
-                self.fall_armyworm_repository = FallArmywormRepository(db)
+                self.soil_analysis_repository = SoilAnalysisRepository(db)
 
                 # Validar acceso y existencia de la tarea
                 task = self.cultural_practices_repository.get_task_by_id(task_id)
@@ -250,13 +256,13 @@ class DetectFallArmywormUseCase:
                     logger.error(f"Usuario {user_id} sin acceso a tarea {task_id}")
                     return
 
-                # Crear monitoreo fitosanitario principal
-                monitoreo = self.fall_armyworm_repository.create_monitoreo(
-                    MonitoreoFitosanitarioCreate(
+                # Crear análisis de suelo principal
+                analysis = self.soil_analysis_repository.create_analysis(
+                    SoilAnalysisCreate(
                         tarea_labor_id=task_id,
-                        fecha_monitoreo=datetime_utc_time(),
+                        fecha_analisis=datetime_utc_time(),
                         observaciones=observations,
-                        estado=EstadoMonitoreoEnum.processing,
+                        estado=SoilAnalysisStatusEnum.processing,
                         cantidad_imagenes=len(files_content)
                     )
                 )
@@ -285,7 +291,7 @@ class DetectFallArmywormUseCase:
                             transport=httpx.AsyncHTTPTransport(retries=3)
                         ) as client:
                             response = await client.post(
-                                f"{ARMYWORM_SERVICE_URL}/fall-armyworm/predict",
+                                f"{SOIL_ANALYSIS_SERVICE_URL}/soil-analysis/predict",
                                 files=files_to_upload
                             )
 
@@ -293,12 +299,12 @@ class DetectFallArmywormUseCase:
                             logger.error(f"Error en lote {batch_num + 1}: Status code {response.status_code}")
                             continue
 
-                        detection_results = FallArmywormDetectionResult(**response.json())
+                        analysis_results = SoilAnalysisResult(**response.json())
 
                         # Procesar cada detección del lote
-                        for index, result in enumerate(detection_results.results):
+                        for index, result in enumerate(analysis_results.results):
                             if result.status == "success":
-                                image_folder = f"{self._environment}/fall_armyworm/task_{task_id}"
+                                image_folder = f"{self._environment}/soil_analysis/task_{task_id}"
                                 
                                 # Subir imagen a Cloudinary
                                 cloudinary_result = await self.cloudinary_service.upload_bytes(
@@ -307,22 +313,28 @@ class DetectFallArmywormUseCase:
                                     image_folder
                                 )
                                 
+                                predicted_class = self.soil_analysis_repository.get_predicted_class_by_name(result.predicted_class)
+                                
                                 # Crear detección individual
-                                self.fall_armyworm_repository.create_detection(
-                                    FallArmywormDetectionCreate(
-                                        monitoreo_fitosanitario_id=monitoreo.id,
+                                self.soil_analysis_repository.create_classification(
+                                    SoilClassificationCreate(
+                                        analisis_suelo_id=analysis.id,
                                         imagen_url=cloudinary_result["url"],
                                         imagen_public_id=cloudinary_result["public_id"],
-                                        resultado_deteccion=result.predicted_class,
-                                        confianza_deteccion=result.confidence,
-                                        prob_leaf_with_larva=result.probabilities.leaf_with_larva,
-                                        prob_healthy_leaf=result.probabilities.healthy_leaf,
-                                        prob_damaged_leaf=result.probabilities.damaged_leaf
+                                        resultado_analisis_id=predicted_class.id,
+                                        confianza_clasificacion=result.confidence,
+                                        prob_laterite_soil=result.probabilities.laterite_soil,
+                                        prob_peat_soil=result.probabilities.peat_soil,
+                                        prob_yellow_soil=result.probabilities.yellow_soil,
+                                        prob_cinder_soil=result.probabilities.cinder_soil,
+                                        prob_clay_soil=result.probabilities.clay_soil,
+                                        prob_black_soil=result.probabilities.black_soil,
+                                        prob_alluvial_soil=result.probabilities.alluvial_soil
                                     )
                                 )
 
                         # Guardar cambios después de cada lote
-                        self.fall_armyworm_repository.save_changes()
+                        self.soil_analysis_repository.save_changes()
                         
                         # Pequeña pausa entre lotes
                         await asyncio.sleep(1)
@@ -331,28 +343,28 @@ class DetectFallArmywormUseCase:
                         logger.error(f"Error procesando lote {batch_num + 1}/{total_batches}: {str(e)}")
                         continue
                     
-                # Actualizar estado del monitoreo
+                # Actualizar estado del análisis
                 try:
-                    total_detections = len(self.fall_armyworm_repository.get_detections_by_monitoreo_id(monitoreo.id))
-                    if total_detections == 0:
-                        monitoreo.estado = EstadoMonitoreoEnum.failed
-                    elif total_detections < monitoreo.cantidad_imagenes:
-                        monitoreo.estado = EstadoMonitoreoEnum.partial
+                    total_classifications = len(self.soil_analysis_repository.get_classifications_by_analysis_id(analysis.id))
+                    if total_classifications == 0:
+                        analysis.estado = SoilAnalysisStatusEnum.failed
+                    elif total_classifications < analysis.cantidad_imagenes:
+                        analysis.estado = SoilAnalysisStatusEnum.partial
                     else:
-                        monitoreo.estado = EstadoMonitoreoEnum.completed
+                        analysis.estado = SoilAnalysisStatusEnum.completed
                     
-                    self.fall_armyworm_repository.save_changes()
+                    self.soil_analysis_repository.save_changes()
                 except Exception as e:
-                    logger.error(f"Error actualizando estado del monitoreo: {str(e)}")
+                    logger.error(f"Error actualizando estado del análisis: {str(e)}")
 
         except Exception as e:
             logger.error(f"Error en proceso background: {str(e)}")
             try:
                 with SessionLocal() as db:
-                    fall_armyworm_repository = FallArmywormRepository(db)
-                    monitoreo = fall_armyworm_repository.get_monitoreo_by_task_id(task_id)
-                    if monitoreo:
-                        monitoreo.estado = EstadoMonitoreoEnum.failed
-                        fall_armyworm_repository.save_changes()
+                    soil_analysis_repository = SoilAnalysisRepository(db)
+                    analysis = soil_analysis_repository.get_analysis_by_task_id(task_id)
+                    if analysis:
+                        analysis.estado = SoilAnalysisStatusEnum.failed
+                        soil_analysis_repository.save_changes()
             except Exception as e:
                 logger.error(f"Error actualizando estado a failed: {str(e)}")

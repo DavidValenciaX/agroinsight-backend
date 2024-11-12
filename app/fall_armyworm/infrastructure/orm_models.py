@@ -52,4 +52,3 @@ class FallArmywormDetection(Base):
     prob_leaf_with_larva = Column(Numeric(5,4), nullable=False)
     prob_healthy_leaf = Column(Numeric(5,4), nullable=False)
     prob_damaged_leaf = Column(Numeric(5,4), nullable=False)
-    observaciones = Column(Text)

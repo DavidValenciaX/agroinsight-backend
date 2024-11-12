@@ -38,6 +38,7 @@ class TaskService:
     CERRADA = 'Cerrada'
     
     MONITOREO_FITOSANITARIO = 'Monitoreo fitosanitario'
+    ANALISIS_SUELO = 'Análisis de suelo'
     
     def __init__(self, db: Session):
         """Inicializa el servicio de tareas con la sesión de base de datos.
