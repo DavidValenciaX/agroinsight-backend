@@ -19,6 +19,7 @@ from app.cultural_practices.application.list_tasks_by_user_and_farm_use_case imp
 from app.cultural_practices.application.change_task_state_use_case import ChangeTaskStateUseCase
 from app.cultural_practices.application.list_task_states_use_case import ListTaskStatesUseCase
 from app.cultural_practices.application.list_task_types_use_case import ListTaskTypesUseCase
+from app.cultural_practices.application.list_worker_tasks_use_case import ListWorkerTasksUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -249,4 +250,39 @@ def list_task_types(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar los tipos de labor cultural: {str(e)}"
+        ) from e
+
+@router.get("/farms/{farm_id}/worker/tasks", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
+def list_worker_tasks(
+    farm_id: int,
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> PaginatedTaskListResponse:
+    """
+    Lista todas las tareas asignadas al trabajador actual en una finca específica.
+
+    Parameters:
+        farm_id (int): ID de la finca.
+        page (int): Número de página.
+        per_page (int): Elementos por página.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado (trabajador).
+
+    Returns:
+        PaginatedTaskListResponse: Una lista paginada de tareas asignadas al trabajador.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la lista de tareas.
+    """
+    list_worker_tasks_use_case = ListWorkerTasksUseCase(db)
+    try:
+        return list_worker_tasks_use_case.list_worker_tasks(farm_id, page, per_page, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar las tareas del trabajador: {str(e)}"
         ) from e
