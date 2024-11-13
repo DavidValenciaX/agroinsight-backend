@@ -21,6 +21,10 @@ class DetectionResponse(BaseModel):
     confidence: Probability
     probabilities: DetectionProbabilities
 
+class PredictionServiceResponse(BaseModel):
+    message: str
+    results: List[DetectionResponse]
+
 class FallArmywormDetectionResult(BaseModel):
     monitoring_id: int
     message: str

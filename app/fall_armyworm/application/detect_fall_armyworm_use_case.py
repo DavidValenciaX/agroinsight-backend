@@ -18,7 +18,8 @@ from app.fall_armyworm.domain.schemas import (
     FallArmywormDetectionResult,
     FileContent,
     MonitoreoFitosanitarioCreate,
-    FallArmywormDetectionCreate
+    FallArmywormDetectionCreate,
+    PredictionServiceResponse
 )
 from typing import List, Dict
 import math
@@ -90,7 +91,7 @@ class DetectFallArmywormUseCase:
             message=detection_results.message
         )
 
-    async def _get_predictions(self, files: list[UploadFile]) -> dict:
+    async def _get_predictions(self, files: list[UploadFile]) -> PredictionServiceResponse:
         """
         Obtiene las predicciones del servicio externo de análisis de imágenes
         """
@@ -140,7 +141,7 @@ class DetectFallArmywormUseCase:
         for file in files:
             await file.seek(0)
             
-        return FallArmywormDetectionResult(**response.json())
+        return PredictionServiceResponse(**response.json())
 
     async def process_detection(self, detection_results: FallArmywormDetectionResult, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
