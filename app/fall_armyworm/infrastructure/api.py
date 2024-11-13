@@ -92,8 +92,7 @@ async def predict_images(
                 files_content=files_content,
                 task_id=task_id,
                 observations=observations,
-                user_id=user_id,
-                monitoring_id=monitoring_id
+                user_id=user_id
             )
             
             return {
