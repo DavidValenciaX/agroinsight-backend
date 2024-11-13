@@ -242,7 +242,11 @@ class SoilAnalysisUseCase:
         except Exception as e:
             logger.error(f"Error actualizando estado del análisis: {str(e)}")
         
-        return analysis_results
+        return {
+            "analysis_id": analysis.id,
+            "results": analysis_results.results,
+            "message": analysis_results.message
+        }
 
     async def process_images_in_background(
         self,
