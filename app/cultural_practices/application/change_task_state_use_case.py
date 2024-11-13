@@ -9,6 +9,7 @@ from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time
+from typing import Union
 
 class ChangeTaskStateUseCase:
     """Caso de uso para cambiar el estado de una tarea de labor cultural.
@@ -38,7 +39,7 @@ class ChangeTaskStateUseCase:
         self.farm_service = FarmService(db)
         self.task_service = TaskService(db)
         
-    def change_task_state(self, task_id: int, state_id: int, current_user: UserInDB) -> SuccessResponse:
+    def change_task_state(self, task_id: int, state_id: Union[int, str], current_user: UserInDB) -> SuccessResponse:
         """Cambia el estado de una tarea de labor cultural.
 
         Este método valida la existencia de la tarea y del estado, así como los permisos del usuario
@@ -47,7 +48,7 @@ class ChangeTaskStateUseCase:
 
         Args:
             task_id (int): ID de la tarea cuyo estado se desea cambiar.
-            state_id (int): ID del nuevo estado que se asignará a la tarea.
+            state_id (Union[int, str]): ID del estado o comando ('in_progress', 'done').
             current_user (UserInDB): Usuario actual autenticado que intenta cambiar el estado.
 
         Returns:
@@ -69,6 +70,16 @@ class ChangeTaskStateUseCase:
                 message="No tienes permisos para cambiar el estado de esta tarea.",
                 status_code=status.HTTP_403_FORBIDDEN
             )
+
+        # Convertir comando de texto a ID si es necesario
+        if isinstance(state_id, str):
+            numeric_state_id = self.task_service.get_state_id_from_command(state_id)
+            if numeric_state_id is None:
+                raise DomainException(
+                    message="Comando de estado inválido. Use un ID numérico o 'in_progress'/'done'.",
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
+            state_id = numeric_state_id
 
         # Obtener tarea por ID
         task = self.cultural_practice_repository.get_task_by_id(task_id)
@@ -100,16 +111,8 @@ class ChangeTaskStateUseCase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
-        # Obtener nombre del estado por ID
-        state = self.cultural_practice_repository.get_task_state_by_id(state_id)
-        if not state:
-            raise DomainException(
-                message="No se pudo obtener el estado de la tarea.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
         return SuccessResponse(
-            message="Estado de la tarea cambiado exitosamente a " + state.nombre
+            message="Estado de la tarea cambiado exitosamente a " + target_state.nombre
         )
     
     def user_can_change_task_state(self, user_id: int, task_id: int) -> bool:

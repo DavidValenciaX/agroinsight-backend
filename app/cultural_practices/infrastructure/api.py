@@ -20,6 +20,7 @@ from app.cultural_practices.application.change_task_state_use_case import Change
 from app.cultural_practices.application.list_task_states_use_case import ListTaskStatesUseCase
 from app.cultural_practices.application.list_task_types_use_case import ListTaskTypesUseCase
 from app.cultural_practices.application.list_worker_tasks_use_case import ListWorkerTasksUseCase
+from typing import Union
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -193,7 +194,7 @@ def list_task_states(
 @router.put("/tasks/{task_id}/states/{state_id}", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
 def change_task_state(
     task_id: int,
-    state_id: int,
+    state_id: Union[int, str],
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> SuccessResponse:
@@ -202,7 +203,7 @@ def change_task_state(
 
     Parameters:
         task_id (int): ID de la tarea a cambiar el estado.
-        state_id (int): ID del estado al que se cambiará la tarea.
+        state_id (Union[int, str]): ID del estado o comando ('in_progress', 'done').
         db (Session): Sesión de base de datos.
         current_user (UserInDB): Usuario actual autenticado.
 

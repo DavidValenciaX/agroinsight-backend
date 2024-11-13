@@ -19,7 +19,7 @@ class TaskCreate(BaseModel):
     tipo_labor_id: int
     fecha_inicio_estimada: date
     descripcion: Optional[str] = Field(None, max_length=500)
-    estado_id: int
+    estado_id: int = Field(default=1)
     lote_id: int
     
     @field_validator('nombre')
