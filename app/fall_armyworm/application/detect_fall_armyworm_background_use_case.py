@@ -176,16 +176,10 @@ class DetectFallArmywormBackgroundUseCase:
         """
         Procesa imágenes en lotes de 15 en segundo plano
         """
-        
-        """ monitoring_id = await self.create_initial_monitoring(
-            task_id=task_id,
-            observations=observations,
-            total_images=len(files_content)
-        ) """
-        
         try:
             # Crear una nueva sesión de base de datos
-            with SessionLocal() as db:
+            db = SessionLocal()
+            try:
                 # Inicializar los repositorios y servicios con la nueva sesión
                 self.db = db
                 self.cultural_practices_repository = CulturalPracticesRepository(db)
@@ -225,21 +219,29 @@ class DetectFallArmywormBackgroundUseCase:
                         cantidad_imagenes=len(files_content)
                     )
                 )
+                
+                # Importante: Hacer commit de la transacción antes de iniciar el proceso en segundo plano
+                self.fall_armyworm_repository.save_changes()
+                
+                monitoring_id = monitoreo.id
 
                 # Agregar el procesamiento de lotes como tarea en segundo plano
                 background_tasks.add_task(
                     self._process_batches,
                     files_content,
                     task_id,
-                    monitoreo.id
+                    monitoring_id  # Usar el ID del monitoreo creado
                 )
 
-            return {
-                "monitoring_id": monitoreo.id,
-                "status": "processing",
-                "message": f"Procesando {len(files_content)} imágenes en segundo plano",
-                "total_images": len(files_content)
-            }
+                return {
+                    "monitoring_id": monitoring_id,
+                    "status": "processing",
+                    "message": f"Procesando {len(files_content)} imágenes en segundo plano",
+                    "total_images": len(files_content)
+                }
+
+            finally:
+                db.close()
 
         except Exception as e:
             logger.error(f"Error en proceso background: {str(e)}")
