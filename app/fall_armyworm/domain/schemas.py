@@ -47,3 +47,21 @@ class FileContent:
     filename: str
     content: bytes
     content_type: str
+
+class DetectionResult(BaseModel):
+    id: int
+    imagen_url: str
+    resultado_deteccion: DetectionResultEnum
+    confianza_deteccion: Probability
+    prob_leaf_with_larva: Probability
+    prob_healthy_leaf: Probability
+    prob_damaged_leaf: Probability
+
+class MonitoreoFitosanitarioResult(BaseModel):
+    id: int
+    tarea_labor_id: int
+    fecha_monitoreo: datetime
+    observaciones: Optional[str]
+    estado: EstadoMonitoreoEnum
+    cantidad_imagenes: int
+    detecciones: List[DetectionResult]

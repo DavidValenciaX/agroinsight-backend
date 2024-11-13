@@ -21,7 +21,7 @@ class SoilProbabilities(BaseModel):
 
     class Config:
         populate_by_name = True
-        allow_population_by_field_name = True
+        populate_by_name = True
 
 class SoilClassificationResponse(BaseModel):
     filename: str
@@ -32,7 +32,6 @@ class SoilClassificationResponse(BaseModel):
 
     class Config:
         populate_by_name = True
-        allow_population_by_field_name = True
 
 class SoilAnalysisResult(BaseModel):
     message: str
@@ -40,7 +39,6 @@ class SoilAnalysisResult(BaseModel):
 
     class Config:
         populate_by_name = True
-        allow_population_by_field_name = True
 
 class SoilAnalysisCreate(BaseModel):
     tarea_labor_id: int = Field(gt=0)

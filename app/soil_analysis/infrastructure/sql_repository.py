@@ -34,6 +34,11 @@ class SoilAnalysisRepository:
         return self.db.query(SoilAnalysis)\
             .filter(SoilAnalysis.tarea_labor_id == task_id)\
             .first()
+            
+    def get_analysis_by_id(self, analysis_id: int) -> SoilAnalysis:
+        return self.db.query(SoilAnalysis)\
+            .filter(SoilAnalysis.id == analysis_id)\
+            .first()
 
     def get_classifications_by_analysis_id(self, analysis_id: int) -> List[SoilClassification]:
         return self.db.query(SoilClassification)\

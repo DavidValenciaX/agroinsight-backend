@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.fall_armyworm.infrastructure.orm_models import MonitoreoFitosanitario, FallArmywormDetection
 from app.infrastructure.common.common_exceptions import DomainException
@@ -34,8 +34,27 @@ class FallArmywormRepository:
         return self.db.query(MonitoreoFitosanitario)\
             .filter(MonitoreoFitosanitario.tarea_labor_id == task_id)\
             .first()
+            
+    def get_monitoreo_by_id(self, monitoring_id: int) -> MonitoreoFitosanitario:
+        return self.db.query(MonitoreoFitosanitario)\
+            .filter(MonitoreoFitosanitario.id == monitoring_id)\
+            .first()
 
     def get_detections_by_monitoreo_id(self, monitoreo_id: int) -> List[FallArmywormDetection]:
         return self.db.query(FallArmywormDetection)\
             .filter(FallArmywormDetection.monitoreo_fitosanitario_id == monitoreo_id)\
             .all()
+
+    def get_monitoreo_with_detections(self, monitoreo_id: int) -> tuple[Optional[MonitoreoFitosanitario], List[FallArmywormDetection]]:
+        monitoreo = self.db.query(MonitoreoFitosanitario)\
+            .filter(MonitoreoFitosanitario.id == monitoreo_id)\
+            .first()
+        
+        if not monitoreo:
+            return None, []
+        
+        detections = self.db.query(FallArmywormDetection)\
+            .filter(FallArmywormDetection.monitoreo_fitosanitario_id == monitoreo_id)\
+            .all()
+        
+        return monitoreo, detections

@@ -1,9 +1,14 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Form, BackgroundTasks
 from typing import List
+from fastapi.responses import JSONResponse
 import httpx
 import logging
 from sqlalchemy.orm import Session
-from app.fall_armyworm.domain.schemas import FileContent
+from app.cultural_practices.application.services.task_service import TaskService
+from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
+from app.fall_armyworm.application.get_monitoring_status_use_case import GetMonitoringStatusUseCase
+from app.fall_armyworm.application.get_monitoring_use_case import GetMonitoringUseCase
+from app.fall_armyworm.domain.schemas import FileContent, MonitoreoFitosanitarioResult
 from app.fall_armyworm.infrastructure.sql_repository import FallArmywormRepository
 from app.infrastructure.db.connection import getDb, SessionLocal
 from app.infrastructure.security.jwt_middleware import get_current_user
@@ -12,8 +17,6 @@ from app.fall_armyworm.application.detect_fall_armyworm_use_case import DetectFa
 from app.infrastructure.common.common_exceptions import DomainException
 import os
 from dotenv import load_dotenv
-import socket
-import platform
 
 load_dotenv(override=True)
 
@@ -23,7 +26,6 @@ logger = logging.getLogger(__name__)
 
 # Obtener URL del servicio de análisis de imágenes desde variable de entorno
 ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL', 'http://localhost:8080')
-logger.info(f"ARMYWORM_SERVICE_URL configured as: {ARMYWORM_SERVICE_URL}")
 
 router = APIRouter(prefix="/fall-armyworm", tags=["fall armyworm analysis"])
 
@@ -92,29 +94,31 @@ async def predict_images(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error procesando las imágenes: {str(e)}"
-        )
+        ) from e
 
-@router.get("/test-armyworm-connection")
+@router.get("/test-armyworm-connection", status_code=status.HTTP_200_OK)
 async def test_connection():
     """Endpoint para probar la conexión con el servicio de análisis"""
     try:
         async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
             response = await client.get(f"{ARMYWORM_SERVICE_URL}/fall-armyworm/health")
-            return {
-                "status": "success",
-                "service_url": ARMYWORM_SERVICE_URL,
-                "response": response.json()
-            }
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={
+                    "status": "success",
+                    "service_url": ARMYWORM_SERVICE_URL,
+                    "response": response.json()
+                }
+            )
     except Exception as e:
-        return {
-            "status": "error",
-            "service_url": ARMYWORM_SERVICE_URL,
-            "error": str(e)
-        }
-        
-@router.get("/predict/{task_id}/status")
-async def get_processing_status(
-    task_id: int,
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Error conectando con el servicio de análisis: {str(e)}"
+        ) from e
+
+@router.get("/monitoring/{monitoring_id}/status")
+async def get_monitoring_status(
+    monitoring_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
@@ -122,25 +126,37 @@ async def get_processing_status(
     Consulta el estado del procesamiento de imágenes para una tarea
     """
     try:
-        fall_armyworm_repository = FallArmywormRepository(db)
-        monitoreo = fall_armyworm_repository.get_monitoreo_by_task_id(task_id)
-        
-        if not monitoreo:
-            return {
-                "status": "not_found",
-                "message": "No se encontró un monitoreo para esta tarea"
-            }
-            
-        detections = fall_armyworm_repository.get_detections_by_monitoreo_id(monitoreo.id)
-        
-        return {
-            "status": "completed",
-            "total_processed": len(detections),
-            "monitoreo_id": monitoreo.id
-        }
-        
+        get_monitoring_status_use_case = GetMonitoringStatusUseCase(db)
+        return get_monitoring_status_use_case.get_monitoring_status(monitoring_id)
+    except DomainException as e:
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error consultando estado: {str(e)}"
-        )
+        ) from e
+
+@router.get("/monitoring/{monitoring_id}", response_model=MonitoreoFitosanitarioResult)
+async def get_monitoring_results(
+    monitoring_id: int,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Obtiene los resultados de un monitoreo fitosanitario específico
+    
+    Args:
+        monitoreo_id: ID del monitoreo fitosanitario
+        db: Sesión de base de datos
+        current_user: Usuario autenticado
+    """
+    try:
+        get_monitoring_use_case = GetMonitoringUseCase(db)
+        return get_monitoring_use_case.get_monitoring(monitoring_id, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error obteniendo resultados del monitoreo: {str(e)}"
+        ) from e

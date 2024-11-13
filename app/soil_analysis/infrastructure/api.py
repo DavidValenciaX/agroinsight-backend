@@ -1,19 +1,18 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Form, BackgroundTasks
+from fastapi.responses import JSONResponse
 from typing import List
 import httpx
 import logging
 from sqlalchemy.orm import Session
+from app.soil_analysis.application.get_analysis_status_use_case import GetAnalysisStatusUseCase
 from app.soil_analysis.domain.schemas import FileContent
 from app.infrastructure.db.connection import getDb, SessionLocal
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.soil_analysis.infrastructure.sql_repository import SoilAnalysisRepository
 from app.user.domain.schemas import UserInDB
 from app.soil_analysis.application.soil_analysis_use_case import SoilAnalysisUseCase
 from app.infrastructure.common.common_exceptions import DomainException
 import os
 from dotenv import load_dotenv
-import socket
-import platform
 
 load_dotenv(override=True)
 
@@ -23,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 # Obtener URL del servicio de análisis de imágenes desde variable de entorno
 SOIL_ANALYSIS_SERVICE_URL = os.getenv('SOIL_ANALYSIS_SERVICE_URL', 'http://localhost:5000')
-logger.info(f"SOIL_ANALYSIS_SERVICE_URL configured as: {SOIL_ANALYSIS_SERVICE_URL}")
 
 router = APIRouter(prefix="/soil-analysis", tags=["soil analysis"])
 
@@ -87,34 +85,36 @@ async def predict_images(
             }
             
     except DomainException as e:
-        raise HTTPException(status_code=e.status_code, detail=e.message)
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error procesando las imágenes: {str(e)}"
-        )
+        ) from e
 
-@router.get("/test-soil-analysis-connection")
+@router.get("/test-soil-analysis-connection", status_code=status.HTTP_200_OK)
 async def test_connection():
     """Endpoint para probar la conexión con el servicio de análisis"""
     try:
         async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
             response = await client.get(f"{SOIL_ANALYSIS_SERVICE_URL}/soil-analysis/health")
-            return {
-                "status": "success",
-                "service_url": SOIL_ANALYSIS_SERVICE_URL,
-                "response": response.json()
-            }
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={
+                    "status": "success",
+                    "service_url": SOIL_ANALYSIS_SERVICE_URL,
+                    "response": response.json()
+                }
+            )
     except Exception as e:
-        return {
-            "status": "error",
-            "service_url": SOIL_ANALYSIS_SERVICE_URL,
-            "error": str(e)
-        }
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Error conectando con el servicio de análisis: {str(e)}"
+        ) from e
         
-@router.get("/predict/{task_id}/status")
+@router.get("/analysis/{analysis_id}/status")
 async def get_processing_status(
-    task_id: int,
+    analysis_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ):
@@ -122,25 +122,13 @@ async def get_processing_status(
     Consulta el estado del procesamiento de imágenes para una tarea
     """
     try:
-        soil_analysis_repository = SoilAnalysisRepository(db)
-        monitoreo = soil_analysis_repository.get_monitoreo_by_task_id(task_id)
+        get_analysis_status_use_case = GetAnalysisStatusUseCase(db)
+        return get_analysis_status_use_case.get_analysis_status(analysis_id)
         
-        if not monitoreo:
-            return {
-                "status": "not_found",
-                "message": "No se encontró un monitoreo para esta tarea"
-            }
-            
-        detections = soil_analysis_repository.get_detections_by_monitoreo_id(monitoreo.id)
-        
-        return {
-            "status": "completed",
-            "total_processed": len(detections),
-            "monitoreo_id": monitoreo.id
-        }
-        
+    except DomainException as e:
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error consultando estado: {str(e)}"
-        )
+        ) from e
