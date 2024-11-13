@@ -62,7 +62,7 @@ class GetAnalysisUseCase:
                 ClassificationResult(
                     id=classification.id,
                     imagen_url=classification.imagen_url,
-                    resultado_analisis=classification.resultado_analisis_id,
+                    resultado_analisis=self.soil_analysis_repository.get_soil_type_by_id(classification.resultado_analisis_id).nombre,
                     confianza_clasificacion=classification.confianza_clasificacion,
                     prob_alluvial_soil=classification.prob_alluvial_soil,
                     prob_black_soil=classification.prob_black_soil,

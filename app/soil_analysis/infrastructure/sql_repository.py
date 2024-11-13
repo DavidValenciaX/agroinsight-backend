@@ -49,3 +49,8 @@ class SoilAnalysisRepository:
         return self.db.query(SoilType)\
             .filter(SoilType.nombre == predicted_class)\
             .first()
+            
+    def get_soil_type_by_id(self, soil_type_id: int) -> SoilType:
+        return self.db.query(SoilType)\
+            .filter(SoilType.id == soil_type_id)\
+            .first()
