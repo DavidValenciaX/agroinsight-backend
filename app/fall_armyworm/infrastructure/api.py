@@ -6,6 +6,7 @@ import logging
 from sqlalchemy.orm import Session
 from app.cultural_practices.application.services.task_service import TaskService
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
+from app.fall_armyworm.application.detect_fall_armyworm_background_use_case import DetectFallArmywormBackgroundUseCase
 from app.fall_armyworm.application.get_monitoring_status_use_case import GetMonitoringStatusUseCase
 from app.fall_armyworm.application.get_monitoring_use_case import GetMonitoringUseCase
 from app.fall_armyworm.domain.schemas import FileContent, MonitoreoFitosanitarioResult
@@ -65,42 +66,23 @@ async def predict_images(
         if len(files) <= 15:
             # Procesar normalmente
             detect_fall_armyworm_use_case = DetectFallArmywormUseCase(SessionLocal())
-            result = await detect_fall_armyworm_use_case.detect_fall_armyworm(
+            return await detect_fall_armyworm_use_case.detect_fall_armyworm(
                 files=files,
                 task_id=task_id,
                 observations=observations,
                 current_user=current_user
             )
-            # Modificar la respuesta para incluir el monitoring_id
-            return {
-                "monitoring_id": result.monitoring_id,
-                "results": result.results,
-                "message": result.message
-            }
         else:
             # Procesar en segundo plano
-            detect_fall_armyworm_use_case = DetectFallArmywormUseCase(None)
-            # Crear el monitoreo antes de iniciar el procesamiento en segundo plano
-            monitoring_id = await detect_fall_armyworm_use_case.create_initial_monitoring(
-                task_id=task_id,
-                observations=observations,
-                total_images=len(files_content)
-            )
+            detect_fall_armyworm_background_use_case = DetectFallArmywormBackgroundUseCase(None)
             
-            background_tasks.add_task(
-                detect_fall_armyworm_use_case.process_images_in_background,
+            return await detect_fall_armyworm_background_use_case.process_images_in_background(
                 files_content=files_content,
                 task_id=task_id,
                 observations=observations,
-                user_id=user_id
+                user_id=user_id,
+                background_tasks=background_tasks
             )
-            
-            return {
-                "monitoring_id": monitoring_id,
-                "status": "processing",
-                "message": f"Procesando {len(files_content)} imágenes en segundo plano",
-                "total_images": len(files_content)
-            }
             
     except DomainException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
