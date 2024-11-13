@@ -71,6 +71,36 @@ class DetectFallArmywormUseCase:
                     message=f"Archivo {file.filename} no es una imagen válida. Solo se permiten archivos JPG y PNG",
                     status_code=status.HTTP_400_BAD_REQUEST
                 )
+                
+        # Validar que la tarea existe y el usuario tiene acceso
+        task = self.cultural_practices_repository.get_task_by_id(task_id)
+        if not task:
+            raise DomainException(
+                message="La tarea especificada no existe",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Validar que la tarea es de tipo monitoreo fitosanitario
+        task_type = self.cultural_practices_repository.get_task_type_by_id(task.tipo_labor_id)
+        if not task_type or task_type.nombre != TaskService.MONITOREO_FITOSANITARIO:
+            raise DomainException(
+                message="La tarea debe ser de tipo 'Monitoreo fitosanitario'",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+            
+        lote = self.plot_repository.get_plot_by_id(task.lote_id)
+        if not lote:
+            raise DomainException(
+                message="El lote especificado no existe",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+                
+        # Verificar que el usuario tenga acceso a la tarea
+        if not self.farm_service.user_is_farm_admin(current_user.id, lote.finca_id):
+            raise DomainException(
+                message="No tienes permisos para realizar detecciones en esta tarea",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
 
         # Obtener predicciones del servicio externo
         detection_results = await self._get_predictions(files)
@@ -80,8 +110,7 @@ class DetectFallArmywormUseCase:
             detection_results,
             files,
             task_id,
-            observations,
-            current_user
+            observations
         )
         
         # Construir la respuesta con el formato correcto
@@ -143,7 +172,7 @@ class DetectFallArmywormUseCase:
             
         return PredictionServiceResponse(**response.json())
 
-    async def process_detection(self, detection_results: FallArmywormDetectionResult, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
+    async def process_detection(self, detection_results: FallArmywormDetectionResult, files: list[UploadFile], task_id: int, observations: str):
         """
         Procesa los resultados de la detección y los guarda en la base de datos
         
@@ -152,40 +181,10 @@ class DetectFallArmywormUseCase:
             files: Archivos de imagen subidos
             task_id: ID de la tarea de monitoreo fitosanitario
             observations: Observaciones generales
-            current_user: Usuario actual
             
         Returns:
             FallArmywormDetectionResult: Resultados procesados
         """
-        # Validar que la tarea existe y el usuario tiene acceso
-        task = self.cultural_practices_repository.get_task_by_id(task_id)
-        if not task:
-            raise DomainException(
-                message="La tarea especificada no existe",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-            
-        # Validar que la tarea es de tipo monitoreo fitosanitario
-        task_type = self.cultural_practices_repository.get_task_type_by_id(task.tipo_labor_id)
-        if not task_type or task_type.nombre != TaskService.MONITOREO_FITOSANITARIO:
-            raise DomainException(
-                message="La tarea debe ser de tipo 'Monitoreo fitosanitario'",
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-            
-        lote = self.plot_repository.get_plot_by_id(task.lote_id)
-        if not lote:
-            raise DomainException(
-                message="El lote especificado no existe",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-                
-        # Verificar que el usuario tenga acceso a la tarea
-        if not self.farm_service.user_is_farm_admin(current_user.id, lote.finca_id):
-            raise DomainException(
-                message="No tienes permisos para realizar detecciones en esta tarea",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
 
         # Crear monitoreo fitosanitario
         monitoreo = self.fall_armyworm_repository.create_monitoreo(
