@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from app.fall_armyworm.domain.schemas import PredictionServiceResponse
 from app.soil_analysis.infrastructure.orm_models import SoilAnalysisStatusEnum
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.application.services.task_service import TaskService
@@ -15,7 +16,7 @@ import httpx
 import logging
 from app.soil_analysis.infrastructure.sql_repository import SoilAnalysisRepository
 from app.soil_analysis.domain.schemas import (
-    SoilAnalysisResult,
+    SoilAnalysisResponse,
     FileContent,
     SoilAnalysisCreate,
     SoilClassificationCreate
@@ -75,7 +76,7 @@ class SoilAnalysisUseCase:
         analysis_results = await self._get_predictions(files)
 
         # Procesar resultados y guardar en BD
-        return await self.process_analysis(
+        result = await self.process_analysis(
             analysis_results,
             files,
             task_id,
@@ -83,7 +84,13 @@ class SoilAnalysisUseCase:
             current_user
         )
 
-    async def _get_predictions(self, files: list[UploadFile]) -> dict:
+        return SoilAnalysisResponse(
+            analysis_id=result["analysis_id"],
+            results=analysis_results.results,
+            message=analysis_results.message
+        )
+
+    async def _get_predictions(self, files: list[UploadFile]) -> PredictionServiceResponse:
         """
         Obtiene las predicciones del servicio externo de análisis de imágenes
         """
@@ -133,9 +140,9 @@ class SoilAnalysisUseCase:
         for file in files:
             await file.seek(0)
             
-        return SoilAnalysisResult(**response.json())
+        return PredictionServiceResponse(**response.json())
 
-    async def process_analysis(self, analysis_results: SoilAnalysisResult, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
+    async def process_analysis(self, analysis_results: SoilAnalysisResponse, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
         """
         Procesa los resultados de la análisis y los guarda en la base de datos
         
@@ -147,7 +154,7 @@ class SoilAnalysisUseCase:
             current_user: Usuario actual
             
         Returns:
-            SoilAnalysisResult: Resultados procesados
+            SoilAnalysisResponse: Resultados procesados
         """
         # Validar que la tarea existe y el usuario tiene acceso
         task = self.cultural_practices_repository.get_task_by_id(task_id)
@@ -222,6 +229,20 @@ class SoilAnalysisUseCase:
                 )
 
         self.soil_analysis_repository.save_changes()
+        
+        try:
+            total_classifications = len(self.soil_analysis_repository.get_classifications_by_analysis_id(analysis.id))
+            if total_classifications == 0:
+                analysis.estado = SoilAnalysisStatusEnum.failed
+            elif total_classifications < analysis.cantidad_imagenes:
+                analysis.estado = SoilAnalysisStatusEnum.partial
+            else:
+                analysis.estado = SoilAnalysisStatusEnum.completed
+                
+            self.soil_analysis_repository.save_changes()
+        except Exception as e:
+            logger.error(f"Error actualizando estado del análisis: {str(e)}")
+        
         return analysis_results
 
     async def process_images_in_background(
@@ -299,7 +320,7 @@ class SoilAnalysisUseCase:
                             logger.error(f"Error en lote {batch_num + 1}: Status code {response.status_code}")
                             continue
 
-                        analysis_results = SoilAnalysisResult(**response.json())
+                        analysis_results = SoilAnalysisResponse(**response.json())
 
                         # Procesar cada detección del lote
                         for index, result in enumerate(analysis_results.results):

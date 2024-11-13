@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from datetime import date
+from datetime import date, datetime
 from typing_extensions import Annotated
 from dataclasses import dataclass
 
@@ -32,8 +32,13 @@ class SoilClassificationResponse(BaseModel):
 
     class Config:
         populate_by_name = True
+        
+class PredictionServiceResponse(BaseModel):
+    message: str
+    results: List[SoilClassificationResponse]
 
-class SoilAnalysisResult(BaseModel):
+class SoilAnalysisResponse(BaseModel):
+    analysis_id: int
     message: str
     results: List[SoilClassificationResponse]
 
@@ -66,3 +71,25 @@ class FileContent:
     filename: str
     content: bytes
     content_type: str
+    
+class ClassificationResult(BaseModel):
+    id: int
+    imagen_url: str
+    resultado_analisis: str
+    confianza_clasificacion: Probability
+    prob_alluvial_soil: Probability
+    prob_black_soil: Probability
+    prob_cinder_soil: Probability
+    prob_clay_soil: Probability
+    prob_laterite_soil: Probability
+    prob_peat_soil: Probability
+    prob_yellow_soil: Probability
+
+class SoilAnalysisResult(BaseModel):
+    id: int
+    tarea_labor_id: int
+    fecha_analisis: datetime
+    observaciones: Optional[str]
+    estado: SoilAnalysisStatusEnum
+    cantidad_imagenes: int
+    clasificaciones: List[ClassificationResult]
