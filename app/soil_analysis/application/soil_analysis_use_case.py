@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.fall_armyworm.domain.schemas import PredictionServiceResponse
+from app.soil_analysis.domain.schemas import PredictionServiceResponse
 from app.soil_analysis.infrastructure.orm_models import SoilAnalysisStatusEnum
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.application.services.task_service import TaskService
