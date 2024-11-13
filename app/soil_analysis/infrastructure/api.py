@@ -72,12 +72,13 @@ async def predict_images(
             return result
         else:
             # Procesar en segundo plano
-            soil_analysis_background_use_case = SoilAnalysisBackgroundUseCase(None)  # Pasamos None, inicializaremos dentro del background task
+            soil_analysis_background_use_case = SoilAnalysisBackgroundUseCase(None)
             return await soil_analysis_background_use_case.process_images_in_background(
                 files_content=files_content,
                 task_id=task_id,
                 observations=observations,
-                user_id=user_id
+                user_id=user_id,
+                background_tasks=background_tasks
             )
             
     except DomainException as e:
