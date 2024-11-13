@@ -73,14 +73,21 @@ class DetectFallArmywormUseCase:
 
         # Obtener predicciones del servicio externo
         detection_results = await self._get_predictions(files)
-
+        
         # Procesar resultados y guardar en BD
-        return await self.process_detection(
+        result = await self.process_detection(
             detection_results,
             files,
             task_id,
             observations,
             current_user
+        )
+        
+        # Construir la respuesta con el formato correcto
+        return FallArmywormDetectionResult(
+            monitoring_id=result["monitoring_id"],
+            results=detection_results.results,
+            message=detection_results.message
         )
 
     async def _get_predictions(self, files: list[UploadFile]) -> dict:
@@ -216,7 +223,12 @@ class DetectFallArmywormUseCase:
                 )
 
         self.fall_armyworm_repository.save_changes()
-        return detection_results
+        
+        return {
+            "monitoring_id": monitoreo.id,
+            "results": detection_results.results,
+            "message": detection_results.message
+        }
 
     async def process_images_in_background(
         self,
@@ -356,3 +368,23 @@ class DetectFallArmywormUseCase:
                         fall_armyworm_repository.save_changes()
             except Exception as e:
                 logger.error(f"Error actualizando estado a failed: {str(e)}")
+
+    async def create_initial_monitoring(self, task_id: int, observations: str, total_images: int) -> int:
+        """
+        Crea un registro inicial de monitoreo y retorna su ID
+        """
+        with SessionLocal() as db:
+            self.db = db
+            self.fall_armyworm_repository = FallArmywormRepository(db)
+            
+            monitoreo = self.fall_armyworm_repository.create_monitoreo(
+                MonitoreoFitosanitarioCreate(
+                    tarea_labor_id=task_id,
+                    fecha_monitoreo=datetime_utc_time(),
+                    observaciones=observations,
+                    estado=EstadoMonitoreoEnum.processing,
+                    cantidad_imagenes=total_images
+                )
+            )
+            self.fall_armyworm_repository.save_changes()
+            return monitoreo.id

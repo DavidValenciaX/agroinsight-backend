@@ -43,7 +43,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     Returns:
         str: El token de acceso JWT codificado.
     """
-    access_token_expire_minutes = 120
+    access_token_expire_minutes = 240
     to_encode = data.copy()
     
     current_time = datetime_utc_time()

@@ -71,18 +71,33 @@ async def predict_images(
                 observations=observations,
                 current_user=current_user
             )
-            return result
+            # Modificar la respuesta para incluir el monitoring_id
+            return {
+                "monitoring_id": result.monitoring_id,
+                "results": result.results,
+                "message": result.message
+            }
         else:
             # Procesar en segundo plano
-            detect_fall_armyworm_use_case = DetectFallArmywormUseCase(None)  # Pasamos None, inicializaremos dentro del background task
+            detect_fall_armyworm_use_case = DetectFallArmywormUseCase(None)
+            # Crear el monitoreo antes de iniciar el procesamiento en segundo plano
+            monitoring_id = await detect_fall_armyworm_use_case.create_initial_monitoring(
+                task_id=task_id,
+                observations=observations,
+                total_images=len(files_content)
+            )
+            
             background_tasks.add_task(
                 detect_fall_armyworm_use_case.process_images_in_background,
                 files_content=files_content,
                 task_id=task_id,
                 observations=observations,
-                user_id=user_id
+                user_id=user_id,
+                monitoring_id=monitoring_id
             )
+            
             return {
+                "monitoring_id": monitoring_id,
                 "status": "processing",
                 "message": f"Procesando {len(files_content)} imágenes en segundo plano",
                 "total_images": len(files_content)
