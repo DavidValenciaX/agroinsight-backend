@@ -21,6 +21,7 @@ from app.cultural_practices.application.list_task_states_use_case import ListTas
 from app.cultural_practices.application.list_task_types_use_case import ListTaskTypesUseCase
 from app.cultural_practices.application.list_worker_tasks_use_case import ListWorkerTasksUseCase
 from typing import Union
+from app.cultural_practices.application.list_tasks_by_plot_use_case import ListTasksByPlotUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -286,4 +287,41 @@ def list_worker_tasks(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar las tareas del trabajador: {str(e)}"
+        ) from e
+
+@router.get("/farms/{farm_id}/plots/{plot_id}/tasks", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
+def list_tasks_by_plot(
+    farm_id: int,
+    plot_id: int,
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> PaginatedTaskListResponse:
+    """
+    Lista todas las tareas asignadas a un lote específico.
+
+    Parameters:
+        farm_id (int): ID de la finca.
+        plot_id (int): ID del lote.
+        page (int): Número de página.
+        per_page (int): Elementos por página.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        PaginatedTaskListResponse: Una lista paginada de tareas asignadas al lote.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la lista de tareas.
+    """
+    list_tasks_by_plot_use_case = ListTasksByPlotUseCase(db)
+    try:
+        return list_tasks_by_plot_use_case.list_tasks_by_plot(farm_id, plot_id, page, per_page, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar las tareas del lote: {str(e)}"
         ) from e

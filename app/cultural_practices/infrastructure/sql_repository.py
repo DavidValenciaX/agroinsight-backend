@@ -199,3 +199,24 @@ class CulturalPracticesRepository:
             List[CulturalTaskType]: Lista de todos los tipos de tareas.
         """
         return self.db.query(CulturalTaskType).all()
+
+    def list_tasks_by_plot_paginated(self, plot_id: int, page: int, per_page: int) -> tuple[int, List[CulturalTask]]:
+        """Lista las tareas de un lote específico de forma paginada.
+
+        Args:
+            plot_id (int): ID del lote.
+            page (int): Número de página.
+            per_page (int): Cantidad de tareas por página.
+
+        Returns:
+            tuple[int, List[CulturalTask]]: Tupla con el total de tareas y la lista de tareas para la página actual.
+        """
+        query = self.db.query(CulturalTask)\
+            .options(joinedload(CulturalTask.tipo_labor))\
+            .options(joinedload(CulturalTask.estado))\
+            .filter(CulturalTask.lote_id == plot_id)
+        
+        total_tasks = query.count()
+        tasks = query.offset((page - 1) * per_page).limit(per_page).all()
+        
+        return total_tasks, tasks
