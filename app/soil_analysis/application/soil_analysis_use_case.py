@@ -323,7 +323,7 @@ class SoilAnalysisUseCase:
                             logger.error(f"Error en lote {batch_num + 1}: Status code {response.status_code}")
                             continue
 
-                        analysis_results = SoilAnalysisResponse(**response.json())
+                        analysis_results = PredictionServiceResponse(**response.json())
 
                         # Procesar cada detección del lote
                         for index, result in enumerate(analysis_results.results):

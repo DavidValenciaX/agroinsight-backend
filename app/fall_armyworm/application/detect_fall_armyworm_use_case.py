@@ -319,7 +319,7 @@ class DetectFallArmywormUseCase:
                             logger.error(f"Error en lote {batch_num + 1}: Status code {response.status_code}")
                             continue
 
-                        detection_results = FallArmywormDetectionResult(**response.json())
+                        detection_results = PredictionServiceResponse(**response.json())
 
                         # Procesar cada detección del lote
                         for index, result in enumerate(detection_results.results):
