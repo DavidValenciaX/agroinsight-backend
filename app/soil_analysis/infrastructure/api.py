@@ -5,7 +5,8 @@ import httpx
 import logging
 from sqlalchemy.orm import Session
 from app.soil_analysis.application.get_analysis_status_use_case import GetAnalysisStatusUseCase
-from app.soil_analysis.domain.schemas import FileContent
+from app.soil_analysis.application.get_analysis_use_case import GetAnalysisUseCase
+from app.soil_analysis.domain.schemas import FileContent, SoilAnalysisResult
 from app.infrastructure.db.connection import getDb, SessionLocal
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserInDB
@@ -131,4 +132,29 @@ async def get_processing_status(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error consultando estado: {str(e)}"
+        ) from e
+        
+@router.get("/analysis/{analysis_id}", response_model=SoilAnalysisResult)
+async def get_analysis_results(
+    analysis_id: int,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Obtiene los resultados de un análisis de suelo específico
+    
+    Args:
+        analysis_id: ID del análisis de suelo
+        db: Sesión de base de datos
+        current_user: Usuario autenticado
+    """
+    try:
+        get_analysis_use_case = GetAnalysisUseCase(db)
+        return get_analysis_use_case.get_analysis(analysis_id, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error obteniendo resultados del análisis: {str(e)}"
         ) from e
