@@ -47,6 +47,8 @@ class RecordWeatherUseCase:
                 presion_unidad_id=self.weather_measurement_service.PRESSURE_HPA_ID,
                 humedad_relativa=current['humidity'],
                 humedad_unidad_id=self.weather_measurement_service.HUMIDITY_PERCENT_ID,
+                precipitacion=current.get('rain', {}).get('1h'),
+                precipitacion_unidad_id=self.weather_measurement_service.PRECIPITATION_MMH_ID if current.get('rain', {}).get('1h') is not None else None,
                 indice_uv=current['uvi'],
                 nubosidad=current['clouds'],
                 nubosidad_unidad_id=self.weather_measurement_service.CLOUDINESS_PERCENT_ID,
