@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.measurement.application.services.measurement_service import MeasurementService
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
-from app.core.exceptions import DomainException
+from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 class WeatherMeasurementService:
