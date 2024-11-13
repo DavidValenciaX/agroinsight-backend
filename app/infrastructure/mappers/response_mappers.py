@@ -1,4 +1,5 @@
 from app.cultural_practices.domain.schemas import TaskResponse, TaskStateResponse, TaskTypeResponse
+from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.user.domain.schemas import UserForFarmResponse, UserResponse
 from app.farm.domain.schemas import FarmResponse, WorkerFarmResponse
 from app.plot.domain.schemas import PlotResponse
@@ -116,24 +117,25 @@ def map_plot_to_response(plot) -> PlotResponse:
         finca_id=plot.finca_id
     )
     
-def map_task_to_response(task) -> TaskResponse:
-    """
-    Mapea un objeto de tarea a un esquema de respuesta de tarea.
+def map_task_to_response(task: CulturalTask) -> TaskResponse:
+    """Mapea una tarea a su modelo de respuesta.
 
     Args:
-        task: Objeto de tarea a mapear.
+        task (CulturalTask): Tarea a mapear.
 
     Returns:
-        TaskResponse: Esquema de respuesta con la información de la tarea.
+        TaskResponse: Modelo de respuesta de la tarea.
     """
     return TaskResponse(
         id=task.id,
         nombre=task.nombre,
         tipo_labor_id=task.tipo_labor_id,
+        tipo_labor_nombre=task.tipo_labor.nombre,
         fecha_inicio_estimada=task.fecha_inicio_estimada,
         fecha_finalizacion=task.fecha_finalizacion,
         descripcion=task.descripcion,
         estado_id=task.estado_id,
+        estado_nombre=task.estado.nombre,
         lote_id=task.lote_id
     )
     

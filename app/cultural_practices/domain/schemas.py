@@ -64,19 +64,23 @@ class TaskResponse(BaseModel):
         id (int): ID único de la tarea.
         nombre (str): Nombre de la tarea.
         tipo_labor_id (int): ID del tipo de labor cultural.
+        tipo_labor_nombre (str): Nombre del tipo de labor cultural.
         fecha_inicio_estimada (date): Fecha estimada de inicio de la tarea.
         fecha_finalizacion (Optional[date]): Fecha de finalización de la tarea.
         descripcion (Optional[str]): Descripción de la tarea.
         estado_id (int): ID del estado de la tarea.
+        estado_nombre (str): Nombre del estado de la tarea.
         lote_id (int): ID del lote asociado a la tarea.
     """
     id: int
     nombre: str
     tipo_labor_id: int
+    tipo_labor_nombre: str
     fecha_inicio_estimada: date
     fecha_finalizacion: Optional[date]
     descripcion: Optional[str]
     estado_id: int
+    estado_nombre: str
     lote_id: int
 
     model_config = ConfigDict(from_attributes=True)

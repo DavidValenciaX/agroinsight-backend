@@ -4,6 +4,7 @@ from app.cultural_practices.domain.schemas import AssignmentCreateSingle, TaskCr
 from app.cultural_practices.infrastructure.orm_models import Assignment, CulturalTaskState, CulturalTaskType
 from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.plot.infrastructure.orm_models import Plot
+from sqlalchemy.orm import joinedload
 
 class CulturalPracticesRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con prácticas culturales.
@@ -75,7 +76,11 @@ class CulturalPracticesRepository:
         Returns:
             CulturalTask: Tarea correspondiente al ID proporcionado.
         """
-        return self.db.query(CulturalTask).filter(CulturalTask.id == task_id).first()
+        return self.db.query(CulturalTask)\
+            .options(joinedload(CulturalTask.tipo_labor))\
+            .options(joinedload(CulturalTask.estado))\
+            .filter(CulturalTask.id == task_id)\
+            .first()
     
     def get_states(self) -> List[CulturalTaskState]:
         """Obtiene todos los estados de las tareas.

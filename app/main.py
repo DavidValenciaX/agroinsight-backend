@@ -19,6 +19,7 @@ from app.crop.infrastructure.api import router as crop_router
 from app.measurement.infrastructure.api import measurement_router
 from app.fall_armyworm.infrastructure.api import router as fall_armyworm_router
 from app.soil_analysis.infrastructure.api import router as soil_analysis_router
+from app.weather.infrastructure.api import router as weather_router
 from fastapi.exceptions import RequestValidationError
 from app.infrastructure.common.exceptions_handler import (
     validation_exception_handler, 
@@ -28,14 +29,23 @@ from app.infrastructure.common.exceptions_handler import (
     user_state_exception_handler
 )
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+from app.infrastructure.scheduler.weather_scheduler import WeatherScheduler
+from contextlib import asynccontextmanager
 import logging
 
 # Configuración del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Creación de la instancia de FastAPI
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    weather_scheduler = WeatherScheduler()
+    weather_scheduler.start()
+    yield
+    # Shutdown (if needed)
+
+app = FastAPI(lifespan=lifespan)
 
 # Inclusión de routers
 app.include_router(user_router)
@@ -46,6 +56,7 @@ app.include_router(crop_router)
 app.include_router(measurement_router)
 app.include_router(fall_armyworm_router)
 app.include_router(soil_analysis_router)
+app.include_router(weather_router)
 
 @app.get("/")
 def root():

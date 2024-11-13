@@ -78,6 +78,10 @@ class PlotRepository:
         
         return total, plots
     
+    def list_plots(self) -> List[Plot]:
+        """Lista todos los lotes."""
+        return self.db.query(Plot).all()
+    
     def get_plot_by_name_and_farm(self, nombre: str, finca_id: int) -> Optional[Plot]:
         """Obtiene un lote por su nombre y el ID de la finca.
 

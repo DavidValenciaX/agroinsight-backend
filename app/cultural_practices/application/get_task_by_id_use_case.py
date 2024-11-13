@@ -67,10 +67,12 @@ class GetTaskByIdUseCase:
             id=task.id,
             nombre=task.nombre,
             tipo_labor_id=task.tipo_labor_id,
+            tipo_labor_nombre=task.tipo_labor.nombre,
             fecha_inicio_estimada=task.fecha_inicio_estimada,
             fecha_finalizacion=task.fecha_finalizacion,
             descripcion=task.descripcion,
             estado_id=task.estado_id,
+            estado_nombre=task.estado.nombre,
             lote_id=task.lote_id
         )
 
