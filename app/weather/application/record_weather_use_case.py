@@ -8,6 +8,7 @@ from app.weather.domain.schemas import WeatherLogCreate
 from app.weather.infrastructure.sql_repository import WeatherRepository
 import os
 from dotenv import load_dotenv
+from app.weather.application.services.weather_measurement_service import WeatherMeasurementService
 
 load_dotenv(override=True)
 
@@ -15,6 +16,7 @@ class RecordWeatherUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.repository = WeatherRepository(db)
+        self.weather_measurement_service = WeatherMeasurementService(db)
         self.api_key = os.getenv("OPENWEATHERMAP_API_KEY")
         self.base_url = "https://api.openweathermap.org/data/3.0/onecall"
 
@@ -27,27 +29,39 @@ class RecordWeatherUseCase:
     async def record_weather_data(self, lote_id: int, lat: float, lon: float) -> WeatherLogCreate:
         """Registra los datos meteorológicos actuales para un lote específico."""
         try:
+            # Validar unidades de medida
+            self.weather_measurement_service.validate_weather_units()
+            
             weather_data = await self._fetch_weather_data(lat, lon)
             current = weather_data['current']
             
-            # Crear el registro meteorológico
+            # Crear el registro meteorológico con las unidades correspondientes
             weather_log = WeatherLogCreate(
                 lote_id=lote_id,
                 fecha=datetime_utc_time.date(),
                 hora=datetime_utc_time.time(),
                 temperatura=current['temp'],
                 temperatura_sensacion=current['feels_like'],
+                temperatura_unidad_id=self.weather_measurement_service.TEMPERATURE_CELSIUS_ID,
                 presion_atmosferica=current['pressure'],
+                presion_unidad_id=self.weather_measurement_service.PRESSURE_HPA_ID,
                 humedad_relativa=current['humidity'],
+                humedad_unidad_id=self.weather_measurement_service.HUMIDITY_PERCENT_ID,
                 indice_uv=current['uvi'],
                 nubosidad=current['clouds'],
+                nubosidad_unidad_id=self.weather_measurement_service.CLOUDINESS_PERCENT_ID,
                 velocidad_viento=current['wind_speed'],
+                velocidad_viento_unidad_id=self.weather_measurement_service.WIND_SPEED_MS_ID,
                 direccion_viento=current['wind_deg'],
+                direccion_viento_unidad_id=self.weather_measurement_service.WIND_DIRECTION_DEGREE_ID,
                 rafaga_viento=current.get('wind_gust'),
+                rafaga_viento_unidad_id=self.weather_measurement_service.WIND_SPEED_MS_ID,
                 visibilidad=current.get('visibility'),
+                visibilidad_unidad_id=self.weather_measurement_service.VISIBILITY_M_ID,
                 punto_rocio=current.get('dew_point'),
+                punto_rocio_unidad_id=self.weather_measurement_service.TEMPERATURE_CELSIUS_ID,
                 descripcion_clima=current['weather'][0]['description'],
-                codigo_clima=current['weather'][0]['id']
+                codigo_clima=str(current['weather'][0]['id'])
             )
 
             return self.repository.create_weather_log(weather_log)
