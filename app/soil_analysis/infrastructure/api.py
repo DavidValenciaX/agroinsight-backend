@@ -6,6 +6,7 @@ import logging
 from sqlalchemy.orm import Session
 from app.soil_analysis.application.get_analysis_status_use_case import GetAnalysisStatusUseCase
 from app.soil_analysis.application.get_analysis_use_case import GetAnalysisUseCase
+from app.soil_analysis.application.soil_analysis_background_use_case import SoilAnalysisBackgroundUseCase
 from app.soil_analysis.domain.schemas import FileContent, SoilAnalysisResult
 from app.infrastructure.db.connection import getDb, SessionLocal
 from app.infrastructure.security.jwt_middleware import get_current_user
@@ -71,19 +72,13 @@ async def predict_images(
             return result
         else:
             # Procesar en segundo plano
-            soil_analysis_use_case = SoilAnalysisUseCase(None)  # Pasamos None, inicializaremos dentro del background task
-            background_tasks.add_task(
-                soil_analysis_use_case.process_images_in_background,
+            soil_analysis_background_use_case = SoilAnalysisBackgroundUseCase(None)  # Pasamos None, inicializaremos dentro del background task
+            return await soil_analysis_background_use_case.process_images_in_background(
                 files_content=files_content,
                 task_id=task_id,
                 observations=observations,
                 user_id=user_id
             )
-            return {
-                "status": "processing",
-                "message": f"Procesando {len(files_content)} imágenes en segundo plano",
-                "total_images": len(files_content)
-            }
             
     except DomainException as e:
         raise e
