@@ -36,10 +36,11 @@ class RecordWeatherUseCase:
             current = weather_data['current']
             
             # Crear el registro meteorológico con las unidades correspondientes
+            current_time = datetime_utc_time()
             weather_log = WeatherLogCreate(
                 lote_id=lote_id,
-                fecha=datetime_utc_time.date(),
-                hora=datetime_utc_time.time(),
+                fecha=current_time.date(),
+                hora=current_time.time(),
                 temperatura=current['temp'],
                 temperatura_sensacion=current['feels_like'],
                 temperatura_unidad_id=self.weather_measurement_service.TEMPERATURE_CELSIUS_ID,
