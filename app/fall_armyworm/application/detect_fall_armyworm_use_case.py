@@ -225,6 +225,20 @@ class DetectFallArmywormUseCase:
 
         self.fall_armyworm_repository.save_changes()
         
+        # Actualizar estado del monitoreo
+        try:
+            total_detections = len(self.fall_armyworm_repository.get_detections_by_monitoreo_id(monitoreo.id))
+            if total_detections == 0:
+                monitoreo.estado = EstadoMonitoreoEnum.failed
+            elif total_detections < monitoreo.cantidad_imagenes:
+                monitoreo.estado = EstadoMonitoreoEnum.partial
+            else:
+                monitoreo.estado = EstadoMonitoreoEnum.completed
+            
+            self.fall_armyworm_repository.save_changes()
+        except Exception as e:
+            logger.error(f"Error actualizando estado del monitoreo: {str(e)}")
+        
         return {
             "monitoring_id": monitoreo.id,
             "results": detection_results.results,
