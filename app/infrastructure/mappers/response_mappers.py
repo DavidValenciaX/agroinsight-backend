@@ -1,5 +1,5 @@
-from app.cultural_practices.domain.schemas import TaskResponse, TaskStateResponse, TaskTypeResponse
-from app.cultural_practices.infrastructure.orm_models import CulturalTask
+from app.cultural_practices.domain.schemas import AgriculturalInputCategoryResponse, AgriculturalInputResponse, TaskResponse, TaskStateResponse, TaskTypeResponse
+from app.cultural_practices.infrastructure.orm_models import AgriculturalInput, AgriculturalInputCategory, CulturalTask
 from app.user.domain.schemas import UserForFarmResponse, UserResponse
 from app.farm.domain.schemas import FarmResponse, WorkerFarmResponse
 from app.plot.domain.schemas import PlotResponse
@@ -169,4 +169,40 @@ def map_task_type_to_response(task_type: TaskTypeResponse) -> TaskTypeResponse:
         id=task_type.id,
         nombre=task_type.nombre,
         descripcion=task_type.descripcion
+    )
+
+def map_input_category_to_response(category: AgriculturalInputCategory) -> AgriculturalInputCategoryResponse:
+    """Mapea una categoría de insumo a su modelo de respuesta.
+
+    Args:
+        category (AgriculturalInputCategory): Categoría de insumo a mapear.
+
+    Returns:
+        AgriculturalInputCategoryResponse: Modelo de respuesta de la categoría.
+    """
+    return AgriculturalInputCategoryResponse(
+        id=category.id,
+        nombre=category.nombre,
+        descripcion=category.descripcion
+    )
+    
+def map_agricultural_input_to_response(input: AgriculturalInput) -> AgriculturalInputResponse:
+    """Mapea un insumo agrícola a su modelo de respuesta.
+
+    Args:
+        input (AgriculturalInput): Insumo agrícola a mapear.
+
+    Returns:
+        AgriculturalInputResponse: Modelo de respuesta del insumo.
+    """
+    return AgriculturalInputResponse(
+        id=input.id,
+        categoria_id=input.categoria_id,
+        categoria_nombre=input.categoria.nombre,
+        nombre=input.nombre,
+        descripcion=input.descripcion,
+        unidad_medida_id=input.unidad_medida_id,
+        unidad_medida_nombre=input.unidad_medida.nombre,
+        costo_unitario=input.costo_unitario,
+        stock_actual=input.stock_actual
     )

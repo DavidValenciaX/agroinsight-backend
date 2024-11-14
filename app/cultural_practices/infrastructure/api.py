@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, Path
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.cultural_practices.application.get_task_by_id_use_case import GetTaskByIdUseCase
-from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskResponse, TaskStateListResponse, TaskTypeListResponse, TaskCostsCreate, CostRegistrationResponse
+from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskResponse, TaskStateListResponse, TaskTypeListResponse, TaskCostsCreate, CostRegistrationResponse, AgriculturalInputCategoryListResponse, AgriculturalInputListResponse
 from app.cultural_practices.application.assign_task_use_case import AssignTaskUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
@@ -23,6 +23,8 @@ from app.cultural_practices.application.list_worker_tasks_use_case import ListWo
 from typing import Union
 from app.cultural_practices.application.list_tasks_by_plot_use_case import ListTasksByPlotUseCase
 from app.cultural_practices.application.register_task_costs_use_case import RegisterTaskCostsUseCase
+from app.cultural_practices.application.list_input_categories_use_case import ListInputCategoriesUseCase
+from app.cultural_practices.application.list_agricultural_inputs_use_case import ListAgriculturalInputsUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -366,4 +368,56 @@ def register_task_costs(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al registrar los costos: {str(e)}"
+        ) from e
+
+@router.get("/input-categories", response_model=AgriculturalInputCategoryListResponse, status_code=status.HTTP_200_OK)
+def list_input_categories(
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> AgriculturalInputCategoryListResponse:
+    """Lista todas las categorías de insumos agrícolas.
+
+    Args:
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        AgriculturalInputCategoryListResponse: Lista de categorías de insumos.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de las categorías.
+    """
+    list_categories_use_case = ListInputCategoriesUseCase(db)
+    try:
+        return list_categories_use_case.list_categories(current_user)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar las categorías de insumos: {str(e)}"
+        ) from e
+
+@router.get("/agricultural-inputs", response_model=AgriculturalInputListResponse, status_code=status.HTTP_200_OK)
+def list_agricultural_inputs(
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> AgriculturalInputListResponse:
+    """Lista todos los insumos agrícolas.
+
+    Args:
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        AgriculturalInputListResponse: Lista de insumos agrícolas.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de los insumos.
+    """
+    list_inputs_use_case = ListAgriculturalInputsUseCase(db)
+    try:
+        return list_inputs_use_case.list_inputs(current_user)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar los insumos agrícolas: {str(e)}"
         ) from e

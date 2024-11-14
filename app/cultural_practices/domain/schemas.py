@@ -229,3 +229,59 @@ class CostRegistrationResponse(BaseModel):
     labor_cost_registered: bool
     inputs_registered: int
     machinery_registered: int
+
+class AgriculturalInputCategoryResponse(BaseModel):
+    """Modelo de respuesta para una categoría de insumo agrícola.
+
+    Attributes:
+        id (int): ID único de la categoría.
+        nombre (str): Nombre de la categoría.
+        descripcion (Optional[str]): Descripción de la categoría.
+    """
+    id: int
+    nombre: str
+    descripcion: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+class AgriculturalInputCategoryListResponse(BaseModel):
+    """Modelo de respuesta para la lista de categorías de insumos agrícolas.
+
+    Attributes:
+        categories (List[AgriculturalInputCategoryResponse]): Lista de categorías de insumos.
+    """
+    categories: List[AgriculturalInputCategoryResponse]
+
+class AgriculturalInputResponse(BaseModel):
+    """Modelo de respuesta para un insumo agrícola.
+
+    Attributes:
+        id (int): ID único del insumo.
+        categoria_id (int): ID de la categoría del insumo.
+        categoria_nombre (str): Nombre de la categoría del insumo.
+        nombre (str): Nombre del insumo.
+        descripcion (Optional[str]): Descripción del insumo.
+        unidad_medida_id (int): ID de la unidad de medida.
+        unidad_medida_nombre (str): Nombre de la unidad de medida.
+        costo_unitario (Decimal): Costo por unidad del insumo.
+        stock_actual (Decimal): Cantidad actual en stock.
+    """
+    id: int
+    categoria_id: int
+    categoria_nombre: str
+    nombre: str
+    descripcion: Optional[str] = None
+    unidad_medida_id: int
+    unidad_medida_nombre: str
+    costo_unitario: Decimal
+    stock_actual: Decimal
+
+    model_config = ConfigDict(from_attributes=True)
+
+class AgriculturalInputListResponse(BaseModel):
+    """Modelo de respuesta para la lista de insumos agrícolas.
+
+    Attributes:
+        inputs (List[AgriculturalInputResponse]): Lista de insumos agrícolas.
+    """
+    inputs: List[AgriculturalInputResponse]

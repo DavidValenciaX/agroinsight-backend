@@ -11,6 +11,7 @@ from sqlalchemy import and_
 from typing import Optional, Tuple
 from app.cultural_practices.infrastructure.orm_models import AgriculturalInput
 from app.cultural_practices.infrastructure.orm_models import AgriculturalMachinery
+from app.cultural_practices.infrastructure.orm_models import AgriculturalInputCategory
 
 class CulturalPracticesRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con prácticas culturales.
@@ -298,3 +299,22 @@ class CulturalPracticesRepository:
             AgriculturalMachinery.id == machinery_id
         ).first()
         return result[0] if result else None
+
+    def get_input_categories(self) -> List[AgriculturalInputCategory]:
+        """Obtiene todas las categorías de insumos agrícolas.
+
+        Returns:
+            List[AgriculturalInputCategory]: Lista de todas las categorías de insumos.
+        """
+        return self.db.query(AgriculturalInputCategory).all()
+
+    def get_agricultural_inputs(self) -> List[AgriculturalInput]:
+        """Obtiene todos los insumos agrícolas.
+
+        Returns:
+            List[AgriculturalInput]: Lista de todos los insumos agrícolas.
+        """
+        return self.db.query(AgriculturalInput)\
+            .options(joinedload(AgriculturalInput.categoria))\
+            .options(joinedload(AgriculturalInput.unidad_medida))\
+            .all()
