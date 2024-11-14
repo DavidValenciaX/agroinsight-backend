@@ -123,3 +123,29 @@ class CornVarietyListResponse(BaseModel):
         varieties (List[CornVarietyResponse]): Lista de variedades de maíz.
     """
     varieties: List[CornVarietyResponse]
+
+class CropHarvestUpdate(BaseModel):
+    """Schema para actualizar la información de cosecha y venta de un cultivo.
+
+    Attributes:
+        fecha_cosecha (date): Fecha en que se realizó la cosecha.
+        produccion_total (int): Cantidad total producida. Debe ser mayor que 0.
+        produccion_total_unidad_id (int): ID de la unidad de medida de la producción total. Debe ser mayor que 0.
+        precio_venta_unitario (Decimal): Precio de venta por unidad.
+        cantidad_vendida (int): Cantidad vendida del cultivo. Debe ser mayor que 0.
+        cantidad_vendida_unidad_id (int): ID de la unidad de medida de la cantidad vendida. Debe ser mayor que 0.
+        ingreso_total (Decimal): Ingreso total por la venta.
+        costo_produccion (Decimal): Costo total de producción.
+        moneda_id (int): ID de la moneda utilizada. Debe ser mayor que 0.
+        fecha_venta (date): Fecha en que se realizó la venta.
+    """
+    fecha_cosecha: date
+    produccion_total: int = Field(..., gt=0)
+    produccion_total_unidad_id: int = Field(..., gt=0)
+    precio_venta_unitario: Decimal = Field(..., gt=0)
+    cantidad_vendida: int = Field(..., gt=0)
+    cantidad_vendida_unidad_id: int = Field(..., gt=0)
+    ingreso_total: Decimal = Field(..., gt=0)
+    costo_produccion: Decimal = Field(..., gt=0)
+    moneda_id: int = Field(..., gt=0)
+    fecha_venta: date

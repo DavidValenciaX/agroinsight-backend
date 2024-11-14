@@ -1,7 +1,7 @@
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.crop.infrastructure.orm_models import Crop, CropState, CornVariety
-from app.crop.domain.schemas import CropCreate
+from app.crop.domain.schemas import CropCreate, CropHarvestUpdate
 from sqlalchemy.orm import joinedload
 
 class CropRepository:
@@ -134,3 +134,49 @@ class CropRepository:
         ).offset((page - 1) * per_page).limit(per_page).all()
         
         return total_crops, crops
+
+    def update_crop_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate) -> Optional[Crop]:
+        """Actualiza la información de cosecha y venta de un cultivo.
+
+        Args:
+            crop_id (int): ID del cultivo a actualizar.
+            harvest_data (CropHarvestUpdate): Datos de cosecha y venta.
+
+        Returns:
+            Optional[Crop]: El cultivo actualizado si tiene éxito, None en caso de error.
+        """
+        try:
+            crop = self.db.query(Crop).filter(Crop.id == crop_id).first()
+            if not crop:
+                return None
+
+            # Actualizar los campos del cultivo
+            crop.fecha_cosecha = harvest_data.fecha_cosecha
+            crop.produccion_total = harvest_data.produccion_total
+            crop.produccion_total_unidad_id = harvest_data.produccion_total_unidad_id
+            crop.precio_venta_unitario = harvest_data.precio_venta_unitario
+            crop.cantidad_vendida = harvest_data.cantidad_vendida
+            crop.cantidad_vendida_unidad_id = harvest_data.cantidad_vendida_unidad_id
+            crop.ingreso_total = harvest_data.ingreso_total
+            crop.costo_produccion = harvest_data.costo_produccion
+            crop.moneda_id = harvest_data.moneda_id
+            crop.fecha_venta = harvest_data.fecha_venta
+
+            self.db.commit()
+            self.db.refresh(crop)
+            return crop
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar la información de cosecha: {e}")
+            return None
+
+    def get_crop_by_id(self, crop_id: int) -> Optional[Crop]:
+        """Obtiene un cultivo por su ID.
+
+        Args:
+            crop_id (int): ID del cultivo.
+
+        Returns:
+            Optional[Crop]: El cultivo si se encuentra, None en caso contrario.
+        """
+        return self.db.query(Crop).filter(Crop.id == crop_id).first()

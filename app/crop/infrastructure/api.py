@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.crop.domain.schemas import CropCreate, PaginatedCropListResponse
+from app.crop.domain.schemas import CropCreate, PaginatedCropListResponse, CropHarvestUpdate
 from app.crop.application.create_crop_use_case import CreateCropUseCase
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserInDB
@@ -16,6 +16,7 @@ from app.infrastructure.common.common_exceptions import DomainException
 from app.crop.domain.schemas import CornVarietyListResponse
 from app.crop.application.list_corn_varieties_use_case import ListCornVarietiesUseCase
 from app.crop.application.list_crops_by_plot_use_case import ListCropsByPlotUseCase
+from app.crop.application.update_crop_harvest_use_case import UpdateCropHarvestUseCase
 
 router = APIRouter(tags=["crop"])
 
@@ -113,6 +114,39 @@ def list_crops_by_plot(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al obtener los cultivos del lote: {str(e)}"
         )
+
+@router.put("/crops/{crop_id}/harvest", response_model=SuccessResponse)
+def update_crop_harvest(
+    crop_id: int,
+    harvest_data: CropHarvestUpdate,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> SuccessResponse:
+    """
+    Actualiza la información de cosecha y venta de un cultivo.
+
+    Parameters:
+        crop_id (int): ID del cultivo a actualizar.
+        harvest_data (CropHarvestUpdate): Datos de la cosecha y venta.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        SuccessResponse: Mensaje indicando que la actualización fue exitosa.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la actualización.
+    """
+    try:
+        use_case = UpdateCropHarvestUseCase(db)
+        return use_case.update_harvest(crop_id, harvest_data, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al actualizar la información de cosecha: {str(e)}"
+        ) from e
 
 
 
