@@ -202,13 +202,7 @@ class DetectFallArmywormBackgroundUseCase:
                         status_code=status.HTTP_404_NOT_FOUND,
                         message=f"Lote {task.lote_id} no encontrado"
                     )
-                
-                if not self.farm_service.user_is_farm_admin(user_id, lote.finca_id):
-                    raise DomainException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        message=f"Usuario {user_id} sin acceso a tarea {task_id}"
-                    )
-
+                    
                 # Crear monitoreo fitosanitario principal
                 monitoreo = self.fall_armyworm_repository.create_monitoreo(
                     MonitoreoFitosanitarioCreate(

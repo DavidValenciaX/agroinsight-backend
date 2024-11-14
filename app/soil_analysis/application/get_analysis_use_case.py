@@ -41,12 +41,6 @@ class GetAnalysisUseCase:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Lote no encontrado"
             )
-            
-        if not self.farm_service.user_is_farm_admin(current_user.id, plot.finca_id):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="No tienes permisos para ver este análisis"
-            )
 
         # Obtener las clasificaciones asociadas
         classifications = self.soil_analysis_repository.get_classifications_by_analysis_id(analysis.id)

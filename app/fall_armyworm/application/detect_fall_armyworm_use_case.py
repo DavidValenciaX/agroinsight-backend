@@ -94,13 +94,6 @@ class DetectFallArmywormUseCase:
                 message="El lote especificado no existe",
                 status_code=status.HTTP_404_NOT_FOUND
             )
-                
-        # Verificar que el usuario tenga acceso a la tarea
-        if not self.farm_service.user_is_farm_admin(current_user.id, lote.finca_id):
-            raise DomainException(
-                message="No tienes permisos para realizar detecciones en esta tarea",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
 
         # Obtener predicciones del servicio externo
         detection_results = await self._get_predictions(files)
