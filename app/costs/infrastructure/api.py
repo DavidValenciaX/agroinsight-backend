@@ -5,7 +5,8 @@ Incluye endpoints para la creación de costos de tareas y asignaciones, así com
 """
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.costs.domain.schemas import TaskCostsCreate, CostRegistrationResponse, AgriculturalInputCategoryListResponse, AgriculturalInputListResponse
+from app.costs.application.list_agricultural_machinery_use_case import ListAgriculturalMachineryUseCase
+from app.costs.domain.schemas import AgriculturalMachineryListResponse, TaskCostsCreate, CostRegistrationResponse, AgriculturalInputCategoryListResponse, AgriculturalInputListResponse, MachineryTypeListResponse
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
@@ -13,6 +14,7 @@ from app.user.domain.schemas import UserInDB
 from app.costs.application.register_task_costs_use_case import RegisterTaskCostsUseCase
 from app.costs.application.list_input_categories_use_case import ListInputCategoriesUseCase
 from app.costs.application.list_agricultural_inputs_use_case import ListAgriculturalInputsUseCase
+from app.costs.application.list_machinery_types_use_case import ListMachineryTypesUseCase
 
 router = APIRouter(tags=["costs"])
 
@@ -103,4 +105,56 @@ def list_agricultural_inputs(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar los insumos agrícolas: {str(e)}"
+        ) from e
+
+@router.get("/machinery-types", response_model=MachineryTypeListResponse, status_code=status.HTTP_200_OK)
+def list_machinery_types(
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> MachineryTypeListResponse:
+    """Lista todos los tipos de maquinaria agrícola.
+
+    Args:
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        MachineryTypeListResponse: Lista de tipos de maquinaria.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de los tipos de maquinaria.
+    """
+    list_machinery_types_use_case = ListMachineryTypesUseCase(db)
+    try:
+        return list_machinery_types_use_case.list_machinery_types(current_user)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar los tipos de maquinaria: {str(e)}"
+        ) from e
+
+@router.get("/agricultural-machinery", response_model=AgriculturalMachineryListResponse, status_code=status.HTTP_200_OK)
+def list_agricultural_machinery(
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> AgriculturalMachineryListResponse:
+    """Lista toda la maquinaria agrícola.
+
+    Args:
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        AgriculturalMachineryListResponse: Lista de maquinaria agrícola.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la maquinaria.
+    """
+    list_machinery_use_case = ListAgriculturalMachineryUseCase(db)
+    try:
+        return list_machinery_use_case.list_machinery(current_user)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar la maquinaria agrícola: {str(e)}"
         ) from e

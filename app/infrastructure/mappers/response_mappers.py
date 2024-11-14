@@ -1,6 +1,6 @@
-from app.costs.domain.schemas import AgriculturalInputCategoryResponse, AgriculturalInputResponse
+from app.costs.domain.schemas import AgriculturalInputCategoryResponse, AgriculturalInputResponse, AgriculturalMachineryResponse, MachineryTypeResponse
 from app.cultural_practices.domain.schemas import TaskResponse, TaskStateResponse, TaskTypeResponse
-from app.costs.infrastructure.orm_models import AgriculturalInput, AgriculturalInputCategory
+from app.costs.infrastructure.orm_models import AgriculturalInput, AgriculturalInputCategory, AgriculturalMachinery, MachineryType
 from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.user.domain.schemas import UserForFarmResponse, UserResponse
 from app.farm.domain.schemas import FarmResponse, WorkerFarmResponse
@@ -207,4 +207,25 @@ def map_agricultural_input_to_response(input: AgriculturalInput) -> Agricultural
         unidad_medida_nombre=input.unidad_medida.nombre,
         costo_unitario=input.costo_unitario,
         stock_actual=input.stock_actual
+    )
+    
+def map_machinery_type_to_response(machinery_type: MachineryType) -> MachineryTypeResponse:
+    """Mapea un tipo de maquinaria a su respuesta."""
+    return MachineryTypeResponse(
+        id=machinery_type.id,
+        nombre=machinery_type.nombre,
+        descripcion=machinery_type.descripcion
+    )
+    
+def map_agricultural_machinery_to_response(machinery: AgriculturalMachinery) -> AgriculturalMachineryResponse:
+    """Mapea una maquinaria agrícola a su respuesta."""
+    return AgriculturalMachineryResponse(
+        id=machinery.id,
+        tipo_maquinaria_id=machinery.tipo_maquinaria_id,
+        tipo_maquinaria_nombre=machinery.tipo_maquinaria.nombre,
+        nombre=machinery.nombre,
+        descripcion=machinery.descripcion,
+        modelo=machinery.modelo,
+        numero_serie=machinery.numero_serie,
+        costo_hora=machinery.costo_hora
     )

@@ -126,3 +126,57 @@ class AgriculturalInputListResponse(BaseModel):
         inputs (List[AgriculturalInputResponse]): Lista de insumos agrícolas.
     """
     inputs: List[AgriculturalInputResponse]
+
+class MachineryTypeResponse(BaseModel):
+    """Modelo de respuesta para un tipo de maquinaria.
+
+    Attributes:
+        id (int): ID único del tipo de maquinaria.
+        nombre (str): Nombre del tipo de maquinaria.
+        descripcion (str): Descripción del tipo de maquinaria.
+    """
+    id: int
+    nombre: str
+    descripcion: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+class MachineryTypeListResponse(BaseModel):
+    """Modelo de respuesta para la lista de tipos de maquinaria.
+
+    Attributes:
+        machinery_types (List[MachineryTypeResponse]): Lista de tipos de maquinaria.
+    """
+    machinery_types: List[MachineryTypeResponse]
+
+class AgriculturalMachineryResponse(BaseModel):
+    """Modelo de respuesta para una maquinaria agrícola.
+
+    Attributes:
+        id (int): ID único de la maquinaria.
+        tipo_maquinaria_id (int): ID del tipo de maquinaria.
+        tipo_maquinaria_nombre (str): Nombre del tipo de maquinaria.
+        nombre (str): Nombre de la maquinaria.
+        descripcion (Optional[str]): Descripción de la maquinaria.
+        modelo (Optional[str]): Modelo de la maquinaria.
+        numero_serie (Optional[str]): Número de serie de la maquinaria.
+        costo_hora (Decimal): Costo por hora de la maquinaria.
+    """
+    id: int
+    tipo_maquinaria_id: int
+    tipo_maquinaria_nombre: str
+    nombre: str
+    descripcion: Optional[str] = None
+    modelo: Optional[str] = None
+    numero_serie: Optional[str] = None
+    costo_hora: Decimal
+
+    model_config = ConfigDict(from_attributes=True)
+
+class AgriculturalMachineryListResponse(BaseModel):
+    """Modelo de respuesta para la lista de maquinaria agrícola.
+
+    Attributes:
+        machinery (List[AgriculturalMachineryResponse]): Lista de maquinaria agrícola.
+    """
+    machinery: List[AgriculturalMachineryResponse]

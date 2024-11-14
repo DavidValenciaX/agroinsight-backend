@@ -8,6 +8,7 @@ from typing import Optional
 from app.costs.infrastructure.orm_models import AgriculturalInput
 from app.costs.infrastructure.orm_models import AgriculturalMachinery
 from app.costs.infrastructure.orm_models import AgriculturalInputCategory
+from app.costs.infrastructure.orm_models import MachineryType
 
 class CostsRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con costos.
@@ -115,4 +116,22 @@ class CostsRepository:
         return self.db.query(AgriculturalInput)\
             .options(joinedload(AgriculturalInput.categoria))\
             .options(joinedload(AgriculturalInput.unidad_medida))\
+            .all()
+
+    def get_machinery_types(self) -> List[MachineryType]:
+        """Obtiene todos los tipos de maquinaria agrícola.
+
+        Returns:
+            List[MachineryType]: Lista de todos los tipos de maquinaria.
+        """
+        return self.db.query(MachineryType).all()
+    
+    def get_agricultural_machinery(self) -> List[AgriculturalMachinery]:
+        """Obtiene toda la maquinaria agrícola.
+
+        Returns:
+            List[AgriculturalMachinery]: Lista de toda la maquinaria agrícola.
+        """
+        return self.db.query(AgriculturalMachinery)\
+            .options(joinedload(AgriculturalMachinery.tipo_maquinaria))\
             .all()
