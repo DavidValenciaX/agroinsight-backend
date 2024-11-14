@@ -16,18 +16,6 @@ Endpoint para crear un nuevo lote en una finca específica.
 
 Endpoint para obtener una lista paginada de los lotes pertenecientes a una finca.
 
-### Obtener Lote por ID
-
-::: app.plot.infrastructure.api.get_plot_by_id
-
-Endpoint para obtener la información detallada de un lote específico.
-
-### Actualizar Lote
-
-::: app.plot.infrastructure.api.update_plot
-
-Endpoint para actualizar la información de un lote existente.
-
 ## Estructura de Rutas
 
 El módulo de lotes utiliza el prefijo `/plot` para todos sus endpoints y está etiquetado como "plot" en la documentación de la API.

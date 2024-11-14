@@ -186,3 +186,20 @@ class FarmRepository:
             self.db.rollback()
             print(f"Error al crear al asignar rol a usuario en finca: {e}")
             return False
+
+    def list_farms_by_role(self, user_id: int, rol_id: int) -> List[Farm]:
+        """Lista todas las fincas asociadas a un usuario con un rol específico.
+
+        Args:
+            user_id (int): ID del usuario.
+            rol_id (int): ID del rol.
+
+        Returns:
+            List[Farm]: Lista de fincas.
+        """
+        query = self.db.query(Farm).join(UserFarmRole).filter(
+            UserFarmRole.usuario_id == user_id,
+            UserFarmRole.rol_id == rol_id
+        )
+        
+        return query.all()

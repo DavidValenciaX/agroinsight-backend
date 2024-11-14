@@ -12,7 +12,7 @@ from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.farm.application.list_worker_farms_use_case import ListWorkerFarmsUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail, PaginatedWorkerFarmListResponse
+from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail, PaginatedWorkerFarmListResponse, FarmListResponse
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
@@ -20,6 +20,7 @@ from app.infrastructure.common.response_models import MultipleResponse, SuccessR
 from app.farm.application.get_user_by_id_use_case import AdminGetUserByIdUseCase
 from app.user.domain.schemas import UserForFarmResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+from app.farm.application.list_all_farms_use_case import ListAllFarmsUseCase
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
@@ -207,6 +208,35 @@ def list_worker_farms(
     list_worker_farms_use_case = ListWorkerFarmsUseCase(db)
     try:
         return list_worker_farms_use_case.list_worker_farms(current_user, page, per_page)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar las fincas: {str(e)}"
+        )
+
+@router.get("/list/all", response_model=FarmListResponse, status_code=status.HTTP_200_OK)
+def list_all_farms(
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> FarmListResponse:
+    """
+    Lista todas las fincas en el sistema para un usuario específico sin paginación.
+
+    Parameters:
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        FarmListResponse: Una lista completa de fincas.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de la lista de fincas.
+    """
+    list_all_farms_use_case = ListAllFarmsUseCase(db)
+    try:
+        return list_all_farms_use_case.list_all_farms(current_user)
     except DomainException as e:
         raise e
     except Exception as e:

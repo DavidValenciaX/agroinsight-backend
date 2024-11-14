@@ -10,12 +10,6 @@ Este documento describe los modelos utilizados para la gestión de lotes en el s
 
 Modelo principal que representa un lote o parcela agrícola dentro de una finca.
 
-### Estado del Lote (PlotState)
-
-::: app.plot.infrastructure.orm_models.PlotState
-
-Modelo que representa los diferentes estados posibles de un lote.
-
 ## Esquemas de Datos
 
 ### Crear Lote
@@ -29,12 +23,6 @@ Esquema para la creación de nuevos lotes.
 ::: app.plot.domain.schemas.PlotResponse
 
 Esquema para la respuesta con información de un lote.
-
-### Actualizar Lote
-
-::: app.plot.domain.schemas.PlotUpdate
-
-Esquema para la actualización de información de un lote.
 
 ### Respuesta Paginada de Lotes
 

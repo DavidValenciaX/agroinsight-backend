@@ -168,3 +168,13 @@ class PaginatedWorkerFarmListResponse(BaseModel):
     page: int = Field(..., ge=1)
     per_page: int = Field(..., ge=1, le=100)
     total_pages: int
+
+class FarmListResponse(BaseModel):
+    """Schema para la respuesta de lista de fincas sin paginar.
+
+    Attributes:
+        farms (List[FarmResponse]): Lista de todas las fincas.
+        total_farms (int): Número total de fincas.
+    """
+    farms: List[FarmResponse]
+    total_farms: int

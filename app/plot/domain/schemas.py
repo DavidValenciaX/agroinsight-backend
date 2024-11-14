@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from decimal import Decimal
-from typing import List
+from typing import List, Type
 from app.infrastructure.utils.validators import validate_no_emojis, validate_no_special_chars, validate_no_xss
 
 class PlotCreate(BaseModel):
@@ -24,7 +24,7 @@ class PlotCreate(BaseModel):
     finca_id: int
     
     @field_validator('nombre')
-    def validate_no_emojis_nombre(cls, v):
+    def validate_no_emojis_nombre(cls: Type['PlotCreate'], v: str) -> str:
         """Valida que el nombre no contenga emojis.
 
         Args:
@@ -40,7 +40,7 @@ class PlotCreate(BaseModel):
         return validate_no_emojis(v)
     
     @field_validator('nombre')
-    def validate_no_special_chars_nombre(cls, v):
+    def validate_no_special_chars_nombre(cls: Type['PlotCreate'], v: str) -> str:
         """Valida que el nombre no contenga caracteres especiales.
 
         Args:
@@ -56,7 +56,7 @@ class PlotCreate(BaseModel):
         return validate_no_special_chars(v)
     
     @field_validator('nombre')
-    def validate_no_xss_nombre(cls, v):
+    def validate_no_xss_nombre(cls: Type['PlotCreate'], v: str) -> str:
         """Valida que el nombre no contenga XSS.
 
         Args:

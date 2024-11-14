@@ -24,12 +24,11 @@ def create_plot(
     plot: PlotCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+)-> SuccessResponse:
     """
     Crea un nuevo lote en el sistema dentro de una finca específica.
 
     Parameters:
-        farm_id (int): ID de la finca desde la URL.
         plot (PlotCreate): Datos del lote a crear.
         db (Session): Sesión de base de datos.
         current_user (UserInDB): Usuario actual autenticado.
@@ -52,13 +51,13 @@ def create_plot(
         )
         
 @router.get("/farm/{farm_id}/plot/list", response_model=PaginatedPlotListResponse, status_code=status.HTTP_200_OK)
-def list_plots(
+def list_plots_by_farm(
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
-):
+)-> PaginatedPlotListResponse:
     """
     Lista todos los lotes de una finca específica.
 
