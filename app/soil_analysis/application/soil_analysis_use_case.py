@@ -44,7 +44,7 @@ class SoilAnalysisUseCase:
         self._environment = os.getenv('RAILWAY_ENVIRONMENT_NAME', 'development')
         self.soil_analysis_repository = SoilAnalysisRepository(db)
 
-    async def analyze_soil(self, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
+    async def analyze_soil(self, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB) -> dict:
         """
         Ejecuta el caso de uso completo de análisis de suelo
         
@@ -164,18 +164,18 @@ class SoilAnalysisUseCase:
             
         return PredictionServiceResponse(**response.json())
 
-    async def process_analysis(self, analysis_results: SoilAnalysisResponse, files: list[UploadFile], task_id: int, observations: str):
+    async def process_analysis(self, analysis_results: SoilAnalysisResponse, files: list[UploadFile], task_id: int, observations: str) -> dict:
         """
         Procesa los resultados de la análisis y los guarda en la base de datos
         
         Args:
-            detection_results: Resultados del servicio de análisis
+            analysis_results: Resultados del servicio de análisis
             files: Archivos de imagen subidos
             task_id: ID de la tarea de análisis de suelo
             observations: Observaciones generales
             
         Returns:
-            SoilAnalysisResponse: Resultados procesados
+            dict: Resultados procesados
         """
 
         # Crear análisis de suelo

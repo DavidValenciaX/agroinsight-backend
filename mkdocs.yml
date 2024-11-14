@@ -50,6 +50,36 @@ nav:
       - Endpoints: cultural_practices/endpoints.md
       - Modelos de datos: cultural_practices/models.md
       - Casos de uso: cultural_practices/use_cases.md
+  - Módulo de costos:
+      - Descripción: costs/overview.md
+      - Endpoints: costs/endpoints.md
+      - Modelos de datos: costs/models.md
+      - Casos de uso: costs/use_cases.md
+  - Módulo de Detección de Gusano Cogollero:
+      - Descripción: fall_armyworm/overview.md
+      - Endpoints: fall_armyworm/endpoints.md
+      - Modelos de datos: fall_armyworm/models.md
+      - Casos de uso: fall_armyworm/use_cases.md
+  - Módulo de Medidas:
+      - Descripción: measurement/overview.md
+      - Endpoints: measurement/endpoints.md
+      - Modelos de datos: measurement/models.md
+      - Casos de uso: measurement/use_cases.md
+  - Módulo de Análisis de Suelo:
+      - Descripción: soil_analysis/overview.md
+      - Endpoints: soil_analysis/endpoints.md
+      - Modelos de datos: soil_analysis/models.md
+      - Casos de uso: soil_analysis/use_cases.md
+  - Módulo de Clima:
+      - Descripción: weather/overview.md
+      - Endpoints: weather/endpoints.md
+      - Modelos de datos: weather/models.md
+      - Casos de uso: weather/use_cases.md
+  - Módulo de Reportes:
+      - Descripción: reports/overview.md
+      - Endpoints: reports/endpoints.md
+      - Modelos de datos: reports/models.md
+      - Casos de uso: reports/use_cases.md
 
   - Desarrollo:
       - Guía para contribuir al proyecto: development/contributing.md

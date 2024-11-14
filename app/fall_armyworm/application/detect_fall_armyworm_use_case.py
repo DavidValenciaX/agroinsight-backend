@@ -44,7 +44,7 @@ class DetectFallArmywormUseCase:
         self._environment = os.getenv('RAILWAY_ENVIRONMENT_NAME', 'development')
         self.fall_armyworm_repository = FallArmywormRepository(db)
 
-    async def detect_fall_armyworm(self, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB):
+    async def detect_fall_armyworm(self, files: list[UploadFile], task_id: int, observations: str, current_user: UserInDB) -> dict:
         """
         Ejecuta el caso de uso completo de detección de gusano cogollero
         
@@ -165,7 +165,7 @@ class DetectFallArmywormUseCase:
             
         return PredictionServiceResponse(**response.json())
 
-    async def process_detection(self, detection_results: FallArmywormDetectionResult, files: list[UploadFile], task_id: int, observations: str):
+    async def process_detection(self, detection_results: FallArmywormDetectionResult, files: list[UploadFile], task_id: int, observations: str) -> dict:
         """
         Procesa los resultados de la detección y los guarda en la base de datos
         
@@ -176,7 +176,7 @@ class DetectFallArmywormUseCase:
             observations: Observaciones generales
             
         Returns:
-            FallArmywormDetectionResult: Resultados procesados
+            dict: Resultados procesados
         """
 
         # Crear monitoreo fitosanitario

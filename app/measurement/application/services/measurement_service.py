@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
+from app.measurement.infrastructure.orm_models import UnitOfMeasure
+
 class MeasurementService:
     """Servicio para gestionar la lógica de negocio relacionada con las medidas.
 
@@ -115,14 +117,14 @@ class MeasurementService:
         """
         self.db = db
         
-    def validate_unit_category(self, unit_of_measure, expected_category: str) -> None:
+    def validate_unit_category(self, unit_of_measure: "UnitOfMeasure", expected_category: str) -> None:
         """Valida que la unidad de medida pertenezca a la categoría esperada.
 
         Este método verifica si la categoría de la unidad de medida coincide con la categoría esperada.
         Si no coincide, se lanza una excepción.
 
         Args:
-            unit_of_measure: La unidad de medida a validar.
+            unit_of_measure (UnitOfMeasure): La unidad de medida a validar.
             expected_category (str): La categoría esperada para la unidad de medida.
 
         Raises:

@@ -142,7 +142,7 @@ async def get_monitoring_results(
     Obtiene los resultados de un monitoreo fitosanitario específico
     
     Args:
-        monitoreo_id: ID del monitoreo fitosanitario
+        monitoring_id: ID del monitoreo fitosanitario
         db: Sesión de base de datos
         current_user: Usuario autenticado
     """
