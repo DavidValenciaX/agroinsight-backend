@@ -1725,7 +1725,7 @@
           <tr class="doc-section-item">
             <td><code>task</code></td>
             <td>
-                  <code><span title="app.cultural_practices.domain.schemas.TaskCreate">TaskCreate</span></code>
+                  <code><a class="autorefs autorefs-internal" title="app.cultural_practices.domain.schemas.TaskCreate" href="../models/#app.cultural_practices.domain.schemas.TaskCreate">TaskCreate</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1815,10 +1815,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span>
@@ -1844,7 +1841,10 @@
 <span class="normal">51</span>
 <span class="normal">52</span>
 <span class="normal">53</span>
-<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/task/create&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessTaskCreateResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/task/create&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessTaskCreateResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">create_task</span><span class="p">(</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">TaskCreate</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
@@ -1905,7 +1905,7 @@
           <tr class="doc-section-item">
             <td><code>assignment</code></td>
             <td>
-                  <code><span title="app.cultural_practices.domain.schemas.AssignmentCreate">AssignmentCreate</span></code>
+                  <code><a class="autorefs autorefs-internal" title="app.cultural_practices.domain.schemas.AssignmentCreate" href="../models/#app.cultural_practices.domain.schemas.AssignmentCreate">AssignmentCreate</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1995,10 +1995,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
@@ -2031,7 +2028,10 @@
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span>
-<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/assignment/create&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">MultipleResponse</span><span class="p">,</span> 
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/assignment/create&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">MultipleResponse</span><span class="p">,</span> 
              <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
                  <span class="mi">200</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Todas las tareas asignadas exitosamente&quot;</span><span class="p">},</span>
                  <span class="mi">207</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Algunas tareas asignadas, otras fallaron&quot;</span><span class="p">},</span>
@@ -2217,10 +2217,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 97</span>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
 <span class="normal">100</span>
@@ -2251,7 +2248,10 @@
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
-<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/farm/</span><span class="si">{farm_id}</span><span class="s2">/user/</span><span class="si">{user_id}</span><span class="s2">/tasks/list&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">PaginatedTaskListResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/farm/</span><span class="si">{farm_id}</span><span class="s2">/user/</span><span class="si">{user_id}</span><span class="s2">/tasks/list&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">PaginatedTaskListResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">list_tasks_by_user_and_farm</span><span class="p">(</span>
     <span class="n">farm_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -2421,10 +2421,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">133</span>
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span>
@@ -2452,7 +2449,10 @@
 <span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
-<span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/farm/</span><span class="si">{farm_id}</span><span class="s2">/tasks/</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/farm/</span><span class="si">{farm_id}</span><span class="s2">/tasks/</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_task_by_id</span><span class="p">(</span>
     <span class="n">farm_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -2591,10 +2591,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">166</span>
 <span class="normal">167</span>
 <span class="normal">168</span>
 <span class="normal">169</span>
@@ -2618,7 +2615,10 @@
 <span class="normal">187</span>
 <span class="normal">188</span>
 <span class="normal">189</span>
-<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tasks/states&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskStateListResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tasks/states&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskStateListResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">list_task_states</span><span class="p">(</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
     <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>
@@ -2685,21 +2685,21 @@
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code><span title="fastapi.Path">Path</span>(..., description=&#39;ID de la tarea&#39;, ge=1)</code>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code>state_id</code></td>
             <td>
-                  <code>int</code>
+                  <code><span title="typing.Union">Union</span>[int, str]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>ID del estado al que se cambiará la tarea.</p>
+                <p>ID del estado o comando ('in_progress', 'done').</p>
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code><span title="fastapi.Path">Path</span>(..., description=&#34;ID del estado o comando (&#39;in_progress&#39;/&#39;done&#39;)&#34;)</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2781,10 +2781,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
@@ -2812,10 +2809,21 @@
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
-<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">&quot;/tasks/</span><span class="si">{task_id}</span><span class="s2">/states/</span><span class="si">{state_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+    <span class="s2">&quot;/tasks/</span><span class="si">{task_id}</span><span class="s2">/states/</span><span class="si">{state_id}</span><span class="s2">&quot;</span><span class="p">,</span> 
+    <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> 
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span>
+<span class="p">)</span>
 <span class="k">def</span> <span class="nf">change_task_state</span><span class="p">(</span>
-    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">state_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ID de la tarea&quot;</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+    <span class="n">state_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ID del estado o comando (&#39;in_progress&#39;/&#39;done&#39;)&quot;</span><span class="p">),</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
     <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
@@ -2824,7 +2832,7 @@
 
 <span class="sd">    Parameters:</span>
 <span class="sd">        task_id (int): ID de la tarea a cambiar el estado.</span>
-<span class="sd">        state_id (int): ID del estado al que se cambiará la tarea.</span>
+<span class="sd">        state_id (Union[int, str]): ID del estado o comando (&#39;in_progress&#39;, &#39;done&#39;).</span>
 <span class="sd">        db (Session): Sesión de base de datos.</span>
 <span class="sd">        current_user (UserInDB): Usuario actual autenticado.</span>
 
@@ -2951,14 +2959,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">232</span>
 <span class="normal">233</span>
 <span class="normal">234</span>
 <span class="normal">235</span>
@@ -2978,7 +2979,14 @@
 <span class="normal">249</span>
 <span class="normal">250</span>
 <span class="normal">251</span>
-<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tasks/types&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskTypeListResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tasks/types&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskTypeListResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">list_task_types</span><span class="p">(</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
     <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>

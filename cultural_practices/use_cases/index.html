@@ -2441,7 +2441,7 @@ correspondientes, registrando los mensajes de éxito o error.</p>
           <tr class="doc-section-item">
             <td><code>assignment_data</code></td>
             <td>
-                  <code><span title="app.cultural_practices.domain.schemas.AssignmentCreate">AssignmentCreate</span></code>
+                  <code><a class="autorefs autorefs-internal" title="app.cultural_practices.domain.schemas.AssignmentCreate" href="../models/#app.cultural_practices.domain.schemas.AssignmentCreate">AssignmentCreate</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2827,9 +2827,7 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
 
               <details class="quote">
                 <summary>Source code in <code>app\cultural_practices\application\change_task_state_use_case.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 13</span>
-<span class="normal"> 14</span>
-<span class="normal"> 15</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
 <span class="normal"> 16</span>
 <span class="normal"> 17</span>
 <span class="normal"> 18</span>
@@ -2970,7 +2968,13 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ChangeTaskStateUseCase</span><span class="p">:</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ChangeTaskStateUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Caso de uso para cambiar el estado de una tarea de labor cultural.</span>
 
 <span class="sd">    Este caso de uso gestiona la lógica de negocio para cambiar el estado de una tarea,</span>
@@ -2998,16 +3002,12 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
         <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span> <span class="o">=</span> <span class="n">FarmService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span> <span class="o">=</span> <span class="n">TaskService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">change_task_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">change_task_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Cambia el estado de una tarea de labor cultural.</span>
-
-<span class="sd">        Este método valida la existencia de la tarea y del estado, así como los permisos del usuario</span>
-<span class="sd">        que intenta realizar el cambio. Si las validaciones son exitosas, actualiza el estado de la tarea</span>
-<span class="sd">        y establece la fecha de finalización si el nuevo estado es &quot;Completada&quot;.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            task_id (int): ID de la tarea cuyo estado se desea cambiar.</span>
-<span class="sd">            state_id (int): ID del nuevo estado que se asignará a la tarea.</span>
+<span class="sd">            state_id (Union[int, str]): ID del estado o comando (&#39;in_progress&#39;, &#39;done&#39;).</span>
 <span class="sd">            current_user (UserInDB): Usuario actual autenticado que intenta cambiar el estado.</span>
 
 <span class="sd">        Returns:</span>
@@ -3030,6 +3030,26 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span>
             <span class="p">)</span>
 
+        <span class="c1"># Intentar convertir state_id a entero</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">numeric_state_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># Si falla, intentar convertir comando de texto a ID</span>
+            <span class="n">numeric_state_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">get_state_id_from_command</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">numeric_state_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Comando de estado inválido. Use un ID numérico o &#39;in_progress&#39;/&#39;done&#39;.&quot;</span><span class="p">,</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Obtener el estado objetivo</span>
+        <span class="n">target_state</span><span class="p">:</span> <span class="n">TaskStateResponse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">numeric_state_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">target_state</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener el estado al cuál se quiere cambiar la tarea.&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
+            <span class="p">)</span>
+
         <span class="c1"># Obtener tarea por ID</span>
         <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_by_id</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="p">:</span>
@@ -3038,45 +3058,32 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
             <span class="p">)</span>
 
-        <span class="n">target_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">target_state</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
-                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener el estado al cuál se quiere cambiar la tarea.&quot;</span><span class="p">,</span>
-                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
-            <span class="p">)</span>
+        <span class="c1"># Actualizar el estado de la tarea</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">estado_id</span> <span class="o">=</span> <span class="n">numeric_state_id</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="n">target_state</span>
 
-        <span class="n">task</span><span class="o">.</span><span class="n">estado_id</span> <span class="o">=</span> <span class="n">state_id</span>
-
-        <span class="n">target_state_name</span> <span class="o">=</span> <span class="n">target_state</span><span class="o">.</span><span class="n">nombre</span>
-
-        <span class="k">if</span> <span class="n">target_state_name</span> <span class="o">==</span> <span class="n">TaskService</span><span class="o">.</span><span class="n">COMPLETADA</span><span class="p">:</span>
+        <span class="c1"># Actualizar la fecha de finalización si es necesario</span>
+        <span class="k">if</span> <span class="n">target_state</span><span class="o">.</span><span class="n">nombre</span> <span class="o">==</span> <span class="n">TaskService</span><span class="o">.</span><span class="n">COMPLETADA</span><span class="p">:</span>
             <span class="n">task</span><span class="o">.</span><span class="n">fecha_finalizacion</span> <span class="o">=</span> <span class="n">datetime_utc_time</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">task</span><span class="o">.</span><span class="n">fecha_finalizacion</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="c1"># Guardar cambios en la base de datos</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">update_task</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
                 <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo actualizar el estado de la tarea.&quot;</span><span class="p">,</span>
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
             <span class="p">)</span>
 
-        <span class="c1"># Obtener nombre del estado por ID</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
-                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener el estado de la tarea.&quot;</span><span class="p">,</span>
-                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
-            <span class="p">)</span>
-
         <span class="k">return</span> <span class="n">SuccessResponse</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Estado de la tarea cambiado exitosamente a &quot;</span> <span class="o">+</span> <span class="n">state</span><span class="o">.</span><span class="n">nombre</span>
+            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Estado de la tarea cambiado exitosamente a &#39;</span><span class="si">{</span><span class="n">target_state</span><span class="o">.</span><span class="n">nombre</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">user_can_change_task_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Verifica si un usuario tiene permisos para cambiar el estado de una tarea.</span>
 
 <span class="sd">        Este método valida la existencia de la tarea, el lote y la finca asociada, y verifica si el usuario</span>
-<span class="sd">        es administrador de la finca.</span>
+<span class="sd">        es administrador o trabajador de la finca.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            user_id (int): ID del usuario que intenta cambiar el estado.</span>
@@ -3112,8 +3119,9 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
             <span class="p">)</span>
 
-        <span class="c1"># Verificar si el usuario es administrador de la finca</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span><span class="o">.</span><span class="n">user_is_farm_admin</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">farm</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="c1"># Verificar si el usuario es administrador o trabajador de la finca</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span><span class="o">.</span><span class="n">user_is_farm_admin</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">farm</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">or</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span><span class="o">.</span><span class="n">user_is_farm_worker</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">farm</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -3173,9 +3181,7 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\change_task_state_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
@@ -3184,7 +3190,9 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
 <span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span>
-<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inicializa el caso de uso con las dependencias necesarias.</span>
 
 <span class="sd">    Args:</span>
@@ -3214,9 +3222,6 @@ asegurando que se cumplan las validaciones necesarias antes de realizar el cambi
     <div class="doc doc-contents ">
 
         <p>Cambia el estado de una tarea de labor cultural.</p>
-<p>Este método valida la existencia de la tarea y del estado, así como los permisos del usuario
-que intenta realizar el cambio. Si las validaciones son exitosas, actualiza el estado de la tarea
-y establece la fecha de finalización si el nuevo estado es "Completada".</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3247,11 +3252,11 @@ y establece la fecha de finalización si el nuevo estado es "Completada".</p>
           <tr class="doc-section-item">
             <td><code>state_id</code></td>
             <td>
-                  <code>int</code>
+                  <code><span title="typing.Union">Union</span>[int, str]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>ID del nuevo estado que se asignará a la tarea.</p>
+                <p>ID del estado o comando ('in_progress', 'done').</p>
               </div>
             </td>
             <td>
@@ -3323,9 +3328,7 @@ y establece la fecha de finalización si el nuevo estado es "Completada".</p>
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\change_task_state_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
 <span class="normal"> 44</span>
 <span class="normal"> 45</span>
 <span class="normal"> 46</span>
@@ -3395,16 +3398,17 @@ y establece la fecha de finalización si el nuevo estado es "Completada".</p>
 <span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
-<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">change_task_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">change_task_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cambia el estado de una tarea de labor cultural.</span>
-
-<span class="sd">    Este método valida la existencia de la tarea y del estado, así como los permisos del usuario</span>
-<span class="sd">    que intenta realizar el cambio. Si las validaciones son exitosas, actualiza el estado de la tarea</span>
-<span class="sd">    y establece la fecha de finalización si el nuevo estado es &quot;Completada&quot;.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        task_id (int): ID de la tarea cuyo estado se desea cambiar.</span>
-<span class="sd">        state_id (int): ID del nuevo estado que se asignará a la tarea.</span>
+<span class="sd">        state_id (Union[int, str]): ID del estado o comando (&#39;in_progress&#39;, &#39;done&#39;).</span>
 <span class="sd">        current_user (UserInDB): Usuario actual autenticado que intenta cambiar el estado.</span>
 
 <span class="sd">    Returns:</span>
@@ -3427,6 +3431,26 @@ y establece la fecha de finalización si el nuevo estado es "Completada".</p>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span>
         <span class="p">)</span>
 
+    <span class="c1"># Intentar convertir state_id a entero</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">numeric_state_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="c1"># Si falla, intentar convertir comando de texto a ID</span>
+        <span class="n">numeric_state_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">get_state_id_from_command</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">numeric_state_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Comando de estado inválido. Use un ID numérico o &#39;in_progress&#39;/&#39;done&#39;.&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Obtener el estado objetivo</span>
+    <span class="n">target_state</span><span class="p">:</span> <span class="n">TaskStateResponse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">numeric_state_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_state</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener el estado al cuál se quiere cambiar la tarea.&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
+        <span class="p">)</span>
+
     <span class="c1"># Obtener tarea por ID</span>
     <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_by_id</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="p">:</span>
@@ -3435,38 +3459,25 @@ y establece la fecha de finalización si el nuevo estado es "Completada".</p>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
         <span class="p">)</span>
 
-    <span class="n">target_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_state</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener el estado al cuál se quiere cambiar la tarea.&quot;</span><span class="p">,</span>
-            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
-        <span class="p">)</span>
+    <span class="c1"># Actualizar el estado de la tarea</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">estado_id</span> <span class="o">=</span> <span class="n">numeric_state_id</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="n">target_state</span>
 
-    <span class="n">task</span><span class="o">.</span><span class="n">estado_id</span> <span class="o">=</span> <span class="n">state_id</span>
-
-    <span class="n">target_state_name</span> <span class="o">=</span> <span class="n">target_state</span><span class="o">.</span><span class="n">nombre</span>
-
-    <span class="k">if</span> <span class="n">target_state_name</span> <span class="o">==</span> <span class="n">TaskService</span><span class="o">.</span><span class="n">COMPLETADA</span><span class="p">:</span>
+    <span class="c1"># Actualizar la fecha de finalización si es necesario</span>
+    <span class="k">if</span> <span class="n">target_state</span><span class="o">.</span><span class="n">nombre</span> <span class="o">==</span> <span class="n">TaskService</span><span class="o">.</span><span class="n">COMPLETADA</span><span class="p">:</span>
         <span class="n">task</span><span class="o">.</span><span class="n">fecha_finalizacion</span> <span class="o">=</span> <span class="n">datetime_utc_time</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">task</span><span class="o">.</span><span class="n">fecha_finalizacion</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="c1"># Guardar cambios en la base de datos</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">update_task</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
             <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo actualizar el estado de la tarea.&quot;</span><span class="p">,</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
         <span class="p">)</span>
 
-    <span class="c1"># Obtener nombre del estado por ID</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">state_id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener el estado de la tarea.&quot;</span><span class="p">,</span>
-            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
-        <span class="p">)</span>
-
     <span class="k">return</span> <span class="n">SuccessResponse</span><span class="p">(</span>
-        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Estado de la tarea cambiado exitosamente a &quot;</span> <span class="o">+</span> <span class="n">state</span><span class="o">.</span><span class="n">nombre</span>
+        <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Estado de la tarea cambiado exitosamente a &#39;</span><span class="si">{</span><span class="n">target_state</span><span class="o">.</span><span class="n">nombre</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -3487,7 +3498,7 @@ y establece la fecha de finalización si el nuevo estado es "Completada".</p>
 
         <p>Verifica si un usuario tiene permisos para cambiar el estado de una tarea.</p>
 <p>Este método valida la existencia de la tarea, el lote y la finca asociada, y verifica si el usuario
-es administrador de la finca.</p>
+es administrador o trabajador de la finca.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3580,12 +3591,7 @@ es administrador de la finca.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\change_task_state_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">120</span>
 <span class="normal">121</span>
 <span class="normal">122</span>
 <span class="normal">123</span>
@@ -3621,11 +3627,17 @@ es administrador de la finca.</p>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">user_can_change_task_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">user_can_change_task_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Verifica si un usuario tiene permisos para cambiar el estado de una tarea.</span>
 
 <span class="sd">    Este método valida la existencia de la tarea, el lote y la finca asociada, y verifica si el usuario</span>
-<span class="sd">    es administrador de la finca.</span>
+<span class="sd">    es administrador o trabajador de la finca.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        user_id (int): ID del usuario que intenta cambiar el estado.</span>
@@ -3661,8 +3673,9 @@ es administrador de la finca.</p>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
         <span class="p">)</span>
 
-    <span class="c1"># Verificar si el usuario es administrador de la finca</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span><span class="o">.</span><span class="n">user_is_farm_admin</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">farm</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="c1"># Verificar si el usuario es administrador o trabajador de la finca</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span><span class="o">.</span><span class="n">user_is_farm_admin</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">farm</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">or</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span><span class="o">.</span><span class="n">user_is_farm_worker</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">farm</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4103,7 +4116,7 @@ se crea la tarea.</p>
           <tr class="doc-section-item">
             <td><code>task_data</code></td>
             <td>
-                  <code><span title="app.cultural_practices.domain.schemas.TaskCreate">TaskCreate</span></code>
+                  <code><a class="autorefs autorefs-internal" title="app.cultural_practices.domain.schemas.TaskCreate" href="../models/#app.cultural_practices.domain.schemas.TaskCreate">TaskCreate</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4470,7 +4483,9 @@ asegurando que se cumplan las validaciones necesarias antes de devolver la tarea
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
-<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GetTaskByIdUseCase</span><span class="p">:</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GetTaskByIdUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Caso de uso para obtener una tarea de labor cultural por su ID.</span>
 
 <span class="sd">    Este caso de uso gestiona la lógica de negocio para recuperar una tarea específica,</span>
@@ -4530,10 +4545,12 @@ asegurando que se cumplan las validaciones necesarias antes de devolver la tarea
             <span class="nb">id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
             <span class="n">nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
             <span class="n">tipo_labor_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor_id</span><span class="p">,</span>
+            <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
             <span class="n">fecha_inicio_estimada</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_inicio_estimada</span><span class="p">,</span>
             <span class="n">fecha_finalizacion</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_finalizacion</span><span class="p">,</span>
             <span class="n">descripcion</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">descripcion</span><span class="p">,</span>
             <span class="n">estado_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">estado_id</span><span class="p">,</span>
+            <span class="n">estado_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">estado</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
             <span class="n">lote_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">lote_id</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -4781,7 +4798,9 @@ para acceder a la tarea. Si las validaciones son exitosas, devuelve la tarea.</p
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
-<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_task_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">farm_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskResponse</span><span class="p">:</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_task_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">farm_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtiene una tarea de labor cultural por su ID.</span>
 
 <span class="sd">    Este método valida la existencia de la tarea y verifica si el usuario tiene permisos</span>
@@ -4817,10 +4836,12 @@ para acceder a la tarea. Si las validaciones son exitosas, devuelve la tarea.</p
         <span class="nb">id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
         <span class="n">nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
         <span class="n">tipo_labor_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor_id</span><span class="p">,</span>
+        <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
         <span class="n">fecha_inicio_estimada</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_inicio_estimada</span><span class="p">,</span>
         <span class="n">fecha_finalizacion</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_finalizacion</span><span class="p">,</span>
         <span class="n">descripcion</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">descripcion</span><span class="p">,</span>
         <span class="n">estado_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">estado_id</span><span class="p">,</span>
+        <span class="n">estado_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">estado</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
         <span class="n">lote_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">lote_id</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
