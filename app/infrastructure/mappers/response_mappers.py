@@ -1,5 +1,7 @@
-from app.cultural_practices.domain.schemas import AgriculturalInputCategoryResponse, AgriculturalInputResponse, TaskResponse, TaskStateResponse, TaskTypeResponse
-from app.cultural_practices.infrastructure.orm_models import AgriculturalInput, AgriculturalInputCategory, CulturalTask
+from app.costs.domain.schemas import AgriculturalInputCategoryResponse, AgriculturalInputResponse
+from app.cultural_practices.domain.schemas import TaskResponse, TaskStateResponse, TaskTypeResponse
+from app.costs.infrastructure.orm_models import AgriculturalInput, AgriculturalInputCategory
+from app.cultural_practices.infrastructure.orm_models import CulturalTask
 from app.user.domain.schemas import UserForFarmResponse, UserResponse
 from app.farm.domain.schemas import FarmResponse, WorkerFarmResponse
 from app.plot.domain.schemas import PlotResponse

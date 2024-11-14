@@ -1,6 +1,7 @@
 from fastapi import status
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import TaskCostsCreate, CostRegistrationResponse
+from app.costs.domain.schemas import TaskCostsCreate, CostRegistrationResponse
+from app.costs.infrastructure.sql_repository import CostsRepository
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.infrastructure.common.common_exceptions import DomainException
 from app.user.domain.schemas import UserInDB
@@ -11,7 +12,8 @@ class RegisterTaskCostsUseCase:
 
     def __init__(self, db: Session):
         self.db = db
-        self.cultural_practice_repository = CulturalPracticesRepository(db)
+        self.costs_repository = CostsRepository(db)
+        self.cultural_practices_repository = CulturalPracticesRepository(db)
         self.farm_service = FarmService(db)
 
     def register_costs(self, task_id: int, farm_id: int, costs: TaskCostsCreate, current_user: UserInDB) -> CostRegistrationResponse:
@@ -30,7 +32,7 @@ class RegisterTaskCostsUseCase:
             DomainException: Si hay errores de validación o permisos.
         """
         # Validar que la tarea existe
-        task = self.cultural_practice_repository.get_task_by_id(task_id)
+        task = self.cultural_practices_repository.get_task_by_id(task_id)
         if not task:
             raise DomainException(
                 message="La tarea especificada no existe.",
@@ -50,32 +52,32 @@ class RegisterTaskCostsUseCase:
 
         # Registrar costo de mano de obra
         if costs.labor_cost:
-            labor_cost_registered = self.cultural_practice_repository.create_labor_cost(
+            labor_cost_registered = self.costs_repository.create_labor_cost(
                 task_id, costs.labor_cost
             )
 
         # Registrar costos de insumos
         if costs.inputs:
             for input_data in costs.inputs:
-                costo_unitario = self.cultural_practice_repository.get_input_cost(input_data.insumo_id)
+                costo_unitario = self.costs_repository.get_input_cost(input_data.insumo_id)
                 if not costo_unitario:
                     continue
                 
                 costo_total = costo_unitario * input_data.cantidad_utilizada
-                if self.cultural_practice_repository.create_task_input(task_id, input_data, costo_total):
+                if self.costs_repository.create_task_input(task_id, input_data, costo_total):
                     inputs_registered += 1
 
         # Registrar costos de maquinaria
         if costs.machinery:
             for machinery_data in costs.machinery:
-                costo_hora = self.cultural_practice_repository.get_machinery_cost_per_hour(
+                costo_hora = self.costs_repository.get_machinery_cost_per_hour(
                     machinery_data.maquinaria_id
                 )
                 if not costo_hora:
                     continue
                 
                 costo_total = costo_hora * machinery_data.horas_uso
-                if self.cultural_practice_repository.create_task_machinery(task_id, machinery_data, costo_total):
+                if self.costs_repository.create_task_machinery(task_id, machinery_data, costo_total):
                     machinery_registered += 1
 
         return CostRegistrationResponse(

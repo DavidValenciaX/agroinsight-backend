@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AgriculturalInputListResponse
-from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
+from app.costs.domain.schemas import AgriculturalInputListResponse
+from app.costs.infrastructure.sql_repository import CostsRepository
 from app.infrastructure.mappers.response_mappers import map_agricultural_input_to_response
 from app.user.domain.schemas import UserInDB
 
@@ -18,7 +18,7 @@ class ListAgriculturalInputsUseCase:
     def __init__(self, db: Session):
         """Inicializa el caso de uso con las dependencias necesarias."""
         self.db = db
-        self.cultural_practice_repository = CulturalPracticesRepository(db)
+        self.costs_repository = CostsRepository(db)
 
     def list_inputs(self, current_user: UserInDB) -> AgriculturalInputListResponse:
         """Lista todos los insumos agrícolas.
@@ -29,6 +29,6 @@ class ListAgriculturalInputsUseCase:
         Returns:
             AgriculturalInputListResponse: Lista de insumos agrícolas.
         """
-        inputs = self.cultural_practice_repository.get_agricultural_inputs()
+        inputs = self.costs_repository.get_agricultural_inputs()
         input_responses = [map_agricultural_input_to_response(input) for input in inputs]
         return AgriculturalInputListResponse(inputs=input_responses) 
