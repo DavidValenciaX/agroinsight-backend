@@ -3,9 +3,11 @@ from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserInDB
-from app.weather.domain.schemas import WeatherAPIResponse
+from app.weather.domain.schemas import WeatherAPIResponse, WeatherLogsListResponse
 from app.weather.application.test_open_weather_map_api_use_case import TestOpenWeatherMapAPIUseCase
 from app.weather.application.get_current_weather_use_case import GetCurrentWeatherUseCase
+from app.weather.application.get_weather_logs_use_case import GetWeatherLogsUseCase
+from datetime import date
 
 router = APIRouter(tags=["weather"])
 
@@ -51,3 +53,27 @@ async def get_current_weather(
     """
     use_case = GetCurrentWeatherUseCase(db)
     return await use_case.get_current_weather(lat, lon) 
+
+@router.get("/weather/logs/{lote_id}", response_model=WeatherLogsListResponse)
+async def get_weather_logs(
+    lote_id: int,
+    start_date: date = Query(..., description="Fecha de inicio (YYYY-MM-DD)"),
+    end_date: date = Query(..., description="Fecha de fin (YYYY-MM-DD)"),
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> WeatherLogsListResponse:
+    """
+    Obtiene los registros meteorológicos de un lote en un rango de fechas.
+
+    Args:
+        lote_id (int): ID del lote
+        start_date (date): Fecha de inicio
+        end_date (date): Fecha de fin
+        db (Session): Sesión de base de datos
+        current_user (UserInDB): Usuario autenticado actual
+
+    Returns:
+        WeatherLogsListResponse: Lista de registros meteorológicos
+    """
+    use_case = GetWeatherLogsUseCase(db)
+    return await use_case.get_weather_logs(lote_id, start_date, end_date) 

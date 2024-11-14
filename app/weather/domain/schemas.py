@@ -48,3 +48,31 @@ class WeatherLog(WeatherLogCreate):
 
     class Config:
         from_attributes = True 
+
+class WeatherLogResponse(BaseModel):
+    id: int
+    lote_id: int
+    fecha: date
+    hora: time
+    temperatura: float
+    temperatura_sensacion: float
+    presion_atmosferica: float
+    humedad_relativa: float
+    precipitacion: Optional[float]
+    indice_uv: float
+    nubosidad: float
+    velocidad_viento: float
+    direccion_viento: int
+    rafaga_viento: Optional[float]
+    visibilidad: Optional[int]
+    punto_rocio: Optional[float]
+    descripcion_clima: Optional[str]
+    codigo_clima: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+class WeatherLogsListResponse(BaseModel):
+    success: bool
+    message: str
+    data: list[WeatherLogResponse] 
