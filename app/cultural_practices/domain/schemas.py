@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import date, timedelta
 from typing import List, Optional
+from decimal import Decimal
 
 from app.infrastructure.utils.validators import validate_no_emojis, validate_no_special_chars, validate_no_xss
         
@@ -160,3 +161,71 @@ class TaskTypeListResponse(BaseModel):
         task_types (List[TaskTypeResponse]): Lista de tipos de tareas.
     """
     task_types: List[TaskTypeResponse]
+
+class LaborCostCreate(BaseModel):
+    """Modelo para la creación de costos de mano de obra.
+
+    Attributes:
+        cantidad_trabajadores (int): Número de trabajadores.
+        horas_trabajadas (Decimal): Horas trabajadas.
+        costo_hora (Decimal): Costo por hora.
+        observaciones (Optional[str]): Observaciones adicionales.
+    """
+    cantidad_trabajadores: int = Field(..., gt=0)
+    horas_trabajadas: Decimal = Field(..., gt=0)
+    costo_hora: Decimal = Field(..., gt=0)
+    observaciones: Optional[str] = None
+
+class TaskInputCreate(BaseModel):
+    """Modelo para la creación de costos de insumos.
+
+    Attributes:
+        insumo_id (int): ID del insumo utilizado.
+        cantidad_utilizada (Decimal): Cantidad utilizada del insumo.
+        fecha_aplicacion (date): Fecha de aplicación del insumo.
+        observaciones (Optional[str]): Observaciones adicionales.
+    """
+    insumo_id: int
+    cantidad_utilizada: Decimal = Field(..., gt=0)
+    fecha_aplicacion: Optional[date] = None
+    observaciones: Optional[str] = None
+
+class TaskMachineryCreate(BaseModel):
+    """Modelo para la creación de costos de maquinaria.
+
+    Attributes:
+        maquinaria_id (int): ID de la maquinaria utilizada.
+        fecha_uso (date): Fecha de uso de la maquinaria.
+        horas_uso (Decimal): Horas de uso de la maquinaria.
+        observaciones (Optional[str]): Observaciones adicionales.
+    """
+    maquinaria_id: int
+    fecha_uso: Optional[date] = None
+    horas_uso: Decimal = Field(..., gt=0)
+    observaciones: Optional[str] = None
+
+class TaskCostsCreate(BaseModel):
+    """Modelo para la creación de todos los costos asociados a una tarea.
+
+    Attributes:
+        labor_cost (Optional[LaborCostCreate]): Costos de mano de obra.
+        inputs (Optional[List[TaskInputCreate]]): Lista de insumos utilizados.
+        machinery (Optional[List[TaskMachineryCreate]]): Lista de maquinaria utilizada.
+    """
+    labor_cost: Optional[LaborCostCreate] = None
+    inputs: Optional[List[TaskInputCreate]] = None
+    machinery: Optional[List[TaskMachineryCreate]] = None
+
+class CostRegistrationResponse(BaseModel):
+    """Modelo de respuesta para el registro de costos.
+
+    Attributes:
+        message: str: Mensaje de éxito.
+        labor_cost_registered: bool: Indica si se registraron costos de mano de obra.
+        inputs_registered: int: Cantidad de insumos registrados.
+        machinery_registered: int: Cantidad de maquinaria registrada.
+    """
+    message: str
+    labor_cost_registered: bool
+    inputs_registered: int
+    machinery_registered: int

@@ -3,11 +3,11 @@ Este módulo define las rutas de la API para la gestión de prácticas culturale
 
 Incluye endpoints para la creación de tareas y asignaciones, así como para listar asignaciones.
 """
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Path
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.cultural_practices.application.get_task_by_id_use_case import GetTaskByIdUseCase
-from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskResponse, TaskStateListResponse, TaskTypeListResponse
+from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskResponse, TaskStateListResponse, TaskTypeListResponse, TaskCostsCreate, CostRegistrationResponse
 from app.cultural_practices.application.assign_task_use_case import AssignTaskUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
 from app.infrastructure.common.common_exceptions import DomainException
@@ -22,6 +22,7 @@ from app.cultural_practices.application.list_task_types_use_case import ListTask
 from app.cultural_practices.application.list_worker_tasks_use_case import ListWorkerTasksUseCase
 from typing import Union
 from app.cultural_practices.application.list_tasks_by_plot_use_case import ListTasksByPlotUseCase
+from app.cultural_practices.application.register_task_costs_use_case import RegisterTaskCostsUseCase
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -192,10 +193,14 @@ def list_task_states(
             detail=f"Error interno al listar los estados de las tareas: {str(e)}"
         ) from e
 
-@router.put("/tasks/{task_id}/states/{state_id}", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
+@router.put(
+    "/tasks/{task_id}/states/{state_id}", 
+    response_model=SuccessResponse, 
+    status_code=status.HTTP_200_OK
+)
 def change_task_state(
-    task_id: int,
-    state_id: Union[int, str],
+    task_id: int = Path(..., description="ID de la tarea", ge=1),
+    state_id: Union[int, str] = Path(..., description="ID del estado o comando ('in_progress'/'done')"),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> SuccessResponse:
@@ -324,4 +329,41 @@ def list_tasks_by_plot(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar las tareas del lote: {str(e)}"
+        ) from e
+
+@router.post("/farms/{farm_id}/tasks/{task_id}/costs", 
+            response_model=CostRegistrationResponse, 
+            status_code=status.HTTP_201_CREATED)
+def register_task_costs(
+    farm_id: int,
+    task_id: int,
+    costs: TaskCostsCreate,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> CostRegistrationResponse:
+    """
+    Registra los costos asociados a una tarea cultural.
+
+    Parameters:
+        farm_id (int): ID de la finca.
+        task_id (int): ID de la tarea.
+        costs (TaskCostsCreate): Datos de los costos a registrar.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        CostRegistrationResponse: Respuesta indicando el resultado del registro de costos.
+
+    Raises:
+        HTTPException: Si ocurre un error durante el registro de los costos.
+    """
+    register_task_costs_use_case = RegisterTaskCostsUseCase(db)
+    try:
+        return register_task_costs_use_case.register_costs(task_id, farm_id, costs, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al registrar los costos: {str(e)}"
         ) from e

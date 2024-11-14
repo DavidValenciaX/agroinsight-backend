@@ -10,6 +10,7 @@ from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from typing import Union
+from app.cultural_practices.domain.schemas import TaskStateResponse
 
 class ChangeTaskStateUseCase:
     """Caso de uso para cambiar el estado de una tarea de labor cultural.
@@ -42,10 +43,6 @@ class ChangeTaskStateUseCase:
     def change_task_state(self, task_id: int, state_id: Union[int, str], current_user: UserInDB) -> SuccessResponse:
         """Cambia el estado de una tarea de labor cultural.
 
-        Este método valida la existencia de la tarea y del estado, así como los permisos del usuario
-        que intenta realizar el cambio. Si las validaciones son exitosas, actualiza el estado de la tarea
-        y establece la fecha de finalización si el nuevo estado es "Completada".
-
         Args:
             task_id (int): ID de la tarea cuyo estado se desea cambiar.
             state_id (Union[int, str]): ID del estado o comando ('in_progress', 'done').
@@ -71,15 +68,25 @@ class ChangeTaskStateUseCase:
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
-        # Convertir comando de texto a ID si es necesario
-        if isinstance(state_id, str):
+        # Intentar convertir state_id a entero
+        try:
+            numeric_state_id = int(state_id)
+        except ValueError:
+            # Si falla, intentar convertir comando de texto a ID
             numeric_state_id = self.task_service.get_state_id_from_command(state_id)
             if numeric_state_id is None:
                 raise DomainException(
                     message="Comando de estado inválido. Use un ID numérico o 'in_progress'/'done'.",
                     status_code=status.HTTP_400_BAD_REQUEST
                 )
-            state_id = numeric_state_id
+
+        # Obtener el estado objetivo
+        target_state: TaskStateResponse = self.cultural_practice_repository.get_task_state_by_id(numeric_state_id)
+        if not target_state:
+            raise DomainException(
+                message="No se pudo obtener el estado al cuál se quiere cambiar la tarea.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
 
         # Obtener tarea por ID
         task = self.cultural_practice_repository.get_task_by_id(task_id)
@@ -88,31 +95,26 @@ class ChangeTaskStateUseCase:
                 message="No se pudo obtener la tarea.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
-            
-        target_state = self.cultural_practice_repository.get_task_state_by_id(state_id)
-        if not target_state:
-            raise DomainException(
-                message="No se pudo obtener el estado al cuál se quiere cambiar la tarea.",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-            
-        task.estado_id = state_id
-        
-        target_state_name = target_state.nombre
-        
-        if target_state_name == TaskService.COMPLETADA:
+
+        # Actualizar el estado de la tarea
+        task.estado_id = numeric_state_id
+        task.estado = target_state
+
+        # Actualizar la fecha de finalización si es necesario
+        if target_state.nombre == TaskService.COMPLETADA:
             task.fecha_finalizacion = datetime_utc_time()
         else:
             task.fecha_finalizacion = None
-        
+
+        # Guardar cambios en la base de datos
         if not self.cultural_practice_repository.update_task(task):
             raise DomainException(
                 message="No se pudo actualizar el estado de la tarea.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
+
         return SuccessResponse(
-            message="Estado de la tarea cambiado exitosamente a " + target_state.nombre
+            message=f"Estado de la tarea cambiado exitosamente a '{target_state.nombre}'."
         )
     
     def user_can_change_task_state(self, user_id: int, task_id: int) -> bool:
