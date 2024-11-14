@@ -21,6 +21,7 @@ from app.fall_armyworm.infrastructure.api import router as fall_armyworm_router
 from app.soil_analysis.infrastructure.api import router as soil_analysis_router
 from app.weather.infrastructure.api import router as weather_router
 from app.costs.infrastructure.api import router as costs_router
+from app.reports.infrastructure.api import router as reports_router
 from fastapi.exceptions import RequestValidationError
 from app.infrastructure.common.exceptions_handler import (
     validation_exception_handler, 
@@ -59,6 +60,7 @@ app.include_router(fall_armyworm_router)
 app.include_router(soil_analysis_router)
 app.include_router(weather_router)
 app.include_router(costs_router)
+app.include_router(reports_router)
 
 @app.get("/")
 def root():
