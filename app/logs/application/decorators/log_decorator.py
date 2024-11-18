@@ -13,23 +13,36 @@ def log_activity(
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            # Obtener el request y log_service de los kwargs
             request: Request = next((arg for arg in args if isinstance(arg, Request)), 
                                  kwargs.get('request'))
             log_service: LogService = getattr(request.state, 'log_service', None)
 
             if not log_service:
-                # Si no hay log_service, continuar sin logging
                 return await func(*args, **kwargs)
 
             try:
                 # Intentar obtener el usuario autenticado
                 user = kwargs.get('current_user')
                 
-                # Si no hay usuario autenticado, intentar obtener el email
-                if user is None and 'email' in kwargs:
-                    user = kwargs['email']  # Usar el email como identificador
-                
+                # Si no hay usuario autenticado, buscar el email en diferentes lugares
+                if user is None:
+                    # 1. Buscar en kwargs directamente
+                    email = kwargs.get('email')
+                    
+                    # 2. Buscar en el body del request si es un modelo Pydantic
+                    if not email:
+                        for arg in args:
+                            if hasattr(arg, 'email'):
+                                email = getattr(arg, 'email')
+                                break
+                        for value in kwargs.values():
+                            if hasattr(value, 'email'):
+                                email = getattr(value, 'email')
+                                break
+                    
+                    if email:
+                        user = email
+
                 # Ejecutar la función original
                 result = await func(*args, **kwargs)
 

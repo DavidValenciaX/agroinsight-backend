@@ -89,16 +89,21 @@ class LogService:
         usuario_id = None
         if isinstance(user, UserInDB):
             usuario_id = user.id
-            user_description = f"Usuario ID: {user.id}"
-        elif isinstance(user, str):  # Es un email
+            user_description = f"Usuario ID: {user.id} ({user.email})"
+        elif isinstance(user, str) and '@' in user:  # Validar que sea un email
             usuario = self.user_repository.get_user_by_email(user)
             if usuario:
                 usuario_id = usuario.id
-                user_description = f"Usuario ID: {usuario.id}"
+                user_description = f"Usuario ID: {usuario.id} ({usuario.email})"
             else:
                 user_description = f"Usuario no registrado (Email: {user})"
         else:
             user_description = "Usuario no identificado"
+
+        # Agregar logging para debug
+        print(f"Debug - User input: {user}")
+        print(f"Debug - Usuario ID: {usuario_id}")
+        print(f"Debug - User description: {user_description}")
 
         # Crear la descripción completa
         full_description = f"{user_description}. {description or ''}"
