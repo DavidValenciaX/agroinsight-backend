@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserInDB
@@ -8,10 +9,17 @@ from app.weather.application.test_open_weather_map_api_use_case import TestOpenW
 from app.weather.application.get_current_weather_use_case import GetCurrentWeatherUseCase
 from app.weather.application.get_weather_logs_use_case import GetWeatherLogsUseCase
 from datetime import date
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.application.services.log_service import LogActionType
 
 router = APIRouter(tags=["weather"])
 
 @router.get("/weather/test-api", response_model=WeatherAPIResponse)
+@log_activity(
+    action_type=LogActionType.VERIFY_CONNECTION,
+    table_name="registro_meteorologico",
+    description="Prueba de conexión con API OpenWeatherMap",
+)
 async def test_weather_api(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -30,9 +38,19 @@ async def test_weather_api(
         WeatherAPIResponse: Respuesta de la prueba de conexión.
     """
     use_case = TestOpenWeatherMapAPIUseCase(db)
-    return await use_case.test_api_connection() 
+    try:
+        return await use_case.test_api_connection()
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
 
 @router.get("/weather/current", response_model=WeatherAPIResponse)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="registro_meteorologico",
+    description="Consulta de datos meteorológicos actuales",
+)
 async def get_current_weather(
     lat: float = Query(..., description="Latitud de la ubicación"),
     lon: float = Query(..., description="Longitud de la ubicación"),
@@ -52,9 +70,20 @@ async def get_current_weather(
         WeatherAPIResponse: Datos meteorológicos actuales.
     """
     use_case = GetCurrentWeatherUseCase(db)
-    return await use_case.get_current_weather(lat, lon) 
+    try:
+        return await use_case.get_current_weather(lat, lon)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
 
 @router.get("/weather/logs/{lote_id}", response_model=WeatherLogsListResponse)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="registro_meteorologico",
+    description="Consulta de registros meteorológicos históricos",
+    get_record_id=lambda *args, **kwargs: kwargs.get('lote_id')
+)
 async def get_weather_logs(
     lote_id: int,
     start_date: date = Query(..., description="Fecha de inicio (YYYY-MM-DD)"),
@@ -76,4 +105,9 @@ async def get_weather_logs(
         WeatherLogsListResponse: Lista de registros meteorológicos
     """
     use_case = GetWeatherLogsUseCase(db)
-    return await use_case.get_weather_logs(lote_id, start_date, end_date) 
+    try:
+        return await use_case.get_weather_logs(lote_id, start_date, end_date) 
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
