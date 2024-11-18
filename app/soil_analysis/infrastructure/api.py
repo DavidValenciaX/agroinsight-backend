@@ -15,6 +15,8 @@ from app.soil_analysis.application.soil_analysis_use_case import SoilAnalysisUse
 from app.infrastructure.common.common_exceptions import DomainException
 import os
 from dotenv import load_dotenv
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.application.services.log_service import LogActionType
 
 load_dotenv(override=True)
 
@@ -28,6 +30,17 @@ SOIL_ANALYSIS_SERVICE_URL = os.getenv('SOIL_ANALYSIS_SERVICE_URL', 'http://local
 router = APIRouter(prefix="/soil-analysis", tags=["soil analysis"])
 
 @router.post("/predict")
+@log_activity(
+    action_type=LogActionType.REGISTER_SOIL_ANALYSIS,
+    table_name="analisis_suelo",
+    description="Registro de nuevo análisis de suelo",
+    get_record_id=lambda *args, **kwargs: kwargs.get('result', {}).get('analysis_id'),
+    get_new_value=lambda *args, **kwargs: {
+        "task_id": kwargs.get('task_id'),
+        "observations": kwargs.get('observations'),
+        "total_images": len(kwargs.get('files', []))
+    }
+)
 async def predict_images(
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(...),
@@ -90,18 +103,28 @@ async def predict_images(
         ) from e
 
 @router.get("/test-soil-analysis-connection", status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VERIFY_CONNECTION,
+    table_name="analisis_suelo",
+    description="Verificación de conexión con servicio de análisis de suelo",
+    get_new_value=lambda *args, **kwargs: {
+        "service_url": SOIL_ANALYSIS_SERVICE_URL,
+        "status": "success" if kwargs.get('result') else "error"
+    }
+)
 async def test_connection():
     """Endpoint para probar la conexión con el servicio de análisis"""
     try:
         async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
             response = await client.get(f"{SOIL_ANALYSIS_SERVICE_URL}/soil-analysis/health")
+            result = {
+                "status": "success",
+                "service_url": SOIL_ANALYSIS_SERVICE_URL,
+                "response": response.json()
+            }
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
-                content={
-                    "status": "success",
-                    "service_url": SOIL_ANALYSIS_SERVICE_URL,
-                    "response": response.json()
-                }
+                content=result
             )
     except Exception as e:
         raise HTTPException(
@@ -110,6 +133,11 @@ async def test_connection():
         ) from e
         
 @router.get("/analysis/{analysis_id}/status")
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="analisis_suelo",
+    description="Consulta de estado de análisis de suelo"
+)
 async def get_processing_status(
     analysis_id: int,
     db: Session = Depends(getDb),
@@ -131,6 +159,11 @@ async def get_processing_status(
         ) from e
         
 @router.get("/analysis/{analysis_id}", response_model=SoilAnalysisResult)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="analisis_suelo",
+    description="Consulta de resultados de análisis de suelo"
+)
 async def get_analysis_results(
     analysis_id: int,
     db: Session = Depends(getDb),

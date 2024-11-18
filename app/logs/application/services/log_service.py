@@ -40,6 +40,7 @@ class LogActionType(str, Enum):
     CONFIRM_RECOVERY = "CONFIRM_RECOVERY"
     RESEND_PIN = "RESEND_PIN"
     ANALIZE_FALL_ARMYWORM = "ANALIZAR_GUSANO_COGOLLERO"
+    VERIFY_CONNECTION = "VERIFICAR_CONEXION"
 
 class LogService:
     """Servicio para gestionar la lógica de negocio relacionada con logs."""

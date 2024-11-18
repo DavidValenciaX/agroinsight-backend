@@ -109,9 +109,8 @@ async def predict_images(
 
 @router.get("/test-armyworm-connection", status_code=status.HTTP_200_OK)
 @log_activity(
-    action_type=LogActionType.VIEW,
+    action_type=LogActionType.VERIFY_CONNECTION,
     table_name="system_health",
-    severity=LogSeverity.INFO,
     description="Prueba de conexión con servicio de análisis"
 )
 async def test_connection():
