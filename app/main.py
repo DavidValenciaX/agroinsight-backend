@@ -10,7 +10,7 @@ Attributes:
 
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from app.user.infrastructure.api import user_router
 from app.farm.infrastructure.api import router as farm_router
 from app.plot.infrastructure.api import router as plot_router
@@ -34,6 +34,8 @@ from app.infrastructure.common.common_exceptions import DomainException, UserSta
 from app.infrastructure.scheduler.weather_scheduler import WeatherScheduler
 from contextlib import asynccontextmanager
 import logging
+from app.infrastructure.middleware.logging_middleware import logging_middleware as log_middleware_func
+from app.infrastructure.middleware.database_middleware import database_middleware as db_middleware_func
 
 # Configuración del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -48,6 +50,16 @@ async def lifespan(app: FastAPI):
     # Shutdown (if needed)
 
 app = FastAPI(lifespan=lifespan)
+
+# Define y registra el logging_middleware primero
+@app.middleware("http")
+async def logging_middleware(request: Request, call_next):
+    return await log_middleware_func(request, call_next)
+
+# Define y registra el database_middleware después
+@app.middleware("http")
+async def database_middleware(request: Request, call_next):
+    return await db_middleware_func(request, call_next)
 
 # Inclusión de routers
 app.include_router(user_router)

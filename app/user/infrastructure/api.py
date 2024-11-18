@@ -5,7 +5,7 @@ Incluye endpoints para la creación, actualización, eliminación y recuperació
 así como para el manejo de autenticación y autorización.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Security, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, Security, BackgroundTasks, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.user.application.update_user_info_use_case import UpdateUserInfoUseCase
@@ -26,6 +26,8 @@ from app.infrastructure.security.jwt_middleware import get_current_user
 from app.infrastructure.common.response_models import SuccessResponse
 from app.user.domain.schemas import UserCreate, ResendPinConfirmRequest, ConfirmationRequest, LoginRequest, Resend2FARequest, TwoFactorAuthRequest, TokenResponse, UserResponse, UserUpdate, PasswordRecoveryRequest, PinConfirmationRequest, PasswordResetRequest, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.application.services.log_service import LogActionType
 
 # Crear una instancia de HTTPBearer
 security_scheme = HTTPBearer()
@@ -33,8 +35,10 @@ security_scheme = HTTPBearer()
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 @user_router.post("/register", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-def register_user(
+@log_activity(action_type=LogActionType.REGISTER_USER, table_name="usuario")
+async def register_user(
     user: UserCreate,
+    request: Request,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb),
 ) -> SuccessResponse:
@@ -43,6 +47,7 @@ def register_user(
 
     Args:
         user (UserCreate): Datos del usuario a registrar.
+        request (Request): Objeto de solicitud HTTP.
         background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
@@ -67,8 +72,10 @@ def register_user(
         ) from e
         
 @user_router.post("/resend-confirm-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def resend_confirmation_pin_endpoint(
+@log_activity(action_type=LogActionType.RESEND_PIN, table_name="confirmacion_usuario")
+async def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
+    request: Request,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ) -> SuccessResponse:
@@ -77,6 +84,7 @@ def resend_confirmation_pin_endpoint(
 
     Args:
         resend_request (ResendPinConfirmRequest): Solicitud de reenvío de PIN.
+        request (Request): Objeto de solicitud HTTP.
         background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
@@ -98,8 +106,10 @@ def resend_confirmation_pin_endpoint(
         ) from e
         
 @user_router.post("/confirm", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def confirm_user_registration(
+@log_activity(action_type=LogActionType.CONFIRM_REGISTRATION, table_name="usuario")
+async def confirm_user_registration(
     confirmation: ConfirmationRequest,
+    request: Request,
     db: Session = Depends(getDb)
 ) -> SuccessResponse:
     """
@@ -107,6 +117,7 @@ def confirm_user_registration(
 
     Args:
         confirmation (ConfirmationRequest): Datos de confirmación del usuario.
+        request (Request): Objeto de solicitud HTTP.
         db (Session): Sesión de base de datos.
 
     Returns:
@@ -127,12 +138,19 @@ def confirm_user_registration(
         ) from e
     
 @user_router.post("/login", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def login_for_access_token(login_request: LoginRequest, background_tasks: BackgroundTasks, db: Session = Depends(getDb)) -> SuccessResponse:
+@log_activity(action_type=LogActionType.LOGIN, table_name="usuario")
+async def login_for_access_token(
+    request: Request,
+    login_request: LoginRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(getDb)
+) -> SuccessResponse:
     """
     Inicia el proceso de doble factor de autenticación.
 
     Args:
         login_request (LoginRequest): Datos de inicio de sesión del usuario.
+        request (Request): Objeto de solicitud HTTP.
         background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
@@ -154,8 +172,10 @@ def login_for_access_token(login_request: LoginRequest, background_tasks: Backgr
         ) from e
     
 @user_router.post("/resend-2fa-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def resend_2fa_pin_endpoint(
+@log_activity(action_type=LogActionType.RESEND_PIN, table_name="verificacion_dos_pasos")
+async def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
+    request: Request,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ) -> SuccessResponse:
@@ -164,6 +184,7 @@ def resend_2fa_pin_endpoint(
 
     Args:
         resend_request (Resend2FARequest): Solicitud de reenvío de PIN de 2FA.
+        request (Request): Objeto de solicitud HTTP.
         background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
@@ -185,12 +206,18 @@ def resend_2fa_pin_endpoint(
         ) from e
         
 @user_router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
-def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb)) -> TokenResponse:
+@log_activity(action_type=LogActionType.VERIFY_2FA, table_name="verificacion_dos_pasos")
+async def verify_login(
+    auth_request: TwoFactorAuthRequest,
+    request: Request,
+    db: Session = Depends(getDb)
+) -> TokenResponse:
     """
     Verifica el inicio de sesión utilizando el PIN de doble factor de autenticación.
 
     Args:
         auth_request (TwoFactorAuthRequest): Datos de autenticación de dos factores.
+        request (Request): Objeto de solicitud HTTP.
         db (Session): Sesión de base de datos.
 
     Returns:
@@ -211,11 +238,17 @@ def verify_login(auth_request: TwoFactorAuthRequest, db: Session = Depends(getDb
         ) from e
 
 @user_router.get("/me", response_model=UserResponse)
-def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db: Session = Depends(getDb)) -> UserResponse:
+@log_activity(action_type=LogActionType.VIEW, table_name="usuario")
+async def get_current_user_info(
+    request: Request,
+    current_user: UserInDB = Depends(get_current_user),
+    db: Session = Depends(getDb)
+) -> UserResponse:
     """
     Obtiene la información del usuario actual.
 
     Args:
+        request (Request): Objeto de solicitud HTTP.
         current_user (UserInDB): Usuario actual autenticado.
         db (Session): Sesión de base de datos.
 
@@ -237,8 +270,10 @@ def get_current_user_info(current_user: UserInDB = Depends(get_current_user), db
         ) from e
     
 @user_router.put("/me/update", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def update_user_info(
+@log_activity(action_type=LogActionType.UPDATE_PROFILE, table_name="usuario")
+async def update_user_info(
     user_update: UserUpdate,
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> SuccessResponse:
@@ -247,6 +282,7 @@ def update_user_info(
 
     Args:
         user_update (UserUpdate): Datos de actualización del usuario.
+        request (Request): Objeto de solicitud HTTP.
         db (Session): Sesión de base de datos.
         current_user (UserInDB): Usuario actual autenticado.
 
@@ -268,8 +304,10 @@ def update_user_info(
         ) from e
     
 @user_router.post("/password-recovery", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def initiate_password_recovery(
+@log_activity(action_type=LogActionType.PASSWORD_RECOVERY, table_name="recuperacion_contrasena")
+async def initiate_password_recovery(
     recovery_request: PasswordRecoveryRequest,
+    request: Request,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ) -> SuccessResponse:
@@ -278,6 +316,7 @@ def initiate_password_recovery(
 
     Args:
         recovery_request (PasswordRecoveryRequest): Solicitud de recuperación de contraseña.
+        request (Request): Objeto de solicitud HTTP.
         background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
@@ -299,8 +338,10 @@ def initiate_password_recovery(
         ) from e
         
 @user_router.post("/resend-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def resend_recovery_pin(
+@log_activity(action_type=LogActionType.RESEND_PIN, table_name="recuperacion_contrasena")
+async def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
+    request: Request,
     background_tasks: BackgroundTasks,
     db: Session = Depends(getDb)
 ) -> SuccessResponse:
@@ -309,6 +350,7 @@ def resend_recovery_pin(
 
     Args:
         recovery_request (PasswordRecoveryRequest): Solicitud de reenvío de PIN de recuperación.
+        request (Request): Objeto de solicitud HTTP.
         background_tasks (BackgroundTasks): Tareas en segundo plano.
         db (Session): Sesión de base de datos.
 
@@ -330,8 +372,10 @@ def resend_recovery_pin(
         ) from e
         
 @user_router.post("/confirm-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def confirm_recovery_pin(
+@log_activity(action_type=LogActionType.CONFIRM_RECOVERY, table_name="recuperacion_contrasena")
+async def confirm_recovery_pin(
     pin_confirmation: PinConfirmationRequest,
+    request: Request,
     db: Session = Depends(getDb)
 ) -> SuccessResponse:
     """
@@ -339,6 +383,7 @@ def confirm_recovery_pin(
 
     Args:
         pin_confirmation (PinConfirmationRequest): Datos de confirmación del PIN de recuperación.
+        request (Request): Objeto de solicitud HTTP.
         db (Session): Sesión de base de datos.
 
     Returns:
@@ -359,8 +404,10 @@ def confirm_recovery_pin(
         ) from e
         
 @user_router.post("/reset-password", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def reset_password(
+@log_activity(action_type=LogActionType.CHANGE_PASSWORD, table_name="usuario")
+async def reset_password(
     reset_request: PasswordResetRequest,
+    request: Request,
     db: Session = Depends(getDb)
 ) -> SuccessResponse:
     """
@@ -368,6 +415,7 @@ def reset_password(
 
     Args:
         reset_request (PasswordResetRequest): Solicitud de restablecimiento de contraseña.
+        request (Request): Objeto de solicitud HTTP.
         db (Session): Sesión de base de datos.
 
     Returns:
@@ -388,7 +436,9 @@ def reset_password(
         ) from e
         
 @user_router.post("/logout", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-def logout(
+@log_activity(action_type=LogActionType.LOGOUT, table_name="blacklisted_tokens")
+async def logout(
+    request: Request,
     current_user: UserInDB = Depends(get_current_user),
     db: Session = Depends(getDb),
     credentials: HTTPAuthorizationCredentials = Security(security_scheme)
@@ -397,6 +447,7 @@ def logout(
     Cierra la sesión del usuario actual.
 
     Args:
+        request (Request): Objeto de solicitud HTTP.
         current_user (UserInDB): Usuario actual autenticado.
         db (Session): Sesión de base de datos.
         credentials (HTTPAuthorizationCredentials): Credenciales de autorización HTTP.

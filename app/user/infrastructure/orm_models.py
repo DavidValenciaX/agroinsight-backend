@@ -26,6 +26,7 @@ class User(Base):
         blacklisted_tokens (List[BlacklistedToken]): Lista de tokens en lista negra.
         asignaciones (List[Assignment]): Lista de asignaciones del usuario.
         roles_fincas (List[UserFarmRole]): Lista de roles del usuario en diferentes fincas.
+        logs (List[ActivityLog]): Lista de registros de actividad del usuario.
     """
     __tablename__ = "usuario"
     
@@ -46,6 +47,7 @@ class User(Base):
     blacklisted_tokens = relationship("BlacklistedToken", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
     asignaciones = relationship("Assignment", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
     roles_fincas = relationship("UserFarmRole", back_populates="usuario", cascade=CASCADE_DELETE_ORPHAN)
+    logs = relationship("ActivityLog", back_populates="usuario", cascade="all, delete-orphan")
 
 class UserFarmRole(Base):
     """

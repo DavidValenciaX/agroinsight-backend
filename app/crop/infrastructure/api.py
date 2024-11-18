@@ -4,7 +4,7 @@ Este módulo define las rutas de la API para la gestión de cultivos.
 Incluye endpoints para la creación de cultivos y otras operaciones relacionadas.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
@@ -17,12 +17,16 @@ from app.crop.domain.schemas import CornVarietyListResponse
 from app.crop.application.list_corn_varieties_use_case import ListCornVarietiesUseCase
 from app.crop.application.list_crops_by_plot_use_case import ListCropsByPlotUseCase
 from app.crop.application.update_crop_harvest_use_case import UpdateCropHarvestUseCase
+from app.logs.application.services.log_service import LogActionType
+from app.logs.application.decorators.log_decorator import log_activity
 
 router = APIRouter(tags=["crop"])
 
 @router.post("/crops", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-def create_crop(
+@log_activity(action_type=LogActionType.CREATE, table_name="cultivo")
+async def create_crop(
     crop: CropCreate,
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> SuccessResponse:
@@ -54,7 +58,9 @@ def create_crop(
 # endpoint para listar las variedades de maiz
 
 @router.get("/corn-varieties", response_model=CornVarietyListResponse)
-def list_corn_varieties(
+@log_activity(action_type=LogActionType.VIEW, table_name="variedad_maiz")
+async def list_corn_varieties(
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> CornVarietyListResponse:
@@ -83,8 +89,10 @@ def list_corn_varieties(
         )
 
 @router.get("/plots/{plot_id}/crops", response_model=PaginatedCropListResponse)
-def list_crops_by_plot(
+@log_activity(action_type=LogActionType.VIEW, table_name="cultivo")
+async def list_crops_by_plot(
     plot_id: int,
+    request: Request,
     page: int = Query(1, ge=1),
     per_page: int = Query(10, ge=1, le=100),
     db: Session = Depends(getDb),
@@ -116,9 +124,11 @@ def list_crops_by_plot(
         )
 
 @router.put("/crops/{crop_id}/harvest", response_model=SuccessResponse)
-def update_crop_harvest(
+@log_activity(action_type=LogActionType.REGISTER_HARVEST, table_name="cultivo")
+async def update_crop_harvest(
     crop_id: int,
     harvest_data: CropHarvestUpdate,
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> SuccessResponse:
