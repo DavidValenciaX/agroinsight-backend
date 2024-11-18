@@ -39,6 +39,7 @@ class LogActionType(str, Enum):
     PASSWORD_RECOVERY = "PASSWORD_RECOVERY"
     CONFIRM_RECOVERY = "CONFIRM_RECOVERY"
     RESEND_PIN = "RESEND_PIN"
+    ANALIZE_FALL_ARMYWORM = "ANALIZAR_GUSANO_COGOLLERO"
 
 class LogService:
     """Servicio para gestionar la lógica de negocio relacionada con logs."""

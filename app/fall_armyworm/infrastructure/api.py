@@ -18,6 +18,9 @@ from app.fall_armyworm.application.detect_fall_armyworm_use_case import DetectFa
 from app.infrastructure.common.common_exceptions import DomainException
 import os
 from dotenv import load_dotenv
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.domain.schemas import LogSeverity
+from app.logs.application.services.log_service import LogActionType
 
 load_dotenv(override=True)
 
@@ -31,6 +34,18 @@ ARMYWORM_SERVICE_URL = os.getenv('ARMYWORM_SERVICE_URL', 'http://localhost:8080'
 router = APIRouter(prefix="/fall-armyworm", tags=["fall armyworm analysis"])
 
 @router.post("/predict")
+@log_activity(
+    action_type=LogActionType.ANALIZE_FALL_ARMYWORM,
+    table_name="monitoreo_fitosanitario",
+    severity=LogSeverity.INFO,
+    description="Análisis de imágenes para detección de gusano cogollero",
+    get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id'),
+    get_new_value=lambda *args, **kwargs: {
+        "task_id": kwargs.get('task_id'),
+        "observations": kwargs.get('observations'),
+        "total_images": len(kwargs.get('files', []))
+    }
+)
 async def predict_images(
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(...),
@@ -93,6 +108,12 @@ async def predict_images(
         ) from e
 
 @router.get("/test-armyworm-connection", status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="system_health",
+    severity=LogSeverity.INFO,
+    description="Prueba de conexión con servicio de análisis"
+)
 async def test_connection():
     """Endpoint para probar la conexión con el servicio de análisis"""
     try:
@@ -113,6 +134,13 @@ async def test_connection():
         ) from e
 
 @router.get("/monitoring/{monitoring_id}/status")
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="monitoreo_fitosanitario",
+    severity=LogSeverity.INFO,
+    description="Consulta de estado de monitoreo",
+    get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
+)
 async def get_monitoring_status(
     monitoring_id: int,
     db: Session = Depends(getDb),
@@ -133,6 +161,13 @@ async def get_monitoring_status(
         ) from e
 
 @router.get("/monitoring/{monitoring_id}", response_model=MonitoreoFitosanitarioResult)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="monitoreo_fitosanitario",
+    severity=LogSeverity.INFO,
+    description="Consulta de resultados de monitoreo",
+    get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
+)
 async def get_monitoring_results(
     monitoring_id: int,
     db: Session = Depends(getDb),
