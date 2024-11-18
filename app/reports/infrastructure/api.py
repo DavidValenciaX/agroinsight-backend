@@ -8,10 +8,17 @@ from app.infrastructure.security.jwt_middleware import get_current_user
 from app.reports.application.generate_financial_report_use_case import GenerateFinancialReportUseCase
 from app.reports.domain.schemas import FarmFinancialReport
 from app.user.domain.schemas import UserInDB
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.application.services.log_service import LogActionType
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
 @router.get("/financial", response_model=FarmFinancialReport)
+@log_activity(
+    action_type=LogActionType.GENERATE_REPORT,
+    table_name="finca",
+    description="Generación de reporte financiero"
+)
 async def generate_financial_report(
     farm_id: int,
     start_date: date,
