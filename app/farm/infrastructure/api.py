@@ -5,7 +5,7 @@ Incluye endpoints para la creación de fincas, asignación de usuarios,
 listado de fincas y usuarios de una finca específica.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
@@ -34,7 +34,8 @@ router = APIRouter(prefix="/farm", tags=["farm"])
     get_record_id=lambda *args, **kwargs: args[0].id if args and hasattr(args[0], 'id') else None,
     get_new_value=lambda *args, **kwargs: kwargs.get('farm').model_dump() if 'farm' in kwargs else None
 )
-def create_farm(
+async def create_farm(
+    request: Request,
     farm: FarmCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -71,6 +72,7 @@ def create_farm(
     description="Listado paginado de fincas administradas"
 )
 def list_farms(
+    request: Request,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
@@ -117,6 +119,7 @@ def list_farms(
     get_new_value=lambda *args, **kwargs: kwargs.get('assignment_data').model_dump() if 'assignment_data' in kwargs else None
 )
 def assign_users_to_farm_by_email(
+    request: Request,
     assignment_data: FarmUserAssignmentByEmail,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -141,6 +144,7 @@ def assign_users_to_farm_by_email(
     description="Listado de usuarios de una finca específica"
 )
 def list_farm_users(
+    request: Request,
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -182,6 +186,7 @@ def list_farm_users(
     description="Consulta de información de usuario en finca específica"
 )
 def get_user_by_id(
+    request: Request,
     farm_id: int,
     user_id: int,
     db: Session = Depends(getDb),
@@ -220,6 +225,7 @@ def get_user_by_id(
     description="Listado de fincas donde el usuario es trabajador"
 )
 def list_worker_farms(
+    request: Request,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(getDb),
@@ -258,6 +264,7 @@ def list_worker_farms(
     description="Listado completo de fincas administradas"
 )
 def list_all_farms(
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> FarmListResponse:
