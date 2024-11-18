@@ -22,10 +22,21 @@ from app.cultural_practices.application.list_task_types_use_case import ListTask
 from app.cultural_practices.application.list_worker_tasks_use_case import ListWorkerTasksUseCase
 from typing import Union
 from app.cultural_practices.application.list_tasks_by_plot_use_case import ListTasksByPlotUseCase
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.domain.schemas import LogSeverity
+from app.logs.application.services.log_service import LogActionType
 
 router = APIRouter(tags=["cultural practices"])
 
 @router.post("/task/create", response_model=SuccessTaskCreateResponse, status_code=status.HTTP_201_CREATED)
+@log_activity(
+    action_type=LogActionType.REGISTER_TASK,
+    table_name="tarea_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Creación de nueva tarea de labor cultural",
+    get_record_id=lambda *args, **kwargs: kwargs.get('result').task_id if kwargs.get('result') else None,
+    get_new_value=lambda *args, **kwargs: args[0].model_dump() if args else None
+)
 def create_task(
     task: TaskCreate,
     db: Session = Depends(getDb),
@@ -61,7 +72,14 @@ def create_task(
                  200: {"description": "Todas las tareas asignadas exitosamente"},
                  207: {"description": "Algunas tareas asignadas, otras fallaron"},
                  400: {"description": "No se pudo asignar ninguna tarea"}
-             }
+             })
+@log_activity(
+    action_type=LogActionType.ASSIGN_TASK,
+    table_name="asignacion",
+    severity=LogSeverity.INFO,
+    description="Asignación de tarea a usuarios",
+    get_record_id=lambda *args, **kwargs: kwargs.get('result').task_id if kwargs.get('result') else None,
+    get_new_value=lambda *args, **kwargs: args[0].model_dump() if args else None
 )
 def create_assignment(
     assignment: AssignmentCreate,
@@ -95,6 +113,12 @@ def create_assignment(
         ) from e
 
 @router.get("/farm/{farm_id}/user/{user_id}/tasks/list", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="tarea_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Consulta de tareas por usuario y finca"
+)
 def list_tasks_by_user_and_farm(
     farm_id: int,
     user_id: int,
@@ -131,6 +155,13 @@ def list_tasks_by_user_and_farm(
         ) from e
         
 @router.get("/farm/{farm_id}/tasks/{task_id}", response_model=TaskResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="tarea_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Consulta de tarea específica",
+    get_record_id=lambda *args, **kwargs: int(kwargs.get('task_id')) if kwargs.get('task_id') else None
+)
 def get_task_by_id(
     farm_id: int,
     task_id: int,
@@ -164,6 +195,12 @@ def get_task_by_id(
         ) from e
 
 @router.get("/tasks/states", response_model=TaskStateListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="estado_tarea_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Consulta de estados de tareas disponibles"
+)
 def list_task_states(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -196,6 +233,19 @@ def list_task_states(
     "/tasks/{task_id}/states/{state_id}", 
     response_model=SuccessResponse, 
     status_code=status.HTTP_200_OK
+)
+@log_activity(
+    action_type=LogActionType.CHANGE_STATUS,
+    table_name="tarea_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Cambio de estado de tarea",
+    get_record_id=lambda *args, **kwargs: int(kwargs.get('task_id')),
+    get_old_value=lambda *args, **kwargs: {
+        "estado_id": kwargs.get('task').estado_id
+    } if kwargs.get('task') else None,
+    get_new_value=lambda *args, **kwargs: {
+        "estado_id": int(kwargs.get('state_id'))
+    } if kwargs.get('state_id') else None
 )
 def change_task_state(
     task_id: int = Path(..., description="ID de la tarea", ge=1),
@@ -230,6 +280,12 @@ def change_task_state(
         ) from e
 
 @router.get("/tasks/types", response_model=TaskTypeListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="tipo_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Consulta de tipos de labor cultural"
+)
 def list_task_types(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -259,6 +315,13 @@ def list_task_types(
         ) from e
 
 @router.get("/farms/{farm_id}/worker/tasks", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="tarea_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Consulta de tareas asignadas al trabajador",
+    get_record_id=lambda *args, **kwargs: kwargs.get('current_user').id if kwargs.get('current_user') else None
+)
 def list_worker_tasks(
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
@@ -294,6 +357,12 @@ def list_worker_tasks(
         ) from e
 
 @router.get("/farms/{farm_id}/plots/{plot_id}/tasks", response_model=PaginatedTaskListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="tarea_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Consulta de tareas por lote"
+)
 def list_tasks_by_plot(
     farm_id: int,
     plot_id: int,
