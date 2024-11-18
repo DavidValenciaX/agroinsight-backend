@@ -16,11 +16,34 @@ from app.infrastructure.common.common_exceptions import DomainException
 from app.plot.domain.schemas import PaginatedPlotListResponse
 from app.plot.application.list_plots_use_case import ListPlotsUseCase
 from fastapi import Query
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.application.services.log_service import LogActionType
 
 router = APIRouter(tags=["plot"])
 
+def get_created_plot_id(*args, **kwargs) -> int:
+    """Obtiene el ID del lote creado desde el resultado de la operación."""
+    result = kwargs.get('result')
+    if isinstance(result, dict) and 'id' in result:
+        return result['id']
+    return None
+
+def get_plot_data(*args, **kwargs) -> dict:
+    """Obtiene los datos del lote desde los argumentos."""
+    plot_data = next((arg for arg in args if isinstance(arg, PlotCreate)), None)
+    if plot_data:
+        return plot_data.model_dump()
+    return None
+
 @router.post("/plot/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-def create_plot(
+@log_activity(
+    action_type=LogActionType.REGISTER_PLOT,
+    table_name="lote",
+    description="Creación de nuevo lote",
+    get_record_id=get_created_plot_id,
+    get_new_value=get_plot_data
+)
+async def create_plot(
     plot: PlotCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -51,7 +74,12 @@ def create_plot(
         )
         
 @router.get("/farm/{farm_id}/plot/list", response_model=PaginatedPlotListResponse, status_code=status.HTTP_200_OK)
-def list_plots_by_farm(
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="lote",
+    description="Consulta de lista de lotes"
+)
+async def list_plots_by_farm(
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
