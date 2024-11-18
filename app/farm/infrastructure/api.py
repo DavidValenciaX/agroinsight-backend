@@ -32,7 +32,7 @@ router = APIRouter(prefix="/farm", tags=["farm"])
     action_type=LogActionType.REGISTER_FARM,
     table_name="finca",
     get_record_id=lambda *args, **kwargs: args[0].id if args and hasattr(args[0], 'id') else None,
-    get_new_value=lambda *args, **kwargs: kwargs.get('farm').model_dump() if 'farm' in kwargs else None
+    get_new_value=lambda *args, **kwargs: kwargs.get('farm').to_log_dict() if 'farm' in kwargs else None
 )
 async def create_farm(
     request: Request,

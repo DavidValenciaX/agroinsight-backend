@@ -53,6 +53,12 @@ class FarmCreate(BaseModel):
     def validate_no_xss_ubicacion(cls, v):
         return validate_no_xss(v)
 
+    def to_log_dict(self) -> dict:
+        """Convierte el modelo a un diccionario serializable para logs."""
+        data = self.model_dump()
+        data['area_total'] = float(data['area_total'])
+        return data
+
 class FarmResponse(BaseModel):
     """Schema para la respuesta con información de una finca.
 
