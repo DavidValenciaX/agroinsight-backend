@@ -7,10 +7,17 @@ from app.infrastructure.security.jwt_middleware import get_current_user
 from app.measurement.domain.schemas import UnitsListResponse
 from app.measurement.application.list_units_use_case import ListUnitsUseCase
 from app.user.domain.schemas import UserInDB
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.application.services.log_service import LogActionType
 
 measurement_router = APIRouter(prefix="/measurement", tags=["measurement"])
 
 @measurement_router.get("/units", response_model=UnitsListResponse)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="unidad_medida",
+    description="Consulta de unidades de medida"
+)
 def list_units(
     db: Session = Depends(getDb), 
     current_user: UserInDB = Depends(get_current_user)
