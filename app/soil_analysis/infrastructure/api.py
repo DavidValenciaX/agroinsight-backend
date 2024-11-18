@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Form, BackgroundTasks
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
 from typing import List
 import httpx
@@ -42,6 +42,7 @@ router = APIRouter(prefix="/soil-analysis", tags=["soil analysis"])
     }
 )
 async def predict_images(
+    request: Request,
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(...),
     task_id: int = Form(...),
@@ -112,7 +113,7 @@ async def predict_images(
         "status": "success" if kwargs.get('result') else "error"
     }
 )
-async def test_connection():
+async def test_connection(request: Request):
     """Endpoint para probar la conexión con el servicio de análisis"""
     try:
         async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
@@ -139,6 +140,7 @@ async def test_connection():
     description="Consulta de estado de análisis de suelo"
 )
 async def get_processing_status(
+    request: Request,
     analysis_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -165,6 +167,7 @@ async def get_processing_status(
     description="Consulta de resultados de análisis de suelo"
 )
 async def get_analysis_results(
+    request: Request,
     analysis_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)

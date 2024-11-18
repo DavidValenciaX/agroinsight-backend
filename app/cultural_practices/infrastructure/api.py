@@ -3,7 +3,7 @@ Este módulo define las rutas de la API para la gestión de prácticas culturale
 
 Incluye endpoints para la creación de tareas y asignaciones, así como para listar asignaciones.
 """
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Path
+from fastapi import APIRouter, Depends, HTTPException, Request, status, Query, Path
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.cultural_practices.application.get_task_by_id_use_case import GetTaskByIdUseCase
@@ -37,7 +37,8 @@ router = APIRouter(tags=["cultural practices"])
     get_record_id=lambda *args, **kwargs: kwargs.get('result').task_id if kwargs.get('result') else None,
     get_new_value=lambda *args, **kwargs: args[0].model_dump() if args else None
 )
-def create_task(
+async def create_task(
+    request: Request,
     task: TaskCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -81,7 +82,8 @@ def create_task(
     get_record_id=lambda *args, **kwargs: kwargs.get('result').task_id if kwargs.get('result') else None,
     get_new_value=lambda *args, **kwargs: args[0].model_dump() if args else None
 )
-def create_assignment(
+async def create_assignment(
+    request: Request,
     assignment: AssignmentCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -119,7 +121,8 @@ def create_assignment(
     severity=LogSeverity.INFO,
     description="Consulta de tareas por usuario y finca"
 )
-def list_tasks_by_user_and_farm(
+async def list_tasks_by_user_and_farm(
+    request: Request,
     farm_id: int,
     user_id: int,
     page: int = Query(1, ge=1, description="Page number"),
@@ -162,7 +165,8 @@ def list_tasks_by_user_and_farm(
     description="Consulta de tarea específica",
     get_record_id=lambda *args, **kwargs: int(kwargs.get('task_id')) if kwargs.get('task_id') else None
 )
-def get_task_by_id(
+async def get_task_by_id(
+    request: Request,
     farm_id: int,
     task_id: int,
     db: Session = Depends(getDb),
@@ -201,7 +205,8 @@ def get_task_by_id(
     severity=LogSeverity.INFO,
     description="Consulta de estados de tareas disponibles"
 )
-def list_task_states(
+async def list_task_states(
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> TaskStateListResponse:
@@ -247,7 +252,8 @@ def list_task_states(
         "estado_id": int(kwargs.get('state_id'))
     } if kwargs.get('state_id') else None
 )
-def change_task_state(
+async def change_task_state(
+    request: Request,
     task_id: int = Path(..., description="ID de la tarea", ge=1),
     state_id: Union[int, str] = Path(..., description="ID del estado o comando ('in_progress'/'done')"),
     db: Session = Depends(getDb),
@@ -286,7 +292,8 @@ def change_task_state(
     severity=LogSeverity.INFO,
     description="Consulta de tipos de labor cultural"
 )
-def list_task_types(
+async def list_task_types(
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> TaskTypeListResponse:
@@ -322,7 +329,8 @@ def list_task_types(
     description="Consulta de tareas asignadas al trabajador",
     get_record_id=lambda *args, **kwargs: kwargs.get('current_user').id if kwargs.get('current_user') else None
 )
-def list_worker_tasks(
+async def list_worker_tasks(
+    request: Request,
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -363,7 +371,8 @@ def list_worker_tasks(
     severity=LogSeverity.INFO,
     description="Consulta de tareas por lote"
 )
-def list_tasks_by_plot(
+async def list_tasks_by_plot(
+    request: Request,
     farm_id: int,
     plot_id: int,
     page: int = Query(1, ge=1, description="Page number"),

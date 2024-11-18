@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.orm import Session
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.db.connection import getDb
@@ -21,6 +21,7 @@ router = APIRouter(tags=["weather"])
     description="Prueba de conexión con API OpenWeatherMap",
 )
 async def test_weather_api(
+    request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> WeatherAPIResponse:
@@ -52,6 +53,7 @@ async def test_weather_api(
     description="Consulta de datos meteorológicos actuales",
 )
 async def get_current_weather(
+    request: Request,
     lat: float = Query(..., description="Latitud de la ubicación"),
     lon: float = Query(..., description="Longitud de la ubicación"),
     db: Session = Depends(getDb),
@@ -85,6 +87,7 @@ async def get_current_weather(
     get_record_id=lambda *args, **kwargs: kwargs.get('lote_id')
 )
 async def get_weather_logs(
+    request: Request,
     lote_id: int,
     start_date: date = Query(..., description="Fecha de inicio (YYYY-MM-DD)"),
     end_date: date = Query(..., description="Fecha de fin (YYYY-MM-DD)"),

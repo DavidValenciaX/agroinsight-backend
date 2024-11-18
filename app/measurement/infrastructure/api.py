@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from typing import List
 from app.infrastructure.common.common_exceptions import DomainException
@@ -18,7 +18,8 @@ measurement_router = APIRouter(prefix="/measurement", tags=["measurement"])
     table_name="unidad_medida",
     description="Consulta de unidades de medida"
 )
-def list_units(
+async def list_units(
+    request: Request,
     db: Session = Depends(getDb), 
     current_user: UserInDB = Depends(get_current_user)
 ) -> UnitsListResponse:

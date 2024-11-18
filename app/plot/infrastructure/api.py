@@ -4,7 +4,7 @@ Este módulo define las rutas de la API para la gestión de lotes.
 Incluye endpoints para la creación de lotes y el listado de lotes de una finca específica.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
@@ -44,6 +44,7 @@ def get_plot_data(*args, **kwargs) -> dict:
     get_new_value=get_plot_data
 )
 async def create_plot(
+    request: Request,
     plot: PlotCreate,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -80,6 +81,7 @@ async def create_plot(
     description="Consulta de lista de lotes"
 )
 async def list_plots_by_farm(
+    request: Request,
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),

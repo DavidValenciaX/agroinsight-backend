@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Form, BackgroundTasks
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status, Form, BackgroundTasks
 from typing import List
 from fastapi.responses import JSONResponse
 import httpx
@@ -47,6 +47,7 @@ router = APIRouter(prefix="/fall-armyworm", tags=["fall armyworm analysis"])
     }
 )
 async def predict_images(
+    request: Request,
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(...),
     task_id: int = Form(...),
@@ -113,7 +114,7 @@ async def predict_images(
     table_name="system_health",
     description="Prueba de conexión con servicio de análisis"
 )
-async def test_connection():
+async def test_connection(request: Request):
     """Endpoint para probar la conexión con el servicio de análisis"""
     try:
         async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
@@ -141,6 +142,7 @@ async def test_connection():
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
 )
 async def get_monitoring_status(
+    request: Request,
     monitoring_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
@@ -168,6 +170,7 @@ async def get_monitoring_status(
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
 )
 async def get_monitoring_results(
+    request: Request,
     monitoring_id: int,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)

@@ -1,5 +1,5 @@
 # app/reports/infrastructure/api.py
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.orm import Session
 from datetime import date
 from typing import Optional
@@ -20,6 +20,7 @@ router = APIRouter(prefix="/reports", tags=["reports"])
     description="Generación de reporte financiero"
 )
 async def generate_financial_report(
+    request: Request,
     farm_id: int,
     start_date: date,
     end_date: date,
