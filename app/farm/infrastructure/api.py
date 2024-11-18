@@ -18,13 +18,22 @@ from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
 from app.infrastructure.common.response_models import MultipleResponse, SuccessResponse
 from app.farm.application.get_user_by_id_use_case import AdminGetUserByIdUseCase
+from app.logs.application.services.log_service import LogActionType
 from app.user.domain.schemas import UserForFarmResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.farm.application.list_all_farms_use_case import ListAllFarmsUseCase
+from app.logs.application.decorators.log_decorator import log_activity
+from app.logs.domain.schemas import LogSeverity
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
 @router.post("/create", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@log_activity(
+    action_type=LogActionType.REGISTER_FARM,
+    table_name="finca",
+    get_record_id=lambda *args, **kwargs: args[0].id if args and hasattr(args[0], 'id') else None,
+    get_new_value=lambda *args, **kwargs: kwargs.get('farm').model_dump() if 'farm' in kwargs else None
+)
 def create_farm(
     farm: FarmCreate,
     db: Session = Depends(getDb),
@@ -56,6 +65,11 @@ def create_farm(
         )
         
 @router.get("/list", response_model=PaginatedFarmListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="finca",
+    description="Listado paginado de fincas administradas"
+)
 def list_farms(
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -96,6 +110,12 @@ def list_farms(
                  400: {"description": "No se pudo asignar ningún usuario"}
              }
 )
+@log_activity(
+    action_type=LogActionType.ASSIGN_USER_TO_FARM,
+    table_name="usuario_finca_rol",
+    get_record_id=lambda *args, **kwargs: kwargs.get('assignment_data').farm_id if 'assignment_data' in kwargs else None,
+    get_new_value=lambda *args, **kwargs: kwargs.get('assignment_data').model_dump() if 'assignment_data' in kwargs else None
+)
 def assign_users_to_farm_by_email(
     assignment_data: FarmUserAssignmentByEmail,
     db: Session = Depends(getDb),
@@ -115,6 +135,11 @@ def assign_users_to_farm_by_email(
 
         
 @router.get("/{farm_id}/users", response_model=PaginatedFarmUserListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="usuario_finca_rol",
+    description="Listado de usuarios de una finca específica"
+)
 def list_farm_users(
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
@@ -151,6 +176,11 @@ def list_farm_users(
         )
         
 @router.get("/{farm_id}/user/{user_id}", response_model=UserForFarmResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="usuario",
+    description="Consulta de información de usuario en finca específica"
+)
 def get_user_by_id(
     farm_id: int,
     user_id: int,
@@ -184,6 +214,11 @@ def get_user_by_id(
         )
 
 @router.get("/worker/farms", response_model=PaginatedWorkerFarmListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="finca",
+    description="Listado de fincas donde el usuario es trabajador"
+)
 def list_worker_farms(
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -217,6 +252,11 @@ def list_worker_farms(
         )
 
 @router.get("/list/all", response_model=FarmListResponse, status_code=status.HTTP_200_OK)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="finca",
+    description="Listado completo de fincas administradas"
+)
 def list_all_farms(
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
