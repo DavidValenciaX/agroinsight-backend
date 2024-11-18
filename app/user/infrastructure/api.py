@@ -270,7 +270,23 @@ async def get_current_user_info(
         ) from e
     
 @user_router.put("/me/update", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.UPDATE_PROFILE, table_name="usuario")
+@log_activity(
+    action_type=LogActionType.UPDATE_PROFILE,
+    table_name="usuario",
+    get_record_id=lambda *args, **kwargs: kwargs['current_user'].id,
+    get_old_value=lambda *args, **kwargs: {
+        'id': kwargs['current_user'].id,
+        'email': kwargs['current_user'].email,
+        'nombre': kwargs['current_user'].nombre,
+        'apellido': kwargs['current_user'].apellido
+    },
+    get_new_value=lambda *args, **kwargs: {
+        'id': kwargs['current_user'].id,
+        'email': kwargs['current_user'].email,
+        'nombre': kwargs['current_user'].nombre,
+        'apellido': kwargs['current_user'].apellido
+    }
+)
 async def update_user_info(
     user_update: UserUpdate,
     request: Request,

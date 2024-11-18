@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, Dict, Any, Union
 from fastapi import Request
-from app.logs.domain.schemas import ActivityLogCreate, LogSeverity
+from app.logs.domain.schemas import ActivityLogCreate, LogActionTypeCreate, LogSeverity
 from app.logs.infrastructure.sql_repository import LogRepository
 from app.user.domain.schemas import UserInDB
 from app.user.infrastructure.sql_repository import UserRepository
@@ -48,21 +48,28 @@ class LogService:
         self.repository = repository
         self.user_repository = UserRepository(repository.db)
 
-    def _ensure_action_type_exists(self, action_type: LogActionType) -> int:
+    def _ensure_action_type_exists(self, action_type: Union[str, LogActionType]) -> int:
         """Asegura que existe el tipo de acción y devuelve su ID."""
-        existing_type = self.repository.get_action_type_by_name(action_type.value)
+        # Si action_type es una instancia de LogActionType, obtenemos su valor
+        if isinstance(action_type, LogActionType):
+            action_type_value = action_type.value
+        else:
+            # Si es un string, lo usamos directamente
+            action_type_value = action_type
+
+        existing_type = self.repository.get_action_type_by_name(action_type_value)
         if not existing_type:
-            new_type = self.repository.create_action_type({
-                "nombre": action_type.value,
-                "descripcion": f"Acción de {action_type.value.lower()}"
-            })
+            new_type = self.repository.create_action_type(LogActionTypeCreate(
+                nombre=action_type_value,
+                descripcion=f"Acción de {action_type_value.lower()}"
+            ))
             return new_type.id
         return existing_type.id
 
     def log_activity(
         self,
         user: Optional[Union[UserInDB, str]] = None,
-        action_type: str = None,
+        action_type: Union[str, LogActionType] = None,
         table_name: str = None,
         request: Request = None,
         record_id: Optional[int] = None,
@@ -98,7 +105,16 @@ class LogService:
             else:
                 user_description = f"Usuario no registrado (Email: {user})"
         else:
-            user_description = "Usuario no identificado"
+            # Si es un objeto pero no es UserInDB, intentar obtener id y email
+            try:
+                usuario_id = getattr(user, 'id', None)
+                email = getattr(user, 'email', None)
+                if usuario_id and email:
+                    user_description = f"Usuario ID: {usuario_id} ({email})"
+                else:
+                    user_description = "Usuario no identificado"
+            except:
+                user_description = "Usuario no identificado"
 
         # Agregar logging para debug
         print(f"Debug - User input: {user}")

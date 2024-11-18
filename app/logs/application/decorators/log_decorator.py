@@ -8,13 +8,18 @@ def log_activity(
     action_type: str,
     table_name: str,
     severity: LogSeverity = LogSeverity.INFO,
-    description: Optional[str] = None
+    description: Optional[str] = None,
+    get_record_id=None,
+    get_old_value=None,
+    get_new_value=None
 ):
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            request: Request = next((arg for arg in args if isinstance(arg, Request)), 
-                                 kwargs.get('request'))
+            request: Request = next(
+                (arg for arg in args if isinstance(arg, Request)),
+                kwargs.get('request')
+            )
             log_service: LogService = getattr(request.state, 'log_service', None)
 
             if not log_service:
@@ -26,10 +31,10 @@ def log_activity(
                 
                 # Si no hay usuario autenticado, buscar el email en diferentes lugares
                 if user is None:
-                    # 1. Buscar en kwargs directamente
+                    # Buscar en kwargs directamente
                     email = kwargs.get('email')
                     
-                    # 2. Buscar en el body del request si es un modelo Pydantic
+                    # Buscar en el body del request si es un modelo Pydantic
                     if not email:
                         for arg in args:
                             if hasattr(arg, 'email'):
@@ -43,8 +48,15 @@ def log_activity(
                     if email:
                         user = email
 
-                # Ejecutar la función original
+                # Obtener valor anterior antes de ejecutar la función
+                old_value = get_old_value(*args, **kwargs) if get_old_value else None
+
+                # Ejecutar la función original y obtener el resultado
                 result = await func(*args, **kwargs)
+
+                # Obtener registro_id y valor_nuevo después de la ejecución
+                record_id = get_record_id(*args, **kwargs) if get_record_id else None
+                new_value = get_new_value(*args, **kwargs) if get_new_value else None
 
                 # Registrar la actividad
                 log_service.log_activity(
@@ -52,6 +64,9 @@ def log_activity(
                     action_type=action_type,
                     table_name=table_name,
                     request=request,
+                    record_id=record_id,
+                    old_value=old_value,
+                    new_value=new_value,
                     severity=severity,
                     description=description
                 )

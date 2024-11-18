@@ -45,6 +45,13 @@ class UpdateUserInfoUseCase:
             UserAlreadyRegisteredException: Si el nuevo correo electrónico ya está en uso por otro usuario.
             DomainException: Si no se pudo actualizar la información del usuario.
         """
+        old_data = {
+            'id': current_user.id,
+            'email': current_user.email,
+            'nombre': current_user.nombre,
+            'apellido': current_user.apellido
+        }
+
         # Verificar si el email ya está en uso por otro usuario
         if user_update.email != current_user.email:
             if self.user_repository.get_user_by_email(user_update.email):
