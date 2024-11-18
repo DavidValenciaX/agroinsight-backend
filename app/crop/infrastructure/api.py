@@ -23,7 +23,11 @@ from app.logs.application.decorators.log_decorator import log_activity
 router = APIRouter(tags=["crop"])
 
 @router.post("/crops", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-@log_activity(action_type=LogActionType.CREATE, table_name="cultivo")
+@log_activity(
+    action_type=LogActionType.CREATE, 
+    table_name="cultivo",
+    get_new_value=lambda *args, **kwargs: kwargs.get('crop').dict() if 'crop' in kwargs else None
+)
 async def create_crop(
     crop: CropCreate,
     request: Request,
@@ -124,7 +128,15 @@ async def list_crops_by_plot(
         )
 
 @router.put("/crops/{crop_id}/harvest", response_model=SuccessResponse)
-@log_activity(action_type=LogActionType.REGISTER_HARVEST, table_name="cultivo")
+@log_activity(
+    action_type=LogActionType.REGISTER_HARVEST, 
+    table_name="cultivo",
+    get_record_id=lambda *args, **kwargs: kwargs.get('crop_id'),
+    get_old_value=lambda *args, **kwargs: {
+        'crop_id': kwargs.get('crop_id')
+    },
+    get_new_value=lambda *args, **kwargs: kwargs.get('harvest_data').dict() if 'harvest_data' in kwargs else None
+)
 async def update_crop_harvest(
     crop_id: int,
     harvest_data: CropHarvestUpdate,
