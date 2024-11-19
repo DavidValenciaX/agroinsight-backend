@@ -6,6 +6,7 @@ from app.cultural_practices.infrastructure.sql_repository import CulturalPractic
 from app.infrastructure.common.common_exceptions import DomainException
 from app.user.domain.schemas import UserInDB
 from app.farm.application.services.farm_service import FarmService
+from app.cultural_practices.domain.schemas import NivelLaborCultural
 
 class RegisterTaskCostsUseCase:
     """Caso de uso para registrar los costos asociados a una tarea cultural."""

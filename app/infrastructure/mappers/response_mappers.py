@@ -170,7 +170,8 @@ def map_task_type_to_response(task_type: TaskTypeResponse) -> TaskTypeResponse:
     return TaskTypeResponse(
         id=task_type.id,
         nombre=task_type.nombre,
-        descripcion=task_type.descripcion
+        descripcion=task_type.descripcion,
+        nivel=task_type.nivel
     )
 
 def map_input_category_to_response(category: AgriculturalInputCategory) -> AgriculturalInputCategoryResponse:

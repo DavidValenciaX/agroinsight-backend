@@ -1,9 +1,15 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import date, timedelta
 from typing import List, Optional
+from enum import Enum
 
 from app.infrastructure.utils.validators import validate_no_emojis, validate_no_special_chars, validate_no_xss
         
+class NivelLaborCultural(str, Enum):
+    """Enumeración para los niveles de labor cultural."""
+    LOTE = "LOTE"
+    CULTIVO = "CULTIVO"
+
 class TaskCreate(BaseModel):
     """Modelo para la creación de una tarea de labor cultural.
 
@@ -148,10 +154,12 @@ class TaskTypeResponse(BaseModel):
         id (int): ID único del tipo de labor.
         nombre (str): Nombre del tipo de labor.
         descripcion (Optional[str]): Descripción del tipo de labor.
+        nivel (NivelLaborCultural): Nivel de la labor cultural.
     """
     id: int
     nombre: str
     descripcion: Optional[str] = None
+    nivel: NivelLaborCultural
     
 class TaskTypeListResponse(BaseModel):
     """Modelo de respuesta para la lista de tipos de tareas.

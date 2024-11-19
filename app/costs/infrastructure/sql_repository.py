@@ -135,3 +135,17 @@ class CostsRepository:
         return self.db.query(AgriculturalMachinery)\
             .options(joinedload(AgriculturalMachinery.tipo_maquinaria))\
             .all()
+
+    def get_input_by_id(self, input_id: int) -> Optional[AgriculturalInput]:
+        """Obtiene un insumo agrícola por su ID.
+
+        Args:
+            input_id (int): ID del insumo.
+
+        Returns:
+            Optional[AgriculturalInput]: El insumo encontrado o None.
+        """
+        return self.db.query(AgriculturalInput)\
+            .options(joinedload(AgriculturalInput.categoria))\
+            .filter(AgriculturalInput.id == input_id)\
+            .first()

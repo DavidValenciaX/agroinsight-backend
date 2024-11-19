@@ -5,9 +5,8 @@ from app.cultural_practices.infrastructure.sql_repository import CulturalPractic
 from app.cultural_practices.application.services.task_service import TaskService
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.farm.application.services.farm_service import FarmService
-from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
-from fastapi import BackgroundTasks, status, UploadFile
+from fastapi import BackgroundTasks, status
 from app.infrastructure.common.datetime_utils import datetime_utc_time
 from app.infrastructure.services.cloudinary_service import CloudinaryService
 from dotenv import load_dotenv
@@ -16,7 +15,6 @@ import httpx
 import logging
 from app.soil_analysis.infrastructure.sql_repository import SoilAnalysisRepository
 from app.soil_analysis.domain.schemas import (
-    SoilAnalysisResponse,
     FileContent,
     SoilAnalysisCreate,
     SoilClassificationCreate

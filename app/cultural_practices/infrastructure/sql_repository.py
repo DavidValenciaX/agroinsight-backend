@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-from app.cultural_practices.domain.schemas import AssignmentCreateSingle, TaskCreate
+from app.cultural_practices.domain.schemas import AssignmentCreateSingle, NivelLaborCultural, TaskCreate
 from app.cultural_practices.infrastructure.orm_models import Assignment, CulturalTaskState, CulturalTaskType, CulturalTask
 from app.plot.infrastructure.orm_models import Plot
 from sqlalchemy.orm import joinedload
@@ -219,4 +219,15 @@ class CulturalPracticesRepository:
         tasks = query.offset((page - 1) * per_page).limit(per_page).all()
         
         return total_tasks, tasks
+
+    def get_task_types_by_level(self, nivel: NivelLaborCultural) -> List[CulturalTaskType]:
+        """Obtiene los tipos de tareas de labor cultural filtrados por nivel.
+
+        Args:
+            nivel (NivelLaborCultural): Nivel de labor cultural (LOTE o CULTIVO).
+
+        Returns:
+            List[CulturalTaskType]: Lista de tipos de tareas del nivel especificado.
+        """
+        return self.db.query(CulturalTaskType).filter(CulturalTaskType.nivel == nivel).all()
 

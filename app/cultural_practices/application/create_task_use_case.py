@@ -9,6 +9,7 @@ from app.crop.infrastructure.sql_repository import CropRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
+from app.cultural_practices.domain.schemas import NivelLaborCultural
 
 class CreateTaskUseCase:
     """Caso de uso para crear tareas de labor cultural.
@@ -87,11 +88,21 @@ class CreateTaskUseCase:
             )
         
         # Verificar si el tipo de labor cultural existe
-        if not self.cultural_practice_repository.get_task_type_by_id(task_data.tipo_labor_id):
+        task_type = self.cultural_practice_repository.get_task_type_by_id(task_data.tipo_labor_id)
+        if not task_type:
             raise DomainException(
                 message="El tipo de labor cultural especificado no existe.",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+
+        # Obtener el cultivo activo del lote si el tipo de labor es a nivel de CULTIVO
+        if task_type.nivel == NivelLaborCultural.CULTIVO:
+            active_crop = self.crop_repository.get_active_crop_by_plot_id(task_data.lote_id)
+            if not active_crop:
+                raise DomainException(
+                    message="No se pueden crear tareas de nivel CULTIVO en lotes sin cultivos activos.",
+                    status_code=status.HTTP_409_CONFLICT
+                )
 
         # Verificar si el estado de tarea existe
         task_state = self.cultural_practice_repository.get_task_state_by_id(task_data.estado_id)

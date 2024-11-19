@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status, Query, P
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.cultural_practices.application.get_task_by_id_use_case import GetTaskByIdUseCase
+from app.cultural_practices.application.list_task_types_by_level_use_case import ListTaskTypesByLevelUseCase
 from app.cultural_practices.domain.schemas import AssignmentCreate, TaskCreate, PaginatedTaskListResponse, SuccessTaskCreateResponse, TaskResponse, TaskStateListResponse, TaskTypeListResponse
 from app.cultural_practices.application.assign_task_use_case import AssignTaskUseCase
 from app.cultural_practices.application.create_task_use_case import CreateTaskUseCase
@@ -25,6 +26,7 @@ from app.cultural_practices.application.list_tasks_by_plot_use_case import ListT
 from app.logs.application.decorators.log_decorator import log_activity
 from app.logs.domain.schemas import LogSeverity
 from app.logs.application.services.log_service import LogActionType
+from app.cultural_practices.domain.schemas import NivelLaborCultural
 
 router = APIRouter(tags=["cultural practices"])
 
@@ -313,6 +315,40 @@ async def list_task_types(
     list_task_types_use_case = ListTaskTypesUseCase(db)
     try:
         return list_task_types_use_case.list_task_types(current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al listar los tipos de labor cultural: {str(e)}"
+        ) from e
+
+@router.get("/tasks/types/{nivel}", response_model=TaskTypeListResponse)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="tipo_labor_cultural",
+    severity=LogSeverity.INFO,
+    description="Consulta de tipos de labor cultural por nivel"
+)
+async def list_task_types_by_level(
+    request: Request,
+    nivel: NivelLaborCultural,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> TaskTypeListResponse:
+    """Lista los tipos de labor cultural filtrados por nivel.
+
+    Args:
+        nivel (NivelLaborCultural): Nivel de labor cultural (LOTE o CULTIVO).
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        TaskTypeListResponse: Lista de tipos de labor cultural del nivel especificado.
+    """
+    list_task_types_by_level_use_case = ListTaskTypesByLevelUseCase(db)
+    try:
+        return list_task_types_by_level_use_case.list_task_types_by_level(nivel, current_user)
     except DomainException as e:
         raise e
     except Exception as e:

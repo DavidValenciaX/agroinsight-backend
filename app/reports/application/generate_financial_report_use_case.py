@@ -3,8 +3,6 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional
 from sqlalchemy.orm import Session
-from app.crop.application.services.crop_service import CropService
-from app.cultural_practices.application.services.task_service import TaskService
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.reports.infrastructure.sql_repository import FinancialReportRepository

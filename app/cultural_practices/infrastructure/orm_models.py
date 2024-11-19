@@ -1,6 +1,12 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, Text, Date
+from sqlalchemy import Column, Integer, ForeignKey, String, Text, Date, Enum
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
+import enum
+
+class NivelLaborCultural(enum.Enum):
+    """Enumeración para los niveles de labor cultural."""
+    LOTE = "LOTE"
+    CULTIVO = "CULTIVO"
 
 class Assignment(Base):
     """Modelo de asignación de tareas.
@@ -93,6 +99,7 @@ class CulturalTaskType(Base):
         id (int): ID único del tipo de labor.
         nombre (str): Nombre del tipo de labor.
         descripcion (str): Descripción del tipo de labor.
+        nivel (NivelLaborCultural): Nivel de la labor cultural (LOTE o CULTIVO).
         tareas (List[CulturalTask]): Lista de tareas asociadas a este tipo de labor.
     """
     __tablename__ = "tipo_labor_cultural"
@@ -100,6 +107,7 @@ class CulturalTaskType(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nombre = Column(String(100), unique=True, nullable=False)
     descripcion = Column(Text)
+    nivel = Column(Enum(NivelLaborCultural), nullable=False)
 
     # Relación con CulturalTask
     tareas = relationship("CulturalTask", back_populates="tipo_labor")

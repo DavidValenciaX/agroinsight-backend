@@ -4,13 +4,10 @@ from fastapi.responses import JSONResponse
 import httpx
 import logging
 from sqlalchemy.orm import Session
-from app.cultural_practices.application.services.task_service import TaskService
-from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.fall_armyworm.application.detect_fall_armyworm_background_use_case import DetectFallArmywormBackgroundUseCase
 from app.fall_armyworm.application.get_monitoring_status_use_case import GetMonitoringStatusUseCase
 from app.fall_armyworm.application.get_monitoring_use_case import GetMonitoringUseCase
 from app.fall_armyworm.domain.schemas import FileContent, MonitoreoFitosanitarioResult
-from app.fall_armyworm.infrastructure.sql_repository import FallArmywormRepository
 from app.infrastructure.db.connection import getDb, SessionLocal
 from app.infrastructure.security.jwt_middleware import get_current_user
 from app.user.domain.schemas import UserInDB

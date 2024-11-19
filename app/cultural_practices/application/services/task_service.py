@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from app.cultural_practices.infrastructure.orm_models import CulturalTaskState
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 
 

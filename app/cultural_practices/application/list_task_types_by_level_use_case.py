@@ -5,7 +5,7 @@ from app.infrastructure.mappers.response_mappers import map_task_type_to_respons
 from app.user.domain.schemas import UserInDB
 from app.cultural_practices.domain.schemas import NivelLaborCultural
 
-class ListTaskTypesUseCase:
+class ListTaskTypesByLevelUseCase:
     """Caso de uso para listar los tipos de tareas de labor cultural.
 
     Este caso de uso gestiona la lógica de negocio para recuperar todos los tipos de tareas,
@@ -25,18 +25,17 @@ class ListTaskTypesUseCase:
         self.db = db
         self.cultural_practice_repository = CulturalPracticesRepository(db)
 
-    def list_task_types(self, current_user: UserInDB) -> TaskTypeListResponse:
-        """Lista todos los tipos de tareas de labor cultural.
-
-        Este método obtiene todos los tipos de tareas desde el repositorio y los mapea a
-        objetos de respuesta.
+    def list_task_types_by_level(self, nivel: NivelLaborCultural, current_user: UserInDB) -> TaskTypeListResponse:
+        """Lista los tipos de tareas de labor cultural filtrados por nivel.
 
         Args:
-            current_user (UserInDB): Usuario actual autenticado que intenta acceder a los tipos de tareas.
+            nivel (NivelLaborCultural): Nivel de labor cultural (LOTE o CULTIVO).
+            current_user (UserInDB): Usuario actual autenticado.
 
         Returns:
-            TaskTypeListResponse: Respuesta que contiene la lista de tipos de tareas.
+            TaskTypeListResponse: Lista de tipos de tareas del nivel especificado.
         """
-        task_types = self.cultural_practice_repository.get_task_types()
+        task_types = self.cultural_practice_repository.get_task_types_by_level(nivel)
         task_type_responses = [map_task_type_to_response(type) for type in task_types]
         return TaskTypeListResponse(task_types=task_type_responses)
+
