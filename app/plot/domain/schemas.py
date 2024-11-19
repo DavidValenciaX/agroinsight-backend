@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from decimal import Decimal
-from typing import List, Type
+from typing import List, Type, Optional
 from app.infrastructure.utils.validators import validate_no_emojis, validate_no_special_chars, validate_no_xss
 
 class PlotCreate(BaseModel):
@@ -16,6 +16,7 @@ class PlotCreate(BaseModel):
         longitud (Decimal): Longitud del lote. Debe estar entre -180 y 180.
         finca_id (int): ID de la finca a la que pertenece el lote.
         costos_mantenimiento (Decimal): Costos de mantenimiento del lote. Debe ser un valor positivo.
+        moneda_id (Optional[int]): ID de la moneda del lote. Opcional porque se asignará automáticamente.
     """
     nombre: str = Field(..., min_length=1, max_length=100)
     area: Decimal = Field(..., gt=0)
@@ -24,6 +25,7 @@ class PlotCreate(BaseModel):
     longitud: Decimal = Field(..., ge=-180, le=180)
     finca_id: int
     costos_mantenimiento: Decimal = Field(default=Decimal('0.00'), ge=0)
+    moneda_id: Optional[int] = None
     
     @field_validator('nombre')
     def validate_no_emojis_nombre(cls: Type['PlotCreate'], v: str) -> str:
@@ -87,6 +89,7 @@ class PlotResponse(BaseModel):
         longitud (Decimal): Longitud del lote.
         finca_id (int): ID de la finca a la que pertenece el lote.
         costos_mantenimiento (Decimal): Costos de mantenimiento del lote.
+        moneda (str): Nombre de la moneda del lote.
     """
     id: int
     nombre: str
@@ -96,6 +99,7 @@ class PlotResponse(BaseModel):
     longitud: Decimal
     finca_id: int
     costos_mantenimiento: Decimal
+    moneda: str
 
     model_config = ConfigDict(from_attributes=True)
     

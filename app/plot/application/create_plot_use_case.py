@@ -72,6 +72,19 @@ class CreatePlotUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
             
+        # Obtener el ID de la moneda COP
+        cop_currency = self.measurement_repository.get_unit_of_measure_by_name(
+            self.measurement_service.UNIT_COP
+        )
+        if not cop_currency:
+            raise DomainException(
+                message="No se encontró la moneda COP en el sistema.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+        # Asignar la moneda COP al plot_data
+        plot_data.moneda_id = cop_currency.id
+            
         # validar que la unidad de medida sea de area
         if self.measurement_repository.get_unit_category_by_id(unit_of_measure.categoria_id).nombre != self.measurement_service.UNIT_CATEGORY_AREA_NAME:
             raise DomainException(

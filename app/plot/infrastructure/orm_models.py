@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DECIMAL, ForeignKey
+from sqlalchemy import Column, Integer, String, DECIMAL, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from app.infrastructure.db.connection import Base
 
 class Plot(Base):
@@ -16,6 +17,7 @@ class Plot(Base):
         longitud (Decimal): Longitud del lote con precisión de 8 decimales.
         finca_id (int): Clave foránea que referencia la finca a la que pertenece el lote.
         unidad_area (UnitOfMeasure): Relación con la unidad de medida del área.
+        moneda_id (UnitOfMeasure): Relación con la moneda del lote.
         finca (Farm): Relación con la finca a la que pertenece el lote.
         tareas (List[CulturalTask]): Relación con las tareas culturales asociadas al lote.
         cultivos (List[Crop]): Relación con los cultivos asociados al lote.
@@ -32,8 +34,10 @@ class Plot(Base):
     longitud = Column(DECIMAL(11, 8), nullable=False)
     finca_id = Column(Integer, ForeignKey('finca.id'), nullable=False)
     costos_mantenimiento = Column(DECIMAL(15, 2), nullable=False, default=0.00)
+    moneda_id = Column(Integer, ForeignKey('unidad_medida.id'), nullable=True)
 
-    unidad_area = relationship("UnitOfMeasure")
+    unidad_area = relationship("UnitOfMeasure", foreign_keys=[unidad_area_id])
+    moneda = relationship("UnitOfMeasure", foreign_keys=[moneda_id])
     finca = relationship("Farm", back_populates="lotes")
     registros_meteorologicos = relationship("WeatherLog", back_populates="lote")
     tareas = relationship("CulturalTask", back_populates="lote")
