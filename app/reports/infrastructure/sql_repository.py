@@ -1,14 +1,15 @@
 # app/reports/infrastructure/sql_repository.py
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from datetime import date
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from decimal import Decimal
 
 from app.costs.infrastructure.orm_models import LaborCost, TaskInput, TaskMachinery
 from app.crop.infrastructure.orm_models import Crop
-from app.cultural_practices.infrastructure.orm_models import CulturalTask
+from app.cultural_practices.infrastructure.orm_models import CulturalTask, CulturalTaskType, NivelLaborCultural
 from app.plot.infrastructure.orm_models import Plot
+from app.measurement.infrastructure.orm_models import UnitOfMeasure, UnitCategory
 
 class FinancialReportRepository:
     def __init__(self, db: Session):
@@ -56,3 +57,44 @@ class FinancialReportRepository:
         return self.db.query(Plot)\
             .filter(Plot.finca_id == farm_id)\
             .all()
+
+    def get_plot_level_tasks_in_period(self, plot_id: int, start_date: date, end_date: date) -> List[CulturalTask]:
+        """Obtiene las tareas de nivel LOTE en un período específico"""
+        return self.db.query(CulturalTask)\
+            .join(CulturalTaskType)\
+            .filter(
+                CulturalTask.lote_id == plot_id,
+                CulturalTask.fecha_inicio_estimada >= start_date,
+                CulturalTask.fecha_inicio_estimada <= end_date,
+                CulturalTaskType.nivel == NivelLaborCultural.LOTE
+            ).all()
+
+    def get_crop_level_tasks_in_period(self, crop_id: int, start_date: date, end_date: date) -> List[CulturalTask]:
+        """Obtiene las tareas de nivel CULTIVO en un período específico para un cultivo"""
+        # Primero obtenemos el cultivo para saber su lote
+        crop = self.db.query(Crop).filter(Crop.id == crop_id).first()
+        if not crop:
+            return []
+        
+        return self.db.query(CulturalTask)\
+            .join(CulturalTaskType)\
+            .filter(
+                CulturalTask.lote_id == crop.lote_id,
+                CulturalTask.fecha_inicio_estimada >= start_date,
+                CulturalTask.fecha_inicio_estimada <= end_date,
+                CulturalTaskType.nivel == NivelLaborCultural.CULTIVO,
+                CulturalTask.fecha_inicio_estimada >= crop.fecha_siembra,
+                or_(
+                    (crop.fecha_cosecha == None),
+                    (CulturalTask.fecha_inicio_estimada <= crop.fecha_cosecha)
+                )
+            ).all()
+
+    def get_default_currency(self) -> Optional[UnitOfMeasure]:
+        """Obtiene la moneda por defecto (COP)"""
+        return self.db.query(UnitOfMeasure)\
+            .join(UnitCategory)\
+            .filter(
+                UnitCategory.nombre == "Moneda",
+                UnitOfMeasure.abreviatura == "COP"
+            ).first()

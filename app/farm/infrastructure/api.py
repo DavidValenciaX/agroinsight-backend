@@ -71,7 +71,7 @@ async def create_farm(
     table_name="finca",
     description="Listado paginado de fincas administradas"
 )
-def list_farms(
+async def list_farms(
     request: Request,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -118,7 +118,7 @@ def list_farms(
     get_record_id=lambda *args, **kwargs: kwargs.get('assignment_data').farm_id if 'assignment_data' in kwargs else None,
     get_new_value=lambda *args, **kwargs: kwargs.get('assignment_data').model_dump() if 'assignment_data' in kwargs else None
 )
-def assign_users_to_farm_by_email(
+async def assign_users_to_farm_by_email(
     request: Request,
     assignment_data: FarmUserAssignmentByEmail,
     db: Session = Depends(getDb),
@@ -143,7 +143,7 @@ def assign_users_to_farm_by_email(
     table_name="usuario_finca_rol",
     description="Listado de usuarios de una finca específica"
 )
-def list_farm_users(
+async def list_farm_users(
     request: Request,
     farm_id: int,
     page: int = Query(1, ge=1, description="Page number"),
@@ -185,7 +185,7 @@ def list_farm_users(
     table_name="usuario",
     description="Consulta de información de usuario en finca específica"
 )
-def get_user_by_id(
+async def get_user_by_id(
     request: Request,
     farm_id: int,
     user_id: int,
@@ -224,7 +224,7 @@ def get_user_by_id(
     table_name="finca",
     description="Listado de fincas donde el usuario es trabajador"
 )
-def list_worker_farms(
+async def list_worker_farms(
     request: Request,
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -263,7 +263,7 @@ def list_worker_farms(
     table_name="finca",
     description="Listado completo de fincas administradas"
 )
-def list_all_farms(
+async def list_all_farms(
     request: Request,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)

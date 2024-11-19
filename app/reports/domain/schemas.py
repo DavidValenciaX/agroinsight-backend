@@ -9,6 +9,7 @@ class TaskCost(BaseModel):
     tarea_id: int
     tarea_nombre: str
     fecha: date
+    nivel: str
     costo_mano_obra: Decimal
     costo_insumos: Decimal
     costo_maquinaria: Decimal
@@ -26,7 +27,7 @@ class CropFinancials(BaseModel):
     precio_venta_unitario: Optional[Decimal]
     ingreso_total: Optional[Decimal]
     costo_produccion: Optional[Decimal]
-    costos_tareas: List[TaskCost]
+    tareas_cultivo: List[TaskCost]
     costo_total: Decimal
     ganancia_neta: Optional[Decimal]
 
@@ -35,7 +36,8 @@ class PlotFinancials(BaseModel):
     lote_id: int
     lote_nombre: str
     cultivos: List[CropFinancials]
-    tareas: List[TaskCost]
+    tareas_lote: List[TaskCost]
+    costo_mantenimiento_base: Decimal
     costo_tareas: Decimal
     costo_cultivos: Decimal
     costo_total: Decimal
@@ -48,6 +50,7 @@ class FarmFinancialReport(BaseModel):
     finca_nombre: str
     fecha_inicio: date
     fecha_fin: date
+    moneda: str
     lotes: List[PlotFinancials]
     costo_total: Decimal
     ingreso_total: Decimal

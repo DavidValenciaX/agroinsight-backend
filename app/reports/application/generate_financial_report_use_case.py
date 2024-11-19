@@ -54,6 +54,14 @@ class GenerateFinancialReportUseCase:
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
+        # Obtener la moneda por defecto (COP)
+        default_currency = self.repository.get_default_currency()
+        if not default_currency:
+            raise DomainException(
+                message="No se pudo obtener la moneda por defecto",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
         plots = self.repository.get_farm_plots(farm_id)
         if plot_id:
             plots = [p for p in plots if p.id == plot_id]
@@ -63,20 +71,20 @@ class GenerateFinancialReportUseCase:
         total_farm_income = Decimal(0)
 
         for plot in plots:
-            # Obtener todas las tareas del lote para el período
-            tasks = self.repository.get_plot_tasks_in_period(plot.id, start_date, end_date)
-            task_costs = []
+            # Obtener tareas a nivel de LOTE
+            plot_tasks = self.repository.get_plot_level_tasks_in_period(plot.id, start_date, end_date)
+            plot_task_costs = []
             total_plot_task_cost = Decimal(0)
 
-            # Calcular costos de tareas a nivel de lote
-            for task in tasks:
+            for task in plot_tasks:
                 labor_cost, input_cost, machinery_cost = self.repository.get_task_costs(task.id)
                 task_total = labor_cost + input_cost + machinery_cost
                 total_plot_task_cost += task_total
 
-                task_costs.append(TaskCost(
+                plot_task_costs.append(TaskCost(
                     tarea_id=task.id,
                     tarea_nombre=task.nombre,
+                    nivel="LOTE",
                     fecha=task.fecha_inicio_estimada,
                     costo_mano_obra=labor_cost,
                     costo_insumos=input_cost,
@@ -95,8 +103,30 @@ class GenerateFinancialReportUseCase:
             total_plot_income = Decimal(0)
 
             for crop in crops:
+                # Obtener tareas a nivel de CULTIVO
+                crop_tasks = self.repository.get_crop_level_tasks_in_period(crop.id, start_date, end_date)
+                crop_task_costs = []
+                total_crop_task_cost = Decimal(0)
+
+                for task in crop_tasks:
+                    labor_cost, input_cost, machinery_cost = self.repository.get_task_costs(task.id)
+                    task_total = labor_cost + input_cost + machinery_cost
+                    total_crop_task_cost += task_total
+
+                    crop_task_costs.append(TaskCost(
+                        tarea_id=task.id,
+                        tarea_nombre=task.nombre,
+                        nivel="CULTIVO",
+                        fecha=task.fecha_inicio_estimada,
+                        costo_mano_obra=labor_cost,
+                        costo_insumos=input_cost,
+                        costo_maquinaria=machinery_cost,
+                        costo_total=task_total,
+                        observaciones=task.descripcion
+                    ))
+
                 crop_income = crop.ingreso_total or Decimal(0)
-                crop_production_cost = crop.costo_produccion or Decimal(0)
+                crop_production_cost = (crop.costo_produccion or Decimal(0)) + total_crop_task_cost
                 total_plot_crop_cost += crop_production_cost
                 total_plot_income += crop_income
 
@@ -109,21 +139,23 @@ class GenerateFinancialReportUseCase:
                     cantidad_vendida=crop.cantidad_vendida,
                     precio_venta_unitario=crop.precio_venta_unitario,
                     ingreso_total=crop_income,
-                    costo_produccion=crop_production_cost,
+                    costo_produccion=crop.costo_produccion,
+                    tareas_cultivo=crop_task_costs,
                     costo_total=crop_production_cost,
                     ganancia_neta=crop_income - crop_production_cost
                 ))
 
-            # Calcular totales del lote
-            total_plot_cost = total_plot_task_cost + total_plot_crop_cost
+            # Calcular totales del lote incluyendo costo de mantenimiento base
+            total_plot_cost = total_plot_task_cost + total_plot_crop_cost + plot.costos_mantenimiento
 
             plot_financials.append(PlotFinancials(
                 lote_id=plot.id,
                 lote_nombre=plot.nombre,
                 cultivos=crop_financials,
-                tareas=task_costs,  # Agregar las tareas a nivel de lote
-                costo_tareas=total_plot_task_cost,  # Nuevo campo
-                costo_cultivos=total_plot_crop_cost,  # Nuevo campo
+                tareas_lote=plot_task_costs,
+                costo_mantenimiento_base=plot.costos_mantenimiento,
+                costo_tareas=total_plot_task_cost,
+                costo_cultivos=total_plot_crop_cost,
                 costo_total=total_plot_cost,
                 ingreso_total=total_plot_income,
                 ganancia_neta=total_plot_income - total_plot_cost
@@ -137,6 +169,7 @@ class GenerateFinancialReportUseCase:
             finca_nombre=farm.nombre,
             fecha_inicio=start_date,
             fecha_fin=end_date,
+            moneda=default_currency.nombre,
             lotes=plot_financials,
             costo_total=total_farm_cost,
             ingreso_total=total_farm_income,
