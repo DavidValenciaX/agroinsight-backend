@@ -15,6 +15,7 @@ class CropCreate(BaseModel):
         densidad_siembra (int): Densidad de siembra del cultivo. Debe ser mayor que 0.
         densidad_siembra_unidad_id (int): ID de la unidad de medida de la densidad de siembra. Debe ser mayor que 0.
         estado_id (int): ID del estado del cultivo. Debe ser mayor que 0.
+        moneda_id (Optional[int]): ID de la moneda utilizada. Debe ser mayor que 0.
     """
     lote_id: int = Field(..., gt=0)
     variedad_maiz_id: int = Field(..., gt=0)
@@ -22,6 +23,7 @@ class CropCreate(BaseModel):
     densidad_siembra: int = Field(..., gt=0)
     densidad_siembra_unidad_id: int = Field(..., gt=0)
     estado_id: int = Field(..., gt=0)
+    moneda_id: Optional[int] = None
 
 class CropResponse(BaseModel):
     """Schema para la respuesta con información de un cultivo.
@@ -136,7 +138,7 @@ class CropHarvestUpdate(BaseModel):
         cantidad_vendida_unidad_id (int): ID de la unidad de medida de la cantidad vendida. Debe ser mayor que 0.
         ingreso_total (Decimal): Ingreso total por la venta.
         costo_produccion (Decimal): Costo total de producción.
-        moneda_id (int): ID de la moneda utilizada. Debe ser mayor que 0.
+        moneda_id (Optional[int]): ID de la moneda utilizada. Si no se especifica, se usará COP por defecto.
         fecha_venta (date): Fecha en que se realizó la venta.
     """
     fecha_cosecha: date
@@ -147,5 +149,5 @@ class CropHarvestUpdate(BaseModel):
     cantidad_vendida_unidad_id: int = Field(..., gt=0)
     ingreso_total: Decimal = Field(..., gt=0)
     costo_produccion: Decimal = Field(..., gt=0)
-    moneda_id: int = Field(..., gt=0)
+    moneda_id: Optional[int] = None
     fecha_venta: date

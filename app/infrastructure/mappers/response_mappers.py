@@ -116,7 +116,8 @@ def map_plot_to_response(plot) -> PlotResponse:
         unidad_area=plot.unidad_area.abreviatura if plot.unidad_area else "Desconocida",
         latitud=plot.latitud,
         longitud=plot.longitud,
-        finca_id=plot.finca_id
+        finca_id=plot.finca_id,
+        costos_mantenimiento=plot.costos_mantenimiento
     )
     
 def map_task_to_response(task: CulturalTask) -> TaskResponse:

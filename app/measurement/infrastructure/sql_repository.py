@@ -73,3 +73,17 @@ class MeasurementRepository:
             Optional[UnitCategory]: La categoría de unidad de medida si se encuentra, None en caso contrario.
         """
         return self.db.query(UnitCategory).filter(UnitCategory.id == unit_category_id).first()
+    
+    def get_unit_category_by_name(self, unit_category_name: str) -> Optional[UnitCategory]:
+        """Obtiene una categoría de unidad de medida por su nombre.
+
+        Este método consulta la base de datos para recuperar una categoría de unidad de medida
+        específica utilizando su nombre.
+
+        Args:
+            unit_category_name (str): Nombre de la categoría de unidad de medida.
+
+        Returns:
+            Optional[UnitCategory]: La categoría de unidad de medida si se encuentra, None en caso contrario.
+        """
+        return self.db.query(UnitCategory).filter(UnitCategory.nombre == unit_category_name).first()

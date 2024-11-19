@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from app.crop.infrastructure.orm_models import Crop, CropState, CornVariety
 from app.crop.domain.schemas import CropCreate, CropHarvestUpdate
 from sqlalchemy.orm import joinedload
+from decimal import Decimal
+from sqlalchemy import update
+from app.measurement.infrastructure.sql_repository import MeasurementRepository
 
 class CropRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con cultivos.
@@ -20,6 +23,7 @@ class CropRepository:
             db (Session): Sesión de base de datos SQLAlchemy.
         """
         self.db = db
+        self.measurement_repository = MeasurementRepository(db)
         
     def create_crop(self, crop_data: CropCreate) -> Optional[Crop]:
         """Crea un nuevo cultivo en la base de datos.
@@ -37,7 +41,8 @@ class CropRepository:
                 fecha_siembra=crop_data.fecha_siembra,
                 densidad_siembra=crop_data.densidad_siembra,
                 densidad_siembra_unidad_id=crop_data.densidad_siembra_unidad_id,
-                estado_id=crop_data.estado_id
+                estado_id=crop_data.estado_id,
+                moneda_id=crop_data.moneda_id
             )
             self.db.add(new_crop)
             self.db.commit()
@@ -135,17 +140,30 @@ class CropRepository:
         
         return total_crops, crops
 
-    def update_crop_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate) -> Optional[Crop]:
-        """Actualiza la información de cosecha y venta de un cultivo.
+    def validate_currency(self, currency_id: int) -> bool:
+        """Valida que el ID proporcionado corresponda a una unidad de medida de tipo moneda.
 
         Args:
-            crop_id (int): ID del cultivo a actualizar.
-            harvest_data (CropHarvestUpdate): Datos de cosecha y venta.
+            currency_id (int): ID de la unidad de medida a validar
 
         Returns:
-            Optional[Crop]: El cultivo actualizado si tiene éxito, None en caso de error.
+            bool: True si es una moneda válida, False en caso contrario
         """
+        unit = self.measurement_repository.get_unit_of_measure_by_id(currency_id)
+        if not unit:
+            return False
+            
+        category = self.measurement_repository.get_unit_category_by_id(unit.categoria_id)
+        return category and category.nombre == "Moneda"
+
+    def update_crop_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate) -> Optional[Crop]:
+        """Actualiza la información de cosecha y venta de un cultivo."""
         try:
+            # Validar que la moneda sea válida
+            if not self.validate_currency(harvest_data.moneda_id):
+                print("La moneda especificada no es válida")
+                return None
+
             crop = self.db.query(Crop).filter(Crop.id == crop_id).first()
             if not crop:
                 return None
@@ -180,3 +198,34 @@ class CropRepository:
             Optional[Crop]: El cultivo si se encuentra, None en caso contrario.
         """
         return self.db.query(Crop).filter(Crop.id == crop_id).first()
+
+    def update_production_cost(self, crop_id: int, additional_cost: Decimal) -> bool:
+        """Actualiza el costo de producción de un cultivo sumando el nuevo costo.
+
+        Args:
+            crop_id (int): ID del cultivo
+            additional_cost (Decimal): Costo adicional a sumar
+
+        Returns:
+            bool: True si la actualización fue exitosa, False en caso contrario
+        """
+        try:
+            stmt = update(Crop).where(Crop.id == crop_id).\
+                values(costo_produccion=Crop.costo_produccion + additional_cost)
+            self.db.execute(stmt)
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar el costo de producción: {e}")
+            return False
+
+    def get_active_crop_by_plot_id(self, plot_id: int) -> Optional[Crop]:
+        """Obtiene el cultivo activo en un lote específico."""
+        active_states = self.get_active_crop_states()
+        active_state_ids = [state.id for state in active_states]
+        
+        return self.db.query(Crop).filter(
+            Crop.lote_id == plot_id,
+            Crop.estado_id.in_(active_state_ids)
+        ).first()

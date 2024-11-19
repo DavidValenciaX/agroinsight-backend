@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Date, DECIMAL, ForeignKey, TIMESTAMP, func, String, Text
+from sqlalchemy import Column, Integer, Date, DECIMAL, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
 
@@ -44,7 +44,7 @@ class Crop(Base):
     cantidad_vendida_unidad_id = Column(Integer, ForeignKey('unidad_medida.id'))
     ingreso_total = Column(DECIMAL(15, 2))
     costo_produccion = Column(DECIMAL(15, 2))
-    moneda_id = Column(Integer, ForeignKey('moneda.id'))
+    moneda_id = Column(Integer, ForeignKey('unidad_medida.id'))
     fecha_venta = Column(Date)
 
     # Relaciones
@@ -54,7 +54,7 @@ class Crop(Base):
     estado = relationship("CropState")
     produccion_total_unidad = relationship("UnitOfMeasure", foreign_keys=[produccion_total_unidad_id])
     cantidad_vendida_unidad = relationship("UnitOfMeasure", foreign_keys=[cantidad_vendida_unidad_id])
-    moneda = relationship("Currency")
+    moneda = relationship("UnitOfMeasure", foreign_keys=[moneda_id])
 
 class CropState(Base):
     """
@@ -85,21 +85,4 @@ class CornVariety(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(100), unique=True, nullable=False)
     descripcion = Column(Text)
-
-class Currency(Base):
-    """
-    Representa la tabla 'moneda' en la base de datos.
-
-    Attributes:
-        id (int): Identificador único de la moneda.
-        nombre (str): Nombre de la moneda.
-        codigo (str): Código de la moneda.
-        simbolo (str): Símbolo de la moneda.
-    """
-    __tablename__ = "moneda"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(50), unique=True, nullable=False)
-    codigo = Column(String(3), unique=True, nullable=False)
-    simbolo = Column(String(5), nullable=False)
 

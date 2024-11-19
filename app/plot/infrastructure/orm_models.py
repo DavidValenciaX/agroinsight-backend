@@ -19,6 +19,7 @@ class Plot(Base):
         finca (Farm): Relación con la finca a la que pertenece el lote.
         tareas (List[CulturalTask]): Relación con las tareas culturales asociadas al lote.
         cultivos (List[Crop]): Relación con los cultivos asociados al lote.
+        costos_mantenimiento (Decimal): Costos de mantenimiento del lote. Debe ser un valor positivo con precisión de 2 decimales.
     """
 
     __tablename__ = "lote"
@@ -30,6 +31,7 @@ class Plot(Base):
     latitud = Column(DECIMAL(10, 8), nullable=False)
     longitud = Column(DECIMAL(11, 8), nullable=False)
     finca_id = Column(Integer, ForeignKey('finca.id'), nullable=False)
+    costos_mantenimiento = Column(DECIMAL(15, 2), nullable=False, default=0.00)
 
     unidad_area = relationship("UnitOfMeasure")
     finca = relationship("Farm", back_populates="lotes")

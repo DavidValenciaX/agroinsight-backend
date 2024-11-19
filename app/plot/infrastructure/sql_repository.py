@@ -4,6 +4,8 @@ from app.plot.domain.schemas import PlotCreate
 from typing import Optional
 from typing import List, Tuple
 from sqlalchemy import func
+from decimal import Decimal
+from sqlalchemy import update
 
 class PlotRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con los lotes.
@@ -96,3 +98,24 @@ class PlotRepository:
             Plot.nombre == nombre,
             Plot.finca_id == finca_id
         ).first()
+    
+    def update_maintenance_costs(self, plot_id: int, additional_cost: Decimal) -> bool:
+        """Actualiza los costos de mantenimiento de un lote sumando el nuevo costo.
+
+        Args:
+            plot_id (int): ID del lote
+            additional_cost (Decimal): Costo adicional a sumar
+
+        Returns:
+            bool: True si la actualización fue exitosa, False en caso contrario
+        """
+        try:
+            stmt = update(Plot).where(Plot.id == plot_id).\
+                values(costos_mantenimiento=Plot.costos_mantenimiento + additional_cost)
+            self.db.execute(stmt)
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(f"Error al actualizar los costos de mantenimiento: {e}")
+            return False

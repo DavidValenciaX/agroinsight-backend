@@ -15,6 +15,7 @@ class PlotCreate(BaseModel):
         latitud (Decimal): Latitud del lote. Debe estar entre -90 y 90.
         longitud (Decimal): Longitud del lote. Debe estar entre -180 y 180.
         finca_id (int): ID de la finca a la que pertenece el lote.
+        costos_mantenimiento (Decimal): Costos de mantenimiento del lote. Debe ser un valor positivo.
     """
     nombre: str = Field(..., min_length=1, max_length=100)
     area: Decimal = Field(..., gt=0)
@@ -22,6 +23,7 @@ class PlotCreate(BaseModel):
     latitud: Decimal = Field(..., ge=-90, le=90)
     longitud: Decimal = Field(..., ge=-180, le=180)
     finca_id: int
+    costos_mantenimiento: Decimal = Field(default=Decimal('0.00'), ge=0)
     
     @field_validator('nombre')
     def validate_no_emojis_nombre(cls: Type['PlotCreate'], v: str) -> str:
@@ -84,6 +86,7 @@ class PlotResponse(BaseModel):
         latitud (Decimal): Latitud del lote.
         longitud (Decimal): Longitud del lote.
         finca_id (int): ID de la finca a la que pertenece el lote.
+        costos_mantenimiento (Decimal): Costos de mantenimiento del lote.
     """
     id: int
     nombre: str
@@ -92,6 +95,7 @@ class PlotResponse(BaseModel):
     latitud: Decimal
     longitud: Decimal
     finca_id: int
+    costos_mantenimiento: Decimal
 
     model_config = ConfigDict(from_attributes=True)
     

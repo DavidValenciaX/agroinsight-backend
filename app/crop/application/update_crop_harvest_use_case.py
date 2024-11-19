@@ -10,6 +10,7 @@ from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from app.infrastructure.common.response_models import SuccessResponse
 from fastapi import status
+from typing import Optional
 
 class UpdateCropHarvestUseCase:
     """Caso de uso para actualizar la información de cosecha de un cultivo."""
@@ -22,6 +23,15 @@ class UpdateCropHarvestUseCase:
         self.farm_service = FarmService(db)
         self.measurement_service = MeasurementService(db)
         self.measurement_repository = MeasurementRepository(db)
+
+    def get_default_currency_id(self) -> Optional[int]:
+        """Obtiene el ID de la moneda colombiana (COP)."""
+        category = self.measurement_repository.get_unit_category_by_name(self.measurement_service.UNIT_CATEGORY_CURRENCY_NAME)
+        if not category:
+            return None
+            
+        cop_unit = self.measurement_repository.get_unit_of_measure_by_name(self.measurement_service.UNIT_COP)
+        return cop_unit.id if cop_unit else None
 
     def update_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate, current_user: UserInDB) -> SuccessResponse:
         """Actualiza la información de cosecha y venta de un cultivo.
@@ -67,6 +77,16 @@ class UpdateCropHarvestUseCase:
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
+        # Si no se especifica moneda, usar COP por defecto
+        if harvest_data.moneda_id is None:
+            default_currency_id = self.get_default_currency_id()
+            if not default_currency_id:
+                raise DomainException(
+                    message="No se pudo obtener la moneda por defecto (COP).",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            harvest_data.moneda_id = default_currency_id
+
         # Validar unidades de medida
         for unit_id in [
             harvest_data.produccion_total_unidad_id,
@@ -77,6 +97,22 @@ class UpdateCropHarvestUseCase:
                     message=f"La unidad de medida con ID {unit_id} no existe.",
                     status_code=status.HTTP_404_NOT_FOUND
                 )
+
+        # Validar que la moneda sea una unidad de medida válida
+        currency = self.measurement_repository.get_unit_of_measure_by_id(harvest_data.moneda_id)
+        if not currency:
+            raise DomainException(
+                message="La moneda especificada no existe.",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Verificar que la unidad de medida sea de tipo moneda
+        currency_category = self.measurement_repository.get_unit_category_by_id(currency.categoria_id)
+        if not currency_category or currency_category.nombre != "Moneda":
+            raise DomainException(
+                message="La unidad de medida especificada no es una moneda válida.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
 
         # Actualizar el cultivo
         updated_crop = self.crop_repository.update_crop_harvest(crop_id, harvest_data)
