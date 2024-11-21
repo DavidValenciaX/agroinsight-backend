@@ -23,7 +23,6 @@ from app.user.domain.schemas import UserForFarmResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.farm.application.list_all_farms_use_case import ListAllFarmsUseCase
 from app.logs.application.decorators.log_decorator import log_activity
-from app.logs.domain.schemas import LogSeverity
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
@@ -31,6 +30,7 @@ router = APIRouter(prefix="/farm", tags=["farm"])
 @log_activity(
     action_type=LogActionType.REGISTER_FARM,
     table_name="finca",
+    description="Creación de nueva finca con información básica y asignación automática del usuario creador como administrador",
     get_record_id=lambda *args, **kwargs: args[0].id if args and hasattr(args[0], 'id') else None,
     get_new_value=lambda *args, **kwargs: kwargs.get('farm').to_log_dict() if 'farm' in kwargs else None
 )
@@ -69,7 +69,7 @@ async def create_farm(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="finca",
-    description="Listado paginado de fincas administradas"
+    description="Consulta de listado paginado de fincas donde el usuario es administrador. Página {page}, elementos por página: {per_page}"
 )
 async def list_farms(
     request: Request,
@@ -115,6 +115,7 @@ async def list_farms(
 @log_activity(
     action_type=LogActionType.ASSIGN_USER_TO_FARM,
     table_name="usuario_finca_rol",
+    description="Asignación masiva de usuarios a finca mediante correos electrónicos con roles específicos",
     get_record_id=lambda *args, **kwargs: kwargs.get('assignment_data').farm_id if 'assignment_data' in kwargs else None,
     get_new_value=lambda *args, **kwargs: kwargs.get('assignment_data').model_dump() if 'assignment_data' in kwargs else None
 )
@@ -141,7 +142,7 @@ async def assign_users_to_farm_by_email(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="usuario_finca_rol",
-    description="Listado de usuarios de una finca específica"
+    description="Consulta de usuarios asignados a la finca {farm_id} con sus roles correspondientes"
 )
 async def list_farm_users(
     request: Request,
@@ -183,7 +184,7 @@ async def list_farm_users(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="usuario",
-    description="Consulta de información de usuario en finca específica"
+    description="Consulta detallada de información y roles del usuario {user_id} en la finca {farm_id}"
 )
 async def get_user_by_id(
     request: Request,
@@ -222,7 +223,7 @@ async def get_user_by_id(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="finca",
-    description="Listado de fincas donde el usuario es trabajador"
+    description="Consulta de listado paginado de fincas donde el usuario actual tiene rol de trabajador"
 )
 async def list_worker_farms(
     request: Request,
@@ -261,7 +262,7 @@ async def list_worker_farms(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="finca",
-    description="Listado completo de fincas administradas"
+    description="Consulta de listado completo (sin paginación) de fincas donde el usuario es administrador"
 )
 async def list_all_farms(
     request: Request,

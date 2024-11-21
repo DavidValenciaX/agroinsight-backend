@@ -1,8 +1,41 @@
 from functools import wraps
-from typing import Optional, Dict, Any
-from fastapi import Request
+from typing import Optional
+from fastapi import Request, HTTPException, status
+from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.logs.domain.schemas import LogSeverity
 from app.logs.application.services.log_service import LogService
+from sqlalchemy.exc import SQLAlchemyError
+
+def _determine_error_severity(error: Exception) -> LogSeverity:
+    """Determina la severidad del log basado en el tipo de error."""
+    
+    # Errores críticos que podrían afectar el funcionamiento del sistema
+    if isinstance(error, (
+        SQLAlchemyError,  # Errores de base de datos
+        ConnectionError,   # Errores de conexión
+        MemoryError,      # Errores de memoria
+        SystemError       # Errores del sistema
+    )):
+        return LogSeverity.CRITICAL
+    
+    # Errores HTTP
+    if isinstance(error, (
+        HTTPException,
+        DomainException,
+        UserStateException
+    )):
+        if error.status_code >= status.HTTP_500_INTERNAL_SERVER_ERROR:
+            return LogSeverity.CRITICAL
+        elif error.status_code >= status.HTTP_400_BAD_REQUEST:
+            # 401, 403 -> WARNING
+            if error.status_code in [status.HTTP_401_UNAUTHORIZED, 
+                                   status.HTTP_403_FORBIDDEN]:
+                return LogSeverity.WARNING
+            # 400, 404, etc -> ERROR
+            return LogSeverity.ERROR
+    
+    # Por defecto, cualquier otra excepción se considera ERROR
+    return LogSeverity.ERROR
 
 def log_activity(
     action_type: str,
@@ -74,15 +107,26 @@ def log_activity(
                 return result
 
             except Exception as e:
-                # Registrar el error si ocurre
+                # Determinar la severidad basada en el error
+                error_severity = _determine_error_severity(e)
+                
+                # Crear una descripción más detallada del error
+                error_details = (
+                    f"Error: {str(e)}\n"
+                    f"Tipo: {type(e).__name__}"
+                )
+                
+                if isinstance(e, HTTPException):
+                    error_details += f"\nCódigo de estado: {e.status_code}"
+                
                 if log_service:
                     log_service.log_activity(
                         user=user if 'user' in locals() else None,
                         action_type=f"{action_type}_ERROR",
                         table_name=table_name,
                         request=request,
-                        severity=LogSeverity.ERROR,
-                        description=f"Error: {str(e)}"
+                        severity=error_severity,  # Usar la severidad determinada
+                        description=error_details
                     )
                 raise
 
