@@ -35,12 +35,17 @@ router = APIRouter(prefix="/fall-armyworm", tags=["fall armyworm analysis"])
     action_type=LogActionType.ANALIZE_FALL_ARMYWORM,
     table_name="monitoreo_fitosanitario",
     severity=LogSeverity.INFO,
-    description="Análisis de imágenes para detección de gusano cogollero",
+    description=(
+        "Inicio de análisis de imágenes para detección de gusano cogollero. "
+        "Se procesarán las imágenes para identificar la presencia y nivel de infestación "
+        "del gusano cogollero (Spodoptera frugiperda) en el cultivo."
+    ),
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id'),
     get_new_value=lambda *args, **kwargs: {
         "task_id": kwargs.get('task_id'),
         "observations": kwargs.get('observations'),
-        "total_images": len(kwargs.get('files', []))
+        "total_images": len(kwargs.get('files', [])),
+        "processing_type": "background" if len(kwargs.get('files', [])) > 15 else "immediate"
     }
 )
 async def predict_images(
@@ -135,7 +140,11 @@ async def test_connection(request: Request):
     action_type=LogActionType.VIEW,
     table_name="monitoreo_fitosanitario",
     severity=LogSeverity.INFO,
-    description="Consulta de estado de monitoreo",
+    description=(
+        "Consulta del estado de procesamiento del monitoreo fitosanitario. "
+        "Se verifica el progreso del análisis de imágenes y la detección "
+        "del gusano cogollero en el lote seleccionado."
+    ),
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
 )
 async def get_monitoring_status(
@@ -163,7 +172,12 @@ async def get_monitoring_status(
     action_type=LogActionType.VIEW,
     table_name="monitoreo_fitosanitario",
     severity=LogSeverity.INFO,
-    description="Consulta de resultados de monitoreo",
+    description=(
+        "Consulta de resultados completos del monitoreo fitosanitario. "
+        "Se obtienen los resultados del análisis de imágenes, incluyendo "
+        "la detección del gusano cogollero, nivel de infestación, "
+        "recomendaciones y observaciones registradas."
+    ),
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
 )
 async def get_monitoring_results(
