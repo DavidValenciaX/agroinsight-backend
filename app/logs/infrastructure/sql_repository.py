@@ -61,3 +61,15 @@ class LogRepository:
             .order_by(ActivityLog.fecha_creacion.desc())\
             .limit(limit)\
             .all() 
+
+    def get_paginated_logs(self, limit: int = 100, offset: int = 0) -> List[ActivityLog]:
+        """Obtiene una lista paginada de logs de actividad."""
+        try:
+            return self.db.query(ActivityLog)\
+                .order_by(ActivityLog.id.desc())\
+                .offset(offset)\
+                .limit(limit)\
+                .all()
+        except Exception as e:
+            print(f"Error al obtener los logs paginados: {e}")
+            return []

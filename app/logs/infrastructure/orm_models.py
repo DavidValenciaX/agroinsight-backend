@@ -40,6 +40,7 @@ class ActivityLog(Base):
     user_agent = Column(Text, nullable=True)
     severidad = Column(SQLAlchemyEnum(LogSeverityEnum), nullable=False, default=LogSeverityEnum.INFO)
     descripcion = Column(Text, nullable=True)
+    fecha_creacion = Column(TIMESTAMP(timezone=True), server_default=func.current_timestamp(), nullable=False)
 
     # Relaciones
     usuario = relationship("User", back_populates="logs")

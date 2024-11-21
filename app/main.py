@@ -36,6 +36,7 @@ from contextlib import asynccontextmanager
 import logging
 from app.infrastructure.middleware.logging_middleware import logging_middleware as log_middleware_func
 from app.infrastructure.middleware.database_middleware import database_middleware as db_middleware_func
+from app.logs.infrastructure.api import logs_router
 
 # Configuración del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -73,6 +74,7 @@ app.include_router(soil_analysis_router)
 app.include_router(weather_router)
 app.include_router(costs_router)
 app.include_router(reports_router)
+app.include_router(logs_router)
 
 @app.get("/")
 def root():
