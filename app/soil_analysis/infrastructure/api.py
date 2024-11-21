@@ -17,6 +17,7 @@ import os
 from dotenv import load_dotenv
 from app.logs.application.decorators.log_decorator import log_activity
 from app.logs.application.services.log_service import LogActionType
+from datetime import datetime
 
 load_dotenv(override=True)
 
@@ -33,12 +34,18 @@ router = APIRouter(prefix="/soil-analysis", tags=["soil analysis"])
 @log_activity(
     action_type=LogActionType.REGISTER_SOIL_ANALYSIS,
     table_name="analisis_suelo",
-    description="Registro de nuevo análisis de suelo",
+    description=lambda *args, **kwargs: (
+        f"Inicio de nuevo análisis de suelo con {len(kwargs.get('files', []))} imágenes "
+        f"para la tarea {kwargs.get('task_id')}. "
+        f"Modo de procesamiento: {'background' if len(kwargs.get('files', [])) > 15 else 'sync'}. "
+        f"Observaciones: {kwargs.get('observations')}"
+    ),
     get_record_id=lambda *args, **kwargs: kwargs.get('result', {}).get('analysis_id'),
     get_new_value=lambda *args, **kwargs: {
         "task_id": kwargs.get('task_id'),
         "observations": kwargs.get('observations'),
-        "total_images": len(kwargs.get('files', []))
+        "total_images": len(kwargs.get('files', [])),
+        "processing_mode": "background" if len(kwargs.get('files', [])) > 15 else "sync"
     }
 )
 async def predict_images(
@@ -107,10 +114,14 @@ async def predict_images(
 @log_activity(
     action_type=LogActionType.VERIFY_CONNECTION,
     table_name="analisis_suelo",
-    description="Verificación de conexión con servicio de análisis de suelo",
+    description=lambda *args, **kwargs: (
+        f"Verificación de conectividad con servicio de análisis de suelo en {kwargs.get('service_url')}. "
+        f"Resultado: {kwargs.get('result')}"
+    ),
     get_new_value=lambda *args, **kwargs: {
         "service_url": SOIL_ANALYSIS_SERVICE_URL,
-        "status": "success" if kwargs.get('result') else "error"
+        "status": "Conexión exitosa" if kwargs.get('result') else "Error de conexión",
+        "timestamp": datetime.now().isoformat()
     }
 )
 async def test_connection(request: Request):
@@ -137,7 +148,10 @@ async def test_connection(request: Request):
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="analisis_suelo",
-    description="Consulta de estado de análisis de suelo"
+    description=lambda *args, **kwargs: (
+        f"Consulta de estado para análisis de suelo ID: {kwargs.get('analysis_id')}"
+    ),
+    get_record_id=lambda *args, **kwargs: kwargs.get('analysis_id')
 )
 async def get_processing_status(
     request: Request,
@@ -164,7 +178,15 @@ async def get_processing_status(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="analisis_suelo",
-    description="Consulta de resultados de análisis de suelo"
+    description=lambda *args, **kwargs: (
+        f"Consulta de resultados completos para análisis de suelo ID: {kwargs.get('analysis_id')} "
+        f"por usuario {kwargs.get('current_user').email}"
+    ),
+    get_record_id=lambda *args, **kwargs: kwargs.get('analysis_id'),
+    get_new_value=lambda *args, **kwargs: {
+        "user_email": kwargs.get('current_user').email if kwargs.get('current_user') else None,
+        "timestamp": datetime.now().isoformat()
+    }
 )
 async def get_analysis_results(
     request: Request,
