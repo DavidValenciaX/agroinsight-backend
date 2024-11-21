@@ -29,7 +29,6 @@ class GenerateFinancialReportUseCase:
         min_cost: Optional[float] = None,
         max_cost: Optional[float] = None,
         task_types: Optional[List[str]] = None,
-        include_tasks: bool = True,
         group_by: str = "none",
         only_profitable: Optional[bool] = None,
         current_user: UserInDB = None
@@ -120,9 +119,8 @@ class GenerateFinancialReportUseCase:
                 ))
 
             # Filtrar tareas del lote según los criterios
-            if include_tasks:
-                plot_task_costs = filter_task_costs(plot_task_costs)
-                total_plot_task_cost = sum(task.costo_total for task in plot_task_costs)
+            plot_task_costs = filter_task_costs(plot_task_costs)
+            total_plot_task_cost = sum(task.costo_total for task in plot_task_costs)
 
             # Obtener y procesar cultivos
             crops = self.repository.get_plot_crops_in_period(plot.id, start_date, end_date)
@@ -158,9 +156,8 @@ class GenerateFinancialReportUseCase:
                     ))
 
                 # Filtrar tareas del cultivo según los criterios
-                if include_tasks:
-                    crop_task_costs = filter_task_costs(crop_task_costs)
-                    total_crop_task_cost = sum(task.costo_total for task in crop_task_costs)
+                crop_task_costs = filter_task_costs(crop_task_costs)
+                total_crop_task_cost = sum(task.costo_total for task in crop_task_costs)
 
                 crop_income = crop.ingreso_total or Decimal(0)
                 crop_production_cost = (crop.costo_produccion or Decimal(0)) + total_crop_task_cost
@@ -189,10 +186,9 @@ class GenerateFinancialReportUseCase:
 
             # Si se especificó group_by, agrupar las tareas
             if group_by != "none":
-                if include_tasks:
-                    plot_task_costs = self._group_tasks(plot_task_costs, group_by)
-                    for crop in crop_financials:
-                        crop.tareas_cultivo = self._group_tasks(crop.tareas_cultivo, group_by)
+                plot_task_costs = self._group_tasks(plot_task_costs, group_by)
+                for crop in crop_financials:
+                    crop.tareas_cultivo = self._group_tasks(crop.tareas_cultivo, group_by)
 
             # Calcular totales del lote
             total_plot_cost = total_plot_task_cost + total_plot_crop_cost + plot.costos_mantenimiento

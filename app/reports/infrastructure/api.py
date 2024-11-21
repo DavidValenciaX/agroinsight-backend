@@ -37,7 +37,6 @@ async def generate_financial_report(
     min_cost: Optional[float] = None,
     max_cost: Optional[float] = None,
     task_types: Optional[List[str]] = Query(None),
-    include_tasks: bool = True,
     group_by: ReportGroupBy = ReportGroupBy.NONE,
     only_profitable: Optional[bool] = None,
     db: Session = Depends(getDb),
@@ -55,7 +54,6 @@ async def generate_financial_report(
     - min_cost: Costo mínimo para filtrar tareas/cultivos
     - max_cost: Costo máximo para filtrar tareas/cultivos
     - task_types: Lista de tipos de tareas a incluir
-    - include_tasks: Si es False, no incluye el detalle de tareas
     - group_by: Tipo de agrupación para el reporte
     - only_profitable: Si es True, solo incluye elementos con ganancia positiva
     """
@@ -69,7 +67,6 @@ async def generate_financial_report(
         min_cost=min_cost,
         max_cost=max_cost,
         task_types=task_types,
-        include_tasks=include_tasks,
         group_by=group_by,
         only_profitable=only_profitable,
         current_user=current_user
