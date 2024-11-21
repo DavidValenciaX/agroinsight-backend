@@ -19,7 +19,11 @@ from app.logs.application.services.log_service import LogActionType
 logs_router = APIRouter(prefix="/logs", tags=["logs"])
 
 @logs_router.get("", response_model=List[ActivityLogResponse])
-@log_activity(action_type=LogActionType.VIEW, table_name="log_actividad")
+@log_activity(
+    action_type=LogActionType.VIEW, 
+    table_name="log_actividad",
+    description="Consulta de logs del sistema"
+)
 async def get_system_logs(
     request: Request,
     page: int = Query(1, ge=1, description="Número de página"),
