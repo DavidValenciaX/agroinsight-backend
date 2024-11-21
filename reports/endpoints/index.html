@@ -14,7 +14,7 @@
         <link rel="prev" href="../overview/">
       
       
-        <link rel="next" href="../models/">
+        <link rel="next" href="../financial/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -2029,12 +2029,27 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="generate_financial_report">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros-de-agrupacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros de Agrupación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#estructura-de-rutas" class="md-nav__link">
+  <a href="#futuros-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
-      Estructura de Rutas
+      Futuros Endpoints
     </span>
   </a>
   
@@ -2044,6 +2059,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -2259,12 +2295,27 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="generate_financial_report">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros-de-agrupacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros de Agrupación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#estructura-de-rutas" class="md-nav__link">
+  <a href="#futuros-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
-      Estructura de Rutas
+      Futuros Endpoints
     </span>
   </a>
   
@@ -2297,27 +2348,22 @@
 <a id="app.reports.infrastructure.api.generate_financial_report"></a>
     <div class="doc doc-contents first">
 
-        <p>Genera un reporte financiero detallado.</p>
+        <p>Genera un reporte financiero detallado con opciones de filtrado.</p>
 <p>Parámetros:
 - farm_id: ID de la finca
 - start_date: Fecha de inicio del período (YYYY-MM-DD)
 - end_date: Fecha fin del período (YYYY-MM-DD)
 - plot_id: ID del lote (opcional)
-- crop_id: ID del cultivo (opcional)</p>
+- crop_id: ID del cultivo (opcional)
+- min_cost: Costo mínimo para filtrar tareas/cultivos
+- max_cost: Costo máximo para filtrar tareas/cultivos
+- task_types: Lista de tipos de tareas a incluir
+- group_by: Tipo de agrupación para el reporte
+- only_profitable: Si es True, solo incluye elementos con ganancia positiva</p>
 
             <details class="quote">
               <summary>Source code in <code>app\reports\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
@@ -2335,18 +2381,60 @@
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/financial&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">FarmFinancialReport</span><span class="p">)</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/financial&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">FarmFinancialReport</span><span class="p">)</span>
+<span class="nd">@log_activity</span><span class="p">(</span>
+    <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">GENERATE_REPORT</span><span class="p">,</span>
+    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;finca&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Generación de reporte financiero&quot;</span>
+<span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">generate_financial_report</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
     <span class="n">farm_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">start_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
     <span class="n">end_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
     <span class="n">plot_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">crop_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">task_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="n">group_by</span><span class="p">:</span> <span class="n">ReportGroupBy</span> <span class="o">=</span> <span class="n">ReportGroupBy</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span>
+    <span class="n">only_profitable</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
     <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FarmFinancialReport</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Genera un reporte financiero detallado.</span>
+<span class="sd">    Genera un reporte financiero detallado con opciones de filtrado.</span>
 
 <span class="sd">    Parámetros:</span>
 <span class="sd">    - farm_id: ID de la finca</span>
@@ -2354,6 +2442,11 @@
 <span class="sd">    - end_date: Fecha fin del período (YYYY-MM-DD)</span>
 <span class="sd">    - plot_id: ID del lote (opcional)</span>
 <span class="sd">    - crop_id: ID del cultivo (opcional)</span>
+<span class="sd">    - min_cost: Costo mínimo para filtrar tareas/cultivos</span>
+<span class="sd">    - max_cost: Costo máximo para filtrar tareas/cultivos</span>
+<span class="sd">    - task_types: Lista de tipos de tareas a incluir</span>
+<span class="sd">    - group_by: Tipo de agrupación para el reporte</span>
+<span class="sd">    - only_profitable: Si es True, solo incluye elementos con ganancia positiva</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">use_case</span> <span class="o">=</span> <span class="n">GenerateFinancialReportUseCase</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">use_case</span><span class="o">.</span><span class="n">generate_report</span><span class="p">(</span>
@@ -2362,15 +2455,38 @@
         <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">,</span>
         <span class="n">plot_id</span><span class="o">=</span><span class="n">plot_id</span><span class="p">,</span>
         <span class="n">crop_id</span><span class="o">=</span><span class="n">crop_id</span><span class="p">,</span>
+        <span class="n">min_cost</span><span class="o">=</span><span class="n">min_cost</span><span class="p">,</span>
+        <span class="n">max_cost</span><span class="o">=</span><span class="n">max_cost</span><span class="p">,</span>
+        <span class="n">task_types</span><span class="o">=</span><span class="n">task_types</span><span class="p">,</span>
+        <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,</span>
+        <span class="n">only_profitable</span><span class="o">=</span><span class="n">only_profitable</span><span class="p">,</span>
         <span class="n">current_user</span><span class="o">=</span><span class="n">current_user</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
 
-</div><p>Endpoint principal para la generación de reportes financieros detallados. Permite obtener información financiera completa de una finca, incluyendo costos, ingresos y ganancias, con opciones de filtrado por lote y cultivo.</p>
-<h2 id="estructura-de-rutas">Estructura de Rutas</h2>
-<p>El módulo de reportes utiliza el prefijo <code>/reports</code> para todos sus endpoints y está etiquetado como "reports" en la documentación de la API.</p>
+</div><p>Endpoint principal para generar reportes financieros detallados. Permite:</p>
+<ul>
+<li>Filtrar por período específico</li>
+<li>Filtrar por lote o cultivo</li>
+<li>Agrupar resultados por diferentes criterios</li>
+<li>Aplicar filtros de costos</li>
+<li>Obtener análisis de rentabilidad</li>
+</ul>
+<h4 id="parametros-de-agrupacion">Parámetros de Agrupación</h4>
+<ul>
+<li><code>none</code>: Sin agrupación (por defecto)</li>
+<li><code>task_type</code>: Agrupa por tipo de tarea</li>
+<li><code>month</code>: Agrupa por mes</li>
+<li><code>cost_type</code>: Agrupa por categoría de costo</li>
+</ul>
+<p><a href="../financial/">Ver documentación detallada</a></p>
+<h2 id="futuros-endpoints">Futuros Endpoints</h2>
+<ul>
+<li>Endpoints de reportes de producción</li>
+<li>Endpoints de reportes de actividades</li>
+</ul>
 
 
 

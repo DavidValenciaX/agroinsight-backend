@@ -1216,30 +1216,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="CornVariety">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#moneda" class="md-nav__link">
-    <span class="md-ellipsis">
-      Moneda
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#app.crop.infrastructure.orm_models.Currency" class="md-nav__link">
-    <span class="md-ellipsis">
-      Currency
-    </span>
-  </a>
-  
 </li>
       
     </ul>
@@ -2119,6 +2095,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reports/financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reports/models/" class="md-nav__link">
         
   
@@ -2367,30 +2364,6 @@
   <a href="#app.crop.infrastructure.orm_models.CornVariety" class="md-nav__link">
     <span class="md-ellipsis">
       CornVariety
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CornVariety">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#moneda" class="md-nav__link">
-    <span class="md-ellipsis">
-      Moneda
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#app.crop.infrastructure.orm_models.Currency" class="md-nav__link">
-    <span class="md-ellipsis">
-      Currency
     </span>
   </a>
   
@@ -2747,7 +2720,7 @@
     <span class="n">cantidad_vendida_unidad_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;unidad_medida.id&#39;</span><span class="p">))</span>
     <span class="n">ingreso_total</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="n">costo_produccion</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="n">moneda_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;moneda.id&#39;</span><span class="p">))</span>
+    <span class="n">moneda_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;unidad_medida.id&#39;</span><span class="p">))</span>
     <span class="n">fecha_venta</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">)</span>
 
     <span class="c1"># Relaciones</span>
@@ -2757,7 +2730,7 @@
     <span class="n">estado</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;CropState&quot;</span><span class="p">)</span>
     <span class="n">produccion_total_unidad</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;UnitOfMeasure&quot;</span><span class="p">,</span> <span class="n">foreign_keys</span><span class="o">=</span><span class="p">[</span><span class="n">produccion_total_unidad_id</span><span class="p">])</span>
     <span class="n">cantidad_vendida_unidad</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;UnitOfMeasure&quot;</span><span class="p">,</span> <span class="n">foreign_keys</span><span class="o">=</span><span class="p">[</span><span class="n">cantidad_vendida_unidad_id</span><span class="p">])</span>
-    <span class="n">moneda</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Currency&quot;</span><span class="p">)</span>
+    <span class="n">moneda</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;UnitOfMeasure&quot;</span><span class="p">,</span> <span class="n">foreign_keys</span><span class="o">=</span><span class="p">[</span><span class="n">moneda_id</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -2982,133 +2955,6 @@
     <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">nombre</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">descripcion</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-              </details>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div><h3 id="moneda">Moneda</h3>
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<a id="app.crop.infrastructure.orm_models.Currency"></a>
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="app.infrastructure.db.connection.Base">Base</span></code></p>
-
-
-        <p>Representa la tabla 'moneda' en la base de datos.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="app.crop.infrastructure.orm_models.Currency.id">id</span></code></td>
-            <td>
-                  <code>int</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Identificador único de la moneda.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="app.crop.infrastructure.orm_models.Currency.nombre">nombre</span></code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Nombre de la moneda.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="app.crop.infrastructure.orm_models.Currency.codigo">codigo</span></code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Código de la moneda.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="app.crop.infrastructure.orm_models.Currency.simbolo">simbolo</span></code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Símbolo de la moneda.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-              <details class="quote">
-                <summary>Source code in <code>app\crop\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Currency</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Representa la tabla &#39;moneda&#39; en la base de datos.</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        id (int): Identificador único de la moneda.</span>
-<span class="sd">        nombre (str): Nombre de la moneda.</span>
-<span class="sd">        codigo (str): Código de la moneda.</span>
-<span class="sd">        simbolo (str): Símbolo de la moneda.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;moneda&quot;</span>
-
-    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">nombre</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">codigo</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">simbolo</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 

@@ -2191,6 +2191,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reports/financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reports/models/" class="md-nav__link">
         
   
@@ -2749,6 +2770,17 @@
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="app.user.infrastructure.orm_models.User.logs">logs</span></code></td>
+            <td>
+                  <code>List[ActivityLog]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Lista de registros de actividad del usuario.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -2793,7 +2825,9 @@
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;usuario&#39; en la base de datos.</span>
 
@@ -2813,6 +2847,7 @@
 <span class="sd">        blacklisted_tokens (List[BlacklistedToken]): Lista de tokens en lista negra.</span>
 <span class="sd">        asignaciones (List[Assignment]): Lista de asignaciones del usuario.</span>
 <span class="sd">        roles_fincas (List[UserFarmRole]): Lista de roles del usuario en diferentes fincas.</span>
+<span class="sd">        logs (List[ActivityLog]): Lista de registros de actividad del usuario.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;usuario&quot;</span>
 
@@ -2833,6 +2868,7 @@
     <span class="n">blacklisted_tokens</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;BlacklistedToken&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;usuario&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="n">CASCADE_DELETE_ORPHAN</span><span class="p">)</span>
     <span class="n">asignaciones</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Assignment&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;usuario&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="n">CASCADE_DELETE_ORPHAN</span><span class="p">)</span>
     <span class="n">roles_fincas</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;UserFarmRole&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;usuario&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="n">CASCADE_DELETE_ORPHAN</span><span class="p">)</span>
+    <span class="n">logs</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;ActivityLog&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;usuario&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -2929,9 +2965,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\user\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
@@ -2945,7 +2979,9 @@
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span>
-<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Role</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Role</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;rol&#39; en la base de datos.</span>
 
@@ -3047,9 +3083,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\user\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
@@ -3060,7 +3094,9 @@
 <span class="normal">102</span>
 <span class="normal">103</span>
 <span class="normal">104</span>
-<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserState</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserState</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;estado_usuario&#39; en la base de datos.</span>
 
@@ -3214,9 +3250,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\user\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
@@ -3238,7 +3272,9 @@
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserConfirmation</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UserConfirmation</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;confirmacion_usuario&#39; en la base de datos.</span>
 
@@ -3403,9 +3439,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\user\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
 <span class="normal">138</span>
@@ -3427,7 +3461,9 @@
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TwoStepVerification</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TwoStepVerification</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;verificacion_dos_pasos&#39; en la base de datos.</span>
 
@@ -3603,9 +3639,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\user\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
 <span class="normal">164</span>
@@ -3629,7 +3663,9 @@
 <span class="normal">182</span>
 <span class="normal">183</span>
 <span class="normal">184</span>
-<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PasswordRecovery</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PasswordRecovery</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;recuperacion_contrasena&#39; en la base de datos.</span>
 
@@ -3763,9 +3799,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\user\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
 <span class="normal">192</span>
@@ -3781,7 +3815,9 @@
 <span class="normal">202</span>
 <span class="normal">203</span>
 <span class="normal">204</span>
-<span class="normal">205</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BlacklistedToken</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BlacklistedToken</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;blacklisted_tokens&#39; en la base de datos.</span>
 

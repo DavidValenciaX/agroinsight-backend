@@ -1195,6 +1195,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#app.crop.application.create_crop_use_case.CreateCropUseCase.get_default_currency_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_default_currency_id
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#listar-variedades-de-maiz" class="md-nav__link">
     <span class="md-ellipsis">
       Listar Variedades de Maíz
@@ -2122,6 +2131,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reports/financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reports/models/" class="md-nav__link">
         
   
@@ -2325,6 +2355,15 @@
   <a href="#app.crop.application.create_crop_use_case.CreateCropUseCase.create_crop" class="md-nav__link">
     <span class="md-ellipsis">
       create_crop
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.crop.application.create_crop_use_case.CreateCropUseCase.get_default_currency_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_default_currency_id
     </span>
   </a>
   
@@ -2656,7 +2695,42 @@ incluyendo validaciones de permisos y existencia de recursos.</p>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
-<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CreateCropUseCase</span><span class="p">:</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CreateCropUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Caso de uso para crear un nuevo cultivo.</span>
 
 <span class="sd">    Esta clase maneja la lógica de negocio necesaria para crear un cultivo en un lote,</span>
@@ -2685,6 +2759,30 @@ incluyendo validaciones de permisos y existencia de recursos.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span> <span class="o">=</span> <span class="n">FarmService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">measurement_service</span> <span class="o">=</span> <span class="n">MeasurementService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span> <span class="o">=</span> <span class="n">MeasurementRepository</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_default_currency_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtiene el ID de la moneda por defecto (COP)&quot;&quot;&quot;</span>
+        <span class="c1"># Obtener la categoría de moneda</span>
+        <span class="n">currency_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_category_by_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measurement_service</span><span class="o">.</span><span class="n">UNIT_CATEGORY_CURRENCY_NAME</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">currency_category</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la categoría de moneda&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Obtener la moneda COP</span>
+        <span class="n">cop_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_of_measure_by_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measurement_service</span><span class="o">.</span><span class="n">UNIT_COP</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cop_currency</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la moneda COP&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cop_currency</span><span class="o">.</span><span class="n">id</span>
 
     <span class="k">def</span> <span class="nf">create_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crop_data</span><span class="p">:</span> <span class="n">CropCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Crea un nuevo cultivo en la base de datos.</span>
@@ -2777,6 +2875,17 @@ incluyendo validaciones de permisos y existencia de recursos.</p>
                 <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Ya existe un cultivo activo en este lote.&quot;</span><span class="p">,</span>
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
             <span class="p">)</span>
+
+        <span class="c1"># Si no se especificó una moneda, usar COP por defecto</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">crop_data</span><span class="o">.</span><span class="n">moneda_id</span><span class="p">:</span>
+            <span class="n">crop_data</span><span class="o">.</span><span class="n">moneda_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_default_currency_id</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Si se especificó una moneda, validar que sea válida</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span><span class="o">.</span><span class="n">validate_currency</span><span class="p">(</span><span class="n">crop_data</span><span class="o">.</span><span class="n">moneda_id</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;La moneda especificada no es válida&quot;</span><span class="p">,</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+                <span class="p">)</span>
 
         <span class="c1"># Crear el cultivo</span>
         <span class="n">crop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span><span class="o">.</span><span class="n">create_crop</span><span class="p">(</span><span class="n">crop_data</span><span class="p">)</span>
@@ -2993,31 +3102,7 @@ incluyendo validaciones de permisos y existencia de recursos.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\crop\application\create_crop_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 44</span>
-<span class="normal"> 45</span>
-<span class="normal"> 46</span>
-<span class="normal"> 47</span>
-<span class="normal"> 48</span>
-<span class="normal"> 49</span>
-<span class="normal"> 50</span>
-<span class="normal"> 51</span>
-<span class="normal"> 52</span>
-<span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
-<span class="normal"> 57</span>
-<span class="normal"> 58</span>
-<span class="normal"> 59</span>
-<span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 68</span>
 <span class="normal"> 69</span>
 <span class="normal"> 70</span>
 <span class="normal"> 71</span>
@@ -3093,7 +3178,42 @@ incluyendo validaciones de permisos y existencia de recursos.</p>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
-<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crop_data</span><span class="p">:</span> <span class="n">CropCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crop_data</span><span class="p">:</span> <span class="n">CropCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Crea un nuevo cultivo en la base de datos.</span>
 
 <span class="sd">    Este método realiza las siguientes validaciones antes de crear el cultivo:</span>
@@ -3185,6 +3305,17 @@ incluyendo validaciones de permisos y existencia de recursos.</p>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
         <span class="p">)</span>
 
+    <span class="c1"># Si no se especificó una moneda, usar COP por defecto</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">crop_data</span><span class="o">.</span><span class="n">moneda_id</span><span class="p">:</span>
+        <span class="n">crop_data</span><span class="o">.</span><span class="n">moneda_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_default_currency_id</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Si se especificó una moneda, validar que sea válida</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span><span class="o">.</span><span class="n">validate_currency</span><span class="p">(</span><span class="n">crop_data</span><span class="o">.</span><span class="n">moneda_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;La moneda especificada no es válida&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+            <span class="p">)</span>
+
     <span class="c1"># Crear el cultivo</span>
     <span class="n">crop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span><span class="o">.</span><span class="n">create_crop</span><span class="p">(</span><span class="n">crop_data</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">crop</span><span class="p">:</span>
@@ -3194,6 +3325,72 @@ incluyendo validaciones de permisos y existencia de recursos.</p>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">SuccessResponse</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Cultivo creado exitosamente&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="app.crop.application.create_crop_use_case.CreateCropUseCase.get_default_currency_id" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_default_currency_id</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Obtiene el ID de la moneda por defecto (COP)</p>
+
+            <details class="quote">
+              <summary>Source code in <code>app\crop\application\create_crop_use_case.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_default_currency_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtiene el ID de la moneda por defecto (COP)&quot;&quot;&quot;</span>
+    <span class="c1"># Obtener la categoría de moneda</span>
+    <span class="n">currency_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_category_by_name</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_service</span><span class="o">.</span><span class="n">UNIT_CATEGORY_CURRENCY_NAME</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">currency_category</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la categoría de moneda&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Obtener la moneda COP</span>
+    <span class="n">cop_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_of_measure_by_name</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_service</span><span class="o">.</span><span class="n">UNIT_COP</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cop_currency</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la moneda COP&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cop_currency</span><span class="o">.</span><span class="n">id</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

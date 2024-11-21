@@ -2275,6 +2275,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reports/financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reports/models/" class="md-nav__link">
         
   
@@ -4552,8 +4573,7 @@ las validaciones necesarias antes de realizar la creación.</p>
 
               <details class="quote">
                 <summary>Source code in <code>app\cultural_practices\application\create_task_use_case.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 13</span>
-<span class="normal"> 14</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
 <span class="normal"> 15</span>
 <span class="normal"> 16</span>
 <span class="normal"> 17</span>
@@ -4651,7 +4671,18 @@ las validaciones necesarias antes de realizar la creación.</p>
 <span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
-<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CreateTaskUseCase</span><span class="p">:</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CreateTaskUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Caso de uso para crear tareas de labor cultural.</span>
 
 <span class="sd">    Este caso de uso gestiona la lógica de negocio para la creación de tareas, asegurando que se cumplan</span>
@@ -4728,11 +4759,21 @@ las validaciones necesarias antes de realizar la creación.</p>
             <span class="p">)</span>
 
         <span class="c1"># Verificar si el tipo de labor cultural existe</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_type_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">tipo_labor_id</span><span class="p">):</span>
+        <span class="n">task_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_type_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">tipo_labor_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">task_type</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
                 <span class="n">message</span><span class="o">=</span><span class="s2">&quot;El tipo de labor cultural especificado no existe.&quot;</span><span class="p">,</span>
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
             <span class="p">)</span>
+
+        <span class="c1"># Obtener el cultivo activo del lote si el tipo de labor es a nivel de CULTIVO</span>
+        <span class="k">if</span> <span class="n">task_type</span><span class="o">.</span><span class="n">nivel</span> <span class="o">==</span> <span class="n">NivelLaborCultural</span><span class="o">.</span><span class="n">CULTIVO</span><span class="p">:</span>
+            <span class="n">active_crop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span><span class="o">.</span><span class="n">get_active_crop_by_plot_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">lote_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">active_crop</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pueden crear tareas de nivel CULTIVO en lotes sin cultivos activos.&quot;</span><span class="p">,</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
+                <span class="p">)</span>
 
         <span class="c1"># Verificar si el estado de tarea existe</span>
         <span class="n">task_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">estado_id</span><span class="p">)</span>
@@ -4810,8 +4851,7 @@ las validaciones necesarias antes de realizar la creación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\create_task_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
-<span class="normal">30</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
@@ -4822,7 +4862,8 @@ las validaciones necesarias antes de realizar la creación.</p>
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
+<span class="normal">41</span>
+<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inicializa el caso de uso con las dependencias necesarias.</span>
 
 <span class="sd">    Args:</span>
@@ -4948,8 +4989,7 @@ se crea la tarea.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\create_task_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
-<span class="normal"> 44</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 44</span>
 <span class="normal"> 45</span>
 <span class="normal"> 46</span>
 <span class="normal"> 47</span>
@@ -5017,7 +5057,18 @@ se crea la tarea.</p>
 <span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
-<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_data</span><span class="p">:</span> <span class="n">TaskCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessTaskCreateResponse</span><span class="p">:</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_data</span><span class="p">:</span> <span class="n">TaskCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessTaskCreateResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Crea una nueva tarea de labor cultural.</span>
 
 <span class="sd">    Este método valida la existencia del lote, el cultivo activo en el lote, la finca asociada,</span>
@@ -5064,11 +5115,21 @@ se crea la tarea.</p>
         <span class="p">)</span>
 
     <span class="c1"># Verificar si el tipo de labor cultural existe</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_type_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">tipo_labor_id</span><span class="p">):</span>
+    <span class="n">task_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_type_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">tipo_labor_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">task_type</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
             <span class="n">message</span><span class="o">=</span><span class="s2">&quot;El tipo de labor cultural especificado no existe.&quot;</span><span class="p">,</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
         <span class="p">)</span>
+
+    <span class="c1"># Obtener el cultivo activo del lote si el tipo de labor es a nivel de CULTIVO</span>
+    <span class="k">if</span> <span class="n">task_type</span><span class="o">.</span><span class="n">nivel</span> <span class="o">==</span> <span class="n">NivelLaborCultural</span><span class="o">.</span><span class="n">CULTIVO</span><span class="p">:</span>
+        <span class="n">active_crop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span><span class="o">.</span><span class="n">get_active_crop_by_plot_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">lote_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">active_crop</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pueden crear tareas de nivel CULTIVO en lotes sin cultivos activos.&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
+            <span class="p">)</span>
 
     <span class="c1"># Verificar si el estado de tarea existe</span>
     <span class="n">task_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">estado_id</span><span class="p">)</span>
@@ -6657,8 +6718,7 @@ asegurando que se cumplan las validaciones necesarias antes de devolver la lista
 
               <details class="quote">
                 <summary>Source code in <code>app\cultural_practices\application\list_task_types_use_case.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
-<span class="normal"> 8</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
@@ -6691,7 +6751,8 @@ asegurando que se cumplan las validaciones necesarias antes de devolver la lista
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ListTaskTypesUseCase</span><span class="p">:</span>
+<span class="normal">41</span>
+<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ListTaskTypesUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Caso de uso para listar los tipos de tareas de labor cultural.</span>
 
 <span class="sd">    Este caso de uso gestiona la lógica de negocio para recuperar todos los tipos de tareas,</span>
@@ -6785,14 +6846,14 @@ asegurando que se cumplan las validaciones necesarias antes de devolver la lista
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\list_task_types_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
-<span class="normal">19</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
 <span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
-<span class="normal">25</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inicializa el caso de uso con las dependencias necesarias.</span>
 
 <span class="sd">    Args:</span>
@@ -6875,8 +6936,7 @@ objetos de respuesta.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\list_task_types_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
-<span class="normal">28</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span>
@@ -6889,7 +6949,8 @@ objetos de respuesta.</p>
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">list_task_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskTypeListResponse</span><span class="p">:</span>
+<span class="normal">41</span>
+<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">list_task_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskTypeListResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lista todos los tipos de tareas de labor cultural.</span>
 
 <span class="sd">    Este método obtiene todos los tipos de tareas desde el repositorio y los mapea a</span>

@@ -3208,6 +3208,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reports/financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reports/models/" class="md-nav__link">
         
   
@@ -16278,7 +16299,14 @@ incluyendo la verificación de correo electrónico duplicado.</p>
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
-<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UpdateUserInfoUseCase</span><span class="p">:</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UpdateUserInfoUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Caso de uso para actualizar la información de un usuario.</span>
 
@@ -16318,6 +16346,13 @@ incluyendo la verificación de correo electrónico duplicado.</p>
 <span class="sd">            UserAlreadyRegisteredException: Si el nuevo correo electrónico ya está en uso por otro usuario.</span>
 <span class="sd">            DomainException: Si no se pudo actualizar la información del usuario.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">old_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="s1">&#39;nombre&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+            <span class="s1">&#39;apellido&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">apellido</span>
+        <span class="p">}</span>
+
         <span class="c1"># Verificar si el email ya está en uso por otro usuario</span>
         <span class="k">if</span> <span class="n">user_update</span><span class="o">.</span><span class="n">email</span> <span class="o">!=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_email</span><span class="p">(</span><span class="n">user_update</span><span class="o">.</span><span class="n">email</span><span class="p">):</span>
@@ -16567,7 +16602,14 @@ actualiza la información del usuario y guarda los cambios en la base de datos.<
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
-<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">,</span> <span class="n">user_update</span><span class="p">:</span> <span class="n">UserUpdate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">,</span> <span class="n">user_update</span><span class="p">:</span> <span class="n">UserUpdate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Actualiza la información del usuario.</span>
 
@@ -16585,6 +16627,13 @@ actualiza la información del usuario y guarda los cambios en la base de datos.<
 <span class="sd">        UserAlreadyRegisteredException: Si el nuevo correo electrónico ya está en uso por otro usuario.</span>
 <span class="sd">        DomainException: Si no se pudo actualizar la información del usuario.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">old_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+        <span class="s1">&#39;nombre&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+        <span class="s1">&#39;apellido&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">apellido</span>
+    <span class="p">}</span>
+
     <span class="c1"># Verificar si el email ya está en uso por otro usuario</span>
     <span class="k">if</span> <span class="n">user_update</span><span class="o">.</span><span class="n">email</span> <span class="o">!=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_email</span><span class="p">(</span><span class="n">user_update</span><span class="o">.</span><span class="n">email</span><span class="p">):</span>
@@ -16765,7 +16814,14 @@ actualiza la información del usuario y guarda los cambios en la base de datos.<
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
-<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">,</span> <span class="n">user_update</span><span class="p">:</span> <span class="n">UserUpdate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">,</span> <span class="n">user_update</span><span class="p">:</span> <span class="n">UserUpdate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Actualiza la información del usuario.</span>
 
@@ -16783,6 +16839,13 @@ actualiza la información del usuario y guarda los cambios en la base de datos.<
 <span class="sd">        UserAlreadyRegisteredException: Si el nuevo correo electrónico ya está en uso por otro usuario.</span>
 <span class="sd">        DomainException: Si no se pudo actualizar la información del usuario.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">old_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+        <span class="s1">&#39;nombre&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+        <span class="s1">&#39;apellido&#39;</span><span class="p">:</span> <span class="n">current_user</span><span class="o">.</span><span class="n">apellido</span>
+    <span class="p">}</span>
+
     <span class="c1"># Verificar si el email ya está en uso por otro usuario</span>
     <span class="k">if</span> <span class="n">user_update</span><span class="o">.</span><span class="n">email</span> <span class="o">!=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_email</span><span class="p">(</span><span class="n">user_update</span><span class="o">.</span><span class="n">email</span><span class="p">):</span>

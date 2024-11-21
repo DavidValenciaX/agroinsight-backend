@@ -2056,6 +2056,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reports/financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reports/models/" class="md-nav__link">
         
   
@@ -2367,9 +2388,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\measurement\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
 <span class="normal">16</span>
 <span class="normal">17</span>
 <span class="normal">18</span>
@@ -2391,8 +2410,22 @@
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
-<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@measurement_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/units&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">UnitsListResponse</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">list_units</span><span class="p">(</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@measurement_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/units&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">UnitsListResponse</span><span class="p">)</span>
+<span class="nd">@log_activity</span><span class="p">(</span>
+    <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
+    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;unidad_medida&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de unidades de medida&quot;</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">list_units</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span> 
     <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitsListResponse</span><span class="p">:</span>

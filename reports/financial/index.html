@@ -1,0 +1,3260 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentación para el desarrollador backend del proyecto AgroInSight">
+      
+      
+      
+      
+        <link rel="prev" href="../endpoints/">
+      
+      
+        <link rel="next" href="../models/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+    
+    
+      
+        <title>Documentación de reporte financiero - AgroInsight Backend Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#documentacion-del-endpoint-de-reportes-financieros" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="AgroInsight Backend Documentation" class="md-header__button md-logo" aria-label="AgroInsight Backend Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AgroInsight Backend Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Documentación de reporte financiero
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AgroInsight Backend Documentation" class="md-nav__button md-logo" aria-label="AgroInsight Backend Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AgroInsight Backend Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Documentación complementaria
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Documentación complementaria
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../complement-docs/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://agroinsight-backend-production.up.railway.app/docs" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FastAPI Swagger
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://agroinsight-backend-production.up.railway.app/redoc" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ReDoc
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://dbdocs.io/davidvalencia0526/AgroInsight" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Base de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.figma.com/design/PwBFnVysZISNgO8UIoOHL1/Agroinsight?node-id=0-1&node-type=CANVAS&t=s9L7qvi4CEiMX9ad-0" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Diseño de interfaz UI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/DavidValenciaX/agroinsight-backend" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio backend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Alejandroo04/AgroInsight_Front" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio frontend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://usco-team-y6acsy2v.atlassian.net/jira/software/projects/AGROINSHT/boards/1/backlog" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Jira
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://drive.google.com/drive/folders/1Nt50sTun-_FQMulYEXsy5aUcIJ7TXKpZ" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sharepoint
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://join.slack.com/t/agroinsight/shared_invite/zt-2rnhell7b-3~ziopW1zaod0ZD8QP6QFw" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Slack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Guías
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guías
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Instalación
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía de inicio rápido
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/useful_tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía de herramientas útiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/faq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Preguntas frecuentes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de usuarios
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de usuarios
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/schemas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Esquemas
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user/repository/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repositorio
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Fincas
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Fincas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../farm/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de lotes
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de lotes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de cultivos
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de cultivos
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crop/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de labores culturales
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de labores culturales
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cultural_practices/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de costos
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de costos
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../costs/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Detección de Gusano Cogollero
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Detección de Gusano Cogollero
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fall_armyworm/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fall_armyworm/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fall_armyworm/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fall_armyworm/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Medidas
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Medidas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../measurement/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../measurement/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../measurement/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../measurement/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Análisis de Suelo
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Análisis de Suelo
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../soil_analysis/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../soil_analysis/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../soil_analysis/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../soil_analysis/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Clima
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Clima
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weather/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weather/endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weather/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weather/use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Módulo de Reportes
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            Módulo de Reportes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Descripción
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#descripcion-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      Descripción General
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      Endpoint
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parametros-de-la-solicitud" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros de la Solicitud
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parámetros de la Solicitud">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros-obligatorios" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros Obligatorios
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros-opcionales-de-filtrado" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros Opcionales de Filtrado
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros-de-agrupacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros de Agrupación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estructura-del-reporte" class="md-nav__link">
+    <span class="md-ellipsis">
+      Estructura del Reporte
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculo-de-costos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cálculo de Costos
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#funcionalidades-de-agrupacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Funcionalidades de Agrupación
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Funcionalidades de Agrupación">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agrupacion-por-tipo-de-tarea" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agrupación por Tipo de Tarea
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agrupacion-por-mes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agrupación por Mes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agrupacion-por-tipo-de-costo" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agrupación por Tipo de Costo
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seguridad-y-permisos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Seguridad y Permisos
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ejemplo-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ejemplo de Uso
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consideraciones-tecnicas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Consideraciones Técnicas
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#casos-de-uso-comunes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Casos de Uso Comunes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estructura-de-la-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Estructura de la Respuesta
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#codigos-de-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      Códigos de Error
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitaciones-y-consideraciones-de-rendimiento" class="md-nav__link">
+    <span class="md-ellipsis">
+      Limitaciones y Consideraciones de Rendimiento
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Limitaciones y Consideraciones de Rendimiento">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rango-de-fechas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rango de Fechas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rendimiento" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rendimiento
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recomendaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recomendaciones
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementacion-en-react-native-typescript" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementación en React Native (TypeScript)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementación en React Native (TypeScript)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tipos-de-datos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tipos de Datos
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hook-personalizado-para-reportes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hook Personalizado para Reportes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-de-uso-en-componente" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ejemplo de Uso en Componente
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelos de datos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../use_cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Casos de uso
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_15" id="__nav_15_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Desarrollo
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            Desarrollo
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guía para contribuir al proyecto
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/coding_standards/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Estándares de codificación
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acerca de
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#descripcion-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      Descripción General
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      Endpoint
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parametros-de-la-solicitud" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros de la Solicitud
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parámetros de la Solicitud">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parametros-obligatorios" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros Obligatorios
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros-opcionales-de-filtrado" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros Opcionales de Filtrado
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parametros-de-agrupacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parámetros de Agrupación
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estructura-del-reporte" class="md-nav__link">
+    <span class="md-ellipsis">
+      Estructura del Reporte
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculo-de-costos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cálculo de Costos
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#funcionalidades-de-agrupacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Funcionalidades de Agrupación
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Funcionalidades de Agrupación">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agrupacion-por-tipo-de-tarea" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agrupación por Tipo de Tarea
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agrupacion-por-mes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agrupación por Mes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agrupacion-por-tipo-de-costo" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agrupación por Tipo de Costo
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seguridad-y-permisos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Seguridad y Permisos
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ejemplo-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ejemplo de Uso
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consideraciones-tecnicas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Consideraciones Técnicas
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#casos-de-uso-comunes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Casos de Uso Comunes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estructura-de-la-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Estructura de la Respuesta
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#codigos-de-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      Códigos de Error
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitaciones-y-consideraciones-de-rendimiento" class="md-nav__link">
+    <span class="md-ellipsis">
+      Limitaciones y Consideraciones de Rendimiento
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Limitaciones y Consideraciones de Rendimiento">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rango-de-fechas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rango de Fechas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rendimiento" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rendimiento
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recomendaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recomendaciones
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementacion-en-react-native-typescript" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementación en React Native (TypeScript)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementación en React Native (TypeScript)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tipos-de-datos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tipos de Datos
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hook-personalizado-para-reportes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hook Personalizado para Reportes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ejemplo-de-uso-en-componente" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ejemplo de Uso en Componente
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="documentacion-del-endpoint-de-reportes-financieros">Documentación del Endpoint de Reportes Financieros</h1>
+<h2 id="descripcion-general">Descripción General</h2>
+<p>El endpoint de reportes financieros permite generar informes detallados sobre los costos, ingresos y ganancias de una finca agrícola. Este sistema permite filtrar y agrupar la información de diferentes maneras para obtener análisis específicos.</p>
+<h2 id="endpoint">Endpoint</h2>
+<p><code>GET /reports/financial</code></p>
+<h2 id="parametros-de-la-solicitud">Parámetros de la Solicitud</h2>
+<h3 id="parametros-obligatorios">Parámetros Obligatorios</h3>
+<ul>
+<li><code>farm_id</code> (int): ID de la finca para la cual se generará el reporte</li>
+<li><code>start_date</code> (date): Fecha de inicio del período (formato: YYYY-MM-DD)</li>
+<li><code>end_date</code> (date): Fecha fin del período (formato: YYYY-MM-DD)</li>
+</ul>
+<h3 id="parametros-opcionales-de-filtrado">Parámetros Opcionales de Filtrado</h3>
+<ul>
+<li><code>plot_id</code> (int): Filtra los resultados para un lote específico</li>
+<li><code>crop_id</code> (int): Filtra los resultados para un cultivo específico</li>
+<li><code>min_cost</code> (float): Muestra solo las tareas con costo total mayor o igual a este valor</li>
+<li><code>max_cost</code> (float): Muestra solo las tareas con costo total menor o igual a este valor</li>
+<li><code>task_types</code> (List[str]): Lista de tipos de tareas específicas a incluir</li>
+<li><code>only_profitable</code> (bool): Si es True, solo muestra elementos con ganancia positiva</li>
+</ul>
+<h3 id="parametros-de-agrupacion">Parámetros de Agrupación</h3>
+<ul>
+<li><code>group_by</code> (enum): Define cómo se agruparán los datos en el reporte</li>
+<li><code>"none"</code>: Sin agrupación (por defecto)</li>
+<li><code>"task_type"</code>: Agrupa las tareas por tipo</li>
+<li><code>"month"</code>: Agrupa las tareas por mes</li>
+<li><code>"cost_type"</code>: Agrupa los costos por categoría (Mano de obra, Insumos, Maquinaria)</li>
+</ul>
+<h2 id="estructura-del-reporte">Estructura del Reporte</h2>
+<p>El reporte se organiza jerárquicamente:</p>
+<ol>
+<li><strong>Nivel Finca</strong></li>
+<li>Información general de la finca</li>
+<li>Totales globales (costos, ingresos, ganancias)</li>
+<li>
+<p>Moneda utilizada</p>
+</li>
+<li>
+<p><strong>Nivel Lote</strong></p>
+</li>
+<li>Información de cada lote</li>
+<li>Costos de mantenimiento base</li>
+<li>Tareas específicas del lote</li>
+<li>
+<p>Subtotales por lote</p>
+</li>
+<li>
+<p><strong>Nivel Cultivo</strong></p>
+</li>
+<li>Información de cultivos por lote</li>
+<li>Datos de producción y ventas</li>
+<li>Tareas específicas del cultivo</li>
+<li>Costos e ingresos por cultivo</li>
+</ol>
+<h2 id="calculo-de-costos">Cálculo de Costos</h2>
+<p>El sistema calcula tres tipos principales de costos:</p>
+<ol>
+<li><strong>Costos de Mano de Obra</strong>: Gastos relacionados con el trabajo humano</li>
+<li><strong>Costos de Insumos</strong>: Gastos en materiales y productos</li>
+<li><strong>Costos de Maquinaria</strong>: Gastos relacionados con equipos y maquinaria</li>
+</ol>
+<h2 id="funcionalidades-de-agrupacion">Funcionalidades de Agrupación</h2>
+<h3 id="agrupacion-por-tipo-de-tarea">Agrupación por Tipo de Tarea</h3>
+<ul>
+<li>Combina todas las tareas del mismo tipo</li>
+<li>Suma los costos por categoría</li>
+<li>Útil para analizar qué tipos de tareas son más costosas</li>
+</ul>
+<h3 id="agrupacion-por-mes">Agrupación por Mes</h3>
+<ul>
+<li>Organiza las tareas por mes de ejecución</li>
+<li>Permite ver la distribución temporal de gastos</li>
+<li>Facilita el análisis de estacionalidad</li>
+</ul>
+<h3 id="agrupacion-por-tipo-de-costo">Agrupación por Tipo de Costo</h3>
+<ul>
+<li>Consolida los gastos en las tres categorías principales</li>
+<li>Permite ver la distribución del presupuesto</li>
+<li>Útil para análisis de estructura de costos</li>
+</ul>
+<h2 id="seguridad-y-permisos">Seguridad y Permisos</h2>
+<ul>
+<li>Requiere autenticación mediante JWT</li>
+<li>Verifica que el usuario sea administrador de la finca</li>
+<li>Registra la actividad en los logs del sistema</li>
+</ul>
+<h2 id="ejemplo-de-uso">Ejemplo de Uso</h2>
+<div class="highlight"><pre><span></span><code><span class="err">GET /reports/financial?farm_id=1&amp;start_date=2024-01-01&amp;end_date=2024-12-31&amp;group_by=month&amp;min_cost=100&amp;only_profitable=true</span>
+</code></pre></div>
+<p>Este ejemplo generaría un reporte:</p>
+<ul>
+<li>Para todo el año 2024</li>
+<li>Agrupado por meses</li>
+<li>Solo mostrando tareas con costo mayor a 100</li>
+<li>Incluyendo solo elementos rentables</li>
+</ul>
+<h2 id="consideraciones-tecnicas">Consideraciones Técnicas</h2>
+<ul>
+<li>Los cálculos monetarios se realizan usando el tipo Decimal para evitar errores de redondeo</li>
+<li>Las fechas se manejan en formato ISO (YYYY-MM-DD)</li>
+<li>Los resultados se devuelven en la moneda predeterminada del sistema (COP)</li>
+<li>El sistema maneja automáticamente la conversión de tipos de datos</li>
+</ul>
+<h2 id="casos-de-uso-comunes">Casos de Uso Comunes</h2>
+<ol>
+<li><strong>Análisis de Rentabilidad</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="err">GET /reports/financial?farm_id=1&amp;only_profitable=true</span>
+</code></pre></div>
+<ol>
+<li><strong>Análisis de Costos por Tipo</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="err">GET /reports/financial?farm_id=1&amp;group_by=cost_type</span>
+</code></pre></div>
+<ol>
+<li><strong>Análisis Mensual</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="err">GET /reports/financial?farm_id=1&amp;group_by=month</span>
+</code></pre></div>
+<ol>
+<li><strong>Análisis de Lote Específico</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="err">GET /reports/financial?farm_id=1&amp;plot_id=5</span>
+</code></pre></div>
+<h2 id="estructura-de-la-respuesta">Estructura de la Respuesta</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;finca_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;finca_nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Finca Ejemplo&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;fecha_inicio&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;fecha_fin&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;moneda&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COP&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;lotes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;lote_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;lote_nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Lote A&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;cultivos&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;cultivo_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;variedad_maiz&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DK-7088&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;fecha_siembra&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-01-15&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;fecha_cosecha&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-05-15&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;produccion_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;cantidad_vendida&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4800</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;precio_venta_unitario&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2500</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;ingreso_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12000000</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;costo_produccion&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8000000</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;tareas_cultivo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;costo_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000000</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;ganancia_neta&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3000000</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;tareas_lote&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;costo_mantenimiento_base&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;costo_tareas&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2000000</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;costo_cultivos&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000000</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;costo_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12000000</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;ingreso_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12000000</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;ganancia_neta&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;costo_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12000000</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ingreso_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12000000</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ganancia_neta&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="codigos-de-error">Códigos de Error</h2>
+<table>
+<thead>
+<tr>
+<th>Código HTTP</th>
+<th>Descripción</th>
+<th>Causa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>403</td>
+<td>Forbidden</td>
+<td>El usuario no tiene permisos de administrador en la finca</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not Found</td>
+<td>La finca especificada no existe</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Internal Server Error</td>
+<td>Error al obtener la moneda por defecto u otros errores internos</td>
+</tr>
+</tbody>
+</table>
+<h2 id="limitaciones-y-consideraciones-de-rendimiento">Limitaciones y Consideraciones de Rendimiento</h2>
+<h3 id="rango-de-fechas">Rango de Fechas</h3>
+<ul>
+<li>Se recomienda no solicitar períodos mayores a 1 año para mantener tiempos de respuesta óptimos</li>
+<li>Para análisis de períodos más largos, considere hacer múltiples solicitudes</li>
+</ul>
+<h3 id="rendimiento">Rendimiento</h3>
+<ul>
+<li>El tiempo de respuesta aumenta con:</li>
+<li>Número de lotes en la finca</li>
+<li>Número de cultivos por lote</li>
+<li>Cantidad de tareas en el período</li>
+<li>Complejidad de la agrupación solicitada</li>
+</ul>
+<h3 id="recomendaciones">Recomendaciones</h3>
+<ul>
+<li>Use filtros específicos cuando sea posible (plot_id, crop_id)</li>
+<li>Para análisis de grandes volúmenes de datos, considere usar la agrupación por mes</li>
+<li>Evite solicitar datos de múltiples lotes si solo necesita información específica</li>
+</ul>
+<h2 id="implementacion-en-react-native-typescript">Implementación en React Native (TypeScript)</h2>
+<h3 id="tipos-de-datos">Tipos de Datos</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// types/reports.ts</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">TaskCost</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">tarea_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">tarea_nombre</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">tipo_labor_nombre</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">nivel</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;LOTE&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;CULTIVO&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;AGRUPADO&#39;</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">fecha</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_mano_obra</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_insumos</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_maquinaria</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">observaciones?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">CropFinancials</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">cultivo_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">variedad_maiz</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">fecha_siembra</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">fecha_cosecha</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">produccion_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">cantidad_vendida</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">precio_venta_unitario</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">ingreso_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_produccion</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">tareas_cultivo</span><span class="o">:</span><span class="w"> </span><span class="kt">TaskCost</span><span class="p">[];</span>
+<span class="w">  </span><span class="nx">costo_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">ganancia_neta</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">PlotFinancials</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">lote_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">lote_nombre</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">cultivos</span><span class="o">:</span><span class="w"> </span><span class="kt">CropFinancials</span><span class="p">[];</span>
+<span class="w">  </span><span class="nx">tareas_lote</span><span class="o">:</span><span class="w"> </span><span class="kt">TaskCost</span><span class="p">[];</span>
+<span class="w">  </span><span class="nx">costo_mantenimiento_base</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_tareas</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_cultivos</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">costo_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">ingreso_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">ganancia_neta</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">FarmFinancialReport</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">finca_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">finca_nombre</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">fecha_inicio</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">fecha_fin</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">moneda</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">lotes</span><span class="o">:</span><span class="w"> </span><span class="kt">PlotFinancials</span><span class="p">[];</span>
+<span class="w">  </span><span class="nx">costo_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">ingreso_total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">ganancia_neta</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="hook-personalizado-para-reportes">Hook Personalizado para Reportes</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// hooks/useFinancialReport.ts</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useState</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">axios</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;axios&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">FarmFinancialReport</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../types/reports&#39;</span><span class="p">;</span>
+
+<span class="kd">interface</span><span class="w"> </span><span class="nx">UseFinancialReportParams</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">farmId</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">startDate</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">endDate</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">plotId?</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">cropId?</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">minCost?</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">maxCost?</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">taskTypes?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">[];</span>
+<span class="w">  </span><span class="nx">groupBy</span><span class="o">?:</span><span class="w"> </span><span class="s1">&#39;none&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;task_type&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;month&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;cost_type&#39;</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">onlyProfitable?</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">useFinancialReport</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">loading</span><span class="p">,</span><span class="w"> </span><span class="nx">setLoading</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">error</span><span class="p">,</span><span class="w"> </span><span class="nx">setError</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="o">&lt;</span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="o">&gt;</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">report</span><span class="p">,</span><span class="w"> </span><span class="nx">setReport</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="o">&lt;</span><span class="nx">FarmFinancialReport</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="o">&gt;</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">generateReport</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">params</span><span class="o">:</span><span class="w"> </span><span class="kt">UseFinancialReportParams</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">setError</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">queryParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">URLSearchParams</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">farm_id</span><span class="o">:</span><span class="w"> </span><span class="kt">params.farmId.toString</span><span class="p">(),</span>
+<span class="w">        </span><span class="nx">start_date</span><span class="o">:</span><span class="w"> </span><span class="kt">params.startDate</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">end_date</span><span class="o">:</span><span class="w"> </span><span class="kt">params.endDate</span><span class="p">,</span>
+<span class="w">        </span><span class="p">...(</span><span class="nx">params</span><span class="p">.</span><span class="nx">plotId</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">plot_id</span><span class="o">:</span><span class="w"> </span><span class="kt">params.plotId.toString</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">        </span><span class="p">...(</span><span class="nx">params</span><span class="p">.</span><span class="nx">cropId</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">crop_id</span><span class="o">:</span><span class="w"> </span><span class="kt">params.cropId.toString</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">        </span><span class="p">...(</span><span class="nx">params</span><span class="p">.</span><span class="nx">minCost</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">min_cost</span><span class="o">:</span><span class="w"> </span><span class="kt">params.minCost.toString</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">        </span><span class="p">...(</span><span class="nx">params</span><span class="p">.</span><span class="nx">maxCost</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">max_cost</span><span class="o">:</span><span class="w"> </span><span class="kt">params.maxCost.toString</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">        </span><span class="p">...(</span><span class="nx">params</span><span class="p">.</span><span class="nx">groupBy</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">group_by</span><span class="o">:</span><span class="w"> </span><span class="kt">params.groupBy</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">        </span><span class="p">...(</span><span class="nx">params</span><span class="p">.</span><span class="nx">onlyProfitable</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="kc">undefined</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">          </span><span class="nx">only_profitable</span><span class="o">:</span><span class="w"> </span><span class="kt">params.onlyProfitable.toString</span><span class="p">()</span><span class="w"> </span>
+<span class="w">        </span><span class="p">}),</span>
+<span class="w">      </span><span class="p">});</span>
+
+<span class="w">      </span><span class="c1">// Agregar task_types como parámetros múltiples si existen</span>
+<span class="w">      </span><span class="nx">params</span><span class="p">.</span><span class="nx">taskTypes</span><span class="o">?</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kr">type</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">queryParams</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;task_types&#39;</span><span class="p">,</span><span class="w"> </span><span class="kr">type</span><span class="p">);</span>
+<span class="w">      </span><span class="p">});</span>
+
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">axios</span><span class="p">.</span><span class="nx">get</span><span class="o">&lt;</span><span class="nx">FarmFinancialReport</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">        </span><span class="sb">`/reports/financial?</span><span class="si">${</span><span class="nx">queryParams</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">Authorization</span><span class="o">:</span><span class="w"> </span><span class="sb">`Bearer </span><span class="si">${</span><span class="k">await</span><span class="w"> </span><span class="nx">getToken</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="c1">// Función para obtener el token JWT</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">);</span>
+
+<span class="w">      </span><span class="nx">setReport</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setError</span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="ne">Error</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Error al generar el reporte&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">generateReport</span><span class="p">,</span><span class="w"> </span><span class="nx">report</span><span class="p">,</span><span class="w"> </span><span class="nx">loading</span><span class="p">,</span><span class="w"> </span><span class="nx">error</span><span class="w"> </span><span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div>
+<h3 id="ejemplo-de-uso-en-componente">Ejemplo de Uso en Componente</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// screens/FinancialReportScreen.tsx</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">React</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useState</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">View</span><span class="p">,</span><span class="w"> </span><span class="nx">Text</span><span class="p">,</span><span class="w"> </span><span class="nx">ActivityIndicator</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;react-native&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useFinancialReport</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../hooks/useFinancialReport&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">DatePicker</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../components/DatePicker&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Button</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../components/Button&#39;</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">FinancialReportScreen</span><span class="o">:</span><span class="w"> </span><span class="kt">React.FC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">startDate</span><span class="p">,</span><span class="w"> </span><span class="nx">setStartDate</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Date</span><span class="p">());</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">endDate</span><span class="p">,</span><span class="w"> </span><span class="nx">setEndDate</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Date</span><span class="p">());</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">generateReport</span><span class="p">,</span><span class="w"> </span><span class="nx">report</span><span class="p">,</span><span class="w"> </span><span class="nx">loading</span><span class="p">,</span><span class="w"> </span><span class="nx">error</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useFinancialReport</span><span class="p">();</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">handleGenerateReport</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">generateReport</span><span class="p">({</span>
+<span class="w">      </span><span class="nx">farmId</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="c1">// ID de la finca actual</span>
+<span class="w">      </span><span class="nx">startDate</span><span class="o">:</span><span class="w"> </span><span class="kt">startDate.toISOString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)[</span><span class="mf">0</span><span class="p">],</span>
+<span class="w">      </span><span class="nx">endDate</span><span class="o">:</span><span class="w"> </span><span class="kt">endDate.toISOString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)[</span><span class="mf">0</span><span class="p">],</span>
+<span class="w">      </span><span class="nx">groupBy</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;month&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">onlyProfitable</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">minCost</span><span class="o">:</span><span class="w"> </span><span class="kt">100</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">loading</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">ActivityIndicator</span><span class="w"> </span><span class="nx">size</span><span class="o">=</span><span class="s2">&quot;large&quot;</span><span class="w"> </span><span class="o">/&gt;</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">Text</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">error</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">error</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/Text&gt;;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="o">&lt;</span><span class="nx">View</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">container</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">      </span><span class="o">&lt;</span><span class="nx">DatePicker</span>
+<span class="w">        </span><span class="nx">label</span><span class="o">=</span><span class="s2">&quot;Fecha Inicio&quot;</span>
+<span class="w">        </span><span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">startDate</span><span class="p">}</span>
+<span class="w">        </span><span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="nx">setStartDate</span><span class="p">}</span>
+<span class="w">      </span><span class="o">/&gt;</span>
+<span class="w">      </span><span class="o">&lt;</span><span class="nx">DatePicker</span>
+<span class="w">        </span><span class="nx">label</span><span class="o">=</span><span class="s2">&quot;Fecha Fin&quot;</span>
+<span class="w">        </span><span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">endDate</span><span class="p">}</span>
+<span class="w">        </span><span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="nx">setEndDate</span><span class="p">}</span>
+<span class="w">      </span><span class="o">/&gt;</span>
+<span class="w">      </span><span class="o">&lt;</span><span class="nx">Button</span><span class="w"> </span>
+<span class="w">        </span><span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Generar Reporte&quot;</span><span class="w"> </span>
+<span class="w">        </span><span class="nx">onPress</span><span class="o">=</span><span class="p">{</span><span class="nx">handleGenerateReport</span><span class="p">}</span><span class="w"> </span>
+<span class="w">      </span><span class="o">/&gt;</span>
+
+<span class="w">      </span><span class="p">{</span><span class="nx">report</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">        </span><span class="o">&lt;</span><span class="nx">View</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">reportContainer</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="nx">Text</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">title</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">            </span><span class="nx">Reporte</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">report</span><span class="p">.</span><span class="nx">finca_nombre</span><span class="p">}</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="err">/Text&gt;</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="nx">Text</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">summary</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">            </span><span class="nx">Costo</span><span class="w"> </span><span class="nx">Total</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">report</span><span class="p">.</span><span class="nx">costo_total</span><span class="p">}</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="err">/Text&gt;</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="nx">Text</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">summary</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">            </span><span class="nx">Ingreso</span><span class="w"> </span><span class="nx">Total</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">report</span><span class="p">.</span><span class="nx">ingreso_total</span><span class="p">}</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="err">/Text&gt;</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="nx">Text</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">profit</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">            </span><span class="nx">Ganancia</span><span class="w"> </span><span class="nx">Neta</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">report</span><span class="p">.</span><span class="nx">ganancia_neta</span><span class="p">}</span>
+<span class="w">          </span><span class="o">&lt;</span><span class="err">/Text&gt;</span>
+
+<span class="w">          </span><span class="p">{</span><span class="cm">/* Renderizar detalles de lotes */</span><span class="p">}</span>
+<span class="w">          </span><span class="p">{</span><span class="nx">report</span><span class="p">.</span><span class="nx">lotes</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">plot</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">            </span><span class="o">&lt;</span><span class="nx">View</span><span class="w"> </span><span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">plot</span><span class="p">.</span><span class="nx">lote_id</span><span class="p">}</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">plotContainer</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">              </span><span class="o">&lt;</span><span class="nx">Text</span><span class="w"> </span><span class="nx">style</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">plotTitle</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="w">                </span><span class="p">{</span><span class="nx">plot</span><span class="p">.</span><span class="nx">lote_nombre</span><span class="p">}</span>
+<span class="w">              </span><span class="o">&lt;</span><span class="err">/Text&gt;</span>
+<span class="w">              </span><span class="o">&lt;</span><span class="nx">Text</span><span class="o">&gt;</span>
+<span class="w">                </span><span class="nx">Ganancia</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">plot</span><span class="p">.</span><span class="nx">ganancia_neta</span><span class="p">}</span>
+<span class="w">              </span><span class="o">&lt;</span><span class="err">/Text&gt;</span>
+<span class="w">              </span><span class="p">{</span><span class="cm">/* ... más detalles del lote ... */</span><span class="p">}</span>
+<span class="w">            </span><span class="o">&lt;</span><span class="err">/View&gt;</span>
+<span class="w">          </span><span class="p">))}</span>
+<span class="w">        </span><span class="o">&lt;</span><span class="err">/View&gt;</span>
+<span class="w">      </span><span class="p">)}</span>
+<span class="w">    </span><span class="o">&lt;</span><span class="err">/View&gt;</span>
+<span class="w">  </span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">styles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">container</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">flex</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">padding</span><span class="o">:</span><span class="w"> </span><span class="kt">16</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">color</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">textAlign</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">reportContainer</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">marginTop</span><span class="o">:</span><span class="w"> </span><span class="kt">20</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="kt">20</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">fontWeight</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">summary</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="kt">16</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">marginTop</span><span class="o">:</span><span class="w"> </span><span class="kt">8</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">profit</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="kt">18</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">fontWeight</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">marginTop</span><span class="o">:</span><span class="w"> </span><span class="kt">8</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">plotContainer</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">marginTop</span><span class="o">:</span><span class="w"> </span><span class="kt">16</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">padding</span><span class="o">:</span><span class="w"> </span><span class="kt">12</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">backgroundColor</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;#f5f5f5&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">borderRadius</span><span class="o">:</span><span class="w"> </span><span class="kt">8</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">plotTitle</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="kt">16</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">fontWeight</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>Este ejemplo incluye:</p>
+<ul>
+<li>Definición completa de tipos TypeScript</li>
+<li>Hook personalizado para manejar la lógica del reporte</li>
+<li>Componente de ejemplo con gestión de estados y errores</li>
+<li>Manejo de fechas y parámetros opcionales</li>
+<li>Estilos básicos para la visualización</li>
+<li>Integración con sistema de autenticación JWT</li>
+</ul>
+<p>Los componentes <code>DatePicker</code> y <code>Button</code> son componentes personalizados que deberás implementar según tu UI Kit específico (por ejemplo, usando React Native Paper, Native Base, etc.).</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1974,6 +1974,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../financial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentación de reporte financiero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../models/" class="md-nav__link">
         
   
@@ -2300,7 +2321,10 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\reports\application\generate_financial_report_use_case.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
+<span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
 <span class="normal"> 19</span>
 <span class="normal"> 20</span>
 <span class="normal"> 21</span>
@@ -2428,7 +2452,171 @@
 <span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
-<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GenerateFinancialReportUseCase</span><span class="p">:</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GenerateFinancialReportUseCase</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repository</span> <span class="o">=</span> <span class="n">FinancialReportRepository</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
@@ -2442,7 +2630,12 @@
         <span class="n">end_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
         <span class="n">plot_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">crop_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>
+        <span class="n">min_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">task_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+        <span class="n">only_profitable</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FarmFinancialReport</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Genera un reporte financiero completo.</span>
@@ -2469,6 +2662,14 @@
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
             <span class="p">)</span>
 
+        <span class="c1"># Obtener la moneda por defecto (COP)</span>
+        <span class="n">default_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_default_currency</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">default_currency</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener la moneda por defecto&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="p">)</span>
+
         <span class="n">plots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_farm_plots</span><span class="p">(</span><span class="n">farm_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">plot_id</span><span class="p">:</span>
             <span class="n">plots</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">plots</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">plot_id</span><span class="p">]</span>
@@ -2477,21 +2678,42 @@
         <span class="n">total_farm_cost</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">total_farm_income</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
+        <span class="c1"># Aplicar filtros de costo a las tareas</span>
+        <span class="k">def</span> <span class="nf">filter_task_costs</span><span class="p">(</span><span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">]:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="n">tasks</span>
+            <span class="k">if</span> <span class="n">min_cost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">costo_total</span> <span class="o">&gt;=</span> <span class="n">min_cost</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">max_cost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">costo_total</span> <span class="o">&lt;=</span> <span class="n">max_cost</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">task_types</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tipos de tarea disponibles:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">tipo_labor_nombre</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tipos de tarea para filtrar:&quot;</span><span class="p">,</span> <span class="n">task_types</span><span class="p">)</span>
+                <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">tipo_labor_nombre</span> <span class="ow">in</span> <span class="n">task_types</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">filtered</span>
+
+        <span class="c1"># Aplicar filtros a los cultivos</span>
+        <span class="k">def</span> <span class="nf">filter_crops</span><span class="p">(</span><span class="n">crops</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CropFinancials</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CropFinancials</span><span class="p">]:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="n">crops</span>
+            <span class="k">if</span> <span class="n">only_profitable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ganancia_neta</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">only_profitable</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">filtered</span>
+
         <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="n">plots</span><span class="p">:</span>
-            <span class="c1"># Obtener todas las tareas del lote para el período</span>
-            <span class="n">tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_plot_tasks_in_period</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
-            <span class="n">task_costs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># Obtener tareas a nivel de LOTE</span>
+            <span class="n">plot_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_plot_level_tasks_in_period</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
+            <span class="n">plot_task_costs</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">total_plot_task_cost</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-            <span class="c1"># Calcular costos de tareas a nivel de lote</span>
-            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">plot_tasks</span><span class="p">:</span>
                 <span class="n">labor_cost</span><span class="p">,</span> <span class="n">input_cost</span><span class="p">,</span> <span class="n">machinery_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_task_costs</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
                 <span class="n">task_total</span> <span class="o">=</span> <span class="n">labor_cost</span> <span class="o">+</span> <span class="n">input_cost</span> <span class="o">+</span> <span class="n">machinery_cost</span>
                 <span class="n">total_plot_task_cost</span> <span class="o">+=</span> <span class="n">task_total</span>
 
-                <span class="n">task_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TaskCost</span><span class="p">(</span>
+                <span class="n">plot_task_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TaskCost</span><span class="p">(</span>
                     <span class="n">tarea_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                     <span class="n">tarea_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                    <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                    <span class="n">nivel</span><span class="o">=</span><span class="s2">&quot;LOTE&quot;</span><span class="p">,</span>
                     <span class="n">fecha</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_inicio_estimada</span><span class="p">,</span>
                     <span class="n">costo_mano_obra</span><span class="o">=</span><span class="n">labor_cost</span><span class="p">,</span>
                     <span class="n">costo_insumos</span><span class="o">=</span><span class="n">input_cost</span><span class="p">,</span>
@@ -2499,6 +2721,10 @@
                     <span class="n">costo_total</span><span class="o">=</span><span class="n">task_total</span><span class="p">,</span>
                     <span class="n">observaciones</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">descripcion</span>
                 <span class="p">))</span>
+
+            <span class="c1"># Filtrar tareas del lote según los criterios</span>
+            <span class="n">plot_task_costs</span> <span class="o">=</span> <span class="n">filter_task_costs</span><span class="p">(</span><span class="n">plot_task_costs</span><span class="p">)</span>
+            <span class="n">total_plot_task_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">costo_total</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">plot_task_costs</span><span class="p">)</span>
 
             <span class="c1"># Obtener y procesar cultivos</span>
             <span class="n">crops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_plot_crops_in_period</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
@@ -2510,8 +2736,35 @@
             <span class="n">total_plot_income</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crops</span><span class="p">:</span>
+                <span class="c1"># Obtener tareas a nivel de CULTIVO</span>
+                <span class="n">crop_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_crop_level_tasks_in_period</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
+                <span class="n">crop_task_costs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">total_crop_task_cost</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">crop_tasks</span><span class="p">:</span>
+                    <span class="n">labor_cost</span><span class="p">,</span> <span class="n">input_cost</span><span class="p">,</span> <span class="n">machinery_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_task_costs</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                    <span class="n">task_total</span> <span class="o">=</span> <span class="n">labor_cost</span> <span class="o">+</span> <span class="n">input_cost</span> <span class="o">+</span> <span class="n">machinery_cost</span>
+                    <span class="n">total_crop_task_cost</span> <span class="o">+=</span> <span class="n">task_total</span>
+
+                    <span class="n">crop_task_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TaskCost</span><span class="p">(</span>
+                        <span class="n">tarea_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="n">tarea_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                        <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                        <span class="n">nivel</span><span class="o">=</span><span class="s2">&quot;CULTIVO&quot;</span><span class="p">,</span>
+                        <span class="n">fecha</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_inicio_estimada</span><span class="p">,</span>
+                        <span class="n">costo_mano_obra</span><span class="o">=</span><span class="n">labor_cost</span><span class="p">,</span>
+                        <span class="n">costo_insumos</span><span class="o">=</span><span class="n">input_cost</span><span class="p">,</span>
+                        <span class="n">costo_maquinaria</span><span class="o">=</span><span class="n">machinery_cost</span><span class="p">,</span>
+                        <span class="n">costo_total</span><span class="o">=</span><span class="n">task_total</span><span class="p">,</span>
+                        <span class="n">observaciones</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">descripcion</span>
+                    <span class="p">))</span>
+
+                <span class="c1"># Filtrar tareas del cultivo según los criterios</span>
+                <span class="n">crop_task_costs</span> <span class="o">=</span> <span class="n">filter_task_costs</span><span class="p">(</span><span class="n">crop_task_costs</span><span class="p">)</span>
+                <span class="n">total_crop_task_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">costo_total</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">crop_task_costs</span><span class="p">)</span>
+
                 <span class="n">crop_income</span> <span class="o">=</span> <span class="n">crop</span><span class="o">.</span><span class="n">ingreso_total</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">crop_production_cost</span> <span class="o">=</span> <span class="n">crop</span><span class="o">.</span><span class="n">costo_produccion</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">crop_production_cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">costo_produccion</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">+</span> <span class="n">total_crop_task_cost</span>
                 <span class="n">total_plot_crop_cost</span> <span class="o">+=</span> <span class="n">crop_production_cost</span>
                 <span class="n">total_plot_income</span> <span class="o">+=</span> <span class="n">crop_income</span>
 
@@ -2524,21 +2777,34 @@
                     <span class="n">cantidad_vendida</span><span class="o">=</span><span class="n">crop</span><span class="o">.</span><span class="n">cantidad_vendida</span><span class="p">,</span>
                     <span class="n">precio_venta_unitario</span><span class="o">=</span><span class="n">crop</span><span class="o">.</span><span class="n">precio_venta_unitario</span><span class="p">,</span>
                     <span class="n">ingreso_total</span><span class="o">=</span><span class="n">crop_income</span><span class="p">,</span>
-                    <span class="n">costo_produccion</span><span class="o">=</span><span class="n">crop_production_cost</span><span class="p">,</span>
+                    <span class="n">costo_produccion</span><span class="o">=</span><span class="n">crop</span><span class="o">.</span><span class="n">costo_produccion</span><span class="p">,</span>
+                    <span class="n">tareas_cultivo</span><span class="o">=</span><span class="n">crop_task_costs</span><span class="p">,</span>
                     <span class="n">costo_total</span><span class="o">=</span><span class="n">crop_production_cost</span><span class="p">,</span>
                     <span class="n">ganancia_neta</span><span class="o">=</span><span class="n">crop_income</span> <span class="o">-</span> <span class="n">crop_production_cost</span>
                 <span class="p">))</span>
 
+            <span class="c1"># Filtrar cultivos según criterios</span>
+            <span class="n">crop_financials</span> <span class="o">=</span> <span class="n">filter_crops</span><span class="p">(</span><span class="n">crop_financials</span><span class="p">)</span>
+            <span class="n">total_plot_crop_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">costo_total</span> <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crop_financials</span><span class="p">)</span>
+            <span class="n">total_plot_income</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">ingreso_total</span> <span class="ow">or</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crop_financials</span><span class="p">)</span>
+
+            <span class="c1"># Si se especificó group_by, agrupar las tareas</span>
+            <span class="k">if</span> <span class="n">group_by</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+                <span class="n">plot_task_costs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_tasks</span><span class="p">(</span><span class="n">plot_task_costs</span><span class="p">,</span> <span class="n">group_by</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crop_financials</span><span class="p">:</span>
+                    <span class="n">crop</span><span class="o">.</span><span class="n">tareas_cultivo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_tasks</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">tareas_cultivo</span><span class="p">,</span> <span class="n">group_by</span><span class="p">)</span>
+
             <span class="c1"># Calcular totales del lote</span>
-            <span class="n">total_plot_cost</span> <span class="o">=</span> <span class="n">total_plot_task_cost</span> <span class="o">+</span> <span class="n">total_plot_crop_cost</span>
+            <span class="n">total_plot_cost</span> <span class="o">=</span> <span class="n">total_plot_task_cost</span> <span class="o">+</span> <span class="n">total_plot_crop_cost</span> <span class="o">+</span> <span class="n">plot</span><span class="o">.</span><span class="n">costos_mantenimiento</span>
 
             <span class="n">plot_financials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PlotFinancials</span><span class="p">(</span>
                 <span class="n">lote_id</span><span class="o">=</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                 <span class="n">lote_nombre</span><span class="o">=</span><span class="n">plot</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
                 <span class="n">cultivos</span><span class="o">=</span><span class="n">crop_financials</span><span class="p">,</span>
-                <span class="n">tareas</span><span class="o">=</span><span class="n">task_costs</span><span class="p">,</span>  <span class="c1"># Agregar las tareas a nivel de lote</span>
-                <span class="n">costo_tareas</span><span class="o">=</span><span class="n">total_plot_task_cost</span><span class="p">,</span>  <span class="c1"># Nuevo campo</span>
-                <span class="n">costo_cultivos</span><span class="o">=</span><span class="n">total_plot_crop_cost</span><span class="p">,</span>  <span class="c1"># Nuevo campo</span>
+                <span class="n">tareas_lote</span><span class="o">=</span><span class="n">plot_task_costs</span><span class="p">,</span>
+                <span class="n">costo_mantenimiento_base</span><span class="o">=</span><span class="n">plot</span><span class="o">.</span><span class="n">costos_mantenimiento</span><span class="p">,</span>
+                <span class="n">costo_tareas</span><span class="o">=</span><span class="n">total_plot_task_cost</span><span class="p">,</span>
+                <span class="n">costo_cultivos</span><span class="o">=</span><span class="n">total_plot_crop_cost</span><span class="p">,</span>
                 <span class="n">costo_total</span><span class="o">=</span><span class="n">total_plot_cost</span><span class="p">,</span>
                 <span class="n">ingreso_total</span><span class="o">=</span><span class="n">total_plot_income</span><span class="p">,</span>
                 <span class="n">ganancia_neta</span><span class="o">=</span><span class="n">total_plot_income</span> <span class="o">-</span> <span class="n">total_plot_cost</span>
@@ -2552,11 +2818,100 @@
             <span class="n">finca_nombre</span><span class="o">=</span><span class="n">farm</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
             <span class="n">fecha_inicio</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span>
             <span class="n">fecha_fin</span><span class="o">=</span><span class="n">end_date</span><span class="p">,</span>
+            <span class="n">moneda</span><span class="o">=</span><span class="n">default_currency</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
             <span class="n">lotes</span><span class="o">=</span><span class="n">plot_financials</span><span class="p">,</span>
             <span class="n">costo_total</span><span class="o">=</span><span class="n">total_farm_cost</span><span class="p">,</span>
             <span class="n">ingreso_total</span><span class="o">=</span><span class="n">total_farm_income</span><span class="p">,</span>
             <span class="n">ganancia_neta</span><span class="o">=</span><span class="n">total_farm_income</span> <span class="o">-</span> <span class="n">total_farm_cost</span>
         <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_group_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">],</span> <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Agrupa las tareas según el criterio especificado&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">group_by</span> <span class="o">==</span> <span class="s2">&quot;task_type&quot;</span><span class="p">:</span>
+            <span class="c1"># Agrupar por tipo de tarea</span>
+            <span class="n">grouped</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">tarea_nombre</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">grouped</span><span class="p">:</span>
+                    <span class="n">grouped</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">tarea_nombre</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;costo_mano_obra&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                        <span class="s1">&#39;costo_insumos&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                        <span class="s1">&#39;costo_maquinaria&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                        <span class="s1">&#39;costo_total&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">tarea_nombre</span><span class="p">][</span><span class="s1">&#39;costo_mano_obra&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_mano_obra</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">tarea_nombre</span><span class="p">][</span><span class="s1">&#39;costo_insumos&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_insumos</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">tarea_nombre</span><span class="p">][</span><span class="s1">&#39;costo_maquinaria&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_maquinaria</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">tarea_nombre</span><span class="p">][</span><span class="s1">&#39;costo_total&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_total</span>
+
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="n">TaskCost</span><span class="p">(</span>
+                    <span class="n">tarea_id</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># ID genérico para grupos</span>
+                    <span class="n">tarea_nombre</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">fecha</span><span class="o">=</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span>  <span class="c1"># Fecha representativa</span>
+                    <span class="n">nivel</span><span class="o">=</span><span class="s2">&quot;AGRUPADO&quot;</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">costs</span>
+                <span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">costs</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">group_by</span> <span class="o">==</span> <span class="s2">&quot;month&quot;</span><span class="p">:</span>
+            <span class="c1"># Agrupar por mes</span>
+            <span class="n">grouped</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+                <span class="n">month_key</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">fecha</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m&quot;</span><span class="p">)</span>  <span class="c1"># Formato: &quot;2024-03&quot;</span>
+                <span class="k">if</span> <span class="n">month_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">grouped</span><span class="p">:</span>
+                    <span class="n">grouped</span><span class="p">[</span><span class="n">month_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;costo_mano_obra&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                        <span class="s1">&#39;costo_insumos&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                        <span class="s1">&#39;costo_maquinaria&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                        <span class="s1">&#39;costo_total&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">month_key</span><span class="p">][</span><span class="s1">&#39;costo_mano_obra&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_mano_obra</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">month_key</span><span class="p">][</span><span class="s1">&#39;costo_insumos&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_insumos</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">month_key</span><span class="p">][</span><span class="s1">&#39;costo_maquinaria&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_maquinaria</span>
+                <span class="n">grouped</span><span class="p">[</span><span class="n">month_key</span><span class="p">][</span><span class="s1">&#39;costo_total&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_total</span>
+
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="n">TaskCost</span><span class="p">(</span>
+                    <span class="n">tarea_id</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># ID genérico para grupos</span>
+                    <span class="n">tarea_nombre</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Tareas de </span><span class="si">{</span><span class="n">month_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="s2">&quot;Agrupación Mensual&quot;</span><span class="p">,</span>
+                    <span class="n">fecha</span><span class="o">=</span><span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">month_key</span><span class="si">}</span><span class="s2">-01&quot;</span><span class="p">),</span>  <span class="c1"># Primer día del mes</span>
+                    <span class="n">nivel</span><span class="o">=</span><span class="s2">&quot;AGRUPADO&quot;</span><span class="p">,</span>
+                    <span class="n">observaciones</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Tareas agrupadas del mes </span><span class="si">{</span><span class="n">month_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">costs</span>
+                <span class="p">)</span> <span class="k">for</span> <span class="n">month_key</span><span class="p">,</span> <span class="n">costs</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">group_by</span> <span class="o">==</span> <span class="s2">&quot;cost_type&quot;</span><span class="p">:</span>
+            <span class="c1"># Agrupar por tipo de costo</span>
+            <span class="n">total_by_type</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;Mano de Obra&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                <span class="s1">&#39;Insumos&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                <span class="s1">&#39;Maquinaria&#39;</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+                <span class="n">total_by_type</span><span class="p">[</span><span class="s1">&#39;Mano de Obra&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_mano_obra</span>
+                <span class="n">total_by_type</span><span class="p">[</span><span class="s1">&#39;Insumos&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_insumos</span>
+                <span class="n">total_by_type</span><span class="p">[</span><span class="s1">&#39;Maquinaria&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">task</span><span class="o">.</span><span class="n">costo_maquinaria</span>
+
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="n">TaskCost</span><span class="p">(</span>
+                    <span class="n">tarea_id</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">tarea_nombre</span><span class="o">=</span><span class="n">cost_type</span><span class="p">,</span>
+                    <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="s2">&quot;Agrupación por Tipo de Costo&quot;</span><span class="p">,</span>
+                    <span class="n">fecha</span><span class="o">=</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span>
+                    <span class="n">nivel</span><span class="o">=</span><span class="s2">&quot;AGRUPADO&quot;</span><span class="p">,</span>
+                    <span class="n">costo_mano_obra</span><span class="o">=</span><span class="n">total</span> <span class="k">if</span> <span class="n">cost_type</span> <span class="o">==</span> <span class="s1">&#39;Mano de Obra&#39;</span> <span class="k">else</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                    <span class="n">costo_insumos</span><span class="o">=</span><span class="n">total</span> <span class="k">if</span> <span class="n">cost_type</span> <span class="o">==</span> <span class="s1">&#39;Insumos&#39;</span> <span class="k">else</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                    <span class="n">costo_maquinaria</span><span class="o">=</span><span class="n">total</span> <span class="k">if</span> <span class="n">cost_type</span> <span class="o">==</span> <span class="s1">&#39;Maquinaria&#39;</span> <span class="k">else</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                    <span class="n">costo_total</span><span class="o">=</span><span class="n">total</span><span class="p">,</span>
+                    <span class="n">observaciones</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Total de costos de </span><span class="si">{</span><span class="n">cost_type</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="k">for</span> <span class="n">cost_type</span><span class="p">,</span> <span class="n">total</span> <span class="ow">in</span> <span class="n">total_by_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="p">]</span>
+
+        <span class="c1"># Si no hay agrupación o no se reconoce el tipo</span>
+        <span class="k">return</span> <span class="n">tasks</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -2576,7 +2931,7 @@
 
 
 <h2 id="app.reports.application.generate_financial_report_use_case.GenerateFinancialReportUseCase.generate_report" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">generate_report</span><span class="p">(</span><span class="n">farm_id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">plot_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crop_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">current_user</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">))</span></code>
+            <code class="highlight language-python"><span class="n">generate_report</span><span class="p">(</span><span class="n">farm_id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">plot_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crop_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_cost</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_cost</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">only_profitable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">current_user</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -2678,7 +3033,7 @@
               </div>
             </td>
             <td>
-                  <code><span title="fastapi.Depends">Depends</span>(<a class="autorefs autorefs-internal" title="app.infrastructure.security.jwt_middleware.get_current_user" href="../../user/endpoints/#app.user.infrastructure.api.get_current_user">get_current_user</a>)</code>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2686,7 +3041,10 @@
 
             <details class="quote">
               <summary>Source code in <code>app\reports\application\generate_financial_report_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 25</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
 <span class="normal"> 26</span>
 <span class="normal"> 27</span>
 <span class="normal"> 28</span>
@@ -2807,14 +3165,95 @@
 <span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
-<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_report</span><span class="p">(</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_report</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">farm_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">start_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
     <span class="n">end_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
     <span class="n">plot_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">crop_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>
+    <span class="n">min_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">task_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="n">only_profitable</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FarmFinancialReport</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Genera un reporte financiero completo.</span>
@@ -2841,6 +3280,14 @@
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span>
         <span class="p">)</span>
 
+    <span class="c1"># Obtener la moneda por defecto (COP)</span>
+    <span class="n">default_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_default_currency</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">default_currency</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pudo obtener la moneda por defecto&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+        <span class="p">)</span>
+
     <span class="n">plots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_farm_plots</span><span class="p">(</span><span class="n">farm_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">plot_id</span><span class="p">:</span>
         <span class="n">plots</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">plots</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">plot_id</span><span class="p">]</span>
@@ -2849,21 +3296,42 @@
     <span class="n">total_farm_cost</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">total_farm_income</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
+    <span class="c1"># Aplicar filtros de costo a las tareas</span>
+    <span class="k">def</span> <span class="nf">filter_task_costs</span><span class="p">(</span><span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">]:</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">tasks</span>
+        <span class="k">if</span> <span class="n">min_cost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">costo_total</span> <span class="o">&gt;=</span> <span class="n">min_cost</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">max_cost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">costo_total</span> <span class="o">&lt;=</span> <span class="n">max_cost</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">task_types</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tipos de tarea disponibles:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">tipo_labor_nombre</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tipos de tarea para filtrar:&quot;</span><span class="p">,</span> <span class="n">task_types</span><span class="p">)</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">tipo_labor_nombre</span> <span class="ow">in</span> <span class="n">task_types</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">filtered</span>
+
+    <span class="c1"># Aplicar filtros a los cultivos</span>
+    <span class="k">def</span> <span class="nf">filter_crops</span><span class="p">(</span><span class="n">crops</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CropFinancials</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CropFinancials</span><span class="p">]:</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">crops</span>
+        <span class="k">if</span> <span class="n">only_profitable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ganancia_neta</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">only_profitable</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">filtered</span>
+
     <span class="k">for</span> <span class="n">plot</span> <span class="ow">in</span> <span class="n">plots</span><span class="p">:</span>
-        <span class="c1"># Obtener todas las tareas del lote para el período</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_plot_tasks_in_period</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
-        <span class="n">task_costs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Obtener tareas a nivel de LOTE</span>
+        <span class="n">plot_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_plot_level_tasks_in_period</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
+        <span class="n">plot_task_costs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">total_plot_task_cost</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c1"># Calcular costos de tareas a nivel de lote</span>
-        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">plot_tasks</span><span class="p">:</span>
             <span class="n">labor_cost</span><span class="p">,</span> <span class="n">input_cost</span><span class="p">,</span> <span class="n">machinery_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_task_costs</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="n">task_total</span> <span class="o">=</span> <span class="n">labor_cost</span> <span class="o">+</span> <span class="n">input_cost</span> <span class="o">+</span> <span class="n">machinery_cost</span>
             <span class="n">total_plot_task_cost</span> <span class="o">+=</span> <span class="n">task_total</span>
 
-            <span class="n">task_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TaskCost</span><span class="p">(</span>
+            <span class="n">plot_task_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TaskCost</span><span class="p">(</span>
                 <span class="n">tarea_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                 <span class="n">tarea_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                <span class="n">nivel</span><span class="o">=</span><span class="s2">&quot;LOTE&quot;</span><span class="p">,</span>
                 <span class="n">fecha</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_inicio_estimada</span><span class="p">,</span>
                 <span class="n">costo_mano_obra</span><span class="o">=</span><span class="n">labor_cost</span><span class="p">,</span>
                 <span class="n">costo_insumos</span><span class="o">=</span><span class="n">input_cost</span><span class="p">,</span>
@@ -2871,6 +3339,10 @@
                 <span class="n">costo_total</span><span class="o">=</span><span class="n">task_total</span><span class="p">,</span>
                 <span class="n">observaciones</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">descripcion</span>
             <span class="p">))</span>
+
+        <span class="c1"># Filtrar tareas del lote según los criterios</span>
+        <span class="n">plot_task_costs</span> <span class="o">=</span> <span class="n">filter_task_costs</span><span class="p">(</span><span class="n">plot_task_costs</span><span class="p">)</span>
+        <span class="n">total_plot_task_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">costo_total</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">plot_task_costs</span><span class="p">)</span>
 
         <span class="c1"># Obtener y procesar cultivos</span>
         <span class="n">crops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_plot_crops_in_period</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
@@ -2882,8 +3354,35 @@
         <span class="n">total_plot_income</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crops</span><span class="p">:</span>
+            <span class="c1"># Obtener tareas a nivel de CULTIVO</span>
+            <span class="n">crop_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_crop_level_tasks_in_period</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
+            <span class="n">crop_task_costs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">total_crop_task_cost</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">crop_tasks</span><span class="p">:</span>
+                <span class="n">labor_cost</span><span class="p">,</span> <span class="n">input_cost</span><span class="p">,</span> <span class="n">machinery_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_task_costs</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="n">task_total</span> <span class="o">=</span> <span class="n">labor_cost</span> <span class="o">+</span> <span class="n">input_cost</span> <span class="o">+</span> <span class="n">machinery_cost</span>
+                <span class="n">total_crop_task_cost</span> <span class="o">+=</span> <span class="n">task_total</span>
+
+                <span class="n">crop_task_costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TaskCost</span><span class="p">(</span>
+                    <span class="n">tarea_id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">tarea_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                    <span class="n">tipo_labor_nombre</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">tipo_labor</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                    <span class="n">nivel</span><span class="o">=</span><span class="s2">&quot;CULTIVO&quot;</span><span class="p">,</span>
+                    <span class="n">fecha</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">fecha_inicio_estimada</span><span class="p">,</span>
+                    <span class="n">costo_mano_obra</span><span class="o">=</span><span class="n">labor_cost</span><span class="p">,</span>
+                    <span class="n">costo_insumos</span><span class="o">=</span><span class="n">input_cost</span><span class="p">,</span>
+                    <span class="n">costo_maquinaria</span><span class="o">=</span><span class="n">machinery_cost</span><span class="p">,</span>
+                    <span class="n">costo_total</span><span class="o">=</span><span class="n">task_total</span><span class="p">,</span>
+                    <span class="n">observaciones</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">descripcion</span>
+                <span class="p">))</span>
+
+            <span class="c1"># Filtrar tareas del cultivo según los criterios</span>
+            <span class="n">crop_task_costs</span> <span class="o">=</span> <span class="n">filter_task_costs</span><span class="p">(</span><span class="n">crop_task_costs</span><span class="p">)</span>
+            <span class="n">total_crop_task_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">costo_total</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">crop_task_costs</span><span class="p">)</span>
+
             <span class="n">crop_income</span> <span class="o">=</span> <span class="n">crop</span><span class="o">.</span><span class="n">ingreso_total</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">crop_production_cost</span> <span class="o">=</span> <span class="n">crop</span><span class="o">.</span><span class="n">costo_produccion</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">crop_production_cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">costo_produccion</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">+</span> <span class="n">total_crop_task_cost</span>
             <span class="n">total_plot_crop_cost</span> <span class="o">+=</span> <span class="n">crop_production_cost</span>
             <span class="n">total_plot_income</span> <span class="o">+=</span> <span class="n">crop_income</span>
 
@@ -2896,21 +3395,34 @@
                 <span class="n">cantidad_vendida</span><span class="o">=</span><span class="n">crop</span><span class="o">.</span><span class="n">cantidad_vendida</span><span class="p">,</span>
                 <span class="n">precio_venta_unitario</span><span class="o">=</span><span class="n">crop</span><span class="o">.</span><span class="n">precio_venta_unitario</span><span class="p">,</span>
                 <span class="n">ingreso_total</span><span class="o">=</span><span class="n">crop_income</span><span class="p">,</span>
-                <span class="n">costo_produccion</span><span class="o">=</span><span class="n">crop_production_cost</span><span class="p">,</span>
+                <span class="n">costo_produccion</span><span class="o">=</span><span class="n">crop</span><span class="o">.</span><span class="n">costo_produccion</span><span class="p">,</span>
+                <span class="n">tareas_cultivo</span><span class="o">=</span><span class="n">crop_task_costs</span><span class="p">,</span>
                 <span class="n">costo_total</span><span class="o">=</span><span class="n">crop_production_cost</span><span class="p">,</span>
                 <span class="n">ganancia_neta</span><span class="o">=</span><span class="n">crop_income</span> <span class="o">-</span> <span class="n">crop_production_cost</span>
             <span class="p">))</span>
 
+        <span class="c1"># Filtrar cultivos según criterios</span>
+        <span class="n">crop_financials</span> <span class="o">=</span> <span class="n">filter_crops</span><span class="p">(</span><span class="n">crop_financials</span><span class="p">)</span>
+        <span class="n">total_plot_crop_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">costo_total</span> <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crop_financials</span><span class="p">)</span>
+        <span class="n">total_plot_income</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">ingreso_total</span> <span class="ow">or</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crop_financials</span><span class="p">)</span>
+
+        <span class="c1"># Si se especificó group_by, agrupar las tareas</span>
+        <span class="k">if</span> <span class="n">group_by</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="n">plot_task_costs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_tasks</span><span class="p">(</span><span class="n">plot_task_costs</span><span class="p">,</span> <span class="n">group_by</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">crop</span> <span class="ow">in</span> <span class="n">crop_financials</span><span class="p">:</span>
+                <span class="n">crop</span><span class="o">.</span><span class="n">tareas_cultivo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_tasks</span><span class="p">(</span><span class="n">crop</span><span class="o">.</span><span class="n">tareas_cultivo</span><span class="p">,</span> <span class="n">group_by</span><span class="p">)</span>
+
         <span class="c1"># Calcular totales del lote</span>
-        <span class="n">total_plot_cost</span> <span class="o">=</span> <span class="n">total_plot_task_cost</span> <span class="o">+</span> <span class="n">total_plot_crop_cost</span>
+        <span class="n">total_plot_cost</span> <span class="o">=</span> <span class="n">total_plot_task_cost</span> <span class="o">+</span> <span class="n">total_plot_crop_cost</span> <span class="o">+</span> <span class="n">plot</span><span class="o">.</span><span class="n">costos_mantenimiento</span>
 
         <span class="n">plot_financials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PlotFinancials</span><span class="p">(</span>
             <span class="n">lote_id</span><span class="o">=</span><span class="n">plot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
             <span class="n">lote_nombre</span><span class="o">=</span><span class="n">plot</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
             <span class="n">cultivos</span><span class="o">=</span><span class="n">crop_financials</span><span class="p">,</span>
-            <span class="n">tareas</span><span class="o">=</span><span class="n">task_costs</span><span class="p">,</span>  <span class="c1"># Agregar las tareas a nivel de lote</span>
-            <span class="n">costo_tareas</span><span class="o">=</span><span class="n">total_plot_task_cost</span><span class="p">,</span>  <span class="c1"># Nuevo campo</span>
-            <span class="n">costo_cultivos</span><span class="o">=</span><span class="n">total_plot_crop_cost</span><span class="p">,</span>  <span class="c1"># Nuevo campo</span>
+            <span class="n">tareas_lote</span><span class="o">=</span><span class="n">plot_task_costs</span><span class="p">,</span>
+            <span class="n">costo_mantenimiento_base</span><span class="o">=</span><span class="n">plot</span><span class="o">.</span><span class="n">costos_mantenimiento</span><span class="p">,</span>
+            <span class="n">costo_tareas</span><span class="o">=</span><span class="n">total_plot_task_cost</span><span class="p">,</span>
+            <span class="n">costo_cultivos</span><span class="o">=</span><span class="n">total_plot_crop_cost</span><span class="p">,</span>
             <span class="n">costo_total</span><span class="o">=</span><span class="n">total_plot_cost</span><span class="p">,</span>
             <span class="n">ingreso_total</span><span class="o">=</span><span class="n">total_plot_income</span><span class="p">,</span>
             <span class="n">ganancia_neta</span><span class="o">=</span><span class="n">total_plot_income</span> <span class="o">-</span> <span class="n">total_plot_cost</span>
@@ -2924,6 +3436,7 @@
         <span class="n">finca_nombre</span><span class="o">=</span><span class="n">farm</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
         <span class="n">fecha_inicio</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span>
         <span class="n">fecha_fin</span><span class="o">=</span><span class="n">end_date</span><span class="p">,</span>
+        <span class="n">moneda</span><span class="o">=</span><span class="n">default_currency</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
         <span class="n">lotes</span><span class="o">=</span><span class="n">plot_financials</span><span class="p">,</span>
         <span class="n">costo_total</span><span class="o">=</span><span class="n">total_farm_cost</span><span class="p">,</span>
         <span class="n">ingreso_total</span><span class="o">=</span><span class="n">total_farm_income</span><span class="p">,</span>
