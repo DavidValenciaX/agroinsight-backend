@@ -26,12 +26,7 @@ router = APIRouter(tags=["costs"])
 @log_activity(
     action_type=LogActionType.REGISTER_COSTS,
     table_name="costo_mano_obra",
-    description=lambda *args, **kwargs: (
-        f"Registro de costos para la tarea {kwargs.get('task_id')} en la finca {kwargs.get('farm_id')}. "
-        f"Se registraron costos de mano de obra, insumos agrícolas y uso de maquinaria. "
-        f"Los detalles incluyen cantidad de trabajadores, horas trabajadas, insumos utilizados "
-        f"y maquinaria empleada en la tarea."
-    )
+    description=lambda *args, **kwargs: f"Registro de costos para tarea {kwargs.get('task_id')} en finca {kwargs.get('farm_id')}: mano de obra, insumos y maquinaria"
 )
 async def register_task_costs(
     farm_id: int,
@@ -72,11 +67,7 @@ async def register_task_costs(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="categoria_insumo_agricola",
-    description=(
-        "Consulta del catálogo de categorías de insumos agrícolas. "
-        "Recupera la lista completa de categorías disponibles incluyendo fertilizantes, "
-        "pesticidas, herbicidas y otros tipos de insumos utilizados en las labores agrícolas."
-    )
+    description="Consulta del catálogo de categorías de insumos agrícolas disponibles"
 )
 async def list_input_categories(
     request: Request,
@@ -108,12 +99,7 @@ async def list_input_categories(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="insumo_agricola",
-    description=(
-        "Consulta del catálogo completo de insumos agrícolas. "
-        "Obtiene la lista de todos los insumos disponibles con sus detalles como "
-        "nombre comercial, principio activo, categoría, unidad de medida y "
-        "especificaciones técnicas relevantes para su aplicación."
-    )
+    description="Consulta del catálogo de insumos agrícolas con sus especificaciones técnicas"
 )
 async def list_agricultural_inputs(
     request: Request,
@@ -145,12 +131,7 @@ async def list_agricultural_inputs(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="tipo_maquinaria_agricola",
-    description=(
-        "Consulta del catálogo de tipos de maquinaria agrícola. "
-        "Recupera la clasificación completa de los diferentes tipos de maquinaria "
-        "utilizados en las labores agrícolas, incluyendo tractores, implementos, "
-        "equipos de fumigación y otras categorías de maquinaria especializada."
-    )
+    description="Consulta del catálogo de tipos de maquinaria agrícola disponibles"
 )
 async def list_machinery_types(
     request: Request,
@@ -182,12 +163,7 @@ async def list_machinery_types(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="maquinaria_agricola",
-    description=(
-        "Consulta del inventario de maquinaria agrícola. "
-        "Obtiene la lista completa de maquinaria disponible con sus especificaciones "
-        "técnicas, incluyendo marca, modelo, tipo de maquinaria, capacidad, "
-        "estado operativo y detalles relevantes para su uso en campo."
-    )
+    description="Consulta del inventario de maquinaria agrícola con sus especificaciones técnicas"
 )
 async def list_agricultural_machinery(
     request: Request,

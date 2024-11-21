@@ -69,7 +69,7 @@ async def create_farm(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="finca",
-    description="Consulta de listado paginado de fincas donde el usuario es administrador. Página {page}, elementos por página: {per_page}"
+    description=lambda *args, **kwargs: f"Consulta de listado paginado de fincas donde el usuario es administrador. Página {kwargs.get('page')}, elementos por página: {kwargs.get('per_page')}"
 )
 async def list_farms(
     request: Request,
@@ -115,7 +115,7 @@ async def list_farms(
 @log_activity(
     action_type=LogActionType.ASSIGN_USER_TO_FARM,
     table_name="usuario_finca_rol",
-    description="Asignación masiva de usuarios a finca mediante correos electrónicos con roles específicos",
+    description="Asignación masiva de usuarios a finca por email",
     get_record_id=lambda *args, **kwargs: kwargs.get('assignment_data').farm_id if 'assignment_data' in kwargs else None,
     get_new_value=lambda *args, **kwargs: kwargs.get('assignment_data').model_dump() if 'assignment_data' in kwargs else None
 )
@@ -142,7 +142,7 @@ async def assign_users_to_farm_by_email(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="usuario_finca_rol",
-    description="Consulta de usuarios asignados a la finca {farm_id} con sus roles correspondientes"
+    description=lambda *args, **kwargs: f"Consulta de usuarios asignados a la finca {kwargs.get('farm_id')} con sus roles correspondientes"
 )
 async def list_farm_users(
     request: Request,
@@ -184,7 +184,7 @@ async def list_farm_users(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="usuario",
-    description="Consulta detallada de información y roles del usuario {user_id} en la finca {farm_id}"
+    description=lambda *args, **kwargs: f"Consulta detallada de información y roles del usuario {kwargs.get('user_id')} en la finca {kwargs.get('farm_id')}"
 )
 async def get_user_by_id(
     request: Request,
@@ -223,7 +223,7 @@ async def get_user_by_id(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="finca",
-    description="Consulta de listado paginado de fincas donde el usuario actual tiene rol de trabajador"
+    description=lambda *args, **kwargs: f"Consulta de listado paginado de fincas donde el usuario actual tiene rol de trabajador. Página {kwargs.get('page')}, elementos por página: {kwargs.get('per_page')}"
 )
 async def list_worker_farms(
     request: Request,

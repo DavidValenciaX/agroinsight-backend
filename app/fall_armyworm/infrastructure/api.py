@@ -35,11 +35,7 @@ router = APIRouter(prefix="/fall-armyworm", tags=["fall armyworm analysis"])
     action_type=LogActionType.ANALIZE_FALL_ARMYWORM,
     table_name="monitoreo_fitosanitario",
     severity=LogSeverity.INFO,
-    description=(
-        "Inicio de análisis de imágenes para detección de gusano cogollero. "
-        "Se procesarán las imágenes para identificar la presencia y nivel de infestación "
-        "del gusano cogollero (Spodoptera frugiperda) en el cultivo."
-    ),
+    description="Análisis de imágenes para detección de gusano cogollero en cultivo",
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id'),
     get_new_value=lambda *args, **kwargs: {
         "task_id": kwargs.get('task_id'),
@@ -114,7 +110,7 @@ async def predict_images(
 @log_activity(
     action_type=LogActionType.VERIFY_CONNECTION,
     table_name="system_health",
-    description="Prueba de conexión con servicio de análisis"
+    description="Verificación de conexión con servicio de análisis de gusano cogollero"
 )
 async def test_connection(request: Request):
     """Endpoint para probar la conexión con el servicio de análisis"""
@@ -140,11 +136,7 @@ async def test_connection(request: Request):
     action_type=LogActionType.VIEW,
     table_name="monitoreo_fitosanitario",
     severity=LogSeverity.INFO,
-    description=(
-        "Consulta del estado de procesamiento del monitoreo fitosanitario. "
-        "Se verifica el progreso del análisis de imágenes y la detección "
-        "del gusano cogollero en el lote seleccionado."
-    ),
+    description="Consulta del estado de procesamiento del análisis de gusano cogollero",
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
 )
 async def get_monitoring_status(
@@ -172,12 +164,7 @@ async def get_monitoring_status(
     action_type=LogActionType.VIEW,
     table_name="monitoreo_fitosanitario",
     severity=LogSeverity.INFO,
-    description=(
-        "Consulta de resultados completos del monitoreo fitosanitario. "
-        "Se obtienen los resultados del análisis de imágenes, incluyendo "
-        "la detección del gusano cogollero, nivel de infestación, "
-        "recomendaciones y observaciones registradas."
-    ),
+    description="Consulta de resultados del análisis de gusano cogollero y nivel de infestación",
     get_record_id=lambda *args, **kwargs: kwargs.get('monitoring_id')
 )
 async def get_monitoring_results(

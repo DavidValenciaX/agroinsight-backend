@@ -39,11 +39,7 @@ def get_plot_data(*args, **kwargs) -> dict:
 @log_activity(
     action_type=LogActionType.REGISTER_PLOT,
     table_name="lote",
-    description=(
-        "Creación de nuevo lote en el sistema. "
-        "Se registran los detalles del lote incluyendo nombre, área, "
-        "coordenadas y su asociación con la finca correspondiente"
-    ),
+    description="Creación de nuevo lote asociado a una finca",
     get_record_id=get_created_plot_id,
     get_new_value=get_plot_data
 )
@@ -82,10 +78,7 @@ async def create_plot(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="lote",
-    description=(
-        "Consulta del listado paginado de lotes asociados a una finca específica. "
-        "Mostrando 10 elementos por página"
-    )
+    description="Consulta de listado paginado de lotes por finca"
 )
 async def list_plots_by_farm(
     request: Request,

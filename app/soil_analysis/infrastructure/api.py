@@ -34,12 +34,7 @@ router = APIRouter(prefix="/soil-analysis", tags=["soil analysis"])
 @log_activity(
     action_type=LogActionType.REGISTER_SOIL_ANALYSIS,
     table_name="analisis_suelo",
-    description=lambda *args, **kwargs: (
-        f"Inicio de nuevo análisis de suelo con {len(kwargs.get('files', []))} imágenes "
-        f"para la tarea {kwargs.get('task_id')}. "
-        f"Modo de procesamiento: {'background' if len(kwargs.get('files', [])) > 15 else 'sync'}. "
-        f"Observaciones: {kwargs.get('observations')}"
-    ),
+    description=lambda *args, **kwargs: f"Análisis de suelo: {len(kwargs.get('files', []))} imágenes, Tarea {kwargs.get('task_id')}, Modo: {'background' if len(kwargs.get('files', [])) > 15 else 'sync'}, Obs: {kwargs.get('observations')}",
     get_record_id=lambda *args, **kwargs: kwargs.get('result', {}).get('analysis_id'),
     get_new_value=lambda *args, **kwargs: {
         "task_id": kwargs.get('task_id'),
@@ -114,10 +109,7 @@ async def predict_images(
 @log_activity(
     action_type=LogActionType.VERIFY_CONNECTION,
     table_name="analisis_suelo",
-    description=lambda *args, **kwargs: (
-        f"Verificación de conectividad con servicio de análisis de suelo en {kwargs.get('service_url')}. "
-        f"Resultado: {kwargs.get('result')}"
-    ),
+    description=lambda *args, **kwargs: f"Test conexión servicio análisis suelo: {kwargs.get('service_url')} - {kwargs.get('result')}",
     get_new_value=lambda *args, **kwargs: {
         "service_url": SOIL_ANALYSIS_SERVICE_URL,
         "status": "Conexión exitosa" if kwargs.get('result') else "Error de conexión",
@@ -148,9 +140,7 @@ async def test_connection(request: Request):
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="analisis_suelo",
-    description=lambda *args, **kwargs: (
-        f"Consulta de estado para análisis de suelo ID: {kwargs.get('analysis_id')}"
-    ),
+    description=lambda *args, **kwargs: f"Consulta del estado del análisis suelo con ID: {kwargs.get('analysis_id')}",
     get_record_id=lambda *args, **kwargs: kwargs.get('analysis_id')
 )
 async def get_processing_status(
@@ -178,10 +168,7 @@ async def get_processing_status(
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="analisis_suelo",
-    description=lambda *args, **kwargs: (
-        f"Consulta de resultados completos para análisis de suelo ID: {kwargs.get('analysis_id')} "
-        f"por usuario {kwargs.get('current_user').email}"
-    ),
+    description=lambda *args, **kwargs: f"Consulta resultados del análisis suelo con ID: {kwargs.get('analysis_id')} - Usuario: {kwargs.get('current_user').email}",
     get_record_id=lambda *args, **kwargs: kwargs.get('analysis_id'),
     get_new_value=lambda *args, **kwargs: {
         "user_email": kwargs.get('current_user').email if kwargs.get('current_user') else None,

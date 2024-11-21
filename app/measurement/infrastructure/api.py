@@ -16,11 +16,7 @@ measurement_router = APIRouter(prefix="/measurement", tags=["measurement"])
 @log_activity(
     action_type=LogActionType.VIEW,
     table_name="unidad_medida",
-    description=(
-        "Consulta del catálogo completo de unidades de medida del sistema. "
-        "Este endpoint permite obtener todas las unidades disponibles para "
-        "su uso en mediciones y conversiones."
-    )
+    description="Consulta del catálogo de unidades de medida disponibles en el sistema"
 )
 async def list_units(
     request: Request,

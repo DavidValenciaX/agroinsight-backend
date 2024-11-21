@@ -18,11 +18,7 @@ router = APIRouter(tags=["weather"])
 @log_activity(
     action_type=LogActionType.VERIFY_CONNECTION,
     table_name="registro_meteorologico",
-    description=(
-        "Prueba de conexión con la API de OpenWeatherMap. "
-        "Verifica la disponibilidad del servicio y la validez de la API key "
-        "realizando una consulta de prueba con coordenadas predeterminadas."
-    ),
+    description="Prueba de conexión con la API de OpenWeatherMap para verificar disponibilidad del servicio.",
 )
 async def test_weather_api(
     request: Request,
@@ -55,10 +51,7 @@ async def test_weather_api(
     action_type=LogActionType.VIEW,
     table_name="registro_meteorologico",
     description=lambda *args, **kwargs: (
-        f"Consulta de datos meteorológicos actuales. "
-        f"Obtiene temperatura, humedad, presión atmosférica y otros datos "
-        f"para las coordenadas especificadas (lat: {kwargs.get('lat')}, lon: {kwargs.get('lon')}). "
-        f"Los datos son obtenidos en tiempo real desde OpenWeatherMap."
+        f"Consulta meteorológica actual para coordenadas (lat: {kwargs.get('lat')}, lon: {kwargs.get('lon')})."
     ),
 )
 async def get_current_weather(
@@ -93,10 +86,7 @@ async def get_current_weather(
     action_type=LogActionType.VIEW,
     table_name="registro_meteorologico",
     description=lambda *args, **kwargs: (
-        f"Consulta del historial de registros meteorológicos. "
-        f"Recupera todos los datos climáticos almacenados para el lote {kwargs.get('lote_id')} "
-        f"en el período comprendido entre {kwargs.get('start_date')} y {kwargs.get('end_date')}. "
-        f"Incluye temperatura, humedad, presión atmosférica y otros parámetros meteorológicos."
+        f"Consulta histórica meteorológica del lote {kwargs.get('lote_id')} entre {kwargs.get('start_date')} y {kwargs.get('end_date')}."
     ),
     get_record_id=lambda *args, **kwargs: kwargs.get('lote_id')
 )
