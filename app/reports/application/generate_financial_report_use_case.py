@@ -249,5 +249,62 @@ class GenerateFinancialReportUseCase:
                 ) for name, costs in grouped.items()
             ]
         
-        # Implementar otras agrupaciones según necesidad...
+        elif group_by == "month":
+            # Agrupar por mes
+            grouped = {}
+            for task in tasks:
+                month_key = task.fecha.strftime("%Y-%m")  # Formato: "2024-03"
+                if month_key not in grouped:
+                    grouped[month_key] = {
+                        'costo_mano_obra': Decimal(0),
+                        'costo_insumos': Decimal(0),
+                        'costo_maquinaria': Decimal(0),
+                        'costo_total': Decimal(0)
+                    }
+                grouped[month_key]['costo_mano_obra'] += task.costo_mano_obra
+                grouped[month_key]['costo_insumos'] += task.costo_insumos
+                grouped[month_key]['costo_maquinaria'] += task.costo_maquinaria
+                grouped[month_key]['costo_total'] += task.costo_total
+
+            return [
+                TaskCost(
+                    tarea_id=-1,  # ID genérico para grupos
+                    tarea_nombre=f"Tareas de {month_key}",
+                    tipo_labor_nombre="Agrupación Mensual",
+                    fecha=date.fromisoformat(f"{month_key}-01"),  # Primer día del mes
+                    nivel="AGRUPADO",
+                    observaciones=f"Tareas agrupadas del mes {month_key}",
+                    **costs
+                ) for month_key, costs in grouped.items()
+            ]
+        
+        elif group_by == "cost_type":
+            # Agrupar por tipo de costo
+            total_by_type = {
+                'Mano de Obra': Decimal(0),
+                'Insumos': Decimal(0),
+                'Maquinaria': Decimal(0)
+            }
+            
+            for task in tasks:
+                total_by_type['Mano de Obra'] += task.costo_mano_obra
+                total_by_type['Insumos'] += task.costo_insumos
+                total_by_type['Maquinaria'] += task.costo_maquinaria
+
+            return [
+                TaskCost(
+                    tarea_id=-1,
+                    tarea_nombre=cost_type,
+                    tipo_labor_nombre="Agrupación por Tipo de Costo",
+                    fecha=date.today(),
+                    nivel="AGRUPADO",
+                    costo_mano_obra=total if cost_type == 'Mano de Obra' else Decimal(0),
+                    costo_insumos=total if cost_type == 'Insumos' else Decimal(0),
+                    costo_maquinaria=total if cost_type == 'Maquinaria' else Decimal(0),
+                    costo_total=total,
+                    observaciones=f"Total de costos de {cost_type}"
+                ) for cost_type, total in total_by_type.items() if total > 0
+            ]
+
+        # Si no hay agrupación o no se reconoce el tipo
         return tasks

@@ -19,7 +19,7 @@ class ReportGroupBy(str, Enum):
     NONE = "none"  # Sin agrupación especial
     TASK_TYPE = "task_type"  # Agrupar por tipo de tarea
     MONTH = "month"  # Agrupar por mes
-    COST_TYPE = "cost_type"  # Agrupar por tipo de costo (mano obra, insumos, maquinaria)
+    COST_TYPE = "cost_type"  # Agrupar por tipo de costo
 
 @router.get("/financial", response_model=FarmFinancialReport)
 @log_activity(
