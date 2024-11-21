@@ -35,7 +35,11 @@ router = APIRouter(tags=["cultural practices"])
     action_type=LogActionType.REGISTER_TASK,
     table_name="tarea_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Creación de nueva tarea de labor cultural",
+    description=(
+        "Creación de nueva tarea de labor cultural en el sistema. "
+        "Se registran los detalles de la tarea incluyendo tipo de labor, "
+        "descripción, fecha programada, lote asignado y estado inicial"
+    ),
     get_record_id=lambda *args, **kwargs: kwargs.get('result').task_id if kwargs.get('result') else None,
     get_new_value=lambda *args, **kwargs: args[0].model_dump() if args else None
 )
@@ -80,7 +84,11 @@ async def create_task(
     action_type=LogActionType.ASSIGN_TASK,
     table_name="asignacion",
     severity=LogSeverity.INFO,
-    description="Asignación de tarea a usuarios",
+    description=(
+        "Asignación de tarea de labor cultural a trabajadores. "
+        "Se registra la asignación de una tarea específica a uno o más usuarios, "
+        "incluyendo la fecha de asignación y los trabajadores seleccionados"
+    ),
     get_record_id=lambda *args, **kwargs: kwargs.get('result').task_id if kwargs.get('result') else None,
     get_new_value=lambda *args, **kwargs: args[0].model_dump() if args else None
 )
@@ -121,7 +129,10 @@ async def create_assignment(
     action_type=LogActionType.VIEW,
     table_name="tarea_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Consulta de tareas por usuario y finca"
+    description=(
+        "Consulta del listado paginado de tareas asignadas a un usuario específico en una finca. "
+        "Se muestran las tareas con sus estados, fechas y detalles relacionados"
+    )
 )
 async def list_tasks_by_user_and_farm(
     request: Request,
@@ -164,7 +175,11 @@ async def list_tasks_by_user_and_farm(
     action_type=LogActionType.VIEW,
     table_name="tarea_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Consulta de tarea específica",
+    description=(
+        "Consulta detallada de una tarea específica. "
+        "Se obtienen todos los detalles de la tarea incluyendo su estado actual, "
+        "asignaciones, fechas y datos relacionados"
+    ),
     get_record_id=lambda *args, **kwargs: int(kwargs.get('task_id')) if kwargs.get('task_id') else None
 )
 async def get_task_by_id(
@@ -205,7 +220,10 @@ async def get_task_by_id(
     action_type=LogActionType.VIEW,
     table_name="estado_tarea_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Consulta de estados de tareas disponibles"
+    description=(
+        "Consulta de los estados disponibles para las tareas de labor cultural. "
+        "Se obtiene el catálogo completo de estados posibles para las tareas"
+    )
 )
 async def list_task_states(
     request: Request,
@@ -245,7 +263,11 @@ async def list_task_states(
     action_type=LogActionType.CHANGE_STATUS,
     table_name="tarea_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Cambio de estado de tarea",
+    description=(
+        "Actualización del estado de una tarea de labor cultural. "
+        "Se registra el cambio de estado de la tarea, incluyendo el estado anterior "
+        "y el nuevo estado asignado"
+    ),
     get_record_id=lambda *args, **kwargs: int(kwargs.get('task_id')),
     get_old_value=lambda *args, **kwargs: {
         "estado_id": kwargs.get('task').estado_id
@@ -292,7 +314,10 @@ async def change_task_state(
     action_type=LogActionType.VIEW,
     table_name="tipo_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Consulta de tipos de labor cultural"
+    description=(
+        "Consulta del catálogo de tipos de labores culturales disponibles. "
+        "Se obtiene la lista completa de tipos de labores que pueden ser asignadas"
+    )
 )
 async def list_task_types(
     request: Request,
@@ -328,7 +353,11 @@ async def list_task_types(
     action_type=LogActionType.VIEW,
     table_name="tipo_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Consulta de tipos de labor cultural por nivel"
+    description=(
+        "Consulta de tipos de labor cultural filtrados por nivel específico. "
+        "Se obtienen los tipos de labores disponibles para el nivel seleccionado "
+        "(LOTE o CULTIVO)"
+    )
 )
 async def list_task_types_by_level(
     request: Request,
@@ -362,7 +391,11 @@ async def list_task_types_by_level(
     action_type=LogActionType.VIEW,
     table_name="tarea_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Consulta de tareas asignadas al trabajador",
+    description=(
+        "Consulta de tareas asignadas al trabajador actual en una finca específica. "
+        "Se obtiene el listado paginado de tareas con sus estados y detalles, "
+        "filtrado por el trabajador autenticado"
+    ),
     get_record_id=lambda *args, **kwargs: kwargs.get('current_user').id if kwargs.get('current_user') else None
 )
 async def list_worker_tasks(
@@ -405,7 +438,11 @@ async def list_worker_tasks(
     action_type=LogActionType.VIEW,
     table_name="tarea_labor_cultural",
     severity=LogSeverity.INFO,
-    description="Consulta de tareas por lote"
+    description=(
+        "Consulta de tareas asociadas a un lote específico. "
+        "Se obtiene el listado paginado de todas las tareas asignadas al lote, "
+        "incluyendo sus estados y detalles relacionados"
+    )
 )
 async def list_tasks_by_plot(
     request: Request,
