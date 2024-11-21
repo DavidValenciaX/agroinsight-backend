@@ -2,66 +2,68 @@
 
 ## Introducción
 
-El módulo de Reportes es una parte esencial del sistema AgroInsight que proporciona funcionalidades para generar informes detallados sobre diferentes aspectos de la operación agrícola. Este módulo se centra especialmente en la generación de reportes financieros que ayudan en la toma de decisiones y el seguimiento económico de las fincas.
+El módulo de reportes de AgroInsight proporciona funcionalidades para generar informes detallados sobre diferentes aspectos de la operación agrícola. Este módulo es fundamental para el análisis y la toma de decisiones basada en datos.
 
 ## Características Principales
 
 ### 1. Reportes Financieros
 
-- Generación de reportes financieros detallados por finca
-- Análisis de costos e ingresos por lote
-- Seguimiento financiero de cultivos individuales
-- Desglose de costos por tipo (mano de obra, insumos, maquinaria)
-- Cálculo de ganancias netas
-
-### 2. Filtrado y Personalización
-
-- Filtrado por períodos específicos
-- Selección de lotes individuales
-- Filtrado por cultivos específicos
-- Diferentes niveles de detalle en los reportes
-
-### 3. Análisis de Costos
-
-- Desglose detallado de costos por tarea
-- Seguimiento de costos de producción
-- Análisis de rentabilidad por cultivo
-- Comparativas de costos entre períodos
-
-### 4. Seguimiento de Ingresos
-
-- Registro de ingresos por ventas
-- Cálculo de ingresos totales
+- Análisis detallado de costos e ingresos
+- Reportes por finca, lote o cultivo
 - Análisis de rentabilidad
-- Seguimiento de precios de venta
+- Agrupación flexible de datos
+- Filtros personalizables
+
+### 2. Tipos de Costos Analizados
+
+- Costos de mano de obra
+- Costos de insumos
+- Costos de maquinaria
+- Costos de mantenimiento base
+
+### 3. Capacidades de Agrupación
+
+- Por tipo de tarea
+- Por mes
+- Por categoría de costo
+- Sin agrupación (detallado)
+
+### 4. Análisis de Rentabilidad
+
+- Cálculo de ingresos totales
+- Análisis de costos totales
+- Cálculo de ganancias netas
+- Indicadores de rentabilidad
 
 ## Integración con Otros Módulos
 
-El módulo de Reportes se integra con:
+El módulo de reportes se integra con:
 
-- **Módulo de Costos**: Para obtener información detallada de costos
-- **Módulo de Cultivos**: Para datos de producción y ventas
-- **Módulo de Fincas**: Para la estructura organizacional
-- **Módulo de Prácticas Culturales**: Para información de tareas y labores
+- **Módulo de Fincas**: Para la gestión de permisos y acceso a datos
+- **Módulo de Lotes**: Para el análisis a nivel de lote
+- **Módulo de Cultivos**: Para el análisis por cultivo
+- **Módulo de Costos**: Para la obtención de datos financieros
+- **Módulo de Prácticas Culturales**: Para el análisis de tareas y labores
 
 ## Casos de Uso Comunes
 
-1. Generación de reportes financieros mensuales
+1. Generación de reportes financieros periódicos
 2. Análisis de rentabilidad por cultivo
-3. Seguimiento de costos por lote
-4. Evaluación de rendimiento financiero
-5. Planificación presupuestaria
+3. Seguimiento de costos por tipo de labor
+4. Análisis de tendencias mensuales
+5. Evaluación de eficiencia operativa
 
 ## Estructura Técnica
 
 El módulo sigue una arquitectura limpia con:
 
-- **Domain**: Definición de esquemas y reglas de negocio
+- **Domain**: Definición de entidades y reglas de negocio
 - **Application**: Implementación de casos de uso
-- **Infrastructure**: Acceso a datos y endpoints API
+- **Infrastructure**: Acceso a datos y servicios externos
 
 ## Documentación Relacionada
 
 - [Endpoints de Reportes](endpoints.md)
 - [Modelos de Datos](models.md)
 - [Casos de Uso](use_cases.md)
+- [Documentación Detallada de Reportes Financieros](financial.md)

@@ -6,8 +6,24 @@
 
 ::: app.reports.infrastructure.api.generate_financial_report
 
-Endpoint principal para la generación de reportes financieros detallados. Permite obtener información financiera completa de una finca, incluyendo costos, ingresos y ganancias, con opciones de filtrado por lote y cultivo.
+Endpoint principal para generar reportes financieros detallados. Permite:
 
-## Estructura de Rutas
+- Filtrar por período específico
+- Filtrar por lote o cultivo
+- Agrupar resultados por diferentes criterios
+- Aplicar filtros de costos
+- Obtener análisis de rentabilidad
 
-El módulo de reportes utiliza el prefijo `/reports` para todos sus endpoints y está etiquetado como "reports" en la documentación de la API.
+#### Parámetros de Agrupación
+
+- `none`: Sin agrupación (por defecto)
+- `task_type`: Agrupa por tipo de tarea
+- `month`: Agrupa por mes
+- `cost_type`: Agrupa por categoría de costo
+
+[Ver documentación detallada](financial.md)
+
+## Futuros Endpoints
+
+- Endpoints de reportes de producción
+- Endpoints de reportes de actividades

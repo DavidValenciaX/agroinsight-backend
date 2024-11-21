@@ -13,7 +13,3 @@
 ### Variedad de Maíz
 
 ::: app.crop.infrastructure.orm_models.CornVariety
-
-### Moneda
-
-::: app.crop.infrastructure.orm_models.Currency

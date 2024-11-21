@@ -78,6 +78,7 @@ nav:
   - Módulo de Reportes:
       - Descripción: reports/overview.md
       - Endpoints: reports/endpoints.md
+      - Documentación de reporte financiero: reports/financial.md
       - Modelos de datos: reports/models.md
       - Casos de uso: reports/use_cases.md
 
