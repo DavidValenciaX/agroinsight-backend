@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.cultural_practices.domain.schemas import AssignmentCreateSingle, NivelLaborCultural, TaskCreate
 from app.cultural_practices.infrastructure.orm_models import Assignment, CulturalTaskState, CulturalTaskType, CulturalTask
@@ -66,7 +66,7 @@ class CulturalPracticesRepository:
         """
         return self.db.query(CulturalTaskState).filter(CulturalTaskState.nombre == estado_nombre).first()
     
-    def get_task_by_id(self, task_id: int) -> CulturalTask:
+    def get_task_by_id(self, task_id: int) -> Optional[CulturalTask]:
         """Obtiene una tarea por su ID.
 
         Args:

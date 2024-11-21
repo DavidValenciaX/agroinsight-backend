@@ -86,7 +86,7 @@ class RegisterTaskCostsUseCase:
                     total_cost += costo_hora * machinery_data.horas_uso
 
         # Actualizar los costos según el nivel de la tarea
-        if task.nivel == NivelLaborCultural.CULTIVO:
+        if task.tipo_labor.nivel == NivelLaborCultural.CULTIVO:
             # Si es nivel cultivo, actualizar el costo de producción del cultivo activo en el lote
             active_crop = self.crop_repository.get_active_crop_by_plot_id(task.lote_id)
             if active_crop:
