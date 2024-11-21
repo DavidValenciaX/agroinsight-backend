@@ -35,7 +35,11 @@ security_scheme = HTTPBearer()
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 @user_router.post("/register", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-@log_activity(action_type=LogActionType.REGISTER_USER, table_name="usuario")
+@log_activity(
+    action_type=LogActionType.REGISTER_USER, 
+    table_name="usuario",
+    description="Registro inicial de nuevo usuario en el sistema"
+)
 async def register_user(
     user: UserCreate,
     request: Request,
@@ -72,7 +76,11 @@ async def register_user(
         ) from e
         
 @user_router.post("/resend-confirm-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.RESEND_PIN, table_name="confirmacion_usuario")
+@log_activity(
+    action_type=LogActionType.RESEND_PIN, 
+    table_name="confirmacion_usuario",
+    description="Reenvío de PIN de confirmación para activación de cuenta"
+)
 async def resend_confirmation_pin_endpoint(
     resend_request: ResendPinConfirmRequest,
     request: Request,
@@ -106,7 +114,11 @@ async def resend_confirmation_pin_endpoint(
         ) from e
         
 @user_router.post("/confirm", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.CONFIRM_REGISTRATION, table_name="usuario")
+@log_activity(
+    action_type=LogActionType.CONFIRM_REGISTRATION, 
+    table_name="usuario",
+    description="Confirmación exitosa de registro de usuario mediante PIN"
+)
 async def confirm_user_registration(
     confirmation: ConfirmationRequest,
     request: Request,
@@ -138,7 +150,11 @@ async def confirm_user_registration(
         ) from e
     
 @user_router.post("/login", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.LOGIN, table_name="usuario")
+@log_activity(
+    action_type=LogActionType.LOGIN, 
+    table_name="usuario",
+    description="Intento de inicio de sesión - Primera etapa de autenticación"
+)
 async def login_for_access_token(
     request: Request,
     login_request: LoginRequest,
@@ -172,7 +188,11 @@ async def login_for_access_token(
         ) from e
     
 @user_router.post("/resend-2fa-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.RESEND_PIN, table_name="verificacion_dos_pasos")
+@log_activity(
+    action_type=LogActionType.RESEND_PIN, 
+    table_name="verificacion_dos_pasos",
+    description="Reenvío de PIN para autenticación de dos factores"
+)
 async def resend_2fa_pin_endpoint(
     resend_request: Resend2FARequest,
     request: Request,
@@ -206,7 +226,11 @@ async def resend_2fa_pin_endpoint(
         ) from e
         
 @user_router.post("/login/verify", response_model=TokenResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.VERIFY_2FA, table_name="verificacion_dos_pasos")
+@log_activity(
+    action_type=LogActionType.VERIFY_2FA, 
+    table_name="verificacion_dos_pasos",
+    description="Verificación de autenticación de dos factores mediante PIN"
+)
 async def verify_login(
     auth_request: TwoFactorAuthRequest,
     request: Request,
@@ -238,7 +262,11 @@ async def verify_login(
         ) from e
 
 @user_router.get("/me", response_model=UserResponse)
-@log_activity(action_type=LogActionType.VIEW, table_name="usuario")
+@log_activity(
+    action_type=LogActionType.VIEW, 
+    table_name="usuario",
+    description="Consulta de información del perfil de usuario"
+)
 async def get_current_user_info(
     request: Request,
     current_user: UserInDB = Depends(get_current_user),
@@ -273,6 +301,7 @@ async def get_current_user_info(
 @log_activity(
     action_type=LogActionType.UPDATE_PROFILE,
     table_name="usuario",
+    description="Actualización de información del perfil de usuario",
     get_record_id=lambda *args, **kwargs: kwargs['current_user'].id,
     get_old_value=lambda *args, **kwargs: {
         'id': kwargs['current_user'].id,
@@ -320,7 +349,11 @@ async def update_user_info(
         ) from e
     
 @user_router.post("/password-recovery", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.PASSWORD_RECOVERY, table_name="recuperacion_contrasena")
+@log_activity(
+    action_type=LogActionType.PASSWORD_RECOVERY, 
+    table_name="recuperacion_contrasena",
+    description="Inicio del proceso de recuperación de contraseña"
+)
 async def initiate_password_recovery(
     recovery_request: PasswordRecoveryRequest,
     request: Request,
@@ -354,7 +387,11 @@ async def initiate_password_recovery(
         ) from e
         
 @user_router.post("/resend-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.RESEND_PIN, table_name="recuperacion_contrasena")
+@log_activity(
+    action_type=LogActionType.RESEND_PIN, 
+    table_name="recuperacion_contrasena",
+    description="Reenvío de PIN para recuperación de contraseña"
+)
 async def resend_recovery_pin(
     recovery_request: PasswordRecoveryRequest,
     request: Request,
@@ -388,7 +425,11 @@ async def resend_recovery_pin(
         ) from e
         
 @user_router.post("/confirm-recovery-pin", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.CONFIRM_RECOVERY, table_name="recuperacion_contrasena")
+@log_activity(
+    action_type=LogActionType.CONFIRM_RECOVERY, 
+    table_name="recuperacion_contrasena",
+    description="Confirmación de PIN para recuperación de contraseña"
+)
 async def confirm_recovery_pin(
     pin_confirmation: PinConfirmationRequest,
     request: Request,
@@ -420,7 +461,11 @@ async def confirm_recovery_pin(
         ) from e
         
 @user_router.post("/reset-password", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.CHANGE_PASSWORD, table_name="usuario")
+@log_activity(
+    action_type=LogActionType.CHANGE_PASSWORD, 
+    table_name="usuario",
+    description="Restablecimiento de contraseña mediante proceso de recuperación"
+)
 async def reset_password(
     reset_request: PasswordResetRequest,
     request: Request,
@@ -452,7 +497,11 @@ async def reset_password(
         ) from e
         
 @user_router.post("/logout", response_model=SuccessResponse, status_code=status.HTTP_200_OK)
-@log_activity(action_type=LogActionType.LOGOUT, table_name="blacklisted_tokens")
+@log_activity(
+    action_type=LogActionType.LOGOUT, 
+    table_name="blacklisted_tokens",
+    description="Cierre de sesión y revocación de token de acceso"
+)
 async def logout(
     request: Request,
     current_user: UserInDB = Depends(get_current_user),
