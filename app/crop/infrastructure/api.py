@@ -26,6 +26,7 @@ router = APIRouter(tags=["crop"])
 @log_activity(
     action_type=LogActionType.CREATE, 
     table_name="cultivo",
+    description="Creación de nuevo cultivo en el sistema con datos de variedad, fecha de siembra y lote asociado",
     get_new_value=lambda *args, **kwargs: kwargs.get('crop').dict() if 'crop' in kwargs else None
 )
 async def create_crop(
@@ -62,7 +63,11 @@ async def create_crop(
 # endpoint para listar las variedades de maiz
 
 @router.get("/corn-varieties", response_model=CornVarietyListResponse)
-@log_activity(action_type=LogActionType.VIEW, table_name="variedad_maiz")
+@log_activity(
+    action_type=LogActionType.VIEW, 
+    table_name="variedad_maiz",
+    description="Consulta del catálogo de variedades de maíz disponibles en el sistema"
+)
 async def list_corn_varieties(
     request: Request,
     db: Session = Depends(getDb),
@@ -93,7 +98,12 @@ async def list_corn_varieties(
         )
 
 @router.get("/plots/{plot_id}/crops", response_model=PaginatedCropListResponse)
-@log_activity(action_type=LogActionType.VIEW, table_name="cultivo")
+@log_activity(
+    action_type=LogActionType.VIEW, 
+    table_name="cultivo",
+    description="Consulta paginada de cultivos asociados a un lote específico",
+    get_record_id=lambda *args, **kwargs: kwargs.get('plot_id')
+)
 async def list_crops_by_plot(
     plot_id: int,
     request: Request,
@@ -131,6 +141,7 @@ async def list_crops_by_plot(
 @log_activity(
     action_type=LogActionType.REGISTER_HARVEST, 
     table_name="cultivo",
+    description="Registro de datos de cosecha y venta para un cultivo específico, incluyendo rendimiento y precio de venta",
     get_record_id=lambda *args, **kwargs: kwargs.get('crop_id'),
     get_old_value=lambda *args, **kwargs: {
         'crop_id': kwargs.get('crop_id')
