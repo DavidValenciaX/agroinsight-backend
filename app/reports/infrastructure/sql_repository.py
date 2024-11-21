@@ -1,5 +1,5 @@
 # app/reports/infrastructure/sql_repository.py
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, or_
 from datetime import date
 from typing import List, Tuple, Optional
@@ -61,6 +61,7 @@ class FinancialReportRepository:
     def get_plot_level_tasks_in_period(self, plot_id: int, start_date: date, end_date: date) -> List[CulturalTask]:
         """Obtiene las tareas de nivel LOTE en un período específico"""
         return self.db.query(CulturalTask)\
+            .options(joinedload(CulturalTask.tipo_labor))\
             .join(CulturalTaskType)\
             .filter(
                 CulturalTask.lote_id == plot_id,
@@ -77,6 +78,7 @@ class FinancialReportRepository:
             return []
         
         return self.db.query(CulturalTask)\
+            .options(joinedload(CulturalTask.tipo_labor))\
             .join(CulturalTaskType)\
             .filter(
                 CulturalTask.lote_id == crop.lote_id,

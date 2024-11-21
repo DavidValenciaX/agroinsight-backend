@@ -1,15 +1,14 @@
 # app/reports/application/generate_financial_report_use_case.py
 from datetime import date
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.farm.infrastructure.sql_repository import FarmRepository
-from app.infrastructure.security.jwt_middleware import get_current_user
 from app.reports.infrastructure.sql_repository import FinancialReportRepository
 from app.farm.application.services.farm_service import FarmService
 from app.reports.domain.schemas import FarmFinancialReport, PlotFinancials, CropFinancials, TaskCost
 from app.infrastructure.common.common_exceptions import DomainException
-from fastapi import Depends, status
+from fastapi import status
 
 from app.user.domain.schemas import UserInDB
 
@@ -27,7 +26,13 @@ class GenerateFinancialReportUseCase:
         end_date: date,
         plot_id: Optional[int] = None,
         crop_id: Optional[int] = None,
-        current_user: UserInDB = Depends(get_current_user)
+        min_cost: Optional[float] = None,
+        max_cost: Optional[float] = None,
+        task_types: Optional[List[str]] = None,
+        include_tasks: bool = True,
+        group_by: str = "none",
+        only_profitable: Optional[bool] = None,
+        current_user: UserInDB = None
     ) -> FarmFinancialReport:
         """
         Genera un reporte financiero completo.
@@ -70,6 +75,26 @@ class GenerateFinancialReportUseCase:
         total_farm_cost = Decimal(0)
         total_farm_income = Decimal(0)
 
+        # Aplicar filtros de costo a las tareas
+        def filter_task_costs(tasks: List[TaskCost]) -> List[TaskCost]:
+            filtered = tasks
+            if min_cost is not None:
+                filtered = [t for t in filtered if t.costo_total >= min_cost]
+            if max_cost is not None:
+                filtered = [t for t in filtered if t.costo_total <= max_cost]
+            if task_types:
+                print("Tipos de tarea disponibles:", [t.tipo_labor_nombre for t in tasks])
+                print("Tipos de tarea para filtrar:", task_types)
+                filtered = [t for t in filtered if t.tipo_labor_nombre in task_types]
+            return filtered
+
+        # Aplicar filtros a los cultivos
+        def filter_crops(crops: List[CropFinancials]) -> List[CropFinancials]:
+            filtered = crops
+            if only_profitable is not None:
+                filtered = [c for c in filtered if (c.ganancia_neta or 0) > 0 == only_profitable]
+            return filtered
+
         for plot in plots:
             # Obtener tareas a nivel de LOTE
             plot_tasks = self.repository.get_plot_level_tasks_in_period(plot.id, start_date, end_date)
@@ -84,6 +109,7 @@ class GenerateFinancialReportUseCase:
                 plot_task_costs.append(TaskCost(
                     tarea_id=task.id,
                     tarea_nombre=task.nombre,
+                    tipo_labor_nombre=task.tipo_labor.nombre,
                     nivel="LOTE",
                     fecha=task.fecha_inicio_estimada,
                     costo_mano_obra=labor_cost,
@@ -92,6 +118,11 @@ class GenerateFinancialReportUseCase:
                     costo_total=task_total,
                     observaciones=task.descripcion
                 ))
+
+            # Filtrar tareas del lote según los criterios
+            if include_tasks:
+                plot_task_costs = filter_task_costs(plot_task_costs)
+                total_plot_task_cost = sum(task.costo_total for task in plot_task_costs)
 
             # Obtener y procesar cultivos
             crops = self.repository.get_plot_crops_in_period(plot.id, start_date, end_date)
@@ -116,6 +147,7 @@ class GenerateFinancialReportUseCase:
                     crop_task_costs.append(TaskCost(
                         tarea_id=task.id,
                         tarea_nombre=task.nombre,
+                        tipo_labor_nombre=task.tipo_labor.nombre,
                         nivel="CULTIVO",
                         fecha=task.fecha_inicio_estimada,
                         costo_mano_obra=labor_cost,
@@ -124,6 +156,11 @@ class GenerateFinancialReportUseCase:
                         costo_total=task_total,
                         observaciones=task.descripcion
                     ))
+
+                # Filtrar tareas del cultivo según los criterios
+                if include_tasks:
+                    crop_task_costs = filter_task_costs(crop_task_costs)
+                    total_crop_task_cost = sum(task.costo_total for task in crop_task_costs)
 
                 crop_income = crop.ingreso_total or Decimal(0)
                 crop_production_cost = (crop.costo_produccion or Decimal(0)) + total_crop_task_cost
@@ -145,7 +182,19 @@ class GenerateFinancialReportUseCase:
                     ganancia_neta=crop_income - crop_production_cost
                 ))
 
-            # Calcular totales del lote incluyendo costo de mantenimiento base
+            # Filtrar cultivos según criterios
+            crop_financials = filter_crops(crop_financials)
+            total_plot_crop_cost = sum(crop.costo_total for crop in crop_financials)
+            total_plot_income = sum(crop.ingreso_total or 0 for crop in crop_financials)
+
+            # Si se especificó group_by, agrupar las tareas
+            if group_by != "none":
+                if include_tasks:
+                    plot_task_costs = self._group_tasks(plot_task_costs, group_by)
+                    for crop in crop_financials:
+                        crop.tareas_cultivo = self._group_tasks(crop.tareas_cultivo, group_by)
+
+            # Calcular totales del lote
             total_plot_cost = total_plot_task_cost + total_plot_crop_cost + plot.costos_mantenimiento
 
             plot_financials.append(PlotFinancials(
@@ -175,3 +224,34 @@ class GenerateFinancialReportUseCase:
             ingreso_total=total_farm_income,
             ganancia_neta=total_farm_income - total_farm_cost
         )
+
+    def _group_tasks(self, tasks: List[TaskCost], group_by: str) -> List[TaskCost]:
+        """Agrupa las tareas según el criterio especificado"""
+        if group_by == "task_type":
+            # Agrupar por tipo de tarea
+            grouped = {}
+            for task in tasks:
+                if task.tarea_nombre not in grouped:
+                    grouped[task.tarea_nombre] = {
+                        'costo_mano_obra': Decimal(0),
+                        'costo_insumos': Decimal(0),
+                        'costo_maquinaria': Decimal(0),
+                        'costo_total': Decimal(0)
+                    }
+                grouped[task.tarea_nombre]['costo_mano_obra'] += task.costo_mano_obra
+                grouped[task.tarea_nombre]['costo_insumos'] += task.costo_insumos
+                grouped[task.tarea_nombre]['costo_maquinaria'] += task.costo_maquinaria
+                grouped[task.tarea_nombre]['costo_total'] += task.costo_total
+
+            return [
+                TaskCost(
+                    tarea_id=-1,  # ID genérico para grupos
+                    tarea_nombre=name,
+                    fecha=date.today(),  # Fecha representativa
+                    nivel="AGRUPADO",
+                    **costs
+                ) for name, costs in grouped.items()
+            ]
+        
+        # Implementar otras agrupaciones según necesidad...
+        return tasks

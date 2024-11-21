@@ -8,6 +8,7 @@ class TaskCost(BaseModel):
     """Costos asociados a una tarea específica"""
     tarea_id: int
     tarea_nombre: str
+    tipo_labor_nombre: str
     fecha: date
     nivel: str
     costo_mano_obra: Decimal
