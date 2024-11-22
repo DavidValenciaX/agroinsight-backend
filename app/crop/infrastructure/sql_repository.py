@@ -176,7 +176,6 @@ class CropRepository:
             crop.cantidad_vendida = harvest_data.cantidad_vendida
             crop.cantidad_vendida_unidad_id = harvest_data.cantidad_vendida_unidad_id
             crop.ingreso_total = harvest_data.ingreso_total
-            crop.costo_produccion = harvest_data.costo_produccion
             crop.moneda_id = harvest_data.moneda_id
             crop.fecha_venta = harvest_data.fecha_venta
 
