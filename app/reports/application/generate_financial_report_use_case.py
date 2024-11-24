@@ -8,7 +8,7 @@ from app.farm.infrastructure.sql_repository import FarmRepository
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
 from app.reports.infrastructure.sql_repository import FinancialReportRepository
 from app.farm.application.services.farm_service import FarmService
-from app.reports.domain.schemas import FarmFinancialReport, PlotFinancials, CropFinancials, TaskCost
+from app.reports.domain.schemas import FarmFinancialReport, PlotFinancials, CropFinancials, TaskCost, GroupedTaskCost
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.measurement.application.services.currency_conversion_service import CurrencyConversionService
@@ -332,7 +332,7 @@ class GenerateFinancialReportUseCase:
             ganancia_neta=total_farm_income - total_farm_cost
         )
 
-    def _group_tasks(self, tasks: List[TaskCost], group_by: str) -> List[TaskCost]:
+    def _group_tasks(self, tasks: List[TaskCost], group_by: str) -> List[GroupedTaskCost]:
         """Agrupa las tareas según el criterio especificado"""
         if group_by == "task_type":
             # Agrupar por tipo de tarea
@@ -351,27 +351,10 @@ class GenerateFinancialReportUseCase:
                 grouped[task.tarea_nombre]['costo_total'] += task.costo_total
 
             return [
-                TaskCost(
-                    tarea_id=-1,  # ID genérico para grupos
-                    tarea_nombre=name,
-                    fecha_inicio=date.today(),  # Fecha representativa
-                    fecha_finalizacion=date.today(),  # Fecha representativa
-                    nivel="AGRUPADO",
-                    estado_id=-1,
-                    estado_nombre="Agrupado",
-                    mano_obra=LaborCostSchema(
-                        cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                        horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
-                        costo_hora=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
-                        observaciones=f"Total de costos de {name}"
-                    ),
-                    costo_mano_obra=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                    insumos=None,
-                    costo_insumos=sum(costs['costo_insumos'] for costs in grouped.values()),
-                    maquinarias=None,
-                    costo_maquinaria=sum(costs['costo_maquinaria'] for costs in grouped.values()),
-                    costo_total=sum(costs['costo_total'] for costs in grouped.values()),
-                    **costs
+                GroupedTaskCost(
+                    categoria=name,
+                    costo_total=costs['costo_total'],
+                    observaciones=f"Total de costos de {name}"
                 ) for name, costs in grouped.items()
             ]
         
@@ -393,28 +376,10 @@ class GenerateFinancialReportUseCase:
                 grouped[month_key]['costo_total'] += task.costo_total
 
             return [
-                TaskCost(
-                    tarea_id=-1,  # ID genérico para grupos
-                    tarea_nombre=f"Tareas de {month_key}",
-                    tipo_labor_nombre="Agrupación Mensual",
-                    fecha_inicio=date.fromisoformat(f"{month_key}-01"),  # Primer día del mes
-                    fecha_finalizacion=date.fromisoformat(f"{month_key}-01"),  # Primer día del mes
-                    nivel="AGRUPADO",
-                    estado_id=-1,
-                    estado_nombre="Agrupado",
-                    mano_obra=LaborCostSchema(
-                        cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                        horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
-                        costo_hora=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
-                        observaciones=f"Total de costos de {month_key}"
-                    ),
-                    costo_mano_obra=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                    insumos=None,
-                    costo_insumos=sum(costs['costo_insumos'] for costs in grouped.values()),
-                    maquinarias=None,
-                    costo_maquinaria=sum(costs['costo_maquinaria'] for costs in grouped.values()),
-                    costo_total=sum(costs['costo_total'] for costs in grouped.values()),
-                    observaciones=f"Tareas agrupadas del mes {month_key}",
+                GroupedTaskCost(
+                    categoria=f"Tareas de {month_key}",
+                    costo_total=costs['costo_total'],
+                    observaciones=f"Tareas agrupadas del mes {month_key}"
                 ) for month_key, costs in grouped.items()
             ]
         
@@ -434,25 +399,12 @@ class GenerateFinancialReportUseCase:
             grouped_tasks = []
             for cost_type, total in total_by_type.items():
                 if total > 0:
-                    task_cost = TaskCost(
-                        tarea_id=-1,
-                        tarea_nombre=cost_type,
-                        tipo_labor_nombre="Agrupación por Tipo de Costo",
-                        fecha_inicio=date.today(),
-                        fecha_finalizacion=date.today(),
-                        nivel="AGRUPADO",
-                        estado_id=-1,
-                        estado_nombre="Agrupado",
-                        mano_obra=None,
-                        costo_mano_obra=total if cost_type == 'Mano de Obra' else Decimal(0),
-                        insumos=None,
-                        costo_insumos=total if cost_type == 'Insumos' else Decimal(0),
-                        maquinarias=None,
-                        costo_maquinaria=total if cost_type == 'Maquinaria' else Decimal(0),
+                    grouped_task = GroupedTaskCost(
+                        categoria=cost_type,
                         costo_total=total,
                         observaciones=f"Total de costos para {cost_type}"
                     )
-                    grouped_tasks.append(task_cost)
+                    grouped_tasks.append(grouped_task)
 
             return grouped_tasks
 

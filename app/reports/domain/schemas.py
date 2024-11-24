@@ -2,7 +2,7 @@
 from pydantic import BaseModel
 from datetime import date
 from decimal import Decimal
-from typing import List, Optional
+from typing import List, Optional, Union
 
 class InputSchema(BaseModel):
     """Esquema para insumos agrícolas"""
@@ -69,6 +69,15 @@ class TaskCost(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class GroupedTaskCost(BaseModel):
+    """Esquema para tareas agrupadas por tipo de costo"""
+    categoria: str  # 'Mano de Obra', 'Insumos', 'Maquinaria'
+    costo_total: Decimal
+    observaciones: Optional[str]
+
+    class Config:
+        from_attributes = True
 
 class CropFinancials(BaseModel):
     """Información financiera de un cultivo"""
@@ -87,7 +96,7 @@ class CropFinancials(BaseModel):
     moneda_simbolo: Optional[str]
     ingreso_total: Decimal
     costo_produccion: Decimal
-    tareas_cultivo: List[TaskCost]
+    tareas_cultivo: List[Union[TaskCost, GroupedTaskCost]]
     ganancia_neta: Decimal
 
 class PlotFinancials(BaseModel):
@@ -95,7 +104,7 @@ class PlotFinancials(BaseModel):
     lote_id: int
     lote_nombre: str
     cultivos: List[CropFinancials]
-    tareas_lote: List[TaskCost]
+    tareas_lote: List[Union[TaskCost, GroupedTaskCost]]
     costo_mantenimiento: Decimal
     costo_cultivos: Decimal
     costo_total: Decimal
