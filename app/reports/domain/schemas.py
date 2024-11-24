@@ -9,8 +9,14 @@ class TaskCost(BaseModel):
     tarea_id: int
     tarea_nombre: str
     tipo_labor_nombre: str
-    fecha: date
+    fecha_inicio: date
+    fecha_finalizacion: date
     nivel: str
+    estado_id: int
+    estado_nombre: str
+    cantidad_trabajadores: int
+    horas_trabajadas: int
+    costo_hora_trabajador: Decimal
     costo_mano_obra: Decimal
     costo_insumos: Decimal
     costo_maquinaria: Decimal

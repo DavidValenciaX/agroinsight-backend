@@ -112,7 +112,13 @@ class GenerateFinancialReportUseCase:
                     tarea_nombre=task.nombre,
                     tipo_labor_nombre=task.tipo_labor.nombre,
                     nivel="LOTE",
-                    fecha=task.fecha_inicio_estimada,
+                    fecha_inicio=task.fecha_inicio_estimada,
+                    fecha_finalizacion=task.fecha_finalizacion,
+                    estado_id=task.estado_id,
+                    estado_nombre=task.estado.nombre,
+                    cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores if task.costo_mano_obra else 0,
+                    horas_trabajadas=task.costo_mano_obra.horas_trabajadas if task.costo_mano_obra else 0,
+                    costo_hora_trabajador=task.costo_mano_obra.costo_hora if task.costo_mano_obra else 0,
                     costo_mano_obra=labor_cost,
                     costo_insumos=input_cost,
                     costo_maquinaria=machinery_cost,
@@ -154,7 +160,13 @@ class GenerateFinancialReportUseCase:
                         tarea_nombre=task.nombre,
                         tipo_labor_nombre=task.tipo_labor.nombre,
                         nivel="CULTIVO",
-                        fecha=task.fecha_inicio_estimada,
+                        fecha_inicio=task.fecha_inicio_estimada,
+                        fecha_finalizacion=task.fecha_finalizacion,
+                        estado_id=task.estado_id,
+                        estado_nombre=task.estado.nombre,
+                        cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores if task.costo_mano_obra else 0,
+                        horas_trabajadas=task.costo_mano_obra.horas_trabajadas if task.costo_mano_obra else 0,
+                        costo_hora_trabajador=task.costo_mano_obra.costo_hora if task.costo_mano_obra else 0,
                         costo_mano_obra=labor_cost,
                         costo_insumos=input_cost,
                         costo_maquinaria=machinery_cost,
@@ -250,8 +262,14 @@ class GenerateFinancialReportUseCase:
                 TaskCost(
                     tarea_id=-1,  # ID genérico para grupos
                     tarea_nombre=name,
-                    fecha=date.today(),  # Fecha representativa
+                    fecha_inicio=date.today(),  # Fecha representativa
+                    fecha_finalizacion=date.today(),  # Fecha representativa
                     nivel="AGRUPADO",
+                    estado_id=-1,
+                    estado_nombre="Agrupado",
+                    cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
+                    horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
+                    costo_hora_trabajador=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
                     **costs
                 ) for name, costs in grouped.items()
             ]
@@ -278,8 +296,14 @@ class GenerateFinancialReportUseCase:
                     tarea_id=-1,  # ID genérico para grupos
                     tarea_nombre=f"Tareas de {month_key}",
                     tipo_labor_nombre="Agrupación Mensual",
-                    fecha=date.fromisoformat(f"{month_key}-01"),  # Primer día del mes
+                    fecha_inicio=date.fromisoformat(f"{month_key}-01"),  # Primer día del mes
+                    fecha_finalizacion=date.fromisoformat(f"{month_key}-01"),  # Primer día del mes
                     nivel="AGRUPADO",
+                    estado_id=-1,
+                    estado_nombre="Agrupado",
+                    cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
+                    horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
+                    costo_hora_trabajador=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
                     observaciones=f"Tareas agrupadas del mes {month_key}",
                     **costs
                 ) for month_key, costs in grouped.items()
@@ -303,8 +327,14 @@ class GenerateFinancialReportUseCase:
                     tarea_id=-1,
                     tarea_nombre=cost_type,
                     tipo_labor_nombre="Agrupación por Tipo de Costo",
-                    fecha=date.today(),
+                    fecha_inicio=date.today(),
+                    fecha_finalizacion=date.today(),
                     nivel="AGRUPADO",
+                    estado_id=-1,
+                    estado_nombre="Agrupado",
+                    cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
+                    horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
+                    costo_hora_trabajador=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
                     costo_mano_obra=total if cost_type == 'Mano de Obra' else Decimal(0),
                     costo_insumos=total if cost_type == 'Insumos' else Decimal(0),
                     costo_maquinaria=total if cost_type == 'Maquinaria' else Decimal(0),
