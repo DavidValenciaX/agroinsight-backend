@@ -56,45 +56,6 @@ class RegisterTaskCostsUseCase:
         inputs_registered = 0
         machinery_registered = 0
 
-        # Obtener la tarea y su nivel
-        task = self.cultural_practices_repository.get_task_by_id(task_id)
-        
-        # Calcular el costo total de la tarea
-        total_cost = Decimal('0.00')
-        
-        # Sumar costo de mano de obra
-        if costs.labor_cost:
-            labor_cost = (costs.labor_cost.cantidad_trabajadores * 
-                         costs.labor_cost.horas_trabajadas * 
-                         costs.labor_cost.costo_hora)
-            total_cost += labor_cost
-
-        # Sumar costos de insumos
-        if costs.inputs:
-            for input_data in costs.inputs:
-                costo_unitario = self.costs_repository.get_input_cost(input_data.insumo_id)
-                if costo_unitario:
-                    total_cost += costo_unitario * input_data.cantidad_utilizada
-
-        # Sumar costos de maquinaria
-        if costs.machinery:
-            for machinery_data in costs.machinery:
-                costo_hora = self.costs_repository.get_machinery_cost_per_hour(
-                    machinery_data.maquinaria_id
-                )
-                if costo_hora:
-                    total_cost += costo_hora * machinery_data.horas_uso
-
-        # Actualizar los costos según el nivel de la tarea
-        if task.tipo_labor.nivel == NivelLaborCultural.CULTIVO:
-            # Si es nivel cultivo, actualizar el costo de producción del cultivo activo en el lote
-            active_crop = self.crop_repository.get_active_crop_by_plot_id(task.lote_id)
-            if active_crop:
-                self.crop_repository.update_production_cost(active_crop.id, total_cost)
-        else:
-            # Si es nivel lote, actualizar los costos de mantenimiento del lote
-            self.plot_repository.update_maintenance_costs(task.lote_id, total_cost)
-
         # Registrar costo de mano de obra
         if costs.labor_cost:
             labor_cost_registered = self.costs_repository.create_labor_cost(
