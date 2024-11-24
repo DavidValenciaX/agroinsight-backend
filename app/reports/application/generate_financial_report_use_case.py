@@ -338,17 +338,17 @@ class GenerateFinancialReportUseCase:
             # Agrupar por tipo de tarea
             grouped = {}
             for task in tasks:
-                if task.tarea_nombre not in grouped:
-                    grouped[task.tarea_nombre] = {
+                if task.tipo_labor_nombre not in grouped:
+                    grouped[task.tipo_labor_nombre] = {
                         'costo_mano_obra': Decimal(0),
                         'costo_insumos': Decimal(0),
                         'costo_maquinaria': Decimal(0),
                         'costo_total': Decimal(0)
                     }
-                grouped[task.tarea_nombre]['costo_mano_obra'] += task.costo_mano_obra
-                grouped[task.tarea_nombre]['costo_insumos'] += task.costo_insumos
-                grouped[task.tarea_nombre]['costo_maquinaria'] += task.costo_maquinaria
-                grouped[task.tarea_nombre]['costo_total'] += task.costo_total
+                grouped[task.tipo_labor_nombre]['costo_mano_obra'] += task.costo_mano_obra
+                grouped[task.tipo_labor_nombre]['costo_insumos'] += task.costo_insumos
+                grouped[task.tipo_labor_nombre]['costo_maquinaria'] += task.costo_maquinaria
+                grouped[task.tipo_labor_nombre]['costo_total'] += task.costo_total
 
             return [
                 GroupedTaskCost(
