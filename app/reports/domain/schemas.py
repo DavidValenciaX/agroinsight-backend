@@ -18,7 +18,14 @@ class TaskCost(BaseModel):
     horas_trabajadas: int
     costo_hora_trabajador: Decimal
     costo_mano_obra: Decimal
+    insumo: str
+    cantidad_insumos: int
+    unidad_insumos: str
+    precio_unitario_insumos: Decimal
     costo_insumos: Decimal
+    maquinaria: str
+    horas_maquinaria: int
+    precio_hora_maquinaria: Decimal
     costo_maquinaria: Decimal
     costo_total: Decimal
     observaciones: Optional[str]
