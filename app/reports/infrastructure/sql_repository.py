@@ -44,8 +44,12 @@ class FinancialReportRepository:
             ).all()
 
     def get_plot_crops_in_period(self, plot_id: int, start_date: date, end_date: date) -> List[Crop]:
-        """Obtiene todos los cultivos de un lote en un período específico"""
+        """Obtiene todos los cultivos de un lote en un período específico."""
         return self.db.query(Crop)\
+            .options(joinedload(Crop.variedad_maiz))\
+            .options(joinedload(Crop.produccion_total_unidad))\
+            .options(joinedload(Crop.cantidad_vendida_unidad))\
+            .options(joinedload(Crop.moneda))\
             .filter(
                 Crop.lote_id == plot_id,
                 Crop.fecha_siembra >= start_date,
