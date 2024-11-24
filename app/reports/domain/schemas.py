@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 from typing import List, Optional
 
-class InsumoSchema(BaseModel):
+class InputSchema(BaseModel):
     """Esquema para insumos agrícolas"""
     id: int
     categoria_id: int
@@ -21,7 +21,7 @@ class InsumoSchema(BaseModel):
     class Config:
         from_attributes = True
 
-class MaquinariaSchema(BaseModel):
+class MachinerySchema(BaseModel):
     """Esquema para maquinaria agrícola"""
     id: int
     tipo_maquinaria_id: int
@@ -38,6 +38,16 @@ class MaquinariaSchema(BaseModel):
     class Config:
         from_attributes = True
 
+class LaborCostSchema(BaseModel):
+    """Esquema para costos de mano de obra"""
+    cantidad_trabajadores: int
+    horas_trabajadas: Decimal
+    costo_hora: Decimal
+    observaciones: Optional[str]
+
+    class Config:
+        from_attributes = True
+
 class TaskCost(BaseModel):
     """Costos asociados a una tarea específica"""
     tarea_id: int
@@ -48,13 +58,11 @@ class TaskCost(BaseModel):
     nivel: str
     estado_id: int
     estado_nombre: str
-    cantidad_trabajadores: int
-    horas_trabajadas: int
-    costo_hora_trabajador: Decimal
+    mano_obra: Optional[LaborCostSchema]
     costo_mano_obra: Decimal
-    insumos: Optional[List[InsumoSchema]]
+    insumos: Optional[List[InputSchema]]
     costo_insumos: Decimal
-    maquinarias: Optional[List[MaquinariaSchema]]
+    maquinarias: Optional[List[MachinerySchema]]
     costo_maquinaria: Decimal
     costo_total: Decimal
     observaciones: Optional[str]

@@ -14,7 +14,7 @@ from fastapi import status
 from app.measurement.application.services.currency_conversion_service import CurrencyConversionService
 
 from app.user.domain.schemas import UserInDB
-from app.reports.domain.schemas import InsumoSchema, MaquinariaSchema
+from app.reports.domain.schemas import InputSchema, MachinerySchema, LaborCostSchema
 
 class GenerateFinancialReportUseCase:
     def __init__(self, db: Session):
@@ -146,11 +146,14 @@ class GenerateFinancialReportUseCase:
                     fecha_finalizacion=task.fecha_finalizacion,
                     estado_id=task.estado_id,
                     estado_nombre=task.estado.nombre,
-                    cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores if task.costo_mano_obra else 0,
-                    horas_trabajadas=task.costo_mano_obra.horas_trabajadas if task.costo_mano_obra else 0,
-                    costo_hora_trabajador=task.costo_mano_obra.costo_hora if task.costo_mano_obra else 0,
+                    mano_obra=LaborCostSchema(
+                        cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores,
+                        horas_trabajadas=task.costo_mano_obra.horas_trabajadas,
+                        costo_hora=task.costo_mano_obra.costo_hora,
+                        observaciones=task.costo_mano_obra.observaciones
+                    ) if task.costo_mano_obra else None,
                     costo_mano_obra=labor_cost,
-                    insumos=[InsumoSchema(
+                    insumos=[InputSchema(
                         id=ti.insumo.id,
                         categoria_id=ti.insumo.categoria_id,
                         categoria_nombre=ti.insumo.categoria.nombre,
@@ -164,7 +167,7 @@ class GenerateFinancialReportUseCase:
                         observaciones=ti.observaciones
                     ) for ti in task.insumos],
                     costo_insumos=input_cost,
-                    maquinarias=[MaquinariaSchema(
+                    maquinarias=[MachinerySchema(
                         id=tm.maquinaria.id,
                         tipo_maquinaria_id=tm.maquinaria.tipo_maquinaria_id,
                         tipo_maquinaria_nombre=tm.maquinaria.tipo_maquinaria.nombre,
@@ -224,11 +227,14 @@ class GenerateFinancialReportUseCase:
                         fecha_finalizacion=task.fecha_finalizacion,
                         estado_id=task.estado_id,
                         estado_nombre=task.estado.nombre,
-                        cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores if task.costo_mano_obra else 0,
-                        horas_trabajadas=task.costo_mano_obra.horas_trabajadas if task.costo_mano_obra else 0,
-                        costo_hora_trabajador=task.costo_mano_obra.costo_hora if task.costo_mano_obra else 0,
+                        mano_obra=LaborCostSchema(
+                            cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores,
+                            horas_trabajadas=task.costo_mano_obra.horas_trabajadas,
+                            costo_hora=task.costo_mano_obra.costo_hora,
+                            observaciones=task.costo_mano_obra.observaciones
+                        ) if task.costo_mano_obra else None,
                         costo_mano_obra=labor_cost,
-                        insumos=[InsumoSchema(
+                        insumos=[InputSchema(
                             id=ti.insumo.id,
                             categoria_id=ti.insumo.categoria_id,
                             categoria_nombre=ti.insumo.categoria.nombre,
@@ -242,7 +248,7 @@ class GenerateFinancialReportUseCase:
                             observaciones=ti.observaciones
                         ) for ti in task.insumos],
                         costo_insumos=input_cost,
-                        maquinarias=[MaquinariaSchema(
+                        maquinarias=[MachinerySchema(
                             id=tm.maquinaria.id,
                             tipo_maquinaria_id=tm.maquinaria.tipo_maquinaria_id,
                             tipo_maquinaria_nombre=tm.maquinaria.tipo_maquinaria.nombre,
@@ -353,9 +359,12 @@ class GenerateFinancialReportUseCase:
                     nivel="AGRUPADO",
                     estado_id=-1,
                     estado_nombre="Agrupado",
-                    cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                    horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
-                    costo_hora_trabajador=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
+                    mano_obra=LaborCostSchema(
+                        cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
+                        horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
+                        costo_hora=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
+                        observaciones=f"Total de costos de {name}"
+                    ),
                     costo_mano_obra=sum(costs['costo_mano_obra'] for costs in grouped.values()),
                     insumos=None,
                     costo_insumos=sum(costs['costo_insumos'] for costs in grouped.values()),
@@ -393,9 +402,12 @@ class GenerateFinancialReportUseCase:
                     nivel="AGRUPADO",
                     estado_id=-1,
                     estado_nombre="Agrupado",
-                    cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                    horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
-                    costo_hora_trabajador=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
+                    mano_obra=LaborCostSchema(
+                        cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
+                        horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
+                        costo_hora=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
+                        observaciones=f"Total de costos de {month_key}"
+                    ),
                     costo_mano_obra=sum(costs['costo_mano_obra'] for costs in grouped.values()),
                     insumos=None,
                     costo_insumos=sum(costs['costo_insumos'] for costs in grouped.values()),
@@ -429,9 +441,12 @@ class GenerateFinancialReportUseCase:
                     nivel="AGRUPADO",
                     estado_id=-1,
                     estado_nombre="Agrupado",
-                    cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                    horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
-                    costo_hora_trabajador=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
+                    mano_obra=LaborCostSchema(
+                        cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
+                        horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
+                        costo_hora=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
+                        observaciones=f"Total de costos de {cost_type}"
+                    ),
                     costo_mano_obra=sum(costs['costo_mano_obra'] for costs in grouped.values()),
                     insumos=None,
                     costo_insumos=sum(costs['costo_insumos'] for costs in grouped.values()),
