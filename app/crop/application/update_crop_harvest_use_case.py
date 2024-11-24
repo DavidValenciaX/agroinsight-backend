@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.crop.infrastructure.sql_repository import CropRepository
+from app.crop.application.services.crop_service import CropService
 from app.crop.domain.schemas import CropHarvestUpdate
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.farm.infrastructure.sql_repository import FarmRepository
@@ -18,6 +19,7 @@ class UpdateCropHarvestUseCase:
     def __init__(self, db: Session):
         self.db = db
         self.crop_repository = CropRepository(db)
+        self.crop_service = CropService()
         self.plot_repository = PlotRepository(db)
         self.farm_repository = FarmRepository(db)
         self.farm_service = FarmService(db)
@@ -113,9 +115,17 @@ class UpdateCropHarvestUseCase:
                 message="La unidad de medida especificada no es una moneda válida.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
+            
+        # Obtener el estado "Cosechado"
+        estado_cosechado = self.crop_repository.get_crop_state_by_name(self.crop_service.COSECHADO)
+        if not estado_cosechado:
+            raise DomainException(
+                message="No se pudo obtener el estado 'Cosechado'.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         # Actualizar el cultivo
-        updated_crop = self.crop_repository.update_crop_harvest(crop_id, harvest_data)
+        updated_crop = self.crop_repository.update_crop_harvest(crop_id, harvest_data, estado_cosechado.id)
         if not updated_crop:
             raise DomainException(
                 message="Error al actualizar la información de cosecha.",

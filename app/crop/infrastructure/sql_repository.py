@@ -1,13 +1,10 @@
 from typing import Optional, List
-from fastapi import status
 from sqlalchemy.orm import Session
-from app.crop.application.services.crop_service import CropService
 from app.crop.infrastructure.orm_models import Crop, CropState, CornVariety
 from app.crop.domain.schemas import CropCreate, CropHarvestUpdate
 from sqlalchemy.orm import joinedload
 from decimal import Decimal
 from sqlalchemy import update
-from app.infrastructure.common.common_exceptions import DomainException
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
 
 class CropRepository:
@@ -27,7 +24,6 @@ class CropRepository:
         """
         self.db = db
         self.measurement_repository = MeasurementRepository(db)
-        self.crop_service = CropService()
         
     def create_crop(self, crop_data: CropCreate) -> Optional[Crop]:
         """Crea un nuevo cultivo en la base de datos.
@@ -160,7 +156,7 @@ class CropRepository:
         category = self.measurement_repository.get_unit_category_by_id(unit.categoria_id)
         return category and category.nombre == "Moneda"
 
-    def update_crop_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate) -> Optional[Crop]:
+    def update_crop_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate, estado_id: int) -> Optional[Crop]:
         """Actualiza la información de cosecha y venta de un cultivo."""
         try:
             # Validar que la moneda sea válida
@@ -171,14 +167,6 @@ class CropRepository:
             crop = self.db.query(Crop).filter(Crop.id == crop_id).first()
             if not crop:
                 return None
-            
-            # Obtener el estado "Cosechado"
-            estado_cosechado = self.get_crop_state_by_name(self.crop_service.COSECHADO)
-            if not estado_cosechado:
-                raise DomainException(
-                    message="No se pudo obtener el estado 'Cosechado'.",
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
 
             # Actualizar los campos del cultivo
             crop.fecha_cosecha = harvest_data.fecha_cosecha
@@ -189,7 +177,7 @@ class CropRepository:
             crop.cantidad_vendida_unidad_id = harvest_data.cantidad_vendida_unidad_id
             crop.moneda_id = harvest_data.moneda_id
             crop.fecha_venta = harvest_data.fecha_venta
-            crop.estado_id = estado_cosechado.id
+            crop.estado_id = estado_id
 
             self.db.commit()
             self.db.refresh(crop)
