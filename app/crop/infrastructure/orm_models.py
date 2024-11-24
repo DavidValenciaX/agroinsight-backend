@@ -20,8 +20,6 @@ class Crop(Base):
         precio_venta_unitario (decimal): Precio de venta unitario (opcional).
         cantidad_vendida (int): Cantidad vendida (opcional).
         cantidad_vendida_unidad_id (int): ID de la unidad de medida para la cantidad vendida (opcional).
-        ingreso_total (decimal): Ingreso total (opcional).
-        costo_produccion (decimal): Costo de producción (opcional).
         moneda_id (int): ID de la moneda (opcional).
         fecha_venta (date): Fecha de venta (opcional).
         fecha_creacion (timestamp): Fecha de creación del registro.
@@ -42,8 +40,6 @@ class Crop(Base):
     precio_venta_unitario = Column(DECIMAL(10, 2))
     cantidad_vendida = Column(Integer)
     cantidad_vendida_unidad_id = Column(Integer, ForeignKey('unidad_medida.id'))
-    ingreso_total = Column(DECIMAL(15, 2))
-    costo_produccion = Column(DECIMAL(15, 2))
     moneda_id = Column(Integer, ForeignKey('unidad_medida.id'))
     fecha_venta = Column(Date)
 

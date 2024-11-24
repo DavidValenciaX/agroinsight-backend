@@ -230,4 +230,20 @@ class CulturalPracticesRepository:
             List[CulturalTaskType]: Lista de tipos de tareas del nivel especificado.
         """
         return self.db.query(CulturalTaskType).filter(CulturalTaskType.nivel == nivel).all()
+    
+    def get_tasks_by_crop_id(self, crop_id: int) -> List[CulturalTask]:
+        """Obtiene las tareas de un cultivo específico.
+
+        Args:
+            crop_id (int): ID del cultivo.
+
+        Returns:
+            List[CulturalTask]: Lista de tareas del cultivo.
+        """
+        return self.db.query(CulturalTask)\
+            .options(joinedload(CulturalTask.tipo_labor))\
+            .options(joinedload(CulturalTask.estado))\
+            .filter(CulturalTask.lote_id == crop_id)\
+            .filter(CulturalTaskType.nivel == NivelLaborCultural.CULTIVO)\
+            .all()
 

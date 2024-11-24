@@ -1,14 +1,18 @@
+from decimal import Decimal
 from math import ceil
 from sqlalchemy.orm import Session
+from app.costs.infrastructure.sql_repository import CostsRepository
 from app.crop.infrastructure.sql_repository import CropRepository
 from app.crop.domain.schemas import PaginatedCropListResponse
 from app.plot.infrastructure.sql_repository import PlotRepository
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.farm.application.services.farm_service import FarmService
+from app.reports.infrastructure.sql_repository import FinancialReportRepository
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
+from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 
 class ListCropsByPlotUseCase:
     """Caso de uso para listar los cultivos de un lote específico.
@@ -38,6 +42,9 @@ class ListCropsByPlotUseCase:
         self.farm_repository = FarmRepository(db)
         self.farm_service = FarmService(db)
         self.user_repository = UserRepository(db)
+        self.financial_report_repository = FinancialReportRepository(db)
+        self.cultural_practices_repository = CulturalPracticesRepository(db)
+        self.costs_repository = CostsRepository(db)
         
     def list_crops(self, plot_id: int, page: int, per_page: int, current_user: UserInDB) -> PaginatedCropListResponse:
         """Lista los cultivos de un lote específico de forma paginada.
@@ -99,6 +106,20 @@ class ListCropsByPlotUseCase:
 
         # Obtener los cultivos
         total_crops, crops = self.crop_repository.get_crops_by_plot_id_paginated(plot_id, page, per_page)
+        
+        # Agregar los campos de ingreso total y costo de producción
+        for crop in crops:
+            crop.ingreso_total = crop.precio_venta_unitario * crop.cantidad_vendida if crop.precio_venta_unitario and crop.cantidad_vendida else None
+            
+            crop_tasks = self.cultural_practices_repository.get_tasks_by_crop_id(crop.id)
+            total_crop_task_cost = Decimal(0)
+            
+            for task in crop_tasks:
+                labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
+                task_total = labor_cost + input_cost + machinery_cost
+                total_crop_task_cost += task_total
+            
+            crop.costo_produccion = total_crop_task_cost if total_crop_task_cost else None
         
         total_pages = ceil(total_crops / per_page)
         

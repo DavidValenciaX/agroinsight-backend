@@ -3,6 +3,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional, List
 from sqlalchemy.orm import Session
+from app.costs.infrastructure.sql_repository import CostsRepository
 from app.farm.infrastructure.sql_repository import FarmRepository
 from app.reports.infrastructure.sql_repository import FinancialReportRepository
 from app.farm.application.services.farm_service import FarmService
@@ -18,7 +19,8 @@ class GenerateFinancialReportUseCase:
         self.repository = FinancialReportRepository(db)
         self.farm_service = FarmService(db)
         self.farm_repository = FarmRepository(db)
-
+        self.costs_repository = CostsRepository(db)
+        
     def generate_report(
         self,
         farm_id: int,
@@ -101,7 +103,7 @@ class GenerateFinancialReportUseCase:
             total_plot_task_cost = Decimal(0)
 
             for task in plot_tasks:
-                labor_cost, input_cost, machinery_cost = self.repository.get_task_costs(task.id)
+                labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
                 task_total = labor_cost + input_cost + machinery_cost
                 total_plot_task_cost += task_total
 
@@ -132,13 +134,18 @@ class GenerateFinancialReportUseCase:
             total_plot_income = Decimal(0)
 
             for crop in crops:
-                # Obtener tareas a nivel de CULTIVO
+                # Calculate income and costs from task data
+                crop_income = Decimal(0)
+                if crop.cantidad_vendida and crop.precio_venta_unitario:
+                    crop_income = Decimal(crop.cantidad_vendida) * Decimal(crop.precio_venta_unitario)
+
+                # Get crop tasks and their costs
                 crop_tasks = self.repository.get_crop_level_tasks_in_period(crop.id, start_date, end_date)
                 crop_task_costs = []
                 total_crop_task_cost = Decimal(0)
 
                 for task in crop_tasks:
-                    labor_cost, input_cost, machinery_cost = self.repository.get_task_costs(task.id)
+                    labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
                     task_total = labor_cost + input_cost + machinery_cost
                     total_crop_task_cost += task_total
 
@@ -159,11 +166,7 @@ class GenerateFinancialReportUseCase:
                 crop_task_costs = filter_task_costs(crop_task_costs)
                 total_crop_task_cost = sum(task.costo_total for task in crop_task_costs)
 
-                crop_income = crop.ingreso_total or Decimal(0)
-                crop_production_cost = (crop.costo_produccion or Decimal(0)) + total_crop_task_cost
-                total_plot_crop_cost += crop_production_cost
-                total_plot_income += crop_income
-
+                # Update crop financials without using costo_produccion
                 crop_financials.append(CropFinancials(
                     cultivo_id=crop.id,
                     variedad_maiz=crop.variedad_maiz.nombre,
@@ -179,15 +182,14 @@ class GenerateFinancialReportUseCase:
                     moneda_id=crop.moneda_id,
                     moneda_simbolo=crop.moneda.abreviatura if crop.moneda else None,
                     ingreso_total=crop_income,
-                    costo_produccion=crop.costo_produccion,
+                    costo_produccion=total_crop_task_cost,
                     tareas_cultivo=crop_task_costs,
-                    costo_total=crop_production_cost,
-                    ganancia_neta=crop_income - crop_production_cost
+                    ganancia_neta=crop_income - total_crop_task_cost
                 ))
 
             # Filtrar cultivos según criterios
             crop_financials = filter_crops(crop_financials)
-            total_plot_crop_cost = sum(crop.costo_total for crop in crop_financials)
+            total_plot_crop_cost = sum(crop.costo_produccion for crop in crop_financials)
             total_plot_income = sum(crop.ingreso_total or 0 for crop in crop_financials)
 
             # Si se especificó group_by, agrupar las tareas
@@ -204,7 +206,7 @@ class GenerateFinancialReportUseCase:
                 lote_nombre=plot.nombre,
                 cultivos=crop_financials,
                 tareas_lote=plot_task_costs,
-                costo_tareas=total_plot_task_cost,
+                costo_mantenimiento=total_plot_task_cost,
                 costo_cultivos=total_plot_crop_cost,
                 costo_total=total_plot_cost,
                 ingreso_total=total_plot_income,

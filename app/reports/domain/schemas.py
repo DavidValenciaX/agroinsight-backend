@@ -32,11 +32,10 @@ class CropFinancials(BaseModel):
     precio_venta_unitario: Optional[Decimal]
     moneda_id: Optional[int]
     moneda_simbolo: Optional[str]
-    ingreso_total: Optional[Decimal]
-    costo_produccion: Optional[Decimal]
+    ingreso_total: Decimal
+    costo_produccion: Decimal
     tareas_cultivo: List[TaskCost]
-    costo_total: Decimal
-    ganancia_neta: Optional[Decimal]
+    ganancia_neta: Decimal
 
 class PlotFinancials(BaseModel):
     """Información financiera de un lote"""
@@ -44,8 +43,7 @@ class PlotFinancials(BaseModel):
     lote_nombre: str
     cultivos: List[CropFinancials]
     tareas_lote: List[TaskCost]
-    costo_mantenimiento_base: Decimal
-    costo_tareas: Decimal
+    costo_mantenimiento: Decimal
     costo_cultivos: Decimal
     costo_total: Decimal
     ingreso_total: Decimal

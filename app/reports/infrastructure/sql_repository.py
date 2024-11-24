@@ -1,11 +1,8 @@
 # app/reports/infrastructure/sql_repository.py
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func, or_
+from sqlalchemy import or_
 from datetime import date
-from typing import List, Tuple, Optional
-from decimal import Decimal
-
-from app.costs.infrastructure.orm_models import LaborCost, TaskInput, TaskMachinery
+from typing import List, Optional
 from app.crop.infrastructure.orm_models import Crop
 from app.cultural_practices.infrastructure.orm_models import CulturalTask, CulturalTaskType, NivelLaborCultural
 from app.plot.infrastructure.orm_models import Plot
@@ -14,25 +11,6 @@ from app.measurement.infrastructure.orm_models import UnitOfMeasure, UnitCategor
 class FinancialReportRepository:
     def __init__(self, db: Session):
         self.db = db
-
-    def get_task_costs(self, task_id: int) -> Tuple[Decimal, Decimal, Decimal]:
-        """Obtiene los costos de una tarea específica"""
-        # Costo mano de obra
-        labor_cost = self.db.query(func.coalesce(func.sum(LaborCost.costo_total), 0))\
-            .filter(LaborCost.tarea_labor_id == task_id)\
-            .scalar()
-
-        # Costo insumos
-        input_cost = self.db.query(func.coalesce(func.sum(TaskInput.costo_total), 0))\
-            .filter(TaskInput.tarea_labor_id == task_id)\
-            .scalar()
-
-        # Costo maquinaria
-        machinery_cost = self.db.query(func.coalesce(func.sum(TaskMachinery.costo_total), 0))\
-            .filter(TaskMachinery.tarea_labor_id == task_id)\
-            .scalar()
-
-        return labor_cost, input_cost, machinery_cost
 
     def get_plot_tasks_in_period(self, plot_id: int, start_date: date, end_date: date) -> List[CulturalTask]:
         """Obtiene todas las tareas de un lote en un período específico"""

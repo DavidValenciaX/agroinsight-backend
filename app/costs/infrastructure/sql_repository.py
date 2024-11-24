@@ -1,14 +1,13 @@
-from typing import List
-from sqlalchemy.orm import Session
 from app.costs.domain.schemas import LaborCostCreate, TaskInputCreate, TaskMachineryCreate
 from app.costs.infrastructure.orm_models import LaborCost, TaskInput, TaskMachinery
-from sqlalchemy.orm import joinedload
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List, Tuple, Optional
 from app.costs.infrastructure.orm_models import AgriculturalInput
 from app.costs.infrastructure.orm_models import AgriculturalMachinery
 from app.costs.infrastructure.orm_models import AgriculturalInputCategory
 from app.costs.infrastructure.orm_models import MachineryType
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import func
 
 class CostsRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con costos.
@@ -149,3 +148,22 @@ class CostsRepository:
             .options(joinedload(AgriculturalInput.categoria))\
             .filter(AgriculturalInput.id == input_id)\
             .first()
+            
+    def get_task_costs(self, task_id: int) -> Tuple[Decimal, Decimal, Decimal]:
+        """Obtiene los costos de una tarea específica"""
+        # Costo mano de obra
+        labor_cost = self.db.query(func.coalesce(func.sum(LaborCost.costo_total), 0))\
+            .filter(LaborCost.tarea_labor_id == task_id)\
+            .scalar()
+
+        # Costo insumos
+        input_cost = self.db.query(func.coalesce(func.sum(TaskInput.costo_total), 0))\
+            .filter(TaskInput.tarea_labor_id == task_id)\
+            .scalar()
+
+        # Costo maquinaria
+        machinery_cost = self.db.query(func.coalesce(func.sum(TaskMachinery.costo_total), 0))\
+            .filter(TaskMachinery.tarea_labor_id == task_id)\
+            .scalar()
+
+        return labor_cost, input_cost, machinery_cost
