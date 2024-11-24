@@ -15,8 +15,6 @@ class PlotCreate(BaseModel):
         latitud (Decimal): Latitud del lote. Debe estar entre -90 y 90.
         longitud (Decimal): Longitud del lote. Debe estar entre -180 y 180.
         finca_id (int): ID de la finca a la que pertenece el lote.
-        costos_mantenimiento (Decimal): Costos de mantenimiento del lote. Debe ser un valor positivo.
-        moneda_id (Optional[int]): ID de la moneda del lote. Opcional porque se asignará automáticamente.
     """
     nombre: str = Field(..., min_length=1, max_length=100)
     area: Decimal = Field(..., gt=0)
@@ -24,61 +22,21 @@ class PlotCreate(BaseModel):
     latitud: Decimal = Field(..., ge=-90, le=90)
     longitud: Decimal = Field(..., ge=-180, le=180)
     finca_id: int
-    costos_mantenimiento: Decimal = Field(default=Decimal('0.00'), ge=0)
-    moneda_id: Optional[int] = None
     
     @field_validator('nombre')
     def validate_no_emojis_nombre(cls: Type['PlotCreate'], v: str) -> str:
-        """Valida que el nombre no contenga emojis.
-
-        Args:
-            cls: Clase del validador.
-            v (str): Valor del nombre a validar.
-
-        Returns:
-            str: El valor validado.
-
-        Raises:
-            ValueError: Si el nombre contiene emojis.
-        """
         return validate_no_emojis(v)
     
     @field_validator('nombre')
     def validate_no_special_chars_nombre(cls: Type['PlotCreate'], v: str) -> str:
-        """Valida que el nombre no contenga caracteres especiales.
-
-        Args:
-            cls: Clase del validador.
-            v (str): Valor del nombre a validar.
-
-        Returns:
-            str: El valor validado.
-
-        Raises:
-            ValueError: Si el nombre contiene caracteres especiales.
-        """
         return validate_no_special_chars(v)
     
     @field_validator('nombre')
     def validate_no_xss_nombre(cls: Type['PlotCreate'], v: str) -> str:
-        """Valida que el nombre no contenga XSS.
-
-        Args:
-            cls: Clase del validador.
-            v (str): Valor del nombre a validar.
-
-        Returns:
-            str: El valor validado.
-
-        Raises:
-            ValueError: Si el nombre contiene XSS.
-        """
         return validate_no_xss(v)
 
 class PlotResponse(BaseModel):
     """Schema para la respuesta con información de un lote.
-
-    Este modelo define la estructura de la respuesta que incluye los detalles de un lote.
 
     Attributes:
         id (int): Identificador único del lote.
@@ -88,8 +46,6 @@ class PlotResponse(BaseModel):
         latitud (Decimal): Latitud del lote.
         longitud (Decimal): Longitud del lote.
         finca_id (int): ID de la finca a la que pertenece el lote.
-        costos_mantenimiento (Decimal): Costos de mantenimiento del lote.
-        moneda (str): Nombre de la moneda del lote.
     """
     id: int
     nombre: str
@@ -98,8 +54,6 @@ class PlotResponse(BaseModel):
     latitud: Decimal
     longitud: Decimal
     finca_id: int
-    costos_mantenimiento: Decimal
-    moneda: str
 
     model_config = ConfigDict(from_attributes=True)
     

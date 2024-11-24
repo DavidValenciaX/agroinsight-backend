@@ -197,14 +197,13 @@ class GenerateFinancialReportUseCase:
                     crop.tareas_cultivo = self._group_tasks(crop.tareas_cultivo, group_by)
 
             # Calcular totales del lote
-            total_plot_cost = total_plot_task_cost + total_plot_crop_cost + plot.costos_mantenimiento
+            total_plot_cost = total_plot_task_cost + total_plot_crop_cost
 
             plot_financials.append(PlotFinancials(
                 lote_id=plot.id,
                 lote_nombre=plot.nombre,
                 cultivos=crop_financials,
                 tareas_lote=plot_task_costs,
-                costo_mantenimiento_base=plot.costos_mantenimiento,
                 costo_tareas=total_plot_task_cost,
                 costo_cultivos=total_plot_crop_cost,
                 costo_total=total_plot_cost,
