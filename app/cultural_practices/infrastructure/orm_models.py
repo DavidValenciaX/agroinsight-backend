@@ -65,7 +65,7 @@ class CulturalTask(Base):
     estado = relationship("CulturalTaskState", back_populates="tareas")
     asignaciones = relationship("Assignment", back_populates="tarea")    
     lote = relationship("Plot", back_populates="tareas")
-    costo_mano_obra = relationship("LaborCost", back_populates="tarea")
+    costo_mano_obra = relationship("LaborCost", back_populates="tarea", uselist=False)
     insumos = relationship("TaskInput", back_populates="tarea")
     maquinarias = relationship("TaskMachinery", back_populates="tarea")
 

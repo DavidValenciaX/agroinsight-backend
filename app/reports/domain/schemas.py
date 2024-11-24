@@ -4,13 +4,47 @@ from datetime import date
 from decimal import Decimal
 from typing import List, Optional
 
+class InsumoSchema(BaseModel):
+    """Esquema para insumos agrícolas"""
+    id: int
+    categoria_id: int
+    categoria_nombre: str
+    nombre: str
+    descripcion: Optional[str]
+    unidad_medida_id: int
+    unidad_medida_nombre: str
+    costo_unitario: Decimal
+    cantidad_utilizada: Decimal
+    fecha_aplicacion: Optional[date]
+    observaciones: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+class MaquinariaSchema(BaseModel):
+    """Esquema para maquinaria agrícola"""
+    id: int
+    tipo_maquinaria_id: int
+    tipo_maquinaria_nombre: str
+    nombre: str
+    descripcion: Optional[str]
+    modelo: Optional[str]
+    numero_serie: Optional[str]
+    costo_hora: Decimal
+    horas_uso: Decimal
+    fecha_uso: Optional[date]
+    observaciones: Optional[str]
+
+    class Config:
+        from_attributes = True
+
 class TaskCost(BaseModel):
     """Costos asociados a una tarea específica"""
     tarea_id: int
     tarea_nombre: str
     tipo_labor_nombre: str
     fecha_inicio: date
-    fecha_finalizacion: date
+    fecha_finalizacion: Optional[date]
     nivel: str
     estado_id: int
     estado_nombre: str
@@ -18,17 +52,15 @@ class TaskCost(BaseModel):
     horas_trabajadas: int
     costo_hora_trabajador: Decimal
     costo_mano_obra: Decimal
-    insumo: str
-    cantidad_insumos: int
-    unidad_insumos: str
-    precio_unitario_insumos: Decimal
+    insumos: Optional[List[InsumoSchema]]
     costo_insumos: Decimal
-    maquinaria: str
-    horas_maquinaria: int
-    precio_hora_maquinaria: Decimal
+    maquinarias: Optional[List[MaquinariaSchema]]
     costo_maquinaria: Decimal
     costo_total: Decimal
     observaciones: Optional[str]
+
+    class Config:
+        from_attributes = True
 
 class CropFinancials(BaseModel):
     """Información financiera de un cultivo"""
