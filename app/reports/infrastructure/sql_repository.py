@@ -5,12 +5,14 @@ from datetime import date
 from typing import List, Optional
 from app.crop.infrastructure.orm_models import Crop
 from app.cultural_practices.infrastructure.orm_models import CulturalTask, CulturalTaskType, NivelLaborCultural
+from app.measurement.application.services.measurement_service import MeasurementService
 from app.plot.infrastructure.orm_models import Plot
 from app.measurement.infrastructure.orm_models import UnitOfMeasure, UnitCategory
 
 class FinancialReportRepository:
     def __init__(self, db: Session):
         self.db = db
+        self.measurement_service = MeasurementService(db)
 
     def get_plot_tasks_in_period(self, plot_id: int, start_date: date, end_date: date) -> List[CulturalTask]:
         """Obtiene todas las tareas de un lote en un período específico"""
@@ -79,6 +81,6 @@ class FinancialReportRepository:
         return self.db.query(UnitOfMeasure)\
             .join(UnitCategory)\
             .filter(
-                UnitCategory.nombre == "Moneda",
-                UnitOfMeasure.abreviatura == "COP"
+                UnitCategory.nombre == self.measurement_service.UNIT_CATEGORY_CURRENCY_NAME,
+                UnitOfMeasure.abreviatura == self.measurement_service.UNIT_SYMBOL_COP
             ).first()

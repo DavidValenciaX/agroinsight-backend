@@ -5,6 +5,7 @@ from app.crop.domain.schemas import CropCreate, CropHarvestUpdate
 from sqlalchemy.orm import joinedload
 from decimal import Decimal
 from sqlalchemy import update
+from app.measurement.application.services.measurement_service import MeasurementService
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
 
 class CropRepository:
@@ -24,6 +25,7 @@ class CropRepository:
         """
         self.db = db
         self.measurement_repository = MeasurementRepository(db)
+        self.measurement_service = MeasurementService(db)
         
     def create_crop(self, crop_data: CropCreate) -> Optional[Crop]:
         """Crea un nuevo cultivo en la base de datos.
@@ -154,7 +156,7 @@ class CropRepository:
             return False
             
         category = self.measurement_repository.get_unit_category_by_id(unit.categoria_id)
-        return category and category.nombre == "Moneda"
+        return category and category.nombre == self.measurement_service.UNIT_CATEGORY_CURRENCY_NAME
 
     def update_crop_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate, estado_id: int) -> Optional[Crop]:
         """Actualiza la información de cosecha y venta de un cultivo."""

@@ -39,6 +39,7 @@ async def generate_financial_report(
     task_types: Optional[List[str]] = Query(None),
     group_by: ReportGroupBy = ReportGroupBy.NONE,
     only_profitable: Optional[bool] = None,
+    currency_id: Optional[int] = None,
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> FarmFinancialReport:
@@ -56,6 +57,7 @@ async def generate_financial_report(
     - task_types: Lista de tipos de tareas a incluir
     - group_by: Tipo de agrupación para el reporte
     - only_profitable: Si es True, solo incluye elementos con ganancia positiva
+    - currency_id: ID de la moneda en la que se desea ver el informe (opcional, por defecto COP)
     """
     use_case = GenerateFinancialReportUseCase(db)
     return use_case.generate_report(
@@ -69,5 +71,6 @@ async def generate_financial_report(
         task_types=task_types,
         group_by=group_by,
         only_profitable=only_profitable,
+        currency_id=currency_id,
         current_user=current_user
     )

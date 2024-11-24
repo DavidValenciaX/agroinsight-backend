@@ -5,11 +5,13 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.costs.infrastructure.sql_repository import CostsRepository
 from app.farm.infrastructure.sql_repository import FarmRepository
+from app.measurement.infrastructure.sql_repository import MeasurementRepository
 from app.reports.infrastructure.sql_repository import FinancialReportRepository
 from app.farm.application.services.farm_service import FarmService
 from app.reports.domain.schemas import FarmFinancialReport, PlotFinancials, CropFinancials, TaskCost
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
+from app.measurement.application.services.currency_conversion_service import CurrencyConversionService
 
 from app.user.domain.schemas import UserInDB
 
@@ -20,6 +22,8 @@ class GenerateFinancialReportUseCase:
         self.farm_service = FarmService(db)
         self.farm_repository = FarmRepository(db)
         self.costs_repository = CostsRepository(db)
+        self.currency_service = CurrencyConversionService(db)
+        self.measurement_repository = MeasurementRepository(db)
         
     def generate_report(
         self,
@@ -33,6 +37,7 @@ class GenerateFinancialReportUseCase:
         task_types: Optional[List[str]] = None,
         group_by: str = "none",
         only_profitable: Optional[bool] = None,
+        currency_id: Optional[int] = None,
         current_user: UserInDB = None
     ) -> FarmFinancialReport:
         """
@@ -66,6 +71,26 @@ class GenerateFinancialReportUseCase:
             raise DomainException(
                 message="No se pudo obtener la moneda por defecto",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        # Obtener la moneda solicitada o usar COP por defecto
+        target_currency = default_currency
+        if currency_id:
+            target_currency = self.measurement_repository.get_unit_of_measure_by_id(currency_id)
+            if not target_currency:
+                raise DomainException(
+                    message="Moneda no encontrada",
+                    status_code=status.HTTP_404_NOT_FOUND
+                )
+
+        # Función auxiliar para convertir montos
+        def convert_amount(amount: Decimal, from_currency: str) -> Decimal:
+            if not amount:
+                return Decimal(0)
+            return self.currency_service.convert_amount(
+                amount,
+                from_currency,
+                target_currency.abreviatura
             )
 
         plots = self.repository.get_farm_plots(farm_id)
@@ -104,6 +129,10 @@ class GenerateFinancialReportUseCase:
 
             for task in plot_tasks:
                 labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
+                # Convertir costos a la moneda objetivo
+                labor_cost = convert_amount(labor_cost, default_currency.abreviatura)
+                input_cost = convert_amount(input_cost, default_currency.abreviatura)
+                machinery_cost = convert_amount(machinery_cost, default_currency.abreviatura)
                 task_total = labor_cost + input_cost + machinery_cost
                 total_plot_task_cost += task_total
 
@@ -159,6 +188,10 @@ class GenerateFinancialReportUseCase:
 
                 for task in crop_tasks:
                     labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
+                    # Convertir costos a la moneda objetivo
+                    labor_cost = convert_amount(labor_cost, default_currency.abreviatura)
+                    input_cost = convert_amount(input_cost, default_currency.abreviatura)
+                    machinery_cost = convert_amount(machinery_cost, default_currency.abreviatura)
                     task_total = labor_cost + input_cost + machinery_cost
                     total_crop_task_cost += task_total
 

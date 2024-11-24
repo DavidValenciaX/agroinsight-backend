@@ -109,6 +109,67 @@ class MeasurementService:
     # Unidades de Tasa de Precipitación
     UNIT_MILLIMETERS_PER_HOUR = "Milímetro por hora"
     
+    # Abreviaturas de Monedas
+    UNIT_SYMBOL_METER = "m"
+    UNIT_SYMBOL_KILOMETER = "km"
+    UNIT_SYMBOL_CENTIMETER = "cm"
+    UNIT_SYMBOL_MILLIMETER = "mm"
+    UNIT_SYMBOL_INCH = "in"
+    UNIT_SYMBOL_FOOT = "ft"
+    # Área
+    UNIT_SYMBOL_SQUARE_METER = "m²"
+    UNIT_SYMBOL_SQUARE_KILOMETER = "km²"
+    UNIT_SYMBOL_HECTARE = "ha"
+    UNIT_SYMBOL_ACRE = "ac"
+    # Volumen
+    UNIT_SYMBOL_LITER = "L"
+    UNIT_SYMBOL_MILLILITER = "mL"
+    UNIT_SYMBOL_CUBIC_METER = "m³"
+    UNIT_SYMBOL_GALLON = "gal"
+    UNIT_SYMBOL_BAG_60K_SEEDS = "bolsa 60k sem"
+    # Masa
+    UNIT_SYMBOL_KILOGRAM = "kg"
+    UNIT_SYMBOL_GRAM = "g"
+    UNIT_SYMBOL_TON = "t"
+    UNIT_SYMBOL_POUND = "lb"
+    UNIT_SYMBOL_BULK_50_KILOGRAMS = "bulto 50kg"
+    # Tiempo
+    UNIT_SYMBOL_SECOND = "s"
+    UNIT_SYMBOL_MINUTE = "min"
+    UNIT_SYMBOL_HOUR = "h"
+    UNIT_SYMBOL_DAY = "d"
+    # Temperatura
+    UNIT_SYMBOL_CELSIUS = "°C"
+    UNIT_SYMBOL_FAHRENHEIT = "°F"
+    UNIT_SYMBOL_KELVIN = "K"
+    # Densidad de siembra
+    UNIT_SYMBOL_PLANTS_PER_HECTARE = "plantas/ha"
+    UNIT_SYMBOL_SEEDS_PER_HECTARE = "semillas/ha"
+    UNIT_SYMBOL_SEEDS_PER_SQUARE_METER = "semillas/m²"
+    # Moneda
+    UNIT_SYMBOL_COP = "COP"
+    UNIT_SYMBOL_MXN = "MXN"
+    UNIT_SYMBOL_USD = "USD"
+    UNIT_SYMBOL_EUR = "EUR"
+    UNIT_SYMBOL_GBP = "GBP"
+    # Rendimiento
+    UNIT_SYMBOL_TONS_PER_HECTARE = "t/ha"
+    UNIT_SYMBOL_KILOGRAMS_PER_HECTARE = "kg/ha"
+    # Presión 
+    UNIT_SYMBOL_HECTOPASCAL = "hPa"
+    UNIT_SYMBOL_MILLIBAR = "mbar"
+    # Porcentaje
+    UNIT_SYMBOL_PERCENTAGE = "%"
+    # Velocidad
+    UNIT_SYMBOL_METERS_PER_SECOND = "m/s"
+    UNIT_SYMBOL_KILOMETERS_PER_HOUR = "km/h"
+    UNIT_SYMBOL_MILES_PER_HOUR = "mph"
+    # Ángulo
+    UNIT_SYMBOL_DEGREE = "°"
+    # Tasa de precipitación
+    UNIT_SYMBOL_MILLIMETERS_PER_HOUR = "mm/h"
+    
+    
     def __init__(self, db: Session):
         """Inicializa el servicio de medidas con la sesión de base de datos.
 
