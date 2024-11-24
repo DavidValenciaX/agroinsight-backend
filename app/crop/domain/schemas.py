@@ -136,7 +136,6 @@ class CropHarvestUpdate(BaseModel):
         precio_venta_unitario (Decimal): Precio de venta por unidad.
         cantidad_vendida (int): Cantidad vendida del cultivo. Debe ser mayor que 0.
         cantidad_vendida_unidad_id (int): ID de la unidad de medida de la cantidad vendida. Debe ser mayor que 0.
-        ingreso_total (Decimal): Ingreso total por la venta.
         moneda_id (Optional[int]): ID de la moneda utilizada. Si no se especifica, se usará COP por defecto.
         fecha_venta (date): Fecha en que se realizó la venta.
     """
@@ -146,6 +145,5 @@ class CropHarvestUpdate(BaseModel):
     precio_venta_unitario: Decimal = Field(..., gt=0)
     cantidad_vendida: int = Field(..., gt=0)
     cantidad_vendida_unidad_id: int = Field(..., gt=0)
-    ingreso_total: Decimal = Field(..., gt=0)
     moneda_id: Optional[int] = None
     fecha_venta: date

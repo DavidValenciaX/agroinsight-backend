@@ -168,6 +168,9 @@ class CropRepository:
             if not crop:
                 return None
 
+            # Calcular el ingreso total
+            ingreso_total = harvest_data.precio_venta_unitario * harvest_data.cantidad_vendida
+
             # Actualizar los campos del cultivo
             crop.fecha_cosecha = harvest_data.fecha_cosecha
             crop.produccion_total = harvest_data.produccion_total
@@ -175,7 +178,7 @@ class CropRepository:
             crop.precio_venta_unitario = harvest_data.precio_venta_unitario
             crop.cantidad_vendida = harvest_data.cantidad_vendida
             crop.cantidad_vendida_unidad_id = harvest_data.cantidad_vendida_unidad_id
-            crop.ingreso_total = harvest_data.ingreso_total
+            crop.ingreso_total = ingreso_total
             crop.moneda_id = harvest_data.moneda_id
             crop.fecha_venta = harvest_data.fecha_venta
 
