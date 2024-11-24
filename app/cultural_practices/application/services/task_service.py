@@ -25,8 +25,33 @@ class TaskService:
     IN_PROGRESS = 'in_progress'
     DONE = 'done'
     
-    MONITOREO_FITOSANITARIO = 'Monitoreo fitosanitario'
+    # Tipos de tareas de lotes
+    LABRANZA = 'Labranza'
+    ARADO = 'Arado'
+    RASTRILLADO = 'Rastrillado'
+    COMPACTACION = 'Compactación'
     ANALISIS_SUELO = 'Análisis de suelo'
+    ROTACION_DE_CULTIVOS = 'Rotación de cultivos'
+    MANEJO_DE_RESIDUOS_AGRICOLA = 'Manejo de residuos agrícolas'
+    
+    # Tipos de tareas de cultivos
+    
+    SIEMBRA = 'Siembra'
+    FERTILIZACION = 'Fertilización' 
+    RIEGO = 'Riego'
+    CONTROL_DE_PLAGAS = 'Control de plagas'
+    CONTROL_DE_MALEZAS = 'Control de malezas'
+    COSECHA = 'Cosecha'
+    SECADO = 'Secado'
+    LIMPIEZA = 'Limpieza'
+    CLASIFICACION_Y_SELECCION = 'Clasificación y selección'
+    ALMACENAMIENTO = 'Almacenamiento'
+    EMPAQUE = 'Empaque'
+    TRANSPORTE = 'Transporte'
+    TRATAMIENTO_POST_COSECHA = 'Tratamiento post-cosecha'
+    MONITOREO_FITOSANITARIO = 'Monitoreo fitosanitario'
+    APLICACION_DE_FUNGICIDAS = 'Aplicación de fungicidas'
+    CONTROL_BIOLOGICO_DE_PLAGAS = 'Control biológico de plagas'
     
     def __init__(self, db: Session):
         """Inicializa el servicio de tareas con la sesión de base de datos.

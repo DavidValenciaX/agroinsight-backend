@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from app.crop.application.services.crop_service import CropService
 from app.cultural_practices.application.services.task_service import TaskService
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
 from app.cultural_practices.domain.schemas import TaskCreate, SuccessTaskCreateResponse
@@ -40,6 +41,7 @@ class CreateTaskUseCase:
         self.farm_service = FarmService(db)
         self.task_service = TaskService(db)
         self.crop_repository = CropRepository(db)
+        self.crop_service = CropService()
         
     def create_task(self, task_data: TaskCreate, current_user: UserInDB) -> SuccessTaskCreateResponse:
         """Crea una nueva tarea de labor cultural.
@@ -103,6 +105,27 @@ class CreateTaskUseCase:
                     message="No se pueden crear tareas de nivel CULTIVO en lotes sin cultivos activos.",
                     status_code=status.HTTP_409_CONFLICT
                 )
+
+            # Verificar si el cultivo está cosechado
+            if active_crop.estado.nombre == self.crop_service.COSECHADO:
+                # Lista de tareas no permitidas después de la cosecha
+                tareas_no_permitidas = [
+                    self.task_service.SIEMBRA, 
+                    self.task_service.FERTILIZACION, 
+                    self.task_service.RIEGO, 
+                    self.task_service.CONTROL_DE_PLAGAS,
+                    self.task_service.CONTROL_DE_MALEZAS, 
+                    self.task_service.COSECHA, 
+                    self.task_service.MONITOREO_FITOSANITARIO,
+                    self.task_service.APLICACION_DE_FUNGICIDAS, 
+                    self.task_service.CONTROL_BIOLOGICO_DE_PLAGAS
+                ]
+
+                if task_type.nombre in tareas_no_permitidas:
+                    raise DomainException(
+                        message=f"No se pueden crear tareas de tipo '{task_type.nombre}' en cultivos ya cosechados.",
+                        status_code=status.HTTP_409_CONFLICT
+                    )
 
         # Verificar si el estado de tarea existe
         task_state = self.cultural_practice_repository.get_task_state_by_id(task_data.estado_id)

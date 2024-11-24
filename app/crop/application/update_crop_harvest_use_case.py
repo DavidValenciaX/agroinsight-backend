@@ -108,7 +108,7 @@ class UpdateCropHarvestUseCase:
         
         # Verificar que la unidad de medida sea de tipo moneda
         currency_category = self.measurement_repository.get_unit_category_by_id(currency.categoria_id)
-        if not currency_category or currency_category.nombre != "Moneda":
+        if not currency_category or currency_category.nombre != self.measurement_service.UNIT_CATEGORY_CURRENCY_NAME:
             raise DomainException(
                 message="La unidad de medida especificada no es una moneda válida.",
                 status_code=status.HTTP_400_BAD_REQUEST

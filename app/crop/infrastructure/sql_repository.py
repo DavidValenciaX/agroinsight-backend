@@ -1,10 +1,13 @@
 from typing import Optional, List
+from fastapi import status
 from sqlalchemy.orm import Session
+from app.crop.application.services.crop_service import CropService
 from app.crop.infrastructure.orm_models import Crop, CropState, CornVariety
 from app.crop.domain.schemas import CropCreate, CropHarvestUpdate
 from sqlalchemy.orm import joinedload
 from decimal import Decimal
 from sqlalchemy import update
+from app.infrastructure.common.common_exceptions import DomainException
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
 
 class CropRepository:
@@ -24,6 +27,7 @@ class CropRepository:
         """
         self.db = db
         self.measurement_repository = MeasurementRepository(db)
+        self.crop_service = CropService()
         
     def create_crop(self, crop_data: CropCreate) -> Optional[Crop]:
         """Crea un nuevo cultivo en la base de datos.
@@ -167,9 +171,14 @@ class CropRepository:
             crop = self.db.query(Crop).filter(Crop.id == crop_id).first()
             if not crop:
                 return None
-
-            # Calcular el ingreso total
-            ingreso_total = harvest_data.precio_venta_unitario * harvest_data.cantidad_vendida
+            
+            # Obtener el estado "Cosechado"
+            estado_cosechado = self.get_crop_state_by_name(self.crop_service.COSECHADO)
+            if not estado_cosechado:
+                raise DomainException(
+                    message="No se pudo obtener el estado 'Cosechado'.",
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
             # Actualizar los campos del cultivo
             crop.fecha_cosecha = harvest_data.fecha_cosecha
@@ -178,9 +187,9 @@ class CropRepository:
             crop.precio_venta_unitario = harvest_data.precio_venta_unitario
             crop.cantidad_vendida = harvest_data.cantidad_vendida
             crop.cantidad_vendida_unidad_id = harvest_data.cantidad_vendida_unidad_id
-            crop.ingreso_total = ingreso_total
             crop.moneda_id = harvest_data.moneda_id
             crop.fecha_venta = harvest_data.fecha_venta
+            crop.estado_id = estado_cosechado.id
 
             self.db.commit()
             self.db.refresh(crop)
@@ -231,3 +240,14 @@ class CropRepository:
             Crop.lote_id == plot_id,
             Crop.estado_id.in_(active_state_ids)
         ).first()
+
+    def get_crop_state_by_name(self, state_name: str) -> Optional[CropState]:
+        """Obtiene un estado de cultivo por su nombre.
+
+        Args:
+            state_name (str): Nombre del estado a buscar.
+
+        Returns:
+            Optional[CropState]: El estado del cultivo si se encuentra, None en caso contrario.
+        """
+        return self.db.query(CropState).filter(CropState.nombre == state_name).first()
