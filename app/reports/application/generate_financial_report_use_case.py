@@ -427,35 +427,34 @@ class GenerateFinancialReportUseCase:
             }
             
             for task in tasks:
-                total_by_type['Mano de Obra'] += task.costo_mano_obra
-                total_by_type['Insumos'] += task.costo_insumos
-                total_by_type['Maquinaria'] += task.costo_maquinaria
+                total_by_type['Mano de Obra'] += task.costo_mano_obra or Decimal(0)
+                total_by_type['Insumos'] += task.costo_insumos or Decimal(0)
+                total_by_type['Maquinaria'] += task.costo_maquinaria or Decimal(0)
 
-            return [
-                TaskCost(
-                    tarea_id=-1,
-                    tarea_nombre=cost_type,
-                    tipo_labor_nombre="Agrupación por Tipo de Costo",
-                    fecha_inicio=date.today(),
-                    fecha_finalizacion=date.today(),
-                    nivel="AGRUPADO",
-                    estado_id=-1,
-                    estado_nombre="Agrupado",
-                    mano_obra=LaborCostSchema(
-                        cantidad_trabajadores=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                        horas_trabajadas=sum(costs['horas_trabajadas'] for costs in grouped.values()),
-                        costo_hora=sum(costs['costo_mano_obra'] / costs['horas_trabajadas'] for costs in grouped.values()),
-                        observaciones=f"Total de costos de {cost_type}"
-                    ),
-                    costo_mano_obra=sum(costs['costo_mano_obra'] for costs in grouped.values()),
-                    insumos=None,
-                    costo_insumos=sum(costs['costo_insumos'] for costs in grouped.values()),
-                    maquinarias=None,
-                    costo_maquinaria=sum(costs['costo_maquinaria'] for costs in grouped.values()),
-                    costo_total=sum(costs['costo_total'] for costs in grouped.values()),
-                    observaciones=f"Total de costos de {cost_type}"
-                ) for cost_type, total in total_by_type.items() if total > 0
-            ]
+            grouped_tasks = []
+            for cost_type, total in total_by_type.items():
+                if total > 0:
+                    task_cost = TaskCost(
+                        tarea_id=-1,
+                        tarea_nombre=cost_type,
+                        tipo_labor_nombre="Agrupación por Tipo de Costo",
+                        fecha_inicio=date.today(),
+                        fecha_finalizacion=date.today(),
+                        nivel="AGRUPADO",
+                        estado_id=-1,
+                        estado_nombre="Agrupado",
+                        mano_obra=None,
+                        costo_mano_obra=total if cost_type == 'Mano de Obra' else Decimal(0),
+                        insumos=None,
+                        costo_insumos=total if cost_type == 'Insumos' else Decimal(0),
+                        maquinarias=None,
+                        costo_maquinaria=total if cost_type == 'Maquinaria' else Decimal(0),
+                        costo_total=total,
+                        observaciones=f"Total de costos para {cost_type}"
+                    )
+                    grouped_tasks.append(task_cost)
+
+            return grouped_tasks
 
         # Si no hay agrupación o no se reconoce el tipo
         return tasks
