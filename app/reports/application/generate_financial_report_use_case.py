@@ -359,12 +359,33 @@ class GenerateFinancialReportUseCase:
             ]
         
         elif group_by == "month":
-            # Agrupar por mes
+            # Diccionario para mapear números de mes a nombres en español
+            meses = {
+                "01": "Enero",
+                "02": "Febrero",
+                "03": "Marzo",
+                "04": "Abril",
+                "05": "Mayo",
+                "06": "Junio",
+                "07": "Julio",
+                "08": "Agosto",
+                "09": "Septiembre",
+                "10": "Octubre",
+                "11": "Noviembre",
+                "12": "Diciembre"
+            }
+            
             grouped = {}
             for task in tasks:
-                month_key = task.fecha.strftime("%Y-%m")  # Formato: "2024-03"
+                # Obtener el año y mes
+                year = task.fecha_finalizacion.strftime("%Y")
+                month = task.fecha_finalizacion.strftime("%m")
+                month_key = task.fecha_finalizacion.strftime("%Y-%m")  # Para mantener el orden
+                month_name = f"{meses[month]} {year}"  # Nombre del mes con año
+                
                 if month_key not in grouped:
                     grouped[month_key] = {
+                        'nombre': month_name,  # Guardamos el nombre para usar después
                         'costo_mano_obra': Decimal(0),
                         'costo_insumos': Decimal(0),
                         'costo_maquinaria': Decimal(0),
@@ -377,10 +398,10 @@ class GenerateFinancialReportUseCase:
 
             return [
                 GroupedTaskCost(
-                    categoria=f"Tareas de {month_key}",
+                    categoria=f"Tareas de {costs['nombre']}",
                     costo_total=costs['costo_total'],
-                    observaciones=f"Tareas agrupadas del mes {month_key}"
-                ) for month_key, costs in grouped.items()
+                    observaciones=f"Tareas agrupadas del mes de {costs['nombre']}"
+                ) for costs in grouped.values()
             ]
         
         elif group_by == "cost_type":
