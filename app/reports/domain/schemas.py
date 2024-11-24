@@ -55,7 +55,7 @@ class FarmFinancialReport(BaseModel):
     finca_nombre: str
     fecha_inicio: date
     fecha_fin: date
-    moneda: str
+    moneda_simbolo: str
     lotes: List[PlotFinancials]
     costo_total: Decimal
     ingreso_total: Decimal
