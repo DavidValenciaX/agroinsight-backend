@@ -1,7 +1,7 @@
 from app.costs.domain.schemas import LaborCostCreate, TaskInputCreate, TaskMachineryCreate
 from app.costs.infrastructure.orm_models import LaborCost, TaskInput, TaskMachinery
 from decimal import Decimal
-from typing import Optional, List, Tuple, Optional
+from typing import Optional, List, Optional
 from app.costs.infrastructure.orm_models import AgriculturalInput
 from app.costs.infrastructure.orm_models import AgriculturalMachinery
 from app.costs.infrastructure.orm_models import AgriculturalInputCategory
@@ -29,13 +29,11 @@ class CostsRepository:
     def create_labor_cost(self, task_id: int, labor_cost: LaborCostCreate) -> bool:
         """Crea un registro de costo de mano de obra para una tarea."""
         try:
-            costo_total = labor_cost.cantidad_trabajadores * labor_cost.horas_trabajadas * labor_cost.costo_hora
             new_labor_cost = LaborCost(
                 tarea_labor_id=task_id,
                 cantidad_trabajadores=labor_cost.cantidad_trabajadores,
                 horas_trabajadas=labor_cost.horas_trabajadas,
                 costo_hora=labor_cost.costo_hora,
-                costo_total=costo_total,
                 observaciones=labor_cost.observaciones
             )
             self.db.add(new_labor_cost)
@@ -46,14 +44,13 @@ class CostsRepository:
             print(f"Error al crear el costo de mano de obra: {e}")
             return False
 
-    def create_task_input(self, task_id: int, input_data: TaskInputCreate, costo_total: Decimal) -> bool:
+    def create_task_input(self, task_id: int, input_data: TaskInputCreate) -> bool:
         """Crea un registro de uso de insumo para una tarea."""
         try:
             new_task_input = TaskInput(
                 tarea_labor_id=task_id,
                 insumo_id=input_data.insumo_id,
                 cantidad_utilizada=input_data.cantidad_utilizada,
-                costo_total=costo_total,
                 fecha_aplicacion=input_data.fecha_aplicacion,
                 observaciones=input_data.observaciones
             )
@@ -65,7 +62,7 @@ class CostsRepository:
             print(f"Error al crear el registro de insumo: {e}")
             return False
 
-    def create_task_machinery(self, task_id: int, machinery_data: TaskMachineryCreate, costo_total: Decimal) -> bool:
+    def create_task_machinery(self, task_id: int, machinery_data: TaskMachineryCreate) -> bool:
         """Crea un registro de uso de maquinaria para una tarea."""
         try:
             new_task_machinery = TaskMachinery(
@@ -73,7 +70,6 @@ class CostsRepository:
                 maquinaria_id=machinery_data.maquinaria_id,
                 fecha_uso=machinery_data.fecha_uso,
                 horas_uso=machinery_data.horas_uso,
-                costo_total=costo_total,
                 observaciones=machinery_data.observaciones
             )
             self.db.add(new_task_machinery)
@@ -149,21 +145,34 @@ class CostsRepository:
             .filter(AgriculturalInput.id == input_id)\
             .first()
             
-    def get_task_costs(self, task_id: int) -> Tuple[Decimal, Decimal, Decimal]:
-        """Obtiene los costos de una tarea específica"""
-        # Costo mano de obra
-        labor_cost = self.db.query(func.coalesce(func.sum(LaborCost.costo_total), 0))\
-            .filter(LaborCost.tarea_labor_id == task_id)\
-            .scalar()
+    def get_task_costs(self, task_id: int) -> tuple[Decimal, Decimal, Decimal]:
+        """Obtiene los costos de una tarea específica.
+        
+        Returns:
+            tuple[Decimal, Decimal, Decimal]: (costo_mano_obra, costo_insumos, costo_maquinaria)
+        """
+        # Obtener costo de mano de obra
+        labor_cost = self.db.query(LaborCost).filter(
+            LaborCost.tarea_labor_id == task_id
+        ).first()
+        
+        # Obtener costos de insumos
+        task_inputs = self.db.query(TaskInput).options(
+            joinedload(TaskInput.insumo)
+        ).filter(
+            TaskInput.tarea_labor_id == task_id
+        ).all()
+        
+        # Obtener costos de maquinaria
+        task_machinery = self.db.query(TaskMachinery).options(
+            joinedload(TaskMachinery.maquinaria)
+        ).filter(
+            TaskMachinery.tarea_labor_id == task_id
+        ).all()
 
-        # Costo insumos
-        input_cost = self.db.query(func.coalesce(func.sum(TaskInput.costo_total), 0))\
-            .filter(TaskInput.tarea_labor_id == task_id)\
-            .scalar()
+        # Calcular totales
+        total_labor = labor_cost.costo_total if labor_cost else Decimal(0)
+        total_inputs = sum(ti.costo_total for ti in task_inputs)
+        total_machinery = sum(tm.costo_total for tm in task_machinery)
 
-        # Costo maquinaria
-        machinery_cost = self.db.query(func.coalesce(func.sum(TaskMachinery.costo_total), 0))\
-            .filter(TaskMachinery.tarea_labor_id == task_id)\
-            .scalar()
-
-        return labor_cost, input_cost, machinery_cost
+        return total_labor, total_inputs, total_machinery

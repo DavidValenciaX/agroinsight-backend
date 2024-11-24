@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, Text, Date, DECIMAL
 from sqlalchemy.orm import relationship
 from app.infrastructure.db.connection import Base
+from decimal import Decimal
 
 class LaborCost(Base):
     """Modelo de costo de mano de obra para una tarea cultural."""
@@ -11,11 +12,15 @@ class LaborCost(Base):
     cantidad_trabajadores = Column(Integer, nullable=False)
     horas_trabajadas = Column(DECIMAL(5,2), nullable=False)
     costo_hora = Column(DECIMAL(10,2), nullable=False)
-    costo_total = Column(DECIMAL(10,2), nullable=False)
     observaciones = Column(Text)
 
     # Relación con CulturalTask
     tarea = relationship("CulturalTask", back_populates="costo_mano_obra")
+
+    @property
+    def costo_total(self) -> Decimal:
+        """Calcula el costo total de la mano de obra."""
+        return self.cantidad_trabajadores * self.horas_trabajadas * self.costo_hora
 
 class AgriculturalInputCategory(Base):
     """Modelo de categoría de insumos agrícolas."""
@@ -53,13 +58,17 @@ class TaskInput(Base):
     tarea_labor_id = Column(Integer, ForeignKey("tarea_labor_cultural.id"), nullable=False)
     insumo_id = Column(Integer, ForeignKey("insumo_agricola.id"), nullable=False)
     cantidad_utilizada = Column(DECIMAL(10,2), nullable=False)
-    costo_total = Column(DECIMAL(10,2), nullable=False)
     fecha_aplicacion = Column(Date, nullable=True)
     observaciones = Column(Text)
 
     # Relaciones
     tarea = relationship("CulturalTask", back_populates="insumos")
     insumo = relationship("AgriculturalInput", back_populates="usos_tarea")
+
+    @property
+    def costo_total(self) -> Decimal:
+        """Calcula el costo total del insumo."""
+        return self.cantidad_utilizada * self.insumo.costo_unitario
 
 class MachineryType(Base):
     """Modelo de tipo de maquinaria agrícola."""
@@ -97,9 +106,13 @@ class TaskMachinery(Base):
     maquinaria_id = Column(Integer, ForeignKey("maquinaria_agricola.id"), nullable=False)
     fecha_uso = Column(Date, nullable=True)
     horas_uso = Column(DECIMAL(5,2), nullable=False)
-    costo_total = Column(DECIMAL(10,2), nullable=False)
     observaciones = Column(Text)
 
     # Relaciones
     tarea = relationship("CulturalTask", back_populates="maquinarias")
     maquinaria = relationship("AgriculturalMachinery", back_populates="usos_tarea")
+
+    @property
+    def costo_total(self) -> Decimal:
+        """Calcula el costo total de la maquinaria."""
+        return self.horas_uso * self.maquinaria.costo_hora

@@ -6,10 +6,8 @@ from app.cultural_practices.infrastructure.sql_repository import CulturalPractic
 from app.infrastructure.common.common_exceptions import DomainException
 from app.user.domain.schemas import UserInDB
 from app.farm.application.services.farm_service import FarmService
-from app.cultural_practices.domain.schemas import NivelLaborCultural
 from app.crop.infrastructure.sql_repository import CropRepository
 from app.plot.infrastructure.sql_repository import PlotRepository
-from decimal import Decimal
 
 class RegisterTaskCostsUseCase:
     """Caso de uso para registrar los costos asociados a una tarea cultural."""
@@ -65,25 +63,13 @@ class RegisterTaskCostsUseCase:
         # Registrar costos de insumos
         if costs.inputs:
             for input_data in costs.inputs:
-                costo_unitario = self.costs_repository.get_input_cost(input_data.insumo_id)
-                if not costo_unitario:
-                    continue
-                
-                costo_total = costo_unitario * input_data.cantidad_utilizada
-                if self.costs_repository.create_task_input(task_id, input_data, costo_total):
+                if self.costs_repository.create_task_input(task_id, input_data):
                     inputs_registered += 1
 
         # Registrar costos de maquinaria
         if costs.machinery:
             for machinery_data in costs.machinery:
-                costo_hora = self.costs_repository.get_machinery_cost_per_hour(
-                    machinery_data.maquinaria_id
-                )
-                if not costo_hora:
-                    continue
-                
-                costo_total = costo_hora * machinery_data.horas_uso
-                if self.costs_repository.create_task_machinery(task_id, machinery_data, costo_total):
+                if self.costs_repository.create_task_machinery(task_id, machinery_data):
                     machinery_registered += 1
 
         return CostRegistrationResponse(
