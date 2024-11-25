@@ -24,6 +24,7 @@ El endpoint de reportes financieros permite generar informes detallados sobre lo
 - `max_cost` (float): Muestra solo las tareas con costo total menor o igual a este valor
 - `task_types` (List[str]): Lista de tipos de tareas específicas a incluir
 - `only_profitable` (bool): Si es True, solo muestra elementos con ganancia positiva
+- `currency_id` (int): ID de la moneda en la que se desea el reporte. Si no se especifica, se usa COP.
 
 ### Parámetros de Agrupación
 
@@ -41,6 +42,8 @@ El reporte se organiza jerárquicamente:
    - Información general de la finca
    - Totales globales (costos, ingresos, ganancias)
    - Moneda utilizada
+   - Top 10 de maquinaria más utilizada
+   - Top 10 de insumos más utilizados
 
 2. **Nivel Lote**
    - Información de cada lote
@@ -142,7 +145,7 @@ Este ejemplo generaría un reporte:
     "finca_nombre": "Finca Ejemplo",
     "fecha_inicio": "2024-01-01",
     "fecha_fin": "2024-12-31",
-    "moneda": "COP",
+    "moneda_simbolo": "COP",
     "lotes": [
         {
             "lote_id": 1,
@@ -172,9 +175,28 @@ Este ejemplo generaría un reporte:
             "ganancia_neta": 0
         }
     ],
-    "costo_total": 12000000,
-    "ingreso_total": 12000000,
-    "ganancia_neta": 0
+    "top_maquinaria": [
+        {
+            "maquinaria_id": 1,
+            "nombre": "John Deere 6110J",
+            "tipo_maquinaria_nombre": "Tractor",
+            "total_horas_uso": 120,
+            "costo_total": "6000000.00"
+        }
+    ],
+    "top_insumos": [
+        {
+            "insumo_id": 1,
+            "nombre": "Urea",
+            "categoria_nombre": "Fertilizantes",
+            "unidad_medida_simbolo": "kg",
+            "cantidad_total": 500,
+            "costo_total": "1250000.00"
+        }
+    ],
+    "costo_total": "12000000.00",
+    "ingreso_total": "15000000.00",
+    "ganancia_neta": "3000000.00"
 }
 ```
 
