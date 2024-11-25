@@ -126,6 +126,15 @@ class TopMachineryUsage(BaseModel):
     total_horas_uso: Decimal
     costo_total: Decimal
 
+class TopInputUsage(BaseModel):
+    """Información de uso de insumos agrícolas"""
+    insumo_id: int
+    nombre: str
+    categoria_nombre: str
+    unidad_medida_simbolo: str
+    cantidad_total: Decimal
+    costo_total: Decimal
+
 class FarmFinancialReport(BaseModel):
     """Reporte financiero completo de una finca"""
     finca_id: int
@@ -138,3 +147,4 @@ class FarmFinancialReport(BaseModel):
     ingreso_total: Decimal
     ganancia_neta: Decimal
     top_maquinaria: List[TopMachineryUsage]
+    top_insumos: List[TopInputUsage]

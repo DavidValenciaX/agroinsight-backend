@@ -8,7 +8,7 @@ from app.cultural_practices.infrastructure.orm_models import CulturalTask, Cultu
 from app.measurement.application.services.measurement_service import MeasurementService
 from app.plot.infrastructure.orm_models import Plot
 from app.measurement.infrastructure.orm_models import UnitOfMeasure, UnitCategory
-from app.costs.infrastructure.orm_models import TaskMachinery, AgriculturalMachinery, MachineryType
+from app.costs.infrastructure.orm_models import TaskMachinery, AgriculturalMachinery, MachineryType, TaskInput, AgriculturalInput, AgriculturalInputCategory
 
 class FinancialReportRepository:
     def __init__(self, db: Session):
@@ -117,4 +117,51 @@ class FinancialReportRepository:
             MachineryType.nombre
         ).order_by(
             func.sum(TaskMachinery.horas_uso).desc()
+        ).limit(limit).all()
+
+    def get_top_input_usage(self, farm_id: int, start_date: date, end_date: date, limit: int = 10) -> List[tuple]:
+        """Obtiene el top de insumos más usados en una finca durante un período.
+
+        Args:
+            farm_id: ID de la finca
+            start_date: Fecha de inicio del período
+            end_date: Fecha fin del período
+            limit: Cantidad de registros a retornar (default 10)
+
+        Returns:
+            List[tuple]: Lista de tuplas con (insumo_id, nombre, categoria_nombre, unidad_medida_simbolo, cantidad_total, costo_total)
+        """
+        return self.db.query(
+            TaskInput.insumo_id,
+            AgriculturalInput.nombre,
+            AgriculturalInputCategory.nombre.label('categoria_nombre'),
+            UnitOfMeasure.abreviatura.label('unidad_medida_simbolo'),
+            func.sum(TaskInput.cantidad_utilizada).label('cantidad_total'),
+            func.sum(TaskInput.cantidad_utilizada * AgriculturalInput.costo_unitario).label('costo_total')
+        ).join(
+            AgriculturalInput,
+            TaskInput.insumo_id == AgriculturalInput.id
+        ).join(
+            AgriculturalInputCategory,
+            AgriculturalInput.categoria_id == AgriculturalInputCategory.id
+        ).join(
+            UnitOfMeasure,
+            AgriculturalInput.unidad_medida_id == UnitOfMeasure.id
+        ).join(
+            CulturalTask,
+            TaskInput.tarea_labor_id == CulturalTask.id
+        ).join(
+            Plot,
+            CulturalTask.lote_id == Plot.id
+        ).filter(
+            Plot.finca_id == farm_id,
+            TaskInput.fecha_aplicacion >= start_date,
+            TaskInput.fecha_aplicacion <= end_date
+        ).group_by(
+            TaskInput.insumo_id,
+            AgriculturalInput.nombre,
+            AgriculturalInputCategory.nombre,
+            UnitOfMeasure.abreviatura
+        ).order_by(
+            func.sum(TaskInput.cantidad_utilizada).desc()
         ).limit(limit).all()
