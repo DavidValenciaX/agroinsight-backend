@@ -148,15 +148,10 @@ class GenerateFinancialReportUseCase:
             total_plot_income = Decimal(0)
 
             for crop in crops:
-                # Calculate income and costs from task data
-                crop_income = Decimal(0)
-                if crop.cantidad_vendida and crop.precio_venta_unitario:
-                    crop_income = Decimal(crop.cantidad_vendida) * Decimal(crop.precio_venta_unitario)
 
                 # Get crop tasks and their costs
                 crop_tasks = self.repository.get_crop_level_tasks_in_period(crop.id, start_date, end_date)
                 crop_task_costs = []
-                total_crop_task_cost = Decimal(0)
 
                 for task in crop_tasks:
                     task_cost = self._create_task_cost(task, "CULTIVO", convert_amount, target_currency)
@@ -164,7 +159,6 @@ class GenerateFinancialReportUseCase:
 
                 # Filtrar tareas del cultivo según los criterios
                 crop_task_costs = filter_task_costs(crop_task_costs)
-                total_crop_task_cost = sum(task.costo_total for task in crop_task_costs)
 
                 # Update crop financials without using costo_produccion
                 crop_financials.append(self._create_crop_financials(crop, crop_task_costs, convert_amount, target_currency))
@@ -373,8 +367,9 @@ class GenerateFinancialReportUseCase:
     def _create_task_cost(self, task, nivel: str, convert_amount_func, target_currency) -> TaskCost:
         """Helper method to create TaskCost with converted currency values"""
         # Get costs
-        labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
-        # Convert costs to target currency
+        input_cost = self.costs_repository.get_task_inputs_cost(task.id)
+        machinery_cost = self.costs_repository.get_task_machinery_cost(task.id)
+        labor_cost = self.costs_repository.get_labor_cost(task.id)        
         labor_cost = convert_amount_func(labor_cost)
         input_cost = convert_amount_func(input_cost)
         machinery_cost = convert_amount_func(machinery_cost)

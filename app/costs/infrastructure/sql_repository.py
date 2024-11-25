@@ -145,16 +145,28 @@ class CostsRepository:
             .filter(AgriculturalInput.id == input_id)\
             .first()
             
-    def get_task_costs(self, task_id: int) -> tuple[Decimal, Decimal, Decimal]:
-        """Obtiene los costos de una tarea específica.
+    def get_labor_cost(self, task_id: int) -> Decimal:
+        """Obtiene el costo de mano de obra de una tarea específica.
         
         Returns:
-            tuple[Decimal, Decimal, Decimal]: (costo_mano_obra, costo_insumos, costo_maquinaria)
+            Decimal: Costo de mano de obra
         """
         # Obtener costo de mano de obra
         labor_cost = self.db.query(LaborCost).filter(
             LaborCost.tarea_labor_id == task_id
         ).first()
+        
+        # Calcular totales
+        total_labor = labor_cost.costo_total if labor_cost else Decimal(0)
+
+        return total_labor
+    
+    def get_task_inputs_cost(self, task_id: int) -> Decimal:
+        """Obtiene el costo total de insumos de una tarea específica.
+        
+        Returns:
+            Decimal: Costo total de insumos
+        """
         
         # Obtener costos de insumos
         task_inputs = self.db.query(TaskInput).options(
@@ -162,6 +174,17 @@ class CostsRepository:
         ).filter(
             TaskInput.tarea_labor_id == task_id
         ).all()
+
+        total_inputs = sum(ti.costo_total for ti in task_inputs)
+
+        return total_inputs
+            
+    def get_task_machinery_cost(self, task_id: int) -> Decimal:
+        """Obtiene el costo total de maquinaria de una tarea específica.
+        
+        Returns:
+            Decimal: Costo total de maquinaria
+        """
         
         # Obtener costos de maquinaria
         task_machinery = self.db.query(TaskMachinery).options(
@@ -169,10 +192,7 @@ class CostsRepository:
         ).filter(
             TaskMachinery.tarea_labor_id == task_id
         ).all()
-
-        # Calcular totales
-        total_labor = labor_cost.costo_total if labor_cost else Decimal(0)
-        total_inputs = sum(ti.costo_total for ti in task_inputs)
+        
         total_machinery = sum(tm.costo_total for tm in task_machinery)
 
-        return total_labor, total_inputs, total_machinery
+        return total_machinery

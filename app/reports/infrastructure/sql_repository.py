@@ -51,7 +51,7 @@ class FinancialReportRepository:
             .filter(
                 CulturalTask.lote_id == plot_id,
                 CulturalTask.fecha_inicio_estimada >= start_date,
-                CulturalTask.fecha_inicio_estimada <= end_date,
+                CulturalTask.fecha_finalizacion <= end_date,
                 CulturalTaskType.nivel == NivelLaborCultural.LOTE
             ).all()
 
@@ -68,13 +68,8 @@ class FinancialReportRepository:
             .filter(
                 CulturalTask.lote_id == crop.lote_id,
                 CulturalTask.fecha_inicio_estimada >= start_date,
-                CulturalTask.fecha_inicio_estimada <= end_date,
-                CulturalTaskType.nivel == NivelLaborCultural.CULTIVO,
-                CulturalTask.fecha_inicio_estimada >= crop.fecha_siembra,
-                or_(
-                    (crop.fecha_cosecha == None),
-                    (CulturalTask.fecha_inicio_estimada <= crop.fecha_cosecha)
-                )
+                CulturalTask.fecha_finalizacion <= end_date,
+                CulturalTaskType.nivel == NivelLaborCultural.CULTIVO
             ).all()
 
     def get_top_machinery_usage(self, farm_id: int, start_date: date, end_date: date, limit: int = 10) -> List[tuple]:
