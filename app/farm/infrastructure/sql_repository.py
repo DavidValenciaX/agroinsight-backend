@@ -1,3 +1,4 @@
+from datetime import date
 from sqlalchemy.orm import Session
 from app.farm.domain.schemas import FarmCreate
 from app.farm.infrastructure.orm_models import Farm
@@ -6,6 +7,16 @@ from typing import List
 from app.user.infrastructure.orm_models import User, UserFarmRole
 from app.user.infrastructure.sql_repository import UserRepository
 from app.user.application.services.user_service import UserService
+from sqlalchemy import func
+from sqlalchemy.sql import text
+from app.cultural_practices.infrastructure.orm_models import CulturalTask
+from app.plot.infrastructure.orm_models import Plot
+from app.crop.infrastructure.orm_models import Crop
+from app.costs.infrastructure.orm_models import LaborCost
+from app.costs.infrastructure.orm_models import TaskInput
+from app.costs.infrastructure.orm_models import AgriculturalInput
+from app.costs.infrastructure.orm_models import TaskMachinery
+from app.costs.infrastructure.orm_models import AgriculturalMachinery
 
 class FarmRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con fincas.
@@ -203,3 +214,136 @@ class FarmRepository:
         )
         
         return query.all()
+
+    def get_farms_ranked_by_profit(
+        self, 
+        user_id: int, 
+        admin_role_id: int,
+        limit: int,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None
+    ) -> List[Tuple[Farm, float]]:
+        """Obtiene las fincas rankeadas por ganancias.
+        
+        Returns:
+            List[Tuple[Farm, float]]: Lista de tuplas (finca, ganancia)
+        """
+        # Subconsulta para obtener los ingresos por cultivo
+        crop_income = self.db.query(
+            Plot.finca_id.label('farm_id'),
+            func.sum(
+                func.coalesce(Crop.cantidad_vendida, 0) * 
+                func.coalesce(Crop.precio_venta_unitario, 0)
+            ).label('income')
+        ).join(
+            Crop, Plot.id == Crop.lote_id
+        )
+
+        if start_date:
+            crop_income = crop_income.filter(Crop.fecha_siembra >= start_date)
+        if end_date:
+            crop_income = crop_income.filter(Crop.fecha_siembra <= end_date)
+
+        crop_income = crop_income.group_by(Plot.finca_id).subquery()
+
+        # Subconsulta para obtener los costos totales (mano de obra + insumos + maquinaria)
+        total_costs = self.db.query(
+            Plot.finca_id.label('farm_id'),
+            func.sum(
+                func.coalesce(LaborCost.costo_total, 0) +
+                func.coalesce(
+                    TaskInput.cantidad_utilizada * AgriculturalInput.costo_unitario, 
+                    0
+                ) +
+                func.coalesce(
+                    TaskMachinery.horas_uso * AgriculturalMachinery.costo_hora,
+                    0
+                )
+            ).label('costs')
+        ).join(
+            CulturalTask, Plot.id == CulturalTask.lote_id
+        ).outerjoin(
+            LaborCost, CulturalTask.id == LaborCost.tarea_labor_id
+        ).outerjoin(
+            TaskInput, CulturalTask.id == TaskInput.tarea_labor_id
+        ).outerjoin(
+            AgriculturalInput, TaskInput.insumo_id == AgriculturalInput.id
+        ).outerjoin(
+            TaskMachinery, CulturalTask.id == TaskMachinery.tarea_labor_id
+        ).outerjoin(
+            AgriculturalMachinery, TaskMachinery.maquinaria_id == AgriculturalMachinery.id
+        )
+
+        if start_date:
+            total_costs = total_costs.filter(CulturalTask.fecha_inicio_estimada >= start_date)
+        if end_date:
+            total_costs = total_costs.filter(CulturalTask.fecha_inicio_estimada <= end_date)
+
+        total_costs = total_costs.group_by(Plot.finca_id).subquery()
+
+        # Query principal para obtener las fincas y calcular las ganancias
+        query = self.db.query(
+            Farm,
+            (func.coalesce(crop_income.c.income, 0) - 
+             func.coalesce(total_costs.c.costs, 0)).label('profit')
+        ).join(
+            UserFarmRole
+        ).outerjoin(
+            crop_income, Farm.id == crop_income.c.farm_id
+        ).outerjoin(
+            total_costs, Farm.id == total_costs.c.farm_id
+        ).filter(
+            UserFarmRole.usuario_id == user_id,
+            UserFarmRole.rol_id == admin_role_id
+        ).group_by(
+            Farm.id,
+            crop_income.c.income,
+            total_costs.c.costs
+        ).order_by(
+            text('profit DESC')
+        ).limit(limit)
+
+        results = query.all()
+        return [(farm, float(profit)) for farm, profit in results]
+
+    def get_farms_ranked_by_production(
+        self, 
+        user_id: int, 
+        admin_role_id: int,
+        limit: int,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None
+    ) -> List[Tuple[Farm, float]]:
+        """Obtiene las fincas rankeadas por producción total.
+        
+        Returns:
+            List[Tuple[Farm, float]]: Lista de tuplas (finca, producción)
+        """
+        # Query para obtener la producción total por finca
+        query = self.db.query(
+            Farm,
+            func.coalesce(
+                func.sum(Crop.produccion_total), 0.0
+            ).label('total_production')
+        ).join(
+            UserFarmRole
+        ).join(
+            Plot, Farm.id == Plot.finca_id
+        ).join(
+            Crop, Plot.id == Crop.lote_id
+        ).filter(
+            UserFarmRole.usuario_id == user_id,
+            UserFarmRole.rol_id == admin_role_id
+        )
+
+        if start_date:
+            query = query.filter(Crop.fecha_siembra >= start_date)
+        if end_date:
+            query = query.filter(Crop.fecha_siembra <= end_date)
+
+        results = query.group_by(Farm.id)\
+            .order_by(text('total_production DESC'))\
+            .limit(limit)\
+            .all()
+
+        return [(farm, float(production)) for farm, production in results]

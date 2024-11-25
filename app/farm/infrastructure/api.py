@@ -12,7 +12,7 @@ from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.farm.application.list_worker_farms_use_case import ListWorkerFarmsUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail, PaginatedWorkerFarmListResponse, FarmListResponse, FarmTasksStatsResponse
+from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail, PaginatedWorkerFarmListResponse, FarmListResponse, FarmTasksStatsResponse, FarmRankingType, FarmRankingListResponse
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
@@ -26,6 +26,7 @@ from app.logs.application.decorators.log_decorator import log_activity
 from app.farm.application.get_farm_tasks_stats_use_case import GetFarmTasksStatsUseCase
 from datetime import date
 from typing import Optional
+from app.farm.application.get_farm_ranking_use_case import GetFarmRankingUseCase
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
@@ -340,4 +341,53 @@ async def get_farm_tasks_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al obtener las estadísticas: {str(e)}"
+        )
+
+@router.get("/ranking", response_model=FarmRankingListResponse)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="finca",
+    description="Consulta de ranking de fincas por ganancias o producción"
+)
+async def get_farm_ranking(
+    request: Request,
+    ranking_type: FarmRankingType,
+    limit: int = Query(10, ge=1, le=100, description="Cantidad máxima de fincas"),
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> FarmRankingListResponse:
+    """
+    Obtiene un ranking de las fincas del usuario según ganancias o producción.
+
+    Parameters:
+        ranking_type (FarmRankingType): Tipo de ranking (PROFIT/PRODUCTION)
+        limit (int): Cantidad máxima de fincas a retornar
+        start_date (Optional[date]): Fecha inicial del período
+        end_date (Optional[date]): Fecha final del período
+        db (Session): Sesión de base de datos
+        current_user (UserInDB): Usuario actual autenticado
+
+    Returns:
+        FarmRankingListResponse: Ranking de fincas según el criterio especificado
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención del ranking
+    """
+    get_farm_ranking_use_case = GetFarmRankingUseCase(db)
+    try:
+        return get_farm_ranking_use_case.get_farm_ranking(
+            current_user,
+            ranking_type,
+            limit,
+            start_date,
+            end_date
+        )
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener el ranking de fincas: {str(e)}"
         )

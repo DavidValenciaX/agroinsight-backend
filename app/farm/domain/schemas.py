@@ -1,8 +1,10 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from decimal import Decimal
-from typing import List
+from typing import List, Optional
 from app.infrastructure.utils.validators import validate_email_format, validate_no_emojis, validate_no_special_chars, validate_no_xss
 from app.user.domain.schemas import UserForFarmResponse
+from enum import Enum
+from datetime import date
 
 class FarmCreate(BaseModel):
     """Schema para la creación de una nueva finca.
@@ -196,3 +198,42 @@ class FarmTasksStatsResponse(BaseModel):
     total_tasks: int
     completed_tasks: int
     completion_rate: float
+
+class FarmRankingType(str, Enum):
+    """Tipo de ranking para las fincas.
+    
+    PROFIT: Ranking por ganancias
+    PRODUCTION: Ranking por producción
+    """
+    PROFIT = "PROFIT"
+    PRODUCTION = "PRODUCTION"
+
+class FarmRankingResponse(BaseModel):
+    """Modelo de respuesta para una finca en el ranking.
+    
+    Attributes:
+        farm_id (int): ID de la finca
+        farm_name (str): Nombre de la finca
+        value (float): Valor por el cual se rankea (ganancias o producción)
+        ranking_position (int): Posición en el ranking
+    """
+    farm_id: int
+    farm_name: str
+    value: float
+    ranking_position: int = Field(..., gt=0)
+
+class FarmRankingListResponse(BaseModel):
+    """Modelo de respuesta para el ranking de fincas.
+    
+    Attributes:
+        farms (List[FarmRankingResponse]): Lista de fincas rankeadas
+        total_farms (int): Total de fincas en el ranking
+        ranking_type (FarmRankingType): Tipo de ranking (ganancias o producción)
+        start_date (Optional[date]): Fecha de inicio del período
+        end_date (Optional[date]): Fecha de fin del período
+    """
+    farms: List[FarmRankingResponse]
+    total_farms: int
+    ranking_type: FarmRankingType
+    start_date: Optional[date]
+    end_date: Optional[date]
