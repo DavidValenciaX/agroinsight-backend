@@ -130,16 +130,8 @@ class LogService:
         # Obtener información del endpoint
         endpoint = str(request.url.path) if request else None
         http_method = request.method if request else None
-
-        # Crear una descripción más estructurada
-        action_description = description if isinstance(description, str) else "No description provided"
-        full_description = (
-            f"{user_description}\n"
-            f"Endpoint: {endpoint or 'N/A'}\n"
-            f"Método: {http_method or 'N/A'}\n"
-            f"Acción: {action_type_name}\n"
-            f"Descripción: {action_description}"
-        )
+        # Crear la descripción completa
+        full_description = f"{user_description}. {description or ''}"
 
         log_data = ActivityLogCreate(
             usuario_id=usuario_id,

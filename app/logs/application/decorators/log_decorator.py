@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Optional
+from typing import Optional, Union, Callable
 from fastapi import Request, HTTPException, status
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.logs.domain.schemas import LogSeverity
@@ -41,7 +41,7 @@ def log_activity(
     action_type: str,
     table_name: str,
     severity: LogSeverity = LogSeverity.INFO,
-    description: Optional[str] = None,
+    description: Optional[Union[str, Callable]] = None,
     get_record_id=None,
     get_old_value=None,
     get_new_value=None
@@ -91,6 +91,9 @@ def log_activity(
                 record_id = get_record_id(*args, **kwargs) if get_record_id else None
                 new_value = get_new_value(*args, **kwargs) if get_new_value else None
 
+                # Procesar la descripción si es una función
+                final_description = description(*args, **kwargs) if callable(description) else description
+
                 # Registrar la actividad
                 log_service.log_activity(
                     user=user,
@@ -101,7 +104,7 @@ def log_activity(
                     old_value=old_value,
                     new_value=new_value,
                     severity=severity,
-                    description=description
+                    description=final_description
                 )
 
                 return result
