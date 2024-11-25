@@ -37,7 +37,10 @@ async def generate_financial_report(
     min_cost: Optional[float] = None,
     max_cost: Optional[float] = None,
     task_types: Optional[List[str]] = Query(None),
-    group_by: ReportGroupBy = ReportGroupBy.NONE,
+    group_by: ReportGroupBy = Query(
+        default=ReportGroupBy.NONE,
+        description="Criterio de agrupación (solo se permite un valor)"
+    ),
     only_profitable: Optional[bool] = None,
     currency_id: Optional[int] = None,
     db: Session = Depends(getDb),
@@ -55,10 +58,13 @@ async def generate_financial_report(
     - min_cost: Costo mínimo para filtrar tareas/cultivos
     - max_cost: Costo máximo para filtrar tareas/cultivos
     - task_types: Lista de tipos de tareas a incluir
-    - group_by: Tipo de agrupación para el reporte
+    - group_by: Criterio único de agrupación para el reporte
     - only_profitable: Si es True, solo incluye elementos con ganancia positiva
     - currency_id: ID de la moneda en la que se desea ver el informe (opcional, por defecto COP)
     """
+    if isinstance(group_by, list):
+        group_by = group_by[0] if group_by else ReportGroupBy.NONE
+        
     use_case = GenerateFinancialReportUseCase(db)
     return use_case.generate_report(
         farm_id=farm_id,

@@ -349,7 +349,16 @@ class GenerateFinancialReportUseCase:
         )
 
     def _group_tasks(self, tasks: List[TaskCost], group_by: str) -> List[GroupedTaskCost]:
-        """Agrupa las tareas según el criterio especificado"""
+        """
+        Agrupa las tareas según el criterio especificado.
+        Solo se permite un criterio de agrupación a la vez.
+        """
+        if not tasks:
+            return []
+        
+        if not group_by or group_by == "none":
+            return tasks
+
         if group_by == "task_type":
             # Agrupar por tipo de tarea
             grouped = {}
