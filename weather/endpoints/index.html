@@ -2520,7 +2520,7 @@ usando coordenadas de ejemplo para verificar la conectividad.</p>
 <span class="nd">@log_activity</span><span class="p">(</span>
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VERIFY_CONNECTION</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;registro_meteorologico&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prueba de conexión con API OpenWeatherMap&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prueba de conexión con la API de OpenWeatherMap para verificar disponibilidad del servicio.&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">test_weather_api</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
@@ -2691,11 +2691,15 @@ usando coordenadas de ejemplo para verificar la conectividad.</p>
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
-<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/weather/current&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">WeatherAPIResponse</span><span class="p">)</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/weather/current&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">WeatherAPIResponse</span><span class="p">)</span>
 <span class="nd">@log_activity</span><span class="p">(</span>
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;registro_meteorologico&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de datos meteorológicos actuales&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Consulta meteorológica actual para coordenadas (lat: </span><span class="si">{</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">, lon: </span><span class="si">{</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lon&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span>
+    <span class="p">),</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">get_current_weather</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
@@ -2851,9 +2855,7 @@ usando coordenadas de ejemplo para verificar la conectividad.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\weather\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 84</span>
 <span class="normal"> 85</span>
 <span class="normal"> 86</span>
 <span class="normal"> 87</span>
@@ -2885,11 +2887,17 @@ usando coordenadas de ejemplo para verificar la conectividad.</p>
 <span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
-<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/weather/logs/</span><span class="si">{lote_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">WeatherLogsListResponse</span><span class="p">)</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/weather/logs/</span><span class="si">{lote_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">WeatherLogsListResponse</span><span class="p">)</span>
 <span class="nd">@log_activity</span><span class="p">(</span>
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;registro_meteorologico&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de registros meteorológicos históricos&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Consulta histórica meteorológica del lote </span><span class="si">{</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lote_id&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> entre </span><span class="si">{</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;start_date&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> y </span><span class="si">{</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;end_date&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="p">),</span>
     <span class="n">get_record_id</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lote_id&#39;</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">get_weather_logs</span><span class="p">(</span>

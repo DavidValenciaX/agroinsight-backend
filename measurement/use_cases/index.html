@@ -1756,6 +1756,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#app.measurement.application.services.measurement_service.MeasurementService.get_default_currency" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_default_currency
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.measurement.application.services.measurement_service.MeasurementService.get_default_production_unit" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_default_production_unit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#app.measurement.application.services.measurement_service.MeasurementService.validate_unit_category" class="md-nav__link">
     <span class="md-ellipsis">
       validate_unit_category
@@ -2403,6 +2421,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#app.measurement.application.services.measurement_service.MeasurementService.get_default_currency" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_default_currency
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.measurement.application.services.measurement_service.MeasurementService.get_default_production_unit" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_default_production_unit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#app.measurement.application.services.measurement_service.MeasurementService.validate_unit_category" class="md-nav__link">
     <span class="md-ellipsis">
       validate_unit_category
@@ -2855,8 +2891,7 @@ y devuelve un objeto de respuesta que contiene la lista de unidades.</p>
 
               <details class="quote">
                 <summary>Source code in <code>app\measurement\application\services\measurement_service.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  7</span>
-<span class="normal">  8</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  8</span>
 <span class="normal">  9</span>
 <span class="normal"> 10</span>
 <span class="normal"> 11</span>
@@ -2985,7 +3020,116 @@ y devuelve un objeto de respuesta que contiene la lista de unidades.</p>
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span>
-<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">MeasurementService</span><span class="p">:</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">MeasurementService</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Servicio para gestionar la lógica de negocio relacionada con las medidas.</span>
 
 <span class="sd">    Este servicio proporciona métodos para validar y gestionar las unidades de medida y sus categorías.</span>
@@ -3090,6 +3234,67 @@ y devuelve un objeto de respuesta que contiene la lista de unidades.</p>
     <span class="c1"># Unidades de Tasa de Precipitación</span>
     <span class="n">UNIT_MILLIMETERS_PER_HOUR</span> <span class="o">=</span> <span class="s2">&quot;Milímetro por hora&quot;</span>
 
+    <span class="c1"># Abreviaturas de Monedas</span>
+    <span class="n">UNIT_SYMBOL_METER</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span>
+    <span class="n">UNIT_SYMBOL_KILOMETER</span> <span class="o">=</span> <span class="s2">&quot;km&quot;</span>
+    <span class="n">UNIT_SYMBOL_CENTIMETER</span> <span class="o">=</span> <span class="s2">&quot;cm&quot;</span>
+    <span class="n">UNIT_SYMBOL_MILLIMETER</span> <span class="o">=</span> <span class="s2">&quot;mm&quot;</span>
+    <span class="n">UNIT_SYMBOL_INCH</span> <span class="o">=</span> <span class="s2">&quot;in&quot;</span>
+    <span class="n">UNIT_SYMBOL_FOOT</span> <span class="o">=</span> <span class="s2">&quot;ft&quot;</span>
+    <span class="c1"># Área</span>
+    <span class="n">UNIT_SYMBOL_SQUARE_METER</span> <span class="o">=</span> <span class="s2">&quot;m²&quot;</span>
+    <span class="n">UNIT_SYMBOL_SQUARE_KILOMETER</span> <span class="o">=</span> <span class="s2">&quot;km²&quot;</span>
+    <span class="n">UNIT_SYMBOL_HECTARE</span> <span class="o">=</span> <span class="s2">&quot;ha&quot;</span>
+    <span class="n">UNIT_SYMBOL_ACRE</span> <span class="o">=</span> <span class="s2">&quot;ac&quot;</span>
+    <span class="c1"># Volumen</span>
+    <span class="n">UNIT_SYMBOL_LITER</span> <span class="o">=</span> <span class="s2">&quot;L&quot;</span>
+    <span class="n">UNIT_SYMBOL_MILLILITER</span> <span class="o">=</span> <span class="s2">&quot;mL&quot;</span>
+    <span class="n">UNIT_SYMBOL_CUBIC_METER</span> <span class="o">=</span> <span class="s2">&quot;m³&quot;</span>
+    <span class="n">UNIT_SYMBOL_GALLON</span> <span class="o">=</span> <span class="s2">&quot;gal&quot;</span>
+    <span class="n">UNIT_SYMBOL_BAG_60K_SEEDS</span> <span class="o">=</span> <span class="s2">&quot;bolsa 60k sem&quot;</span>
+    <span class="c1"># Masa</span>
+    <span class="n">UNIT_SYMBOL_KILOGRAM</span> <span class="o">=</span> <span class="s2">&quot;kg&quot;</span>
+    <span class="n">UNIT_SYMBOL_GRAM</span> <span class="o">=</span> <span class="s2">&quot;g&quot;</span>
+    <span class="n">UNIT_SYMBOL_TON</span> <span class="o">=</span> <span class="s2">&quot;t&quot;</span>
+    <span class="n">UNIT_SYMBOL_POUND</span> <span class="o">=</span> <span class="s2">&quot;lb&quot;</span>
+    <span class="n">UNIT_SYMBOL_BULK_50_KILOGRAMS</span> <span class="o">=</span> <span class="s2">&quot;bulto 50kg&quot;</span>
+    <span class="c1"># Tiempo</span>
+    <span class="n">UNIT_SYMBOL_SECOND</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span>
+    <span class="n">UNIT_SYMBOL_MINUTE</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span>
+    <span class="n">UNIT_SYMBOL_HOUR</span> <span class="o">=</span> <span class="s2">&quot;h&quot;</span>
+    <span class="n">UNIT_SYMBOL_DAY</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span>
+    <span class="c1"># Temperatura</span>
+    <span class="n">UNIT_SYMBOL_CELSIUS</span> <span class="o">=</span> <span class="s2">&quot;°C&quot;</span>
+    <span class="n">UNIT_SYMBOL_FAHRENHEIT</span> <span class="o">=</span> <span class="s2">&quot;°F&quot;</span>
+    <span class="n">UNIT_SYMBOL_KELVIN</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span>
+    <span class="c1"># Densidad de siembra</span>
+    <span class="n">UNIT_SYMBOL_PLANTS_PER_HECTARE</span> <span class="o">=</span> <span class="s2">&quot;plantas/ha&quot;</span>
+    <span class="n">UNIT_SYMBOL_SEEDS_PER_HECTARE</span> <span class="o">=</span> <span class="s2">&quot;semillas/ha&quot;</span>
+    <span class="n">UNIT_SYMBOL_SEEDS_PER_SQUARE_METER</span> <span class="o">=</span> <span class="s2">&quot;semillas/m²&quot;</span>
+    <span class="c1"># Moneda</span>
+    <span class="n">UNIT_SYMBOL_COP</span> <span class="o">=</span> <span class="s2">&quot;COP&quot;</span>
+    <span class="n">UNIT_SYMBOL_MXN</span> <span class="o">=</span> <span class="s2">&quot;MXN&quot;</span>
+    <span class="n">UNIT_SYMBOL_USD</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span>
+    <span class="n">UNIT_SYMBOL_EUR</span> <span class="o">=</span> <span class="s2">&quot;EUR&quot;</span>
+    <span class="n">UNIT_SYMBOL_GBP</span> <span class="o">=</span> <span class="s2">&quot;GBP&quot;</span>
+    <span class="c1"># Rendimiento</span>
+    <span class="n">UNIT_SYMBOL_TONS_PER_HECTARE</span> <span class="o">=</span> <span class="s2">&quot;t/ha&quot;</span>
+    <span class="n">UNIT_SYMBOL_KILOGRAMS_PER_HECTARE</span> <span class="o">=</span> <span class="s2">&quot;kg/ha&quot;</span>
+    <span class="c1"># Presión </span>
+    <span class="n">UNIT_SYMBOL_HECTOPASCAL</span> <span class="o">=</span> <span class="s2">&quot;hPa&quot;</span>
+    <span class="n">UNIT_SYMBOL_MILLIBAR</span> <span class="o">=</span> <span class="s2">&quot;mbar&quot;</span>
+    <span class="c1"># Porcentaje</span>
+    <span class="n">UNIT_SYMBOL_PERCENTAGE</span> <span class="o">=</span> <span class="s2">&quot;%&quot;</span>
+    <span class="c1"># Velocidad</span>
+    <span class="n">UNIT_SYMBOL_METERS_PER_SECOND</span> <span class="o">=</span> <span class="s2">&quot;m/s&quot;</span>
+    <span class="n">UNIT_SYMBOL_KILOMETERS_PER_HOUR</span> <span class="o">=</span> <span class="s2">&quot;km/h&quot;</span>
+    <span class="n">UNIT_SYMBOL_MILES_PER_HOUR</span> <span class="o">=</span> <span class="s2">&quot;mph&quot;</span>
+    <span class="c1"># Ángulo</span>
+    <span class="n">UNIT_SYMBOL_DEGREE</span> <span class="o">=</span> <span class="s2">&quot;°&quot;</span>
+    <span class="c1"># Tasa de precipitación</span>
+    <span class="n">UNIT_SYMBOL_MILLIMETERS_PER_HOUR</span> <span class="o">=</span> <span class="s2">&quot;mm/h&quot;</span>
+
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Inicializa el servicio de medidas con la sesión de base de datos.</span>
 
@@ -3097,6 +3302,7 @@ y devuelve un objeto de respuesta que contiene la lista de unidades.</p>
 <span class="sd">            db (Session): Sesión de base de datos SQLAlchemy.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span> <span class="o">=</span> <span class="n">MeasurementRepository</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">validate_unit_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_of_measure</span><span class="p">:</span> <span class="s2">&quot;UnitOfMeasure&quot;</span><span class="p">,</span> <span class="n">expected_category</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Valida que la unidad de medida pertenezca a la categoría esperada.</span>
@@ -3116,6 +3322,52 @@ y devuelve un objeto de respuesta que contiene la lista de unidades.</p>
                 <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;La unidad de medida debe ser de tipo </span><span class="si">{</span><span class="n">expected_category</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
             <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_default_currency</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitOfMeasure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtiene la moneda por defecto (COP)&quot;&quot;&quot;</span>
+        <span class="c1"># Obtener la categoría de moneda</span>
+        <span class="n">currency_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_category_by_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_CATEGORY_CURRENCY_NAME</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">currency_category</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la categoría de moneda&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Obtener la moneda COP</span>
+        <span class="n">cop_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_of_measure_by_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_COP</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cop_currency</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la moneda COP&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cop_currency</span>
+
+    <span class="k">def</span> <span class="nf">get_default_production_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitOfMeasure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtiene la unidad por defecto para producción (kilogramo).&quot;&quot;&quot;</span>
+        <span class="c1"># Obtener la categoría de masa</span>
+        <span class="n">mass_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_category_by_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_CATEGORY_MASS_NAME</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mass_category</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la categoría de masa&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="p">)</span>
+        <span class="c1"># Obtener la unidad Kilogramo</span>
+        <span class="n">kg_unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_of_measure_by_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_KILOGRAM</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kg_unit</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la unidad Kilogramo&quot;</span><span class="p">,</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">kg_unit</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -3175,19 +3427,149 @@ y devuelve un objeto de respuesta que contiene la lista de unidades.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\measurement\application\services\measurement_service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inicializa el servicio de medidas con la sesión de base de datos.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        db (Session): Sesión de base de datos SQLAlchemy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span> <span class="o">=</span> <span class="n">MeasurementRepository</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="app.measurement.application.services.measurement_service.MeasurementService.get_default_currency" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_default_currency</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Obtiene la moneda por defecto (COP)</p>
+
+            <details class="quote">
+              <summary>Source code in <code>app\measurement\application\services\measurement_service.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_default_currency</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitOfMeasure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtiene la moneda por defecto (COP)&quot;&quot;&quot;</span>
+    <span class="c1"># Obtener la categoría de moneda</span>
+    <span class="n">currency_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_category_by_name</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_CATEGORY_CURRENCY_NAME</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">currency_category</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la categoría de moneda&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Obtener la moneda COP</span>
+    <span class="n">cop_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_of_measure_by_name</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_COP</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cop_currency</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la moneda COP&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cop_currency</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="app.measurement.application.services.measurement_service.MeasurementService.get_default_production_unit" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_default_production_unit</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Obtiene la unidad por defecto para producción (kilogramo).</p>
+
+            <details class="quote">
+              <summary>Source code in <code>app\measurement\application\services\measurement_service.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_default_production_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitOfMeasure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtiene la unidad por defecto para producción (kilogramo).&quot;&quot;&quot;</span>
+    <span class="c1"># Obtener la categoría de masa</span>
+    <span class="n">mass_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_category_by_name</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_CATEGORY_MASS_NAME</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mass_category</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la categoría de masa&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+        <span class="p">)</span>
+    <span class="c1"># Obtener la unidad Kilogramo</span>
+    <span class="n">kg_unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_repository</span><span class="o">.</span><span class="n">get_unit_of_measure_by_name</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">UNIT_KILOGRAM</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">kg_unit</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se encontró la unidad Kilogramo&quot;</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">kg_unit</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3277,24 +3659,24 @@ Si no coincide, se lanza una excepción.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\measurement\application\services\measurement_service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">validate_unit_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_of_measure</span><span class="p">:</span> <span class="s2">&quot;UnitOfMeasure&quot;</span><span class="p">,</span> <span class="n">expected_category</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">validate_unit_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_of_measure</span><span class="p">:</span> <span class="s2">&quot;UnitOfMeasure&quot;</span><span class="p">,</span> <span class="n">expected_category</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Valida que la unidad de medida pertenezca a la categoría esperada.</span>
 
 <span class="sd">    Este método verifica si la categoría de la unidad de medida coincide con la categoría esperada.</span>

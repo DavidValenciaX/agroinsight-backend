@@ -2556,28 +2556,6 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="app.crop.infrastructure.orm_models.Crop.ingreso_total">ingreso_total</span></code></td>
-            <td>
-                  <code>decimal</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Ingreso total (opcional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="app.crop.infrastructure.orm_models.Crop.costo_produccion">costo_produccion</span></code></td>
-            <td>
-                  <code>decimal</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Costo de producción (opcional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="app.crop.infrastructure.orm_models.Crop.moneda_id">moneda_id</span></code></td>
             <td>
                   <code>int</code>
@@ -2674,11 +2652,7 @@
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Crop</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Crop</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;cultivo&#39; en la base de datos.</span>
 
@@ -2696,8 +2670,6 @@
 <span class="sd">        precio_venta_unitario (decimal): Precio de venta unitario (opcional).</span>
 <span class="sd">        cantidad_vendida (int): Cantidad vendida (opcional).</span>
 <span class="sd">        cantidad_vendida_unidad_id (int): ID de la unidad de medida para la cantidad vendida (opcional).</span>
-<span class="sd">        ingreso_total (decimal): Ingreso total (opcional).</span>
-<span class="sd">        costo_produccion (decimal): Costo de producción (opcional).</span>
 <span class="sd">        moneda_id (int): ID de la moneda (opcional).</span>
 <span class="sd">        fecha_venta (date): Fecha de venta (opcional).</span>
 <span class="sd">        fecha_creacion (timestamp): Fecha de creación del registro.</span>
@@ -2718,8 +2690,6 @@
     <span class="n">precio_venta_unitario</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="n">cantidad_vendida</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
     <span class="n">cantidad_vendida_unidad_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;unidad_medida.id&#39;</span><span class="p">))</span>
-    <span class="n">ingreso_total</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="n">costo_produccion</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="n">moneda_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;unidad_medida.id&#39;</span><span class="p">))</span>
     <span class="n">fecha_venta</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">)</span>
 
@@ -2816,7 +2786,11 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\crop\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
@@ -2825,11 +2799,7 @@
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CropState</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CropState</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;estado_cultivo&#39; en la base de datos.</span>
 
@@ -2928,7 +2898,11 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\crop\infrastructure\orm_models.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">74</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
@@ -2937,11 +2911,7 @@
 <span class="normal">80</span>
 <span class="normal">81</span>
 <span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CornVariety</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CornVariety</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representa la tabla &#39;variedad_maiz&#39; en la base de datos.</span>
 

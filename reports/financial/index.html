@@ -2758,6 +2758,7 @@
 <li><code>max_cost</code> (float): Muestra solo las tareas con costo total menor o igual a este valor</li>
 <li><code>task_types</code> (List[str]): Lista de tipos de tareas específicas a incluir</li>
 <li><code>only_profitable</code> (bool): Si es True, solo muestra elementos con ganancia positiva</li>
+<li><code>currency_id</code> (int): ID de la moneda en la que se desea el reporte. Si no se especifica, se usa COP.</li>
 </ul>
 <h3 id="parametros-de-agrupacion">Parámetros de Agrupación</h3>
 <ul>
@@ -2773,8 +2774,10 @@
 <li><strong>Nivel Finca</strong></li>
 <li>Información general de la finca</li>
 <li>Totales globales (costos, ingresos, ganancias)</li>
+<li>Moneda utilizada</li>
+<li>Top 10 de maquinaria más utilizada</li>
 <li>
-<p>Moneda utilizada</p>
+<p>Top 10 de insumos más utilizados</p>
 </li>
 <li>
 <p><strong>Nivel Lote</strong></p>
@@ -2869,7 +2872,7 @@
 <span class="w">    </span><span class="nt">&quot;finca_nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Finca Ejemplo&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;fecha_inicio&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;fecha_fin&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;moneda&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COP&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;moneda_simbolo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COP&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;lotes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
 <span class="w">            </span><span class="nt">&quot;lote_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
@@ -2899,9 +2902,28 @@
 <span class="w">            </span><span class="nt">&quot;ganancia_neta&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;costo_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12000000</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;ingreso_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12000000</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;ganancia_neta&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="nt">&quot;top_maquinaria&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;maquinaria_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;John Deere 6110J&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;tipo_maquinaria_nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Tractor&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;total_horas_uso&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;costo_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;6000000.00&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;top_insumos&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;insumo_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Urea&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;categoria_nombre&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fertilizantes&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;unidad_medida_simbolo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kg&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;cantidad_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;costo_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1250000.00&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;costo_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;12000000.00&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ingreso_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;15000000.00&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ganancia_neta&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000000.00&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="codigos-de-error">Códigos de Error</h2>

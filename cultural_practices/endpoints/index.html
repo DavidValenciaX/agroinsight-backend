@@ -2635,7 +2635,7 @@
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">REGISTER_TASK</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;tarea_labor_cultural&quot;</span><span class="p">,</span>
     <span class="n">severity</span><span class="o">=</span><span class="n">LogSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Creación de nueva tarea de labor cultural&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Registro de nueva tarea de labor cultural con detalles de tipo, descripción, fecha, lote y estado&quot;</span><span class="p">,</span>
     <span class="n">get_record_id</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;result&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">task_id</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;result&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">get_new_value</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="kc">None</span>
 <span class="p">)</span>
@@ -2844,7 +2844,7 @@
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">ASSIGN_TASK</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;asignacion&quot;</span><span class="p">,</span>
     <span class="n">severity</span><span class="o">=</span><span class="n">LogSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Asignación de tarea a usuarios&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Asignación de tarea de labor cultural a trabajadores con fecha y detalles&quot;</span><span class="p">,</span>
     <span class="n">get_record_id</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;result&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">task_id</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;result&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">get_new_value</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="kc">None</span>
 <span class="p">)</span>
@@ -3074,7 +3074,7 @@
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;tarea_labor_cultural&quot;</span><span class="p">,</span>
     <span class="n">severity</span><span class="o">=</span><span class="n">LogSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de tareas por usuario y finca&quot;</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de listado paginado de tareas por usuario y finca con estados y detalles&quot;</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">list_tasks_by_user_and_farm</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
@@ -3290,7 +3290,7 @@
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;tarea_labor_cultural&quot;</span><span class="p">,</span>
     <span class="n">severity</span><span class="o">=</span><span class="n">LogSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de tarea específica&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta detallada de tarea específica con estado, asignaciones y datos relacionados&quot;</span><span class="p">,</span>
     <span class="n">get_record_id</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_id&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_id&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">get_task_by_id</span><span class="p">(</span>
@@ -3471,7 +3471,7 @@
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;estado_tarea_labor_cultural&quot;</span><span class="p">,</span>
     <span class="n">severity</span><span class="o">=</span><span class="n">LogSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de estados de tareas disponibles&quot;</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta del catálogo de estados disponibles para tareas de labor cultural&quot;</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">list_task_states</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
@@ -3694,7 +3694,7 @@
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">CHANGE_STATUS</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;tarea_labor_cultural&quot;</span><span class="p">,</span>
     <span class="n">severity</span><span class="o">=</span><span class="n">LogSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cambio de estado de tarea&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Actualización de estado de tarea cultural con registro de estado anterior y nuevo&quot;</span><span class="p">,</span>
     <span class="n">get_record_id</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_id&#39;</span><span class="p">)),</span>
     <span class="n">get_old_value</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;estado_id&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">estado_id</span>
@@ -3881,7 +3881,7 @@
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;tipo_labor_cultural&quot;</span><span class="p">,</span>
     <span class="n">severity</span><span class="o">=</span><span class="n">LogSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de tipos de labor cultural&quot;</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta del catálogo completo de tipos de labores culturales disponibles&quot;</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">list_task_types</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>

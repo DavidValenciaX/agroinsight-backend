@@ -2451,29 +2451,47 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\reports\domain\schemas.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TaskCost</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TaskCost</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Costos asociados a una tarea específica&quot;&quot;&quot;</span>
     <span class="n">tarea_id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">tarea_nombre</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">tipo_labor_nombre</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">fecha</span><span class="p">:</span> <span class="n">date</span>
+    <span class="n">fecha_inicio</span><span class="p">:</span> <span class="n">date</span>
+    <span class="n">fecha_finalizacion</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">date</span><span class="p">]</span>
     <span class="n">nivel</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">estado_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">estado_nombre</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">mano_obra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LaborCostSchema</span><span class="p">]</span>
     <span class="n">costo_mano_obra</span><span class="p">:</span> <span class="n">Decimal</span>
+    <span class="n">insumos</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">InputSchema</span><span class="p">]]</span>
     <span class="n">costo_insumos</span><span class="p">:</span> <span class="n">Decimal</span>
+    <span class="n">maquinarias</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">MachinerySchema</span><span class="p">]]</span>
     <span class="n">costo_maquinaria</span><span class="p">:</span> <span class="n">Decimal</span>
     <span class="n">costo_total</span><span class="p">:</span> <span class="n">Decimal</span>
     <span class="n">observaciones</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">from_attributes</span> <span class="o">=</span> <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -2513,33 +2531,43 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\reports\domain\schemas.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CropFinancials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CropFinancials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Información financiera de un cultivo&quot;&quot;&quot;</span>
     <span class="n">cultivo_id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">variedad_maiz</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">fecha_siembra</span><span class="p">:</span> <span class="n">date</span>
     <span class="n">fecha_cosecha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">date</span><span class="p">]</span>
     <span class="n">produccion_total</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">produccion_total_unidad_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">produccion_total_unidad_simbolo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">cantidad_vendida</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">cantidad_vendida_unidad_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">cantidad_vendida_unidad_simbolo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">precio_venta_unitario</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Decimal</span><span class="p">]</span>
-    <span class="n">ingreso_total</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Decimal</span><span class="p">]</span>
-    <span class="n">costo_produccion</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Decimal</span><span class="p">]</span>
-    <span class="n">tareas_cultivo</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">]</span>
-    <span class="n">costo_total</span><span class="p">:</span> <span class="n">Decimal</span>
-    <span class="n">ganancia_neta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Decimal</span><span class="p">]</span>
+    <span class="n">moneda_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">moneda_simbolo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">ingreso_total</span><span class="p">:</span> <span class="n">Decimal</span>
+    <span class="n">costo_produccion</span><span class="p">:</span> <span class="n">Decimal</span>
+    <span class="n">tareas_cultivo</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">,</span> <span class="n">GroupedTaskCost</span><span class="p">]]</span>
+    <span class="n">ganancia_neta</span><span class="p">:</span> <span class="n">Decimal</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -2579,25 +2607,23 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\reports\domain\schemas.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PlotFinancials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PlotFinancials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Información financiera de un lote&quot;&quot;&quot;</span>
     <span class="n">lote_id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">lote_nombre</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">cultivos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CropFinancials</span><span class="p">]</span>
-    <span class="n">tareas_lote</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">]</span>
-    <span class="n">costo_mantenimiento_base</span><span class="p">:</span> <span class="n">Decimal</span>
-    <span class="n">costo_tareas</span><span class="p">:</span> <span class="n">Decimal</span>
+    <span class="n">tareas_lote</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">TaskCost</span><span class="p">,</span> <span class="n">GroupedTaskCost</span><span class="p">]]</span>
+    <span class="n">costo_mantenimiento</span><span class="p">:</span> <span class="n">Decimal</span>
     <span class="n">costo_cultivos</span><span class="p">:</span> <span class="n">Decimal</span>
     <span class="n">costo_total</span><span class="p">:</span> <span class="n">Decimal</span>
     <span class="n">ingreso_total</span><span class="p">:</span> <span class="n">Decimal</span>
@@ -2641,27 +2667,31 @@
 
               <details class="quote">
                 <summary>Source code in <code>app\reports\domain\schemas.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">FarmFinancialReport</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">FarmFinancialReport</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reporte financiero completo de una finca&quot;&quot;&quot;</span>
     <span class="n">finca_id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">finca_nombre</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">fecha_inicio</span><span class="p">:</span> <span class="n">date</span>
     <span class="n">fecha_fin</span><span class="p">:</span> <span class="n">date</span>
-    <span class="n">moneda</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">moneda_simbolo</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">lotes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PlotFinancials</span><span class="p">]</span>
     <span class="n">costo_total</span><span class="p">:</span> <span class="n">Decimal</span>
     <span class="n">ingreso_total</span><span class="p">:</span> <span class="n">Decimal</span>
     <span class="n">ganancia_neta</span><span class="p">:</span> <span class="n">Decimal</span>
+    <span class="n">top_maquinaria</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TopMachineryUsage</span><span class="p">]</span>
+    <span class="n">top_insumos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TopInputUsage</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 

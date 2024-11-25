@@ -2533,7 +2533,7 @@
 <span class="nd">@log_activity</span><span class="p">(</span>
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">REGISTER_PLOT</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;lote&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Creación de nuevo lote&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Creación de nuevo lote asociado a una finca&quot;</span><span class="p">,</span>
     <span class="n">get_record_id</span><span class="o">=</span><span class="n">get_created_plot_id</span><span class="p">,</span>
     <span class="n">get_new_value</span><span class="o">=</span><span class="n">get_plot_data</span>
 <span class="p">)</span>
@@ -2760,7 +2760,7 @@
 <span class="nd">@log_activity</span><span class="p">(</span>
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;lote&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de lista de lotes&quot;</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta de listado paginado de lotes por finca&quot;</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">list_plots_by_farm</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>

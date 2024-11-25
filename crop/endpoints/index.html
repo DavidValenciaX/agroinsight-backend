@@ -2483,10 +2483,12 @@
 <span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/crops&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
+<span class="normal">60</span>
+<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/crops&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">SuccessResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
 <span class="nd">@log_activity</span><span class="p">(</span>
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">CREATE</span><span class="p">,</span> 
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;cultivo&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Creación de nuevo cultivo en el sistema con datos de variedad, fecha de siembra y lote asociado&quot;</span><span class="p">,</span>
     <span class="n">get_new_value</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;crop&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span> <span class="k">if</span> <span class="s1">&#39;crop&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="kc">None</span>
 <span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">create_crop</span><span class="p">(</span>
@@ -2626,8 +2628,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\crop\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
-<span class="normal">65</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
@@ -2655,8 +2656,17 @@
 <span class="normal">90</span>
 <span class="normal">91</span>
 <span class="normal">92</span>
-<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/corn-varieties&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">CornVarietyListResponse</span><span class="p">)</span>
-<span class="nd">@log_activity</span><span class="p">(</span><span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;variedad_maiz&quot;</span><span class="p">)</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/corn-varieties&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">CornVarietyListResponse</span><span class="p">)</span>
+<span class="nd">@log_activity</span><span class="p">(</span>
+    <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span> 
+    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;variedad_maiz&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta del catálogo de variedades de maíz disponibles en el sistema&quot;</span>
+<span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">list_corn_varieties</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
@@ -2806,12 +2816,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app\crop\infrastructure\api.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
@@ -2839,8 +2844,23 @@
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
-<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/plots/</span><span class="si">{plot_id}</span><span class="s2">/crops&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">PaginatedCropListResponse</span><span class="p">)</span>
-<span class="nd">@log_activity</span><span class="p">(</span><span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;cultivo&quot;</span><span class="p">)</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/plots/</span><span class="si">{plot_id}</span><span class="s2">/crops&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">PaginatedCropListResponse</span><span class="p">)</span>
+<span class="nd">@log_activity</span><span class="p">(</span>
+    <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">VIEW</span><span class="p">,</span> 
+    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;cultivo&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consulta paginada de cultivos asociados a un lote específico&quot;</span><span class="p">,</span>
+    <span class="n">get_record_id</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;plot_id&#39;</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">list_crops_by_plot</span><span class="p">(</span>
     <span class="n">plot_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>

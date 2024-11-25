@@ -4573,8 +4573,7 @@ las validaciones necesarias antes de realizar la creación.</p>
 
               <details class="quote">
                 <summary>Source code in <code>app\cultural_practices\application\create_task_use_case.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
-<span class="normal"> 15</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
 <span class="normal"> 16</span>
 <span class="normal"> 17</span>
 <span class="normal"> 18</span>
@@ -4682,7 +4681,30 @@ las validaciones necesarias antes de realizar la creación.</p>
 <span class="normal">120</span>
 <span class="normal">121</span>
 <span class="normal">122</span>
-<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CreateTaskUseCase</span><span class="p">:</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CreateTaskUseCase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Caso de uso para crear tareas de labor cultural.</span>
 
 <span class="sd">    Este caso de uso gestiona la lógica de negocio para la creación de tareas, asegurando que se cumplan</span>
@@ -4711,6 +4733,7 @@ las validaciones necesarias antes de realizar la creación.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span> <span class="o">=</span> <span class="n">FarmService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span> <span class="o">=</span> <span class="n">TaskService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span> <span class="o">=</span> <span class="n">CropRepository</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crop_service</span> <span class="o">=</span> <span class="n">CropService</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">create_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_data</span><span class="p">:</span> <span class="n">TaskCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessTaskCreateResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Crea una nueva tarea de labor cultural.</span>
@@ -4774,6 +4797,27 @@ las validaciones necesarias antes de realizar la creación.</p>
                     <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pueden crear tareas de nivel CULTIVO en lotes sin cultivos activos.&quot;</span><span class="p">,</span>
                     <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
                 <span class="p">)</span>
+
+            <span class="c1"># Verificar si el cultivo está cosechado</span>
+            <span class="k">if</span> <span class="n">active_crop</span><span class="o">.</span><span class="n">estado</span><span class="o">.</span><span class="n">nombre</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_service</span><span class="o">.</span><span class="n">COSECHADO</span><span class="p">:</span>
+                <span class="c1"># Lista de tareas no permitidas después de la cosecha</span>
+                <span class="n">tareas_no_permitidas</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">SIEMBRA</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">FERTILIZACION</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">RIEGO</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">CONTROL_DE_PLAGAS</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">CONTROL_DE_MALEZAS</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">COSECHA</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">MONITOREO_FITOSANITARIO</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">APLICACION_DE_FUNGICIDAS</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">CONTROL_BIOLOGICO_DE_PLAGAS</span>
+                <span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">task_type</span><span class="o">.</span><span class="n">nombre</span> <span class="ow">in</span> <span class="n">tareas_no_permitidas</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                        <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;No se pueden crear tareas de tipo &#39;</span><span class="si">{</span><span class="n">task_type</span><span class="o">.</span><span class="n">nombre</span><span class="si">}</span><span class="s2">&#39; en cultivos ya cosechados.&quot;</span><span class="p">,</span>
+                        <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
+                    <span class="p">)</span>
 
         <span class="c1"># Verificar si el estado de tarea existe</span>
         <span class="n">task_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">estado_id</span><span class="p">)</span>
@@ -4851,8 +4895,7 @@ las validaciones necesarias antes de realizar la creación.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\create_task_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
-<span class="normal">31</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
 <span class="normal">34</span>
@@ -4863,7 +4906,9 @@ las validaciones necesarias antes de realizar la creación.</p>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inicializa el caso de uso con las dependencias necesarias.</span>
 
 <span class="sd">    Args:</span>
@@ -4876,6 +4921,7 @@ las validaciones necesarias antes de realizar la creación.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">farm_service</span> <span class="o">=</span> <span class="n">FarmService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span> <span class="o">=</span> <span class="n">TaskService</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">crop_repository</span> <span class="o">=</span> <span class="n">CropRepository</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">crop_service</span> <span class="o">=</span> <span class="n">CropService</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4989,9 +5035,7 @@ se crea la tarea.</p>
 
             <details class="quote">
               <summary>Source code in <code>app\cultural_practices\application\create_task_use_case.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 44</span>
-<span class="normal"> 45</span>
-<span class="normal"> 46</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 46</span>
 <span class="normal"> 47</span>
 <span class="normal"> 48</span>
 <span class="normal"> 49</span>
@@ -5068,7 +5112,30 @@ se crea la tarea.</p>
 <span class="normal">120</span>
 <span class="normal">121</span>
 <span class="normal">122</span>
-<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_data</span><span class="p">:</span> <span class="n">TaskCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessTaskCreateResponse</span><span class="p">:</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_data</span><span class="p">:</span> <span class="n">TaskCreate</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SuccessTaskCreateResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Crea una nueva tarea de labor cultural.</span>
 
 <span class="sd">    Este método valida la existencia del lote, el cultivo activo en el lote, la finca asociada,</span>
@@ -5130,6 +5197,27 @@ se crea la tarea.</p>
                 <span class="n">message</span><span class="o">=</span><span class="s2">&quot;No se pueden crear tareas de nivel CULTIVO en lotes sin cultivos activos.&quot;</span><span class="p">,</span>
                 <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
             <span class="p">)</span>
+
+        <span class="c1"># Verificar si el cultivo está cosechado</span>
+        <span class="k">if</span> <span class="n">active_crop</span><span class="o">.</span><span class="n">estado</span><span class="o">.</span><span class="n">nombre</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_service</span><span class="o">.</span><span class="n">COSECHADO</span><span class="p">:</span>
+            <span class="c1"># Lista de tareas no permitidas después de la cosecha</span>
+            <span class="n">tareas_no_permitidas</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">SIEMBRA</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">FERTILIZACION</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">RIEGO</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">CONTROL_DE_PLAGAS</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">CONTROL_DE_MALEZAS</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">COSECHA</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">MONITOREO_FITOSANITARIO</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">APLICACION_DE_FUNGICIDAS</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_service</span><span class="o">.</span><span class="n">CONTROL_BIOLOGICO_DE_PLAGAS</span>
+            <span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">task_type</span><span class="o">.</span><span class="n">nombre</span> <span class="ow">in</span> <span class="n">tareas_no_permitidas</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DomainException</span><span class="p">(</span>
+                    <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;No se pueden crear tareas de tipo &#39;</span><span class="si">{</span><span class="n">task_type</span><span class="o">.</span><span class="n">nombre</span><span class="si">}</span><span class="s2">&#39; en cultivos ya cosechados.&quot;</span><span class="p">,</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span>
+                <span class="p">)</span>
 
     <span class="c1"># Verificar si el estado de tarea existe</span>
     <span class="n">task_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cultural_practice_repository</span><span class="o">.</span><span class="n">get_task_state_by_id</span><span class="p">(</span><span class="n">task_data</span><span class="o">.</span><span class="n">estado_id</span><span class="p">)</span>
