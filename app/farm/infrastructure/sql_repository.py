@@ -223,12 +223,9 @@ class FarmRepository:
         start_date: Optional[date] = None,
         end_date: Optional[date] = None
     ) -> List[Tuple[Farm, float]]:
-        """Obtiene las fincas rankeadas por ganancias.
+        """Obtiene las fincas rankeadas por ganancias."""
 
-        Returns:
-            List[Tuple[Farm, float]]: Lista de tuplas (finca, ganancia)
-        """
-        # Subquery para obtener los ingresos por cultivo
+        # Income calculation remains the same
         crop_income = self.db.query(
             Plot.finca_id.label('farm_id'),
             func.sum(
@@ -246,51 +243,93 @@ class FarmRepository:
 
         crop_income = crop_income.group_by(Plot.finca_id).subquery()
 
-        # Subquery para obtener los costos totales (mano de obra + insumos + maquinaria)
-        total_costs = self.db.query(
+        # Subquery for labor costs
+        labor_costs = self.db.query(
             Plot.finca_id.label('farm_id'),
             func.sum(
                 func.coalesce(
-                    LaborCost.cantidad_trabajadores * 
-                    LaborCost.horas_trabajadas * 
-                    LaborCost.costo_hora, 
+                    LaborCost.cantidad_trabajadores *
+                    LaborCost.horas_trabajadas *
+                    LaborCost.costo_hora,
                     0
-                ) +
+                )
+            ).label('labor_cost')
+        ).join(
+            CulturalTask, Plot.id == CulturalTask.lote_id
+        ).join(
+            LaborCost, CulturalTask.id == LaborCost.tarea_labor_id
+        ).filter(
+            CulturalTask.fecha_inicio_estimada >= start_date,
+            CulturalTask.fecha_inicio_estimada <= end_date
+        ).group_by(
+            Plot.finca_id
+        ).subquery()
+
+        # Subquery for input costs
+        input_costs = self.db.query(
+            Plot.finca_id.label('farm_id'),
+            func.sum(
                 func.coalesce(
-                    TaskInput.cantidad_utilizada * AgriculturalInput.costo_unitario, 
+                    TaskInput.cantidad_utilizada * AgriculturalInput.costo_unitario,
                     0
-                ) +
+                )
+            ).label('input_cost')
+        ).join(
+            CulturalTask, Plot.id == CulturalTask.lote_id
+        ).join(
+            TaskInput, CulturalTask.id == TaskInput.tarea_labor_id
+        ).join(
+            AgriculturalInput, TaskInput.insumo_id == AgriculturalInput.id
+        ).filter(
+            CulturalTask.fecha_inicio_estimada >= start_date,
+            CulturalTask.fecha_inicio_estimada <= end_date
+        ).group_by(
+            Plot.finca_id
+        ).subquery()
+
+        # Subquery for machinery costs
+        machinery_costs = self.db.query(
+            Plot.finca_id.label('farm_id'),
+            func.sum(
                 func.coalesce(
                     TaskMachinery.horas_uso * AgriculturalMachinery.costo_hora,
                     0
                 )
-            ).label('costs')
+            ).label('machinery_cost')
         ).join(
             CulturalTask, Plot.id == CulturalTask.lote_id
-        ).outerjoin(
-            LaborCost, CulturalTask.id == LaborCost.tarea_labor_id
-        ).outerjoin(
-            TaskInput, CulturalTask.id == TaskInput.tarea_labor_id
-        ).outerjoin(
-            AgriculturalInput, TaskInput.insumo_id == AgriculturalInput.id
-        ).outerjoin(
+        ).join(
             TaskMachinery, CulturalTask.id == TaskMachinery.tarea_labor_id
-        ).outerjoin(
+        ).join(
             AgriculturalMachinery, TaskMachinery.maquinaria_id == AgriculturalMachinery.id
-        )
+        ).filter(
+            CulturalTask.fecha_inicio_estimada >= start_date,
+            CulturalTask.fecha_inicio_estimada <= end_date
+        ).group_by(
+            Plot.finca_id
+        ).subquery()
 
-        if start_date:
-            total_costs = total_costs.filter(CulturalTask.fecha_inicio_estimada >= start_date)
-        if end_date:
-            total_costs = total_costs.filter(CulturalTask.fecha_inicio_estimada <= end_date)
+        # Combine the costs
+        total_costs = self.db.query(
+            Plot.finca_id.label('farm_id'),
+            (func.coalesce(labor_costs.c.labor_cost, 0) +
+             func.coalesce(input_costs.c.input_cost, 0) +
+             func.coalesce(machinery_costs.c.machinery_cost, 0)).label('total_cost')
+        ).outerjoin(
+            labor_costs, Plot.finca_id == labor_costs.c.farm_id
+        ).outerjoin(
+            input_costs, Plot.finca_id == input_costs.c.farm_id
+        ).outerjoin(
+            machinery_costs, Plot.finca_id == machinery_costs.c.farm_id
+        ).group_by(
+            Plot.finca_id
+        ).subquery()
 
-        total_costs = total_costs.group_by(Plot.finca_id).subquery()
-
-        # Query principal para obtener las fincas y calcular las ganancias
+        # Main query remains similar, but join to the new total_costs subquery
         query = self.db.query(
             Farm,
-            (func.coalesce(crop_income.c.income, 0) - 
-             func.coalesce(total_costs.c.costs, 0)).label('profit')
+            (func.coalesce(crop_income.c.income, 0) -
+             func.coalesce(total_costs.c.total_cost, 0)).label('profit')
         ).join(
             UserFarmRole
         ).outerjoin(
@@ -303,7 +342,7 @@ class FarmRepository:
         ).group_by(
             Farm.id,
             crop_income.c.income,
-            total_costs.c.costs
+            total_costs.c.total_cost
         ).order_by(
             text('profit DESC')
         ).limit(limit)
