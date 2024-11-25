@@ -12,7 +12,7 @@ from app.farm.application.list_farm_users_use_case import ListFarmUsersUseCase
 from app.farm.application.list_worker_farms_use_case import ListWorkerFarmsUseCase
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
-from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail, PaginatedWorkerFarmListResponse, FarmListResponse
+from app.farm.domain.schemas import FarmCreate, PaginatedFarmListResponse, PaginatedFarmUserListResponse, FarmUserAssignmentByEmail, PaginatedWorkerFarmListResponse, FarmListResponse, FarmTasksStatsResponse
 from app.farm.application.create_farm_use_case import CreateFarmUseCase
 from app.farm.application.list_farms_use_case import ListFarmsUseCase
 from app.farm.application.assign_users_to_farm_use_case import AssignUsersToFarmUseCase
@@ -23,6 +23,9 @@ from app.user.domain.schemas import UserForFarmResponse, UserInDB
 from app.infrastructure.common.common_exceptions import DomainException, UserStateException
 from app.farm.application.list_all_farms_use_case import ListAllFarmsUseCase
 from app.logs.application.decorators.log_decorator import log_activity
+from app.farm.application.get_farm_tasks_stats_use_case import GetFarmTasksStatsUseCase
+from datetime import date
+from typing import Optional
 
 router = APIRouter(prefix="/farm", tags=["farm"])
 
@@ -291,4 +294,50 @@ async def list_all_farms(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al listar las fincas: {str(e)}"
+        )
+
+@router.get("/{farm_id}/tasks/stats", response_model=FarmTasksStatsResponse)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="tarea_labor_cultural",
+    description="Consulta de estadísticas de tareas de la finca"
+)
+async def get_farm_tasks_stats(
+    request: Request,
+    farm_id: int,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> FarmTasksStatsResponse:
+    """
+    Obtiene estadísticas de las tareas de una finca específica.
+
+    Parameters:
+        farm_id (int): ID de la finca.
+        start_date (Optional[date]): Fecha inicial del rango de filtrado.
+        end_date (Optional[date]): Fecha final del rango de filtrado.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        FarmTasksStatsResponse: Estadísticas de tareas de la finca.
+
+    Raises:
+        HTTPException: Si ocurre un error durante la obtención de las estadísticas.
+    """
+    get_farm_tasks_stats_use_case = GetFarmTasksStatsUseCase(db)
+    try:
+        return get_farm_tasks_stats_use_case.get_farm_tasks_stats(
+            farm_id, 
+            current_user,
+            start_date,
+            end_date
+        )
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener las estadísticas: {str(e)}"
         )

@@ -1,9 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.orm import Session
 from app.cultural_practices.domain.schemas import AssignmentCreateSingle, NivelLaborCultural, TaskCreate
 from app.cultural_practices.infrastructure.orm_models import Assignment, CulturalTaskState, CulturalTaskType, CulturalTask
 from app.plot.infrastructure.orm_models import Plot
 from sqlalchemy.orm import joinedload
+from datetime import date
+from sqlalchemy import and_
 
 class CulturalPracticesRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con prácticas culturales.
@@ -246,4 +248,39 @@ class CulturalPracticesRepository:
             .filter(CulturalTask.lote_id == crop_id)\
             .filter(CulturalTaskType.nivel == NivelLaborCultural.CULTIVO)\
             .all()
+
+    def get_farm_tasks_stats(
+        self, 
+        farm_id: int, 
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None
+    ) -> Tuple[int, int]:
+        """Obtiene las estadísticas de tareas de una finca.
+
+        Args:
+            farm_id (int): ID de la finca.
+            start_date (Optional[date]): Fecha inicial del rango.
+            end_date (Optional[date]): Fecha final del rango.
+
+        Returns:
+            Tuple[int, int]: Total de tareas y total de tareas completadas.
+        """
+        # Construir la consulta base
+        query = self.db.query(CulturalTask)\
+            .join(Plot)\
+            .filter(Plot.finca_id == farm_id)
+
+        # Aplicar filtros de fecha si se proporcionan
+        if start_date:
+            query = query.filter(CulturalTask.fecha_inicio_estimada >= start_date)
+        if end_date:
+            query = query.filter(CulturalTask.fecha_inicio_estimada <= end_date)
+
+        # Obtener total de tareas
+        total_tasks = query.count()
+
+        # Obtener tareas completadas (asumiendo que el estado_id 3 es "Completada")
+        completed_tasks = query.filter(CulturalTask.estado_id == 3).count()
+
+        return total_tasks, completed_tasks
 

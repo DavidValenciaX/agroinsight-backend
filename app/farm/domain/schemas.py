@@ -184,3 +184,15 @@ class FarmListResponse(BaseModel):
     """
     farms: List[FarmResponse]
     total_farms: int
+
+class FarmTasksStatsResponse(BaseModel):
+    """Schema para la respuesta con estadísticas de tareas de una finca.
+
+    Attributes:
+        total_tasks (int): Total de tareas asignadas en la finca.
+        completed_tasks (int): Total de tareas completadas en la finca.
+        completion_rate (float): Porcentaje de tareas completadas.
+    """
+    total_tasks: int
+    completed_tasks: int
+    completion_rate: float
