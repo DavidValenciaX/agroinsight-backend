@@ -49,7 +49,7 @@ class GetFarmRankingUseCase:
         try:
             # Obtener el rol de administrador
             admin_role = self.farm_service.get_admin_role()
-
+            
             # Obtener las fincas rankeadas y la unidad según el tipo
             if ranking_type == FarmRankingType.PROFIT:
                 ranked_farms = self.farm_repository.get_farms_ranked_by_profit(
