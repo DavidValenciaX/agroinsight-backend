@@ -1,6 +1,6 @@
 # app/reports/infrastructure/sql_repository.py
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from datetime import date
 from typing import List, Optional
 from app.crop.infrastructure.orm_models import Crop
@@ -8,6 +8,7 @@ from app.cultural_practices.infrastructure.orm_models import CulturalTask, Cultu
 from app.measurement.application.services.measurement_service import MeasurementService
 from app.plot.infrastructure.orm_models import Plot
 from app.measurement.infrastructure.orm_models import UnitOfMeasure, UnitCategory
+from app.costs.infrastructure.orm_models import TaskMachinery, AgriculturalMachinery, MachineryType
 
 class FinancialReportRepository:
     def __init__(self, db: Session):
@@ -75,3 +76,45 @@ class FinancialReportRepository:
                     (CulturalTask.fecha_inicio_estimada <= crop.fecha_cosecha)
                 )
             ).all()
+
+    def get_top_machinery_usage(self, farm_id: int, start_date: date, end_date: date, limit: int = 10) -> List[tuple]:
+        """Obtiene el top de maquinaria más usada en una finca durante un período.
+
+        Args:
+            farm_id: ID de la finca
+            start_date: Fecha de inicio del período
+            end_date: Fecha fin del período
+            limit: Cantidad de registros a retornar (default 10)
+
+        Returns:
+            List[tuple]: Lista de tuplas con (maquinaria_id, nombre, tipo_nombre, horas_uso, costo_total)
+        """
+        return self.db.query(
+            TaskMachinery.maquinaria_id,
+            AgriculturalMachinery.nombre,
+            MachineryType.nombre.label('tipo_nombre'),
+            func.sum(TaskMachinery.horas_uso).label('total_horas_uso'),
+            func.sum(TaskMachinery.horas_uso * AgriculturalMachinery.costo_hora).label('costo_total')
+        ).join(
+            AgriculturalMachinery,
+            TaskMachinery.maquinaria_id == AgriculturalMachinery.id
+        ).join(
+            MachineryType,
+            AgriculturalMachinery.tipo_maquinaria_id == MachineryType.id
+        ).join(
+            CulturalTask,
+            TaskMachinery.tarea_labor_id == CulturalTask.id
+        ).join(
+            Plot,
+            CulturalTask.lote_id == Plot.id
+        ).filter(
+            Plot.finca_id == farm_id,
+            TaskMachinery.fecha_uso >= start_date,
+            TaskMachinery.fecha_uso <= end_date
+        ).group_by(
+            TaskMachinery.maquinaria_id,
+            AgriculturalMachinery.nombre,
+            MachineryType.nombre
+        ).order_by(
+            func.sum(TaskMachinery.horas_uso).desc()
+        ).limit(limit).all()

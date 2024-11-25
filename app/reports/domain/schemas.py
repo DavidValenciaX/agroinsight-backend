@@ -118,6 +118,14 @@ class PlotFinancials(BaseModel):
     ingreso_total: Decimal
     ganancia_neta: Decimal
 
+class TopMachineryUsage(BaseModel):
+    """Información de uso de maquinaria agrícola"""
+    maquinaria_id: int
+    nombre: str
+    tipo_maquinaria_nombre: str
+    total_horas_uso: Decimal
+    costo_total: Decimal
+
 class FarmFinancialReport(BaseModel):
     """Reporte financiero completo de una finca"""
     finca_id: int
@@ -129,3 +137,4 @@ class FarmFinancialReport(BaseModel):
     costo_total: Decimal
     ingreso_total: Decimal
     ganancia_neta: Decimal
+    top_maquinaria: List[TopMachineryUsage]

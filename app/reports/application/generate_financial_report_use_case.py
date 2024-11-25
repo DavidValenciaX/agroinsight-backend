@@ -9,7 +9,7 @@ from app.measurement.application.services.measurement_service import Measurement
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
 from app.reports.infrastructure.sql_repository import FinancialReportRepository
 from app.farm.application.services.farm_service import FarmService
-from app.reports.domain.schemas import FarmFinancialReport, PlotFinancials, CropFinancials, TaskCost, GroupedTaskCost
+from app.reports.domain.schemas import FarmFinancialReport, PlotFinancials, CropFinancials, TaskCost, GroupedTaskCost, TopMachineryUsage
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.measurement.application.services.currency_conversion_service import CurrencyConversionService
@@ -336,6 +336,30 @@ class GenerateFinancialReportUseCase:
             total_farm_cost += total_plot_cost
             total_farm_income += total_plot_income
 
+        # Antes del return final, obtener el top de maquinaria
+        top_machinery_data = self.repository.get_top_machinery_usage(
+            farm_id, 
+            start_date, 
+            end_date
+        )
+        
+        top_machinery = []
+        for m_id, nombre, tipo_nombre, horas_uso, costo in top_machinery_data:
+            # Convertir el costo a la moneda objetivo
+            costo_convertido = self.currency_service.convert_amount(
+                costo,
+                default_currency.abreviatura,
+                target_currency.abreviatura
+            )
+            
+            top_machinery.append(TopMachineryUsage(
+                maquinaria_id=m_id,
+                nombre=nombre,
+                tipo_maquinaria_nombre=tipo_nombre,
+                total_horas_uso=horas_uso,
+                costo_total=costo_convertido
+            ))
+
         return FarmFinancialReport(
             finca_id=farm.id,
             finca_nombre=farm.nombre,
@@ -345,7 +369,8 @@ class GenerateFinancialReportUseCase:
             lotes=plot_financials,
             costo_total=total_farm_cost,
             ingreso_total=total_farm_income,
-            ganancia_neta=total_farm_income - total_farm_cost
+            ganancia_neta=total_farm_income - total_farm_cost,
+            top_maquinaria=top_machinery
         )
 
     def _group_tasks(self, tasks: List[TaskCost], group_by: str) -> List[GroupedTaskCost]:
