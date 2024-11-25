@@ -118,11 +118,6 @@ class LogService:
             except:
                 user_description = "Usuario no identificado"
 
-        # Agregar logging para debug
-        print(f"Debug - User input: {user}")
-        print(f"Debug - Usuario ID: {usuario_id}")
-        print(f"Debug - User description: {user_description}")
-
         # Obtener el tipo de acción y su nombre
         action_type_id = self._ensure_action_type_exists(action_type)
         action_type_name = action_type.value if isinstance(action_type, LogActionType) else str(action_type)
