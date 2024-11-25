@@ -216,19 +216,19 @@ class FarmRepository:
         return query.all()
 
     def get_farms_ranked_by_profit(
-        self, 
-        user_id: int, 
+        self,
+        user_id: int,
         admin_role_id: int,
         limit: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None
     ) -> List[Tuple[Farm, float]]:
         """Obtiene las fincas rankeadas por ganancias.
-        
+
         Returns:
             List[Tuple[Farm, float]]: Lista de tuplas (finca, ganancia)
         """
-        # Subconsulta para obtener los ingresos por cultivo
+        # Subquery para obtener los ingresos por cultivo
         crop_income = self.db.query(
             Plot.finca_id.label('farm_id'),
             func.sum(
@@ -246,11 +246,16 @@ class FarmRepository:
 
         crop_income = crop_income.group_by(Plot.finca_id).subquery()
 
-        # Subconsulta para obtener los costos totales (mano de obra + insumos + maquinaria)
+        # Subquery para obtener los costos totales (mano de obra + insumos + maquinaria)
         total_costs = self.db.query(
             Plot.finca_id.label('farm_id'),
             func.sum(
-                func.coalesce(LaborCost.costo_total, 0) +
+                func.coalesce(
+                    LaborCost.cantidad_trabajadores * 
+                    LaborCost.horas_trabajadas * 
+                    LaborCost.costo_hora, 
+                    0
+                ) +
                 func.coalesce(
                     TaskInput.cantidad_utilizada * AgriculturalInput.costo_unitario, 
                     0
