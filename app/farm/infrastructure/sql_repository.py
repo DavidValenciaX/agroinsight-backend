@@ -333,27 +333,15 @@ class FarmRepository:
 
         # Subquery for income
         crop_income = self.get_crop_income_subquery(start_date, end_date)
-        # Ejecutar y mostrar resultados de crop_income
-        crop_income_results = self.db.execute(crop_income.select()).fetchall()
-        print("crop_income results:", crop_income_results)
 
         # Subquery for labor costs
         labor_costs = self.get_labor_costs_subquery(start_date, end_date)
-        # Ejecutar y mostrar resultados de labor_costs
-        labor_costs_results = self.db.execute(labor_costs.select()).fetchall()
-        print("labor_costs results:", labor_costs_results)
 
         # Subquery for input costs
         input_costs = self.get_input_costs_subquery(start_date, end_date)
-        # Ejecutar y mostrar resultados de input_costs
-        input_costs_results = self.db.execute(input_costs.select()).fetchall()
-        print("input_costs results:", input_costs_results)
 
         # Subquery for machinery costs
         machinery_costs = self.get_machinery_costs_subquery(start_date, end_date)
-        # Ejecutar y mostrar resultados de machinery_costs
-        machinery_costs_results = self.db.execute(machinery_costs.select()).fetchall()
-        print("machinery_costs results:", machinery_costs_results)
 
         # Subquery for total costs per farm
         total_costs = self.db.query(
