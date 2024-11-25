@@ -19,13 +19,14 @@ class CurrencyConversionService:
         self.base_url = "https://v6.exchangerate-api.com/v6"
         self._conversion_rates = {}
         self._base_currency = None
+        self._fetch_conversion_rates('COP')
 
-    def _fetch_conversion_rates(self, base_currency: str = 'USD') -> Dict[str, Decimal]:
+    def _fetch_conversion_rates(self, base_currency: str = 'COP') -> Dict[str, Decimal]:
         """
         Obtiene las tasas de conversión actualizadas desde la API
         
         Args:
-            base_currency: Moneda base para las conversiones
+            base_currency: Moneda base para las conversiones (COP por defecto)
             
         Returns:
             Dict[str, Decimal]: Diccionario con las tasas de conversión
@@ -66,7 +67,7 @@ class CurrencyConversionService:
 
     def convert_amount(self, amount: Decimal, from_currency: str, to_currency: str) -> Decimal:
         """
-        Convierte un monto de una moneda a otra
+        Convierte un monto de una moneda a otra usando COP como base
         
         Args:
             amount: Cantidad a convertir
@@ -79,14 +80,26 @@ class CurrencyConversionService:
         if from_currency == to_currency:
             return amount
 
-        # Si no tenemos tasas o la moneda base es diferente, actualizamos las tasas
-        if not self._conversion_rates or self._base_currency != from_currency:
-            self._fetch_conversion_rates(from_currency)
+        # Si no tenemos tasas o necesitamos actualizarlas
+        if not self._conversion_rates:
+            self._fetch_conversion_rates('COP')
+        
+        # Verificar que existan las tasas para ambas monedas
+        for currency in [from_currency, to_currency]:
+            if currency != 'COP' and currency not in self._conversion_rates:
+                raise DomainException(
+                    message=f"No se encontró tasa de conversión para {currency}",
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
 
-        if to_currency not in self._conversion_rates:
-            raise DomainException(
-                message=f"No se encontró tasa de conversión para {to_currency}",
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-
-        return amount * self._conversion_rates[to_currency] 
+        if from_currency == 'COP':
+            # Conversión directa de COP a otra moneda usando la tasa
+            return amount * self._conversion_rates[to_currency]
+        elif to_currency == 'COP':
+            # Conversión de otra moneda a COP
+            return amount / self._conversion_rates[from_currency]
+        else:
+            # Conversión entre dos monedas diferentes a COP
+            # Primero convertimos a COP y luego a la moneda destino
+            amount_in_cop = amount / self._conversion_rates[from_currency]
+            return amount_in_cop * self._conversion_rates[to_currency] 
