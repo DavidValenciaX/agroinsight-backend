@@ -8,6 +8,7 @@ from app.user.domain.schemas import UserInDB
 from app.farm.application.services.farm_service import FarmService
 from app.crop.infrastructure.sql_repository import CropRepository
 from app.plot.infrastructure.sql_repository import PlotRepository
+from app.measurement.application.services.measurement_service import MeasurementService
 
 class RegisterTaskCostsUseCase:
     """Caso de uso para registrar los costos asociados a una tarea cultural."""
@@ -19,6 +20,7 @@ class RegisterTaskCostsUseCase:
         self.farm_service = FarmService(db)
         self.crop_repository = CropRepository(db)
         self.plot_repository = PlotRepository(db)
+        self.measurement_service = MeasurementService(db)
 
     def register_costs(self, task_id: int, farm_id: int, costs: TaskCostsCreate, current_user: UserInDB) -> CostRegistrationResponse:
         """Registra los costos asociados a una tarea cultural.
@@ -50,12 +52,19 @@ class RegisterTaskCostsUseCase:
                 status_code=status.HTTP_403_FORBIDDEN
             )
 
+        # Get default currency if needed
+        default_currency = self.measurement_service.get_default_currency()
+
         labor_cost_registered = False
         inputs_registered = 0
         machinery_registered = 0
 
         # Registrar costo de mano de obra
         if costs.labor_cost:
+            # Set default currency if not provided
+            if costs.labor_cost.moneda_id is None:
+                costs.labor_cost.moneda_id = default_currency.id
+            
             labor_cost_registered = self.costs_repository.create_labor_cost(
                 task_id, costs.labor_cost
             )

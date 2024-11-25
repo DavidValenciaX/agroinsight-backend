@@ -5,6 +5,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.costs.infrastructure.sql_repository import CostsRepository
 from app.farm.infrastructure.sql_repository import FarmRepository
+from app.measurement.application.services.measurement_service import MeasurementService
 from app.measurement.infrastructure.sql_repository import MeasurementRepository
 from app.reports.infrastructure.sql_repository import FinancialReportRepository
 from app.farm.application.services.farm_service import FarmService
@@ -25,6 +26,7 @@ class GenerateFinancialReportUseCase:
         self.costs_repository = CostsRepository(db)
         self.currency_service = CurrencyConversionService(db)
         self.measurement_repository = MeasurementRepository(db)
+        self.measurement_service = MeasurementService(db)
         
     def generate_report(
         self,
@@ -67,7 +69,7 @@ class GenerateFinancialReportUseCase:
             )
 
         # Obtener la moneda por defecto (COP)
-        default_currency = self.repository.get_default_currency()
+        default_currency = self.measurement_service.get_default_currency()
         if not default_currency:
             raise DomainException(
                 message="No se pudo obtener la moneda por defecto",

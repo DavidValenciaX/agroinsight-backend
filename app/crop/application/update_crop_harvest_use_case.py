@@ -26,15 +26,6 @@ class UpdateCropHarvestUseCase:
         self.measurement_service = MeasurementService(db)
         self.measurement_repository = MeasurementRepository(db)
 
-    def get_default_currency_id(self) -> Optional[int]:
-        """Obtiene el ID de la moneda colombiana (COP)."""
-        category = self.measurement_repository.get_unit_category_by_name(self.measurement_service.UNIT_CATEGORY_CURRENCY_NAME)
-        if not category:
-            return None
-            
-        cop_unit = self.measurement_repository.get_unit_of_measure_by_name(self.measurement_service.UNIT_COP)
-        return cop_unit.id if cop_unit else None
-
     def update_harvest(self, crop_id: int, harvest_data: CropHarvestUpdate, current_user: UserInDB) -> SuccessResponse:
         """Actualiza la información de cosecha y venta de un cultivo.
 
@@ -81,13 +72,13 @@ class UpdateCropHarvestUseCase:
 
         # Si no se especifica moneda, usar COP por defecto
         if harvest_data.moneda_id is None:
-            default_currency_id = self.get_default_currency_id()
-            if not default_currency_id:
+            default_currency = self.measurement_service.get_default_currency()
+            if not default_currency:
                 raise DomainException(
                     message="No se pudo obtener la moneda por defecto (COP).",
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-            harvest_data.moneda_id = default_currency_id
+            harvest_data.moneda_id = default_currency.id
 
         # Validar unidades de medida
         for unit_id in [

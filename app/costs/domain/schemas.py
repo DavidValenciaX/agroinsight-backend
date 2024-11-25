@@ -11,13 +11,13 @@ class LaborCostCreate(BaseModel):
         horas_trabajadas (Decimal): Horas trabajadas.
         costo_hora (Decimal): Costo por hora.
         observaciones (Optional[str]): Observaciones adicionales.
-        moneda_id (int): ID de la moneda.
+        moneda_id (Optional[int]): ID de la moneda.
     """
     cantidad_trabajadores: int = Field(..., gt=0)
     horas_trabajadas: Decimal = Field(..., gt=0)
     costo_hora: Decimal = Field(..., gt=0)
     observaciones: Optional[str] = None
-    moneda_id: int
+    moneda_id: Optional[int] = None
 
 class TaskInputCreate(BaseModel):
     """Modelo para la creación de costos de insumos.

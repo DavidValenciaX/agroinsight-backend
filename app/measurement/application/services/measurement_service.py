@@ -3,6 +3,7 @@ from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 
 from app.measurement.infrastructure.orm_models import UnitOfMeasure
+from app.measurement.infrastructure.sql_repository import MeasurementRepository
 
 class MeasurementService:
     """Servicio para gestionar la lógica de negocio relacionada con las medidas.
@@ -177,6 +178,7 @@ class MeasurementService:
             db (Session): Sesión de base de datos SQLAlchemy.
         """
         self.db = db
+        self.measurement_repository = MeasurementRepository(db)
         
     def validate_unit_category(self, unit_of_measure: "UnitOfMeasure", expected_category: str) -> None:
         """Valida que la unidad de medida pertenezca a la categoría esperada.
@@ -196,3 +198,27 @@ class MeasurementService:
                 message=f"La unidad de medida debe ser de tipo {expected_category}.",
                 status_code=status.HTTP_400_BAD_REQUEST
             )
+            
+    def get_default_currency(self) -> UnitOfMeasure:
+        """Obtiene la moneda por defecto (COP)"""
+        # Obtener la categoría de moneda
+        currency_category = self.measurement_repository.get_unit_category_by_name(
+            self.UNIT_CATEGORY_CURRENCY_NAME
+        )
+        if not currency_category:
+            raise DomainException(
+                message="No se encontró la categoría de moneda",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+        # Obtener la moneda COP
+        cop_currency = self.measurement_repository.get_unit_of_measure_by_name(
+            self.UNIT_COP
+        )
+        if not cop_currency:
+            raise DomainException(
+                message="No se encontró la moneda COP",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+        return cop_currency

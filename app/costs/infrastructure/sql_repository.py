@@ -34,7 +34,8 @@ class CostsRepository:
                 cantidad_trabajadores=labor_cost.cantidad_trabajadores,
                 horas_trabajadas=labor_cost.horas_trabajadas,
                 costo_hora=labor_cost.costo_hora,
-                observaciones=labor_cost.observaciones
+                observaciones=labor_cost.observaciones,
+                moneda_id=labor_cost.moneda_id
             )
             self.db.add(new_labor_cost)
             self.db.commit()

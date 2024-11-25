@@ -75,12 +75,3 @@ class FinancialReportRepository:
                     (CulturalTask.fecha_inicio_estimada <= crop.fecha_cosecha)
                 )
             ).all()
-
-    def get_default_currency(self) -> Optional[UnitOfMeasure]:
-        """Obtiene la moneda por defecto (COP)"""
-        return self.db.query(UnitOfMeasure)\
-            .join(UnitCategory)\
-            .filter(
-                UnitCategory.nombre == self.measurement_service.UNIT_CATEGORY_CURRENCY_NAME,
-                UnitOfMeasure.abreviatura == self.measurement_service.UNIT_SYMBOL_COP
-            ).first()

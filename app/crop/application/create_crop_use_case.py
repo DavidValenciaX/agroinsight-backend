@@ -40,30 +40,6 @@ class CreateCropUseCase:
         self.farm_service = FarmService(db)
         self.measurement_service = MeasurementService(db)
         self.measurement_repository = MeasurementRepository(db)
-        
-    def get_default_currency_id(self) -> int:
-        """Obtiene el ID de la moneda por defecto (COP)"""
-        # Obtener la categoría de moneda
-        currency_category = self.measurement_repository.get_unit_category_by_name(
-            self.measurement_service.UNIT_CATEGORY_CURRENCY_NAME
-        )
-        if not currency_category:
-            raise DomainException(
-                message="No se encontró la categoría de moneda",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-            
-        # Obtener la moneda COP
-        cop_currency = self.measurement_repository.get_unit_of_measure_by_name(
-            self.measurement_service.UNIT_COP
-        )
-        if not cop_currency:
-            raise DomainException(
-                message="No se encontró la moneda COP",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-            
-        return cop_currency.id
 
     def create_crop(self, crop_data: CropCreate, current_user: UserInDB) -> SuccessResponse:
         """Crea un nuevo cultivo en la base de datos.
@@ -159,7 +135,7 @@ class CreateCropUseCase:
 
         # Si no se especificó una moneda, usar COP por defecto
         if not crop_data.moneda_id:
-            crop_data.moneda_id = self.get_default_currency_id()
+            crop_data.moneda_id = self.measurement_service.get_default_currency().id
         else:
             # Si se especificó una moneda, validar que sea válida
             if not self.crop_repository.validate_currency(crop_data.moneda_id):
