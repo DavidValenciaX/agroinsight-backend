@@ -222,3 +222,25 @@ class MeasurementService:
             )
             
         return cop_currency
+
+    def get_default_production_unit(self) -> UnitOfMeasure:
+        """Obtiene la unidad por defecto para producción (kilogramo)."""
+        # Obtener la categoría de masa
+        mass_category = self.measurement_repository.get_unit_category_by_name(
+            self.UNIT_CATEGORY_MASS_NAME
+        )
+        if not mass_category:
+            raise DomainException(
+                message="No se encontró la categoría de masa",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        # Obtener la unidad Kilogramo
+        kg_unit = self.measurement_repository.get_unit_of_measure_by_name(
+            self.UNIT_KILOGRAM
+        )
+        if not kg_unit:
+            raise DomainException(
+                message="No se encontró la unidad Kilogramo",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return kg_unit

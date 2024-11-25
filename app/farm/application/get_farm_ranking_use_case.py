@@ -7,6 +7,7 @@ from app.farm.application.services.farm_service import FarmService
 from app.user.domain.schemas import UserInDB
 from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
+from app.measurement.application.services.measurement_service import MeasurementService
 
 class GetFarmRankingUseCase:
     """Caso de uso para obtener el ranking de fincas.
@@ -20,6 +21,7 @@ class GetFarmRankingUseCase:
         self.db = db
         self.farm_repository = FarmRepository(db)
         self.farm_service = FarmService(db)
+        self.measurement_service = MeasurementService(db)
 
     def get_farm_ranking(
         self,
@@ -48,7 +50,7 @@ class GetFarmRankingUseCase:
             # Obtener el rol de administrador
             admin_role = self.farm_service.get_admin_role()
 
-            # Obtener las fincas rankeadas según el tipo
+            # Obtener las fincas rankeadas y la unidad según el tipo
             if ranking_type == FarmRankingType.PROFIT:
                 ranked_farms = self.farm_repository.get_farms_ranked_by_profit(
                     current_user.id,
@@ -57,6 +59,8 @@ class GetFarmRankingUseCase:
                     start_date,
                     end_date
                 )
+                # Obtener la unidad de moneda por defecto
+                unit = self.measurement_service.get_default_currency()
             else:  # PRODUCTION
                 ranked_farms = self.farm_repository.get_farms_ranked_by_production(
                     current_user.id,
@@ -65,6 +69,8 @@ class GetFarmRankingUseCase:
                     start_date,
                     end_date
                 )
+                # Obtener la unidad de producción por defecto
+                unit = self.measurement_service.get_default_production_unit()
 
             # Construir la respuesta
             farm_responses = [
@@ -72,6 +78,8 @@ class GetFarmRankingUseCase:
                     farm_id=farm.id,
                     farm_name=farm.nombre,
                     value=value,
+                    unit_id=unit.id,
+                    unit_abbreviation=unit.abreviatura,
                     ranking_position=position + 1
                 )
                 for position, (farm, value) in enumerate(ranked_farms)

@@ -215,11 +215,15 @@ class FarmRankingResponse(BaseModel):
         farm_id (int): ID de la finca
         farm_name (str): Nombre de la finca
         value (float): Valor por el cual se rankea (ganancias o producción)
+        unit_id (int): ID de la unidad de medida del valor
+        unit_abbreviation (str): Abreviatura de la unidad de medida del valor
         ranking_position (int): Posición en el ranking
     """
     farm_id: int
     farm_name: str
     value: float
+    unit_id: int
+    unit_abbreviation: str
     ranking_position: int = Field(..., gt=0)
 
 class FarmRankingListResponse(BaseModel):
