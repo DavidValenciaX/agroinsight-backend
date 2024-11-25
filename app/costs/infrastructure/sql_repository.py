@@ -7,7 +7,6 @@ from app.costs.infrastructure.orm_models import AgriculturalMachinery
 from app.costs.infrastructure.orm_models import AgriculturalInputCategory
 from app.costs.infrastructure.orm_models import MachineryType
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
 
 class CostsRepository:
     """Repositorio para gestionar las operaciones de base de datos relacionadas con costos.

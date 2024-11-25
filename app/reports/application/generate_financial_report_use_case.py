@@ -341,7 +341,7 @@ class GenerateFinancialReportUseCase:
             finca_nombre=farm.nombre,
             fecha_inicio=start_date,
             fecha_fin=end_date,
-            moneda_simbolo=default_currency.abreviatura,
+            moneda_simbolo=target_currency.abreviatura,
             lotes=plot_financials,
             costo_total=total_farm_cost,
             ingreso_total=total_farm_income,
