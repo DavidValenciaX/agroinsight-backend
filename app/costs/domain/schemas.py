@@ -11,11 +11,13 @@ class LaborCostCreate(BaseModel):
         horas_trabajadas (Decimal): Horas trabajadas.
         costo_hora (Decimal): Costo por hora.
         observaciones (Optional[str]): Observaciones adicionales.
+        moneda_id (int): ID de la moneda.
     """
     cantidad_trabajadores: int = Field(..., gt=0)
     horas_trabajadas: Decimal = Field(..., gt=0)
     costo_hora: Decimal = Field(..., gt=0)
     observaciones: Optional[str] = None
+    moneda_id: int
 
 class TaskInputCreate(BaseModel):
     """Modelo para la creación de costos de insumos.
@@ -106,6 +108,8 @@ class AgriculturalInputResponse(BaseModel):
         unidad_medida_nombre (str): Nombre de la unidad de medida.
         costo_unitario (Decimal): Costo por unidad del insumo.
         stock_actual (Decimal): Cantidad actual en stock.
+        moneda_id (int): ID de la moneda.
+        moneda_simbolo (str): Símbolo de la moneda.
     """
     id: int
     categoria_id: int
@@ -116,6 +120,8 @@ class AgriculturalInputResponse(BaseModel):
     unidad_medida_nombre: str
     costo_unitario: Decimal
     stock_actual: Decimal
+    moneda_id: int
+    moneda_simbolo: str
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -161,6 +167,8 @@ class AgriculturalMachineryResponse(BaseModel):
         modelo (Optional[str]): Modelo de la maquinaria.
         numero_serie (Optional[str]): Número de serie de la maquinaria.
         costo_hora (Decimal): Costo por hora de la maquinaria.
+        moneda_id (int): ID de la moneda.
+        moneda_simbolo (str): Símbolo de la moneda.
     """
     id: int
     tipo_maquinaria_id: int
@@ -170,6 +178,8 @@ class AgriculturalMachineryResponse(BaseModel):
     modelo: Optional[str] = None
     numero_serie: Optional[str] = None
     costo_hora: Decimal
+    moneda_id: int
+    moneda_simbolo: str
 
     model_config = ConfigDict(from_attributes=True)
 

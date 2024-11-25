@@ -14,6 +14,9 @@ class InputSchema(BaseModel):
     unidad_medida_id: int
     unidad_medida_nombre: str
     costo_unitario: Decimal
+    moneda_id: int
+    moneda_simbolo: str
+    stock_actual: Decimal
     cantidad_utilizada: Decimal
     fecha_aplicacion: Optional[date]
     observaciones: Optional[str]
@@ -31,6 +34,8 @@ class MachinerySchema(BaseModel):
     modelo: Optional[str]
     numero_serie: Optional[str]
     costo_hora: Decimal
+    moneda_id: int
+    moneda_simbolo: str
     horas_uso: Decimal
     fecha_uso: Optional[date]
     observaciones: Optional[str]
@@ -43,6 +48,8 @@ class LaborCostSchema(BaseModel):
     cantidad_trabajadores: int
     horas_trabajadas: Decimal
     costo_hora: Decimal
+    moneda_id: int
+    moneda_simbolo: str
     observaciones: Optional[str]
 
     class Config:

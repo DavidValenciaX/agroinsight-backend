@@ -207,7 +207,9 @@ def map_agricultural_input_to_response(input: AgriculturalInput) -> Agricultural
         unidad_medida_id=input.unidad_medida_id,
         unidad_medida_nombre=input.unidad_medida.nombre,
         costo_unitario=input.costo_unitario,
-        stock_actual=input.stock_actual
+        stock_actual=input.stock_actual,
+        moneda_id=input.moneda_id,
+        moneda_simbolo=input.moneda.abreviatura if input.moneda else None
     )
     
 def map_machinery_type_to_response(machinery_type: MachineryType) -> MachineryTypeResponse:
@@ -228,5 +230,7 @@ def map_agricultural_machinery_to_response(machinery: AgriculturalMachinery) -> 
         descripcion=machinery.descripcion,
         modelo=machinery.modelo,
         numero_serie=machinery.numero_serie,
-        costo_hora=machinery.costo_hora
+        costo_hora=machinery.costo_hora,
+        moneda_id=machinery.moneda_id,
+        moneda_simbolo=machinery.moneda.abreviatura if machinery.moneda else None
     )

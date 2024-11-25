@@ -150,6 +150,8 @@ class GenerateFinancialReportUseCase:
                         cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores,
                         horas_trabajadas=task.costo_mano_obra.horas_trabajadas,
                         costo_hora=task.costo_mano_obra.costo_hora,
+                        moneda_id=task.costo_mano_obra.moneda_id,
+                        moneda_simbolo=task.costo_mano_obra.moneda.abreviatura if task.costo_mano_obra.moneda else None,
                         observaciones=task.costo_mano_obra.observaciones
                     ) if task.costo_mano_obra else None,
                     costo_mano_obra=labor_cost,
@@ -162,6 +164,9 @@ class GenerateFinancialReportUseCase:
                         unidad_medida_id=ti.insumo.unidad_medida_id,
                         unidad_medida_nombre=ti.insumo.unidad_medida.nombre,
                         costo_unitario=ti.insumo.costo_unitario,
+                        moneda_id=ti.insumo.moneda_id,
+                        moneda_simbolo=ti.insumo.moneda.abreviatura if ti.insumo.moneda else None,
+                        stock_actual=ti.insumo.stock_actual,
                         cantidad_utilizada=ti.cantidad_utilizada,
                         fecha_aplicacion=ti.fecha_aplicacion,
                         observaciones=ti.observaciones
@@ -176,6 +181,8 @@ class GenerateFinancialReportUseCase:
                         modelo=tm.maquinaria.modelo,
                         numero_serie=tm.maquinaria.numero_serie,
                         costo_hora=tm.maquinaria.costo_hora,
+                        moneda_id=tm.maquinaria.moneda_id,
+                        moneda_simbolo=tm.maquinaria.moneda.abreviatura if tm.maquinaria.moneda else None,
                         horas_uso=tm.horas_uso,
                         fecha_uso=tm.fecha_uso,
                         observaciones=tm.observaciones
@@ -231,6 +238,8 @@ class GenerateFinancialReportUseCase:
                             cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores,
                             horas_trabajadas=task.costo_mano_obra.horas_trabajadas,
                             costo_hora=task.costo_mano_obra.costo_hora,
+                            moneda_id=task.costo_mano_obra.moneda_id,
+                            moneda_simbolo=task.costo_mano_obra.moneda.abreviatura if task.costo_mano_obra.moneda else None,
                             observaciones=task.costo_mano_obra.observaciones
                         ) if task.costo_mano_obra else None,
                         costo_mano_obra=labor_cost,
@@ -243,6 +252,9 @@ class GenerateFinancialReportUseCase:
                             unidad_medida_id=ti.insumo.unidad_medida_id,
                             unidad_medida_nombre=ti.insumo.unidad_medida.nombre,
                             costo_unitario=ti.insumo.costo_unitario,
+                            moneda_id=ti.insumo.moneda_id,
+                            moneda_simbolo=ti.insumo.moneda.abreviatura if ti.insumo.moneda else None,
+                            stock_actual=ti.insumo.stock_actual,
                             cantidad_utilizada=ti.cantidad_utilizada,
                             fecha_aplicacion=ti.fecha_aplicacion,
                             observaciones=ti.observaciones
@@ -257,6 +269,8 @@ class GenerateFinancialReportUseCase:
                             modelo=tm.maquinaria.modelo,
                             numero_serie=tm.maquinaria.numero_serie,
                             costo_hora=tm.maquinaria.costo_hora,
+                            moneda_id=tm.maquinaria.moneda_id,
+                            moneda_simbolo=tm.maquinaria.moneda.abreviatura if tm.maquinaria.moneda else None,
                             horas_uso=tm.horas_uso,
                             fecha_uso=tm.fecha_uso,
                             observaciones=tm.observaciones

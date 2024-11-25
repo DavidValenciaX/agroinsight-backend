@@ -13,9 +13,11 @@ class LaborCost(Base):
     horas_trabajadas = Column(DECIMAL(5,2), nullable=False)
     costo_hora = Column(DECIMAL(10,2), nullable=False)
     observaciones = Column(Text)
+    moneda_id = Column(Integer, ForeignKey("unidad_medida.id"), nullable=False)
 
     # Relación con CulturalTask
     tarea = relationship("CulturalTask", back_populates="costo_mano_obra")
+    moneda = relationship("UnitOfMeasure")
 
     @property
     def costo_total(self) -> Decimal:
@@ -44,11 +46,13 @@ class AgriculturalInput(Base):
     unidad_medida_id = Column(Integer, ForeignKey("unidad_medida.id"), nullable=False)
     costo_unitario = Column(DECIMAL(10,2), nullable=False)
     stock_actual = Column(DECIMAL(10,2), nullable=False, default=0)
+    moneda_id = Column(Integer, ForeignKey("unidad_medida.id"), nullable=False)
 
     # Relaciones
     categoria = relationship("AgriculturalInputCategory", back_populates="insumos")
-    unidad_medida = relationship("UnitOfMeasure")
+    unidad_medida = relationship("UnitOfMeasure", foreign_keys=[unidad_medida_id])
     usos_tarea = relationship("TaskInput", back_populates="insumo")
+    moneda = relationship("UnitOfMeasure", foreign_keys=[moneda_id])
 
 class TaskInput(Base):
     """Modelo de uso de insumo en una tarea."""
@@ -92,10 +96,12 @@ class AgriculturalMachinery(Base):
     modelo = Column(String(100))
     numero_serie = Column(String(100))
     costo_hora = Column(DECIMAL(10,2), nullable=False)
+    moneda_id = Column(Integer, ForeignKey("unidad_medida.id"), nullable=False)
 
     # Relaciones
     tipo_maquinaria = relationship("MachineryType", back_populates="maquinarias")
     usos_tarea = relationship("TaskMachinery", back_populates="maquinaria")
+    moneda = relationship("UnitOfMeasure")
 
 class TaskMachinery(Base):
     """Modelo de uso de maquinaria en una tarea."""
