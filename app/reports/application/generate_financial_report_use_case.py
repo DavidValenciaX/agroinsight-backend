@@ -86,8 +86,8 @@ class GenerateFinancialReportUseCase:
                     status_code=status.HTTP_404_NOT_FOUND
                 )
 
-        # Función auxiliar para convertir montos
-        def convert_amount(amount: Decimal, from_currency: str) -> Decimal:
+        # Function to convert amounts, with default from_currency
+        def convert_amount(amount: Decimal, from_currency: str = default_currency.abreviatura) -> Decimal:
             if not amount:
                 return Decimal(0)
             return self.currency_service.convert_amount(
@@ -131,68 +131,8 @@ class GenerateFinancialReportUseCase:
             total_plot_task_cost = Decimal(0)
 
             for task in plot_tasks:
-                labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
-                # Convertir costos a la moneda objetivo
-                labor_cost = convert_amount(labor_cost, default_currency.abreviatura)
-                input_cost = convert_amount(input_cost, default_currency.abreviatura)
-                machinery_cost = convert_amount(machinery_cost, default_currency.abreviatura)
-                task_total = labor_cost + input_cost + machinery_cost
-                total_plot_task_cost += task_total
-
-                plot_task_costs.append(TaskCost(
-                    tarea_id=task.id,
-                    tarea_nombre=task.nombre,
-                    tipo_labor_nombre=task.tipo_labor.nombre,
-                    nivel="LOTE",
-                    fecha_inicio=task.fecha_inicio_estimada,
-                    fecha_finalizacion=task.fecha_finalizacion,
-                    estado_id=task.estado_id,
-                    estado_nombre=task.estado.nombre,
-                    mano_obra=LaborCostSchema(
-                        cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores,
-                        horas_trabajadas=task.costo_mano_obra.horas_trabajadas,
-                        costo_hora=task.costo_mano_obra.costo_hora,
-                        moneda_id=task.costo_mano_obra.moneda_id,
-                        moneda_simbolo=task.costo_mano_obra.moneda.abreviatura if task.costo_mano_obra.moneda else None,
-                        observaciones=task.costo_mano_obra.observaciones
-                    ) if task.costo_mano_obra else None,
-                    costo_mano_obra=labor_cost,
-                    insumos=[InputSchema(
-                        id=ti.insumo.id,
-                        categoria_id=ti.insumo.categoria_id,
-                        categoria_nombre=ti.insumo.categoria.nombre,
-                        nombre=ti.insumo.nombre,
-                        descripcion=ti.insumo.descripcion,
-                        unidad_medida_id=ti.insumo.unidad_medida_id,
-                        unidad_medida_nombre=ti.insumo.unidad_medida.nombre,
-                        costo_unitario=ti.insumo.costo_unitario,
-                        moneda_id=ti.insumo.moneda_id,
-                        moneda_simbolo=ti.insumo.moneda.abreviatura if ti.insumo.moneda else None,
-                        stock_actual=ti.insumo.stock_actual,
-                        cantidad_utilizada=ti.cantidad_utilizada,
-                        fecha_aplicacion=ti.fecha_aplicacion,
-                        observaciones=ti.observaciones
-                    ) for ti in task.insumos],
-                    costo_insumos=input_cost,
-                    maquinarias=[MachinerySchema(
-                        id=tm.maquinaria.id,
-                        tipo_maquinaria_id=tm.maquinaria.tipo_maquinaria_id,
-                        tipo_maquinaria_nombre=tm.maquinaria.tipo_maquinaria.nombre,
-                        nombre=tm.maquinaria.nombre,
-                        descripcion=tm.maquinaria.descripcion,
-                        modelo=tm.maquinaria.modelo,
-                        numero_serie=tm.maquinaria.numero_serie,
-                        costo_hora=tm.maquinaria.costo_hora,
-                        moneda_id=tm.maquinaria.moneda_id,
-                        moneda_simbolo=tm.maquinaria.moneda.abreviatura if tm.maquinaria.moneda else None,
-                        horas_uso=tm.horas_uso,
-                        fecha_uso=tm.fecha_uso,
-                        observaciones=tm.observaciones
-                    ) for tm in task.maquinarias],
-                    costo_maquinaria=machinery_cost,
-                    costo_total=task_total,
-                    observaciones=task.descripcion
-                ))
+                task_cost = self._create_task_cost(task, "LOTE", convert_amount, target_currency)
+                plot_task_costs.append(task_cost)
 
             # Filtrar tareas del lote según los criterios
             plot_task_costs = filter_task_costs(plot_task_costs)
@@ -219,93 +159,15 @@ class GenerateFinancialReportUseCase:
                 total_crop_task_cost = Decimal(0)
 
                 for task in crop_tasks:
-                    labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
-                    # Convertir costos a la moneda objetivo
-                    labor_cost = convert_amount(labor_cost, default_currency.abreviatura)
-                    input_cost = convert_amount(input_cost, default_currency.abreviatura)
-                    machinery_cost = convert_amount(machinery_cost, default_currency.abreviatura)
-                    task_total = labor_cost + input_cost + machinery_cost
-                    total_crop_task_cost += task_total
-
-                    crop_task_costs.append(TaskCost(
-                        tarea_id=task.id,
-                        tarea_nombre=task.nombre,
-                        tipo_labor_nombre=task.tipo_labor.nombre,
-                        nivel="CULTIVO",
-                        fecha_inicio=task.fecha_inicio_estimada,
-                        fecha_finalizacion=task.fecha_finalizacion,
-                        estado_id=task.estado_id,
-                        estado_nombre=task.estado.nombre,
-                        mano_obra=LaborCostSchema(
-                            cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores,
-                            horas_trabajadas=task.costo_mano_obra.horas_trabajadas,
-                            costo_hora=task.costo_mano_obra.costo_hora,
-                            moneda_id=task.costo_mano_obra.moneda_id,
-                            moneda_simbolo=task.costo_mano_obra.moneda.abreviatura if task.costo_mano_obra.moneda else None,
-                            observaciones=task.costo_mano_obra.observaciones
-                        ) if task.costo_mano_obra else None,
-                        costo_mano_obra=labor_cost,
-                        insumos=[InputSchema(
-                            id=ti.insumo.id,
-                            categoria_id=ti.insumo.categoria_id,
-                            categoria_nombre=ti.insumo.categoria.nombre,
-                            nombre=ti.insumo.nombre,
-                            descripcion=ti.insumo.descripcion,
-                            unidad_medida_id=ti.insumo.unidad_medida_id,
-                            unidad_medida_nombre=ti.insumo.unidad_medida.nombre,
-                            costo_unitario=ti.insumo.costo_unitario,
-                            moneda_id=ti.insumo.moneda_id,
-                            moneda_simbolo=ti.insumo.moneda.abreviatura if ti.insumo.moneda else None,
-                            stock_actual=ti.insumo.stock_actual,
-                            cantidad_utilizada=ti.cantidad_utilizada,
-                            fecha_aplicacion=ti.fecha_aplicacion,
-                            observaciones=ti.observaciones
-                        ) for ti in task.insumos],
-                        costo_insumos=input_cost,
-                        maquinarias=[MachinerySchema(
-                            id=tm.maquinaria.id,
-                            tipo_maquinaria_id=tm.maquinaria.tipo_maquinaria_id,
-                            tipo_maquinaria_nombre=tm.maquinaria.tipo_maquinaria.nombre,
-                            nombre=tm.maquinaria.nombre,
-                            descripcion=tm.maquinaria.descripcion,
-                            modelo=tm.maquinaria.modelo,
-                            numero_serie=tm.maquinaria.numero_serie,
-                            costo_hora=tm.maquinaria.costo_hora,
-                            moneda_id=tm.maquinaria.moneda_id,
-                            moneda_simbolo=tm.maquinaria.moneda.abreviatura if tm.maquinaria.moneda else None,
-                            horas_uso=tm.horas_uso,
-                            fecha_uso=tm.fecha_uso,
-                            observaciones=tm.observaciones
-                        ) for tm in task.maquinarias],
-                        costo_maquinaria=machinery_cost,
-                        costo_total=task_total,
-                        observaciones=task.descripcion
-                    ))
+                    task_cost = self._create_task_cost(task, "CULTIVO", convert_amount, target_currency)
+                    crop_task_costs.append(task_cost)
 
                 # Filtrar tareas del cultivo según los criterios
                 crop_task_costs = filter_task_costs(crop_task_costs)
                 total_crop_task_cost = sum(task.costo_total for task in crop_task_costs)
 
                 # Update crop financials without using costo_produccion
-                crop_financials.append(CropFinancials(
-                    cultivo_id=crop.id,
-                    variedad_maiz=crop.variedad_maiz.nombre,
-                    fecha_siembra=crop.fecha_siembra,
-                    fecha_cosecha=crop.fecha_cosecha,
-                    produccion_total=crop.produccion_total,
-                    produccion_total_unidad_id=crop.produccion_total_unidad_id,
-                    produccion_total_unidad_simbolo=crop.produccion_total_unidad.abreviatura if crop.produccion_total_unidad else None,
-                    cantidad_vendida=crop.cantidad_vendida,
-                    cantidad_vendida_unidad_id=crop.cantidad_vendida_unidad_id,
-                    cantidad_vendida_unidad_simbolo=crop.cantidad_vendida_unidad.abreviatura if crop.cantidad_vendida_unidad else None,
-                    precio_venta_unitario=crop.precio_venta_unitario,
-                    moneda_id=crop.moneda_id,
-                    moneda_simbolo=crop.moneda.abreviatura if crop.moneda else None,
-                    ingreso_total=crop_income,
-                    costo_produccion=total_crop_task_cost,
-                    tareas_cultivo=crop_task_costs,
-                    ganancia_neta=crop_income - total_crop_task_cost
-                ))
+                crop_financials.append(self._create_crop_financials(crop, crop_task_costs, convert_amount, target_currency))
 
             # Filtrar cultivos según criterios
             crop_financials = filter_crops(crop_financials)
@@ -481,3 +343,102 @@ class GenerateFinancialReportUseCase:
 
         # Si no hay agrupación o no se reconoce el tipo
         return tasks
+
+    def _create_task_cost(self, task, nivel: str, convert_amount_func, target_currency) -> TaskCost:
+        """Helper method to create TaskCost with converted currency values"""
+        # Get costs
+        labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
+        # Convert costs to target currency
+        labor_cost = convert_amount_func(labor_cost)
+        input_cost = convert_amount_func(input_cost)
+        machinery_cost = convert_amount_func(machinery_cost)
+        task_total = labor_cost + input_cost + machinery_cost
+
+        return TaskCost(
+            tarea_id=task.id,
+            tarea_nombre=task.nombre,
+            tipo_labor_nombre=task.tipo_labor.nombre,
+            nivel=nivel,
+            fecha_inicio=task.fecha_inicio_estimada,
+            fecha_finalizacion=task.fecha_finalizacion,
+            estado_id=task.estado_id,
+            estado_nombre=task.estado.nombre,
+            mano_obra=LaborCostSchema(
+                cantidad_trabajadores=task.costo_mano_obra.cantidad_trabajadores,
+                horas_trabajadas=task.costo_mano_obra.horas_trabajadas,
+                costo_hora=convert_amount_func(task.costo_mano_obra.costo_hora),
+                moneda_id=target_currency.id,
+                moneda_simbolo=target_currency.abreviatura,
+                observaciones=task.costo_mano_obra.observaciones
+            ) if task.costo_mano_obra else None,
+            costo_mano_obra=labor_cost,
+            insumos=[
+                InputSchema(
+                    id=ti.insumo.id,
+                    categoria_id=ti.insumo.categoria_id,
+                    categoria_nombre=ti.insumo.categoria.nombre,
+                    nombre=ti.insumo.nombre,
+                    descripcion=ti.insumo.descripcion,
+                    unidad_medida_id=ti.insumo.unidad_medida_id,
+                    unidad_medida_nombre=ti.insumo.unidad_medida.nombre,
+                    costo_unitario=convert_amount_func(ti.insumo.costo_unitario),
+                    moneda_id=target_currency.id,
+                    moneda_simbolo=target_currency.abreviatura,
+                    stock_actual=ti.insumo.stock_actual,
+                    cantidad_utilizada=ti.cantidad_utilizada,
+                    fecha_aplicacion=ti.fecha_aplicacion,
+                    observaciones=ti.observaciones
+                ) for ti in task.insumos
+            ],
+            costo_insumos=input_cost,
+            maquinarias=[
+                MachinerySchema(
+                    id=tm.maquinaria.id,
+                    tipo_maquinaria_id=tm.maquinaria.tipo_maquinaria_id,
+                    tipo_maquinaria_nombre=tm.maquinaria.tipo_maquinaria.nombre,
+                    nombre=tm.maquinaria.nombre,
+                    descripcion=tm.maquinaria.descripcion,
+                    modelo=tm.maquinaria.modelo,
+                    numero_serie=tm.maquinaria.numero_serie,
+                    costo_hora=convert_amount_func(tm.maquinaria.costo_hora),
+                    moneda_id=target_currency.id,
+                    moneda_simbolo=target_currency.abreviatura,
+                    horas_uso=tm.horas_uso,
+                    fecha_uso=tm.fecha_uso,
+                    observaciones=tm.observaciones
+                ) for tm in task.maquinarias
+            ],
+            costo_maquinaria=machinery_cost,
+            costo_total=task_total,
+            observaciones=task.descripcion
+        )
+
+    def _create_crop_financials(self, crop, crop_task_costs, convert_amount_func, target_currency) -> CropFinancials:
+        """Helper method to create CropFinancials with converted currency values"""
+        # Convert crop income
+        crop_income = Decimal(0)
+        if crop.cantidad_vendida and crop.precio_venta_unitario:
+            precio_venta_convertido = convert_amount_func(crop.precio_venta_unitario)
+            crop_income = Decimal(crop.cantidad_vendida) * precio_venta_convertido
+
+        total_crop_task_cost = sum(task.costo_total for task in crop_task_costs)
+
+        return CropFinancials(
+            cultivo_id=crop.id,
+            variedad_maiz=crop.variedad_maiz.nombre,
+            fecha_siembra=crop.fecha_siembra,
+            fecha_cosecha=crop.fecha_cosecha,
+            produccion_total=crop.produccion_total,
+            produccion_total_unidad_id=crop.produccion_total_unidad_id,
+            produccion_total_unidad_simbolo=crop.produccion_total_unidad.abreviatura if crop.produccion_total_unidad else None,
+            cantidad_vendida=crop.cantidad_vendida,
+            cantidad_vendida_unidad_id=crop.cantidad_vendida_unidad_id,
+            cantidad_vendida_unidad_simbolo=crop.cantidad_vendida_unidad.abreviatura if crop.cantidad_vendida_unidad else None,
+            precio_venta_unitario=convert_amount_func(crop.precio_venta_unitario) if crop.precio_venta_unitario else None,
+            moneda_id=target_currency.id,
+            moneda_simbolo=target_currency.abreviatura,
+            ingreso_total=crop_income,
+            costo_produccion=total_crop_task_cost,
+            tareas_cultivo=crop_task_costs,
+            ganancia_neta=crop_income - total_crop_task_cost
+        )
