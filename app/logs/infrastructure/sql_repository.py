@@ -16,7 +16,10 @@ class LogRepository:
             log = ActivityLog(
                 usuario_id=log_data.usuario_id,
                 tipo_accion_id=log_data.tipo_accion_id,
+                tipo_accion_nombre=log_data.tipo_accion_nombre,
                 tabla_afectada=log_data.tabla_afectada,
+                endpoint=log_data.endpoint,
+                metodo_http=log_data.metodo_http,
                 registro_id=log_data.registro_id,
                 valor_anterior=log_data.valor_anterior,
                 valor_nuevo=log_data.valor_nuevo,

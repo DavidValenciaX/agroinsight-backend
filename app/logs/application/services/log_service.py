@@ -123,13 +123,31 @@ class LogService:
         print(f"Debug - Usuario ID: {usuario_id}")
         print(f"Debug - User description: {user_description}")
 
-        # Crear la descripción completa
-        full_description = f"{user_description}. {description or ''}"
+        # Obtener el tipo de acción y su nombre
+        action_type_id = self._ensure_action_type_exists(action_type)
+        action_type_name = action_type.value if isinstance(action_type, LogActionType) else str(action_type)
+
+        # Obtener información del endpoint
+        endpoint = str(request.url.path) if request else None
+        http_method = request.method if request else None
+
+        # Crear una descripción más estructurada
+        action_description = description if isinstance(description, str) else "No description provided"
+        full_description = (
+            f"{user_description}\n"
+            f"Endpoint: {endpoint or 'N/A'}\n"
+            f"Método: {http_method or 'N/A'}\n"
+            f"Acción: {action_type_name}\n"
+            f"Descripción: {action_description}"
+        )
 
         log_data = ActivityLogCreate(
-            usuario_id=usuario_id,  # Puede ser None
-            tipo_accion_id=self._ensure_action_type_exists(action_type),
+            usuario_id=usuario_id,
+            tipo_accion_id=action_type_id,
+            tipo_accion_nombre=action_type_name,
             tabla_afectada=table_name,
+            endpoint=endpoint,
+            metodo_http=http_method,
             registro_id=record_id,
             valor_anterior=old_value,
             valor_nuevo=new_value,

@@ -14,7 +14,10 @@ class ActivityLogCreate(BaseModel):
     """Esquema para crear un nuevo log de actividad."""
     usuario_id: Optional[int] = None
     tipo_accion_id: int
+    tipo_accion_nombre: str
     tabla_afectada: str
+    endpoint: Optional[str] = None
+    metodo_http: Optional[str] = None
     registro_id: Optional[int] = None
     valor_anterior: Optional[Dict[str, Any]] = None
     valor_nuevo: Optional[Dict[str, Any]] = None
@@ -28,7 +31,10 @@ class ActivityLogResponse(BaseModel):
     id: int
     usuario_id: int
     tipo_accion_id: int
+    tipo_accion_nombre: str
     tabla_afectada: str
+    endpoint: Optional[str] = None
+    metodo_http: Optional[str] = None
     registro_id: Optional[int] = None
     valor_anterior: Optional[Dict[str, Any]] = None
     valor_nuevo: Optional[Dict[str, Any]] = None
