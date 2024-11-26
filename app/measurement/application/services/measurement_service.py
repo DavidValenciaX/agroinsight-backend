@@ -81,7 +81,7 @@ class MeasurementService:
     UNIT_SEEDS_PER_HECTARE = "Semillas por hectárea"
     UNIT_SEEDS_PER_SQUARE_METER = "Semillas por metro cuadrado"
 
-    # Unidades de Moneda
+    # Unidades de Moneda básicas
     UNIT_COP = "Peso Colombiano"
     UNIT_MXN = "Peso Mexicano"
     UNIT_USD = "Dólar Estadounidense"

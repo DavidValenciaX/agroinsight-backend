@@ -24,7 +24,7 @@ El endpoint de reportes financieros permite generar informes detallados sobre lo
 - `max_cost` (float): Muestra solo las tareas con costo total menor o igual a este valor
 - `task_types` (List[str]): Lista de tipos de tareas específicas a incluir
 - `only_profitable` (bool): Si es True, solo muestra elementos con ganancia positiva
-- `currency_id` (int): ID de la moneda en la que se desea el reporte. Si no se especifica, se usa COP.
+- `currency` (str): Símbolo de la moneda en la que se desea el reporte (ej: COP, USD, EUR). Si no se especifica, se usa COP.
 
 ### Parámetros de Agrupación
 
@@ -94,7 +94,7 @@ El sistema calcula tres tipos principales de costos:
 ## Ejemplo de Uso
 
 ```http
-GET /reports/financial?farm_id=1&start_date=2024-01-01&end_date=2024-12-31&group_by=month&min_cost=100&only_profitable=true
+GET /reports/financial?farm_id=1&start_date=2024-01-01&end_date=2024-12-31&group_by=month&min_cost=100&only_profitable=true&currency=USD
 ```
 
 Este ejemplo generaría un reporte:
@@ -103,12 +103,14 @@ Este ejemplo generaría un reporte:
 - Agrupado por meses
 - Solo mostrando tareas con costo mayor a 100
 - Incluyendo solo elementos rentables
+- En moneda USD
 
 ## Consideraciones Técnicas
 
 - Los cálculos monetarios se realizan usando el tipo Decimal para evitar errores de redondeo
 - Las fechas se manejan en formato ISO (YYYY-MM-DD)
-- Los resultados se devuelven en la moneda predeterminada del sistema (COP)
+- Los resultados se devuelven en la moneda especificada por el parámetro `currency` (por defecto COP)
+- El sistema realiza automáticamente la conversión de monedas según las tasas configuradas
 - El sistema maneja automáticamente la conversión de tipos de datos
 
 ## Casos de Uso Comunes
