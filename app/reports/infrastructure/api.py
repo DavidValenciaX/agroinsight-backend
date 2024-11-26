@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.orm import Session
 from datetime import date
-from typing import Optional, List
+from typing import Optional, List, Union
 from enum import Enum
 from app.infrastructure.db.connection import getDb
 from app.infrastructure.security.jwt_middleware import get_current_user
@@ -42,7 +42,10 @@ async def generate_financial_report(
         description="Criterio de agrupación (solo se permite un valor)"
     ),
     only_profitable: Optional[bool] = None,
-    currency_id: Optional[int] = None,
+    currency: Optional[str] = Query(
+        default="COP",
+        description="Símbolo de la moneda (ej: COP, USD, EUR)"
+    ),
     db: Session = Depends(getDb),
     current_user: UserInDB = Depends(get_current_user)
 ) -> FarmFinancialReport:
@@ -60,7 +63,7 @@ async def generate_financial_report(
     - task_types: Lista de tipos de tareas a incluir
     - group_by: Criterio único de agrupación para el reporte
     - only_profitable: Si es True, solo incluye elementos con ganancia positiva
-    - currency_id: ID de la moneda en la que se desea ver el informe (opcional, por defecto COP)
+    - currency: Símbolo de la moneda (ej: COP, USD, EUR)
     """
     if isinstance(group_by, list):
         group_by = group_by[0] if group_by else ReportGroupBy.NONE
@@ -77,6 +80,6 @@ async def generate_financial_report(
         task_types=task_types,
         group_by=group_by,
         only_profitable=only_profitable,
-        currency_id=currency_id,
+        currency=currency.upper() if currency else "COP",
         current_user=current_user
     )

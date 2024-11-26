@@ -40,7 +40,7 @@ class GenerateFinancialReportUseCase:
         task_types: Optional[List[str]] = None,
         group_by: str = "none",
         only_profitable: Optional[bool] = None,
-        currency_id: Optional[int] = None,
+        currency: Optional[str] = "COP",
         current_user: UserInDB = None
     ) -> FarmFinancialReport:
         """
@@ -52,6 +52,7 @@ class GenerateFinancialReportUseCase:
             end_date: Fecha fin del período
             plot_id: ID del lote (opcional, para filtrar por lote)
             crop_id: ID del cultivo (opcional, para filtrar por cultivo)
+            currency: Símbolo de la moneda (ej: COP, USD, EUR)
             current_user: Usuario actual
         """
         # Validar permisos
@@ -78,11 +79,11 @@ class GenerateFinancialReportUseCase:
 
         # Obtener la moneda solicitada o usar COP por defecto
         target_currency = default_currency
-        if currency_id:
-            target_currency = self.measurement_repository.get_unit_of_measure_by_id(currency_id)
+        if currency and currency != default_currency.abreviatura:
+            target_currency = self.measurement_repository.get_unit_by_symbol(currency)
             if not target_currency:
                 raise DomainException(
-                    message="Moneda no encontrada",
+                    message=f"Moneda {currency} no encontrada",
                     status_code=status.HTTP_404_NOT_FOUND
                 )
 

@@ -87,3 +87,14 @@ class MeasurementRepository:
             Optional[UnitCategory]: La categoría de unidad de medida si se encuentra, None en caso contrario.
         """
         return self.db.query(UnitCategory).filter(UnitCategory.nombre == unit_category_name).first()
+
+    def get_unit_by_symbol(self, symbol: str) -> Optional[UnitOfMeasure]:
+        """Obtiene una unidad de medida por su símbolo/abreviatura.
+
+        Args:
+            symbol (str): Símbolo o abreviatura de la unidad de medida.
+
+        Returns:
+            Optional[UnitOfMeasure]: La unidad de medida si se encuentra, None en caso contrario.
+        """
+        return self.db.query(UnitOfMeasure).filter(UnitOfMeasure.abreviatura == symbol).first()
