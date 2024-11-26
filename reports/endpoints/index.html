@@ -2360,7 +2360,7 @@
 - task_types: Lista de tipos de tareas a incluir
 - group_by: Criterio único de agrupación para el reporte
 - only_profitable: Si es True, solo incluye elementos con ganancia positiva
-- currency_id: ID de la moneda en la que se desea ver el informe (opcional, por defecto COP)</p>
+- currency: Símbolo de la moneda (ej: COP, USD, EUR)</p>
 
             <details class="quote">
               <summary>Source code in <code>app\reports\infrastructure\api.py</code></summary>
@@ -2422,7 +2422,10 @@
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/financial&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">FarmFinancialReport</span><span class="p">)</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/financial&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">FarmFinancialReport</span><span class="p">)</span>
 <span class="nd">@log_activity</span><span class="p">(</span>
     <span class="n">action_type</span><span class="o">=</span><span class="n">LogActionType</span><span class="o">.</span><span class="n">GENERATE_REPORT</span><span class="p">,</span>
     <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;finca&quot;</span><span class="p">,</span>
@@ -2443,7 +2446,10 @@
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Criterio de agrupación (solo se permite un valor)&quot;</span>
     <span class="p">),</span>
     <span class="n">only_profitable</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">currency_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">currency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;COP&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Símbolo de la moneda (ej: COP, USD, EUR)&quot;</span>
+    <span class="p">),</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">getDb</span><span class="p">),</span>
     <span class="n">current_user</span><span class="p">:</span> <span class="n">UserInDB</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FarmFinancialReport</span><span class="p">:</span>
@@ -2461,7 +2467,7 @@
 <span class="sd">    - task_types: Lista de tipos de tareas a incluir</span>
 <span class="sd">    - group_by: Criterio único de agrupación para el reporte</span>
 <span class="sd">    - only_profitable: Si es True, solo incluye elementos con ganancia positiva</span>
-<span class="sd">    - currency_id: ID de la moneda en la que se desea ver el informe (opcional, por defecto COP)</span>
+<span class="sd">    - currency: Símbolo de la moneda (ej: COP, USD, EUR)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">group_by</span> <span class="o">=</span> <span class="n">group_by</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">group_by</span> <span class="k">else</span> <span class="n">ReportGroupBy</span><span class="o">.</span><span class="n">NONE</span>
@@ -2478,7 +2484,7 @@
         <span class="n">task_types</span><span class="o">=</span><span class="n">task_types</span><span class="p">,</span>
         <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,</span>
         <span class="n">only_profitable</span><span class="o">=</span><span class="n">only_profitable</span><span class="p">,</span>
-        <span class="n">currency_id</span><span class="o">=</span><span class="n">currency_id</span><span class="p">,</span>
+        <span class="n">currency</span><span class="o">=</span><span class="n">currency</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">if</span> <span class="n">currency</span> <span class="k">else</span> <span class="s2">&quot;COP&quot;</span><span class="p">,</span>
         <span class="n">current_user</span><span class="o">=</span><span class="n">current_user</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>

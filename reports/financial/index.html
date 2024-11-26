@@ -2758,7 +2758,7 @@
 <li><code>max_cost</code> (float): Muestra solo las tareas con costo total menor o igual a este valor</li>
 <li><code>task_types</code> (List[str]): Lista de tipos de tareas específicas a incluir</li>
 <li><code>only_profitable</code> (bool): Si es True, solo muestra elementos con ganancia positiva</li>
-<li><code>currency_id</code> (int): ID de la moneda en la que se desea el reporte. Si no se especifica, se usa COP.</li>
+<li><code>currency</code> (str): Símbolo de la moneda en la que se desea el reporte (ej: COP, USD, EUR). Si no se especifica, se usa COP.</li>
 </ul>
 <h3 id="parametros-de-agrupacion">Parámetros de Agrupación</h3>
 <ul>
@@ -2829,7 +2829,7 @@
 <li>Registra la actividad en los logs del sistema</li>
 </ul>
 <h2 id="ejemplo-de-uso">Ejemplo de Uso</h2>
-<div class="highlight"><pre><span></span><code><span class="err">GET /reports/financial?farm_id=1&amp;start_date=2024-01-01&amp;end_date=2024-12-31&amp;group_by=month&amp;min_cost=100&amp;only_profitable=true</span>
+<div class="highlight"><pre><span></span><code><span class="err">GET /reports/financial?farm_id=1&amp;start_date=2024-01-01&amp;end_date=2024-12-31&amp;group_by=month&amp;min_cost=100&amp;only_profitable=true&amp;currency=USD</span>
 </code></pre></div>
 <p>Este ejemplo generaría un reporte:</p>
 <ul>
@@ -2837,12 +2837,14 @@
 <li>Agrupado por meses</li>
 <li>Solo mostrando tareas con costo mayor a 100</li>
 <li>Incluyendo solo elementos rentables</li>
+<li>En moneda USD</li>
 </ul>
 <h2 id="consideraciones-tecnicas">Consideraciones Técnicas</h2>
 <ul>
 <li>Los cálculos monetarios se realizan usando el tipo Decimal para evitar errores de redondeo</li>
 <li>Las fechas se manejan en formato ISO (YYYY-MM-DD)</li>
-<li>Los resultados se devuelven en la moneda predeterminada del sistema (COP)</li>
+<li>Los resultados se devuelven en la moneda especificada por el parámetro <code>currency</code> (por defecto COP)</li>
+<li>El sistema realiza automáticamente la conversión de monedas según las tasas configuradas</li>
 <li>El sistema maneja automáticamente la conversión de tipos de datos</li>
 </ul>
 <h2 id="casos-de-uso-comunes">Casos de Uso Comunes</h2>
