@@ -40,9 +40,7 @@ class PlotRepository:
                 unidad_area_id=plot_data.unidad_area_id,
                 latitud=plot_data.latitud,
                 longitud=plot_data.longitud,
-                finca_id=plot_data.finca_id,
-                costos_mantenimiento=plot_data.costos_mantenimiento,
-                moneda_id=plot_data.moneda_id
+                finca_id=plot_data.finca_id
             )
             self.db.add(new_plot)
             self.db.commit()
