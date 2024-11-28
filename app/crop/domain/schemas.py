@@ -41,14 +41,14 @@ class CropResponse(BaseModel):
         estado_id (int): ID del estado del cultivo.
         fecha_cosecha (Optional[date]): Fecha de cosecha del cultivo, si está disponible.
         produccion_total (Optional[int]): Producción total del cultivo, si está disponible.
-        produccion_total_unidad_id (Optional[int]): ID de la unidad de medida de la producción total, si está disponible.
-        precio_venta_unitario (Optional[Decimal]): Precio de venta unitario del cultivo, si está disponible.
-        cantidad_vendida (Optional[int]): Cantidad vendida del cultivo, si está disponible.
-        cantidad_vendida_unidad_id (Optional[int]): ID de la unidad de medida de la cantidad vendida, si está disponible.
-        ingreso_total (Optional[Decimal]): Ingreso total generado por la venta del cultivo, si está disponible.
-        costo_produccion (Optional[Decimal]): Costo de producción del cultivo, si está disponible.
-        moneda_id (Optional[int]): ID de la moneda utilizada, si está disponible.
-        fecha_venta (Optional[date]): Fecha de venta del cultivo, si está disponible.
+        produccion_total_unidad_id (Optional[int]): ID de la unidad de medida de la producción total.
+        precio_venta_unitario (Optional[Decimal]): Precio de venta unitario del cultivo.
+        cantidad_vendida (Optional[int]): Cantidad vendida del cultivo.
+        cantidad_vendida_unidad_id (Optional[int]): ID de la unidad de medida de la cantidad vendida.
+        ingreso_total (Optional[Decimal]): Ingreso total generado por la venta del cultivo.
+        costo_produccion (Optional[Decimal]): Costo de producción del cultivo.
+        moneda_id (Optional[int]): ID de la moneda utilizada.
+        fecha_venta (Optional[date]): Fecha de venta del cultivo.
     """
     id: int
     lote_id: int
@@ -58,16 +58,16 @@ class CropResponse(BaseModel):
     densidad_siembra: int
     densidad_siembra_unidad_id: int
     estado_id: int
-    fecha_cosecha: Optional[date]
-    produccion_total: Optional[int]
-    produccion_total_unidad_id: Optional[int]
-    precio_venta_unitario: Optional[Decimal]
-    cantidad_vendida: Optional[int]
-    cantidad_vendida_unidad_id: Optional[int]
-    ingreso_total: Optional[Decimal]
-    costo_produccion: Optional[Decimal]
-    moneda_id: Optional[int]
-    fecha_venta: Optional[date]
+    fecha_cosecha: Optional[date] = None
+    produccion_total: Optional[int] = None
+    produccion_total_unidad_id: Optional[int] = None
+    precio_venta_unitario: Optional[Decimal] = None
+    cantidad_vendida: Optional[int] = None
+    cantidad_vendida_unidad_id: Optional[int] = None
+    ingreso_total: Optional[Decimal] = None
+    costo_produccion: Optional[Decimal] = None
+    moneda_id: Optional[int] = None
+    fecha_venta: Optional[date] = None
 
     model_config = ConfigDict(from_attributes=True)
 

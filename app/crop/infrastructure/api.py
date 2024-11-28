@@ -19,6 +19,8 @@ from app.crop.application.list_crops_by_plot_use_case import ListCropsByPlotUseC
 from app.crop.application.update_crop_harvest_use_case import UpdateCropHarvestUseCase
 from app.logs.application.services.log_service import LogActionType
 from app.logs.application.decorators.log_decorator import log_activity
+from app.crop.application.get_crop_by_id_use_case import GetCropByIdUseCase
+from app.crop.domain.schemas import CropResponse
 
 router = APIRouter(tags=["crop"])
 
@@ -180,6 +182,44 @@ async def update_crop_harvest(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno al actualizar la información de cosecha: {str(e)}"
         ) from e
+
+@router.get("/crops/{crop_id}", response_model=CropResponse)
+@log_activity(
+    action_type=LogActionType.VIEW,
+    table_name="cultivo",
+    description="Consulta de detalles de un cultivo específico",
+    get_record_id=lambda *args, **kwargs: kwargs.get('crop_id')
+)
+async def get_crop_by_id(
+    crop_id: int,
+    request: Request,
+    db: Session = Depends(getDb),
+    current_user: UserInDB = Depends(get_current_user)
+) -> CropResponse:
+    """
+    Obtiene los detalles de un cultivo específico.
+
+    Parameters:
+        crop_id (int): ID del cultivo a consultar.
+        db (Session): Sesión de base de datos.
+        current_user (UserInDB): Usuario actual autenticado.
+
+    Returns:
+        CropResponse: Detalles del cultivo.
+
+    Raises:
+        HTTPException: Si ocurre un error al obtener el cultivo.
+    """
+    get_crop_use_case = GetCropByIdUseCase(db)
+    try:
+        return get_crop_use_case.get_crop(crop_id, current_user)
+    except DomainException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al obtener el cultivo: {str(e)}"
+        )
 
 
 

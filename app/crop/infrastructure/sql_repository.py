@@ -198,7 +198,13 @@ class CropRepository:
         Returns:
             Optional[Crop]: El cultivo si se encuentra, None en caso contrario.
         """
-        return self.db.query(Crop).filter(Crop.id == crop_id).first()
+        return self.db.query(Crop)\
+            .options(joinedload(Crop.variedad_maiz))\
+            .options(joinedload(Crop.produccion_total_unidad))\
+            .options(joinedload(Crop.cantidad_vendida_unidad))\
+            .options(joinedload(Crop.moneda))\
+            .filter(Crop.id == crop_id)\
+            .first()
 
     def update_production_cost(self, crop_id: int, additional_cost: Decimal) -> bool:
         """Actualiza el costo de producción de un cultivo sumando el nuevo costo.

@@ -13,6 +13,7 @@ from app.infrastructure.common.common_exceptions import DomainException
 from fastapi import status
 from app.user.infrastructure.sql_repository import UserRepository
 from app.cultural_practices.infrastructure.sql_repository import CulturalPracticesRepository
+from app.crop.domain.schemas import CropResponse
 
 class ListCropsByPlotUseCase:
     """Caso de uso para listar los cultivos de un lote específico.
@@ -107,24 +108,35 @@ class ListCropsByPlotUseCase:
         # Obtener los cultivos
         total_crops, crops = self.crop_repository.get_crops_by_plot_id_paginated(plot_id, page, per_page)
         
-        # Agregar los campos de ingreso total y costo de producción
+        # Convertir los cultivos a CropResponse y agregar los campos calculados
+        crop_responses = []
         for crop in crops:
-            crop.ingreso_total = crop.precio_venta_unitario * crop.cantidad_vendida if crop.precio_venta_unitario and crop.cantidad_vendida else None
+            # Calcular ingreso total
+            ingreso_total = None
+            if crop.cantidad_vendida and crop.precio_venta_unitario:
+                ingreso_total = Decimal(crop.cantidad_vendida) * crop.precio_venta_unitario
             
+            # Calcular costo de producción
             crop_tasks = self.cultural_practices_repository.get_tasks_by_crop_id(crop.id)
             total_crop_task_cost = Decimal(0)
             
             for task in crop_tasks:
-                labor_cost, input_cost, machinery_cost = self.costs_repository.get_task_costs(task.id)
+                labor_cost = self.costs_repository.get_labor_cost(task.id)
+                input_cost = self.costs_repository.get_task_inputs_cost(task.id)
+                machinery_cost = self.costs_repository.get_task_machinery_cost(task.id)
                 task_total = labor_cost + input_cost + machinery_cost
                 total_crop_task_cost += task_total
             
-            crop.costo_produccion = total_crop_task_cost if total_crop_task_cost else None
+            # Crear CropResponse con los campos calculados
+            crop_response = CropResponse.model_validate(crop)
+            crop_response.ingreso_total = ingreso_total
+            crop_response.costo_produccion = total_crop_task_cost if total_crop_task_cost > 0 else None
+            crop_responses.append(crop_response)
         
         total_pages = ceil(total_crops / per_page)
         
         return PaginatedCropListResponse(
-            crops=crops,
+            crops=crop_responses,  # Usar la lista de CropResponse
             total_crops=total_crops,
             page=page,
             per_page=per_page,
